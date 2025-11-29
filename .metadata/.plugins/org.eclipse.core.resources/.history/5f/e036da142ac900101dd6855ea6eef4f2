@@ -1,0 +1,22 @@
+package com.aashdit.common.service;
+
+
+import java.util.List;
+
+import com.aashdit.common.model.State;
+import com.aashdit.framework.core.ServiceOutcome;
+
+public interface StateService {
+
+    ServiceOutcome<List<State>> getAllState(Boolean includeDeleted);
+
+    ServiceOutcome<State> getById(Long stateId);
+
+    ServiceOutcome<List<State>> search(State searchParams);
+
+    ServiceOutcome<State> saveState(State state);
+
+    ServiceOutcome<State> updateState(State state);
+
+    ServiceOutcome<State> deleteState(Long stateId);
+}

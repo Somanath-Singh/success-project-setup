@@ -1,0 +1,35 @@
+package com.aashdit.prod.heads.common.service;
+
+import java.util.List;
+
+import com.aashdit.prod.heads.common.dto.BankBranchDTO;
+import com.aashdit.prod.heads.common.dto.FinancialYearMasterDto;
+import com.aashdit.prod.heads.common.model.BankBranchMaster;
+import com.aashdit.prod.heads.common.model.BankMaster;
+import com.aashdit.prod.heads.common.model.FinancialYear;
+import com.aashdit.prod.heads.framework.core.ServiceOutcome;
+
+public interface CoreMasterService {
+
+	ServiceOutcome<FinancialYear> saveFinancialYear(FinancialYearMasterDto financialYear);
+
+	ServiceOutcome<List<FinancialYear>> getAllFinancialYear();
+
+	ServiceOutcome<FinancialYear> editFinancialYear(Long finYrId);
+
+	List<FinancialYear> findByFynYear(String finYear);
+
+	List<BankMaster> getAllBankList();
+
+	ServiceOutcome<BankBranchMaster> saveBankBranch(BankBranchDTO bankBranchDto);
+
+	ServiceOutcome<BankBranchMaster> editBanBranch(Long bankBranchId);
+
+	List<BankBranchMaster> getAllBankBranchList();
+
+	List<BankBranchMaster> findByIfscCode(String ifscCode);
+
+	BankBranchMaster findBranchByIfscCode(String ifscCode);
+
+
+}

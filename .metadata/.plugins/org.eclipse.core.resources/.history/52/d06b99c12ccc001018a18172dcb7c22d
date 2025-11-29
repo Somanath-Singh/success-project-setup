@@ -1,0 +1,602 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+	
+	<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+	
+<div class="card mt-3">
+	<div class="card-header"><h5 class="card-title">Add UC</h5></div>
+    <div class="card-body">
+        <!-- ======== Select Building ======== -->
+  		<div class="row">
+			<div class="col-md-12">
+        		<form action="${contextPath}/uc/save-uc-record" method="post" id="submitForm" enctype="multipart/form-data">
+	                <input type="hidden" id="ucId" name="ucId" value="">
+	                <!-- <input type="hidden" id="buildingId" name="buildingId" value=""> -->
+	        		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+        			<div class="row">
+            			<div class="col-md-3">
+			                <div class="form-group">
+			                    <label class="smallInput required" for="financialYearId">Select Building</label>
+			                    <select class="form-control form-control-sm form-select" id="buildingId" name="buildingId" onchange="LoadWorkOrderValue(this.value);">
+			                        <option value="0">- Select -</option>
+			                        <c:forEach items="${buildings}" var="building">
+			                            <option value="${building.buildingMaster.buildingId}" ${building.buildingMaster.buildingId eq editRecords.buildingId ? 'selected' : ''}>
+			                                ${building.buildingName}
+			                            </option>
+			                        </c:forEach>
+			                    </select>
+			                </div>
+                		</div>
+                		<div class="col-md-1 ">
+		                    <label class="d-block" for="">&nbsp;</label>
+					        <button type="button" class="btn btn-success btn-sm" onclick="addUcRecordRow()">
+					            <i class="fa fa-plus"></i>
+					        </button>
+					    </div>
+            		</div>
+					<div id="appendUcRecord">
+						<c:choose>
+						    <c:when test="${not empty editRecords}">
+						        <c:forEach var="fund" items="${editRecords.listOfUcDto}" varStatus="loop">
+						            <div class="row workOrderRow" id="ucRecordsContainer${loop.index}">
+						                <input type="hidden" id="ucId${loop.index}" name="listOfUcDto[${loop.index}].ucId" value="${fund.ucId}">
+						                <!-- ======== Work Order Value ======== -->
+						                <div class="col-md-3">
+						                    <div class="form-group">
+						                        <label class="required" for="workOrderValue${loop.index}">Work Order Value :</label>
+						                        <input 
+						                            type="text"
+						                            id="workOrderValue${loop.index}"
+						                            name="listOfUcDto[${loop.index}].workOrderAmount"
+						                            value="${fund.workOrderAmount}"
+						                            class="form-control form-control-sm"
+						                            readonly
+						                        >
+						                    </div>
+						                </div>
+						
+						                <!-- ======== Cummulative Amount ======== -->
+						                <div class="col-md-3">
+						                    <div class="form-group">
+						                        <label class="required" for="cummulativeAmount${loop.index}">Cummulative Amount :</label>
+						                        <input 
+						                            type="number" maxlength="10"
+						                            id="cummulativeAmount${loop.index}"
+						                            name="listOfUcDto[${loop.index}].cumulativeAmount"
+						                            value="${fund.cumulativeAmount}"
+						                            class="form-control form-control-sm"
+						                        >
+						                    </div>
+						                </div>
+						
+						                <!-- ======== UC Submission Date ======== -->
+						                <div class="col-md-2">
+						                    <div class="form-group">
+						                        <label class="required" for="submissionDate${loop.index}">UC Submission Date :</label>
+						                        <input 
+						                            type="date"
+						                            class="form-control"
+						                            name="listOfUcDto[${loop.index}].ucSubmissionDate"
+						                            id="submissionDate${loop.index}"
+						                            value="${fund.ucSubmissionDate}"
+						                            required
+						                        />
+						                    </div>
+						                </div>
+						
+						                <!-- ======== UC Document ======== -->
+						               	<div class="col-md-3">
+								            <label class="required" for="ucDocument${loop.index}">UC Document :</label>
+								            <div class="col-md-12 position-relative">
+								            	<input 
+						                           type="file"
+						                           id="ucDocument${loop.index}"
+						                           name="listOfUcDto[${loop.index}].ucDocument"
+						                           class="form-control form-control-sm"
+						                           accept=".pdf,.doc,.docx"
+						                           onchange="uploadFileCheck(this)"
+						                           <c:if test="${not empty fund.ucDocumentPath}">data-existing="true"</c:if>>
+								               <c:if test="${not empty fund.ucDocumentPath}">
+										            <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top: 1px;padding: 6px 10px;" onclick="viewDocument('${fund.ucDocumentPath}','BAMS_UC_DOCUMENT')" title="Download Document">
+										                <i class="fa fa-download"></i>
+										            </button> <span style="font-size: 10px;color: #7b3f00;font-weight: 600;">${fund.ucDocumentPath}</span>
+										        </c:if>
+								            </div>
+							          	</div>
+						                
+						                
+					                  	
+				                		<div class="col-md-1 ">
+						                    <label class="d-block" for="">&nbsp;</label>
+						                    <button type="button" class="btn btn-danger btn-sm" onclick="removeUcRecordRow(${loop.index})">
+						                        <i class="fa fa-trash"></i>
+						                    </button>
+					                	</div>
+					            	</div>
+						        </c:forEach>
+						    </c:when>
+						
+								<c:otherwise>
+						            <div class="row workOrderRow" id="ucRecordsContainer0">
+						            <!-- ======== Work Order Value ======== -->
+						            <div class="col-md-3">
+									    <div class="form-group">
+									        <label class="required" for="workOrderValue">Work Order Value :</label>
+									        <input 
+									            type="text" 
+									            id="workOrderValue0" 
+						                        name="listOfUcDto[0].workOrderAmount" 
+									            value="${work}"
+									            class="form-control form-control-sm" 
+									            readonly
+									        >
+									    </div>
+									</div>
+						
+						            <!-- ======== Cummulative Amount ======== -->
+						            <div class="col-md-3">
+						                <div class="form-group">
+						                    <label class="required" for="blockId">Cummulative Amount :</label>
+						                    <input 
+									            type="number" maxlength="10"
+									           id="cummulativeAmount0" 
+						                       name="listOfUcDto[0].cumulativeAmount"
+									            value="" 
+									            class="form-control form-control-sm text-end" 
+									        >
+						                </div>
+						            </div>
+						            <!-- ======== Uc Submisiion Date ======== -->
+						            <div class="col-md-2">
+						                <div class="form-group">
+						                    <label class="required" for="submissionDate">Uc Submisiion Date :</label>
+						                    <input type="date"
+						                           class="form-control"
+						                           name="listOfUcDto[0].ucSubmissionDate"
+						                           id="submissionDate0"
+						                           value=""
+						                           required />
+						                </div>
+						            </div>
+						            <!-- ======== UC Document ======== -->
+						            
+						            <div class="col-md-3">
+						                <div class="form-group">
+						                    <label class="required" for="gpId">UC Document :</label>
+						                    <input type="file"
+								                id="ucDocument0"
+						                           name="listOfUcDto[0].ucDocument"
+								               class="form-control form-control-sm"
+								               accept=".pdf,.doc,.docx"
+								               onchange="uploadFileCheck(this)"/>
+						                </div>
+						            </div>
+					            </div>
+				            </c:otherwise>
+				        </c:choose>
+            		</div>
+            	</form>
+            </div>
+		    <div class="col-12 text-end mt-3">
+		      	<c:choose>
+				    <c:when test="${empty editRecords}">
+				        <button type="button" class="btn btn-primary btn-sm" onclick="submitPlanningForm('Save')">
+				            <i class="fa fa-save me-1"></i> Save
+				        </button>
+				    </c:when>
+				
+				    <c:otherwise>
+				        <button type="button" class="btn btn-success btn-sm" onclick="submitPlanningForm('Update')">
+				            <i class="fa fa-save me-1"></i> Update
+				        </button>
+				    </c:otherwise>
+				</c:choose>
+	      		<button type="reset" class="btn btn-secondary btn-sm">
+	        		<i class="fa fa-undo me-1"></i> Reset
+	      		</button>
+	    	</div>
+	  	</div>
+	</div>
+</div>
+<div class="card mt-3">
+	<div class="card-header"><h5 class="card-title">UC List</h5></div>
+	<div class="card-body">
+		<div class="table-responsive ">
+			<table class="table table-bordered exportbtn">
+				<thead>
+					<tr>
+						<th class="text-center" style="width:60px;">Sl No.</th>
+						<th class="">Building Name</th>
+						<th class="">Work Order Value</th>
+						<th class="">Cumulative Value</th>
+						<th class="">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach items="${Distrincts}" var="record" varStatus="loop">
+						<tr>
+							<td class="text-center">${loop.index + 1}</td>
+							<td class="">${record.buildingName }</td>
+							<td class="">${record.workOrderAmount }</td>
+							<td class="">${record.cumulativeAmount }</td>
+							<td class="tdbuttons-small">
+								<div class="d-flex gap-2">
+									
+									<button class="btn btn-primary" title="Edit"
+										onclick="editRecord(${record.buildingId})"> <i class="fa fa-edit"></i></a>
+									</button>
+								</div>
+							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+
+<form action="${contextPath}/uc/editRecord" method="Post" id="editForm">
+	<input type="hidden" id="ucCipherText" name="cipherText"> 
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" id="editBuildingId" name="buildingId">
+</form>
+
+
+<Script>
+
+function getTotalCumulativeAmount() {
+    let rowCount = $("#appendUcRecord .workOrderRow").length;
+    let total = 0;
+
+    for (let i = 0; i < rowCount; i++) {
+        let cumInput = document.getElementById("cummulativeAmount" + i);
+        let value = parseFloat(cumInput?.value) || 0;
+        total += value;
+    }
+
+    return total;
+}
+
+
+function addUcRecordRow() {
+	debugger;
+    if (!validateLastUcRecordRow()) {
+        return; 
+    }
+    
+  var workOrderValue=  $("#workOrderValue0").val()
+  var comulativfeAmount=getTotalCumulativeAmount();
+  var total=workOrderValue-comulativfeAmount
+  if(total==0){
+	  bootbox.alert("Work Order Value is Not Available Now!");
+	  return;
+	  }
+
+    let rowCount = $("#appendUcRecord .workOrderRow").length;
+    let index = rowCount;
+
+    let html = '<div class="row workOrderRow" id="ucRecordsContainer'+index+'">' +
+        
+        '<input type="hidden" id="ucId' + index + '" name="listOfUcDto[' + index + '].ucId" value="${fund.ucId}">'+
+        
+        <!-- Work Order Amount -->
+        '<div class="col-md-3">' +
+        '<div class="form-group">' +
+        '<label class="required">Work Order Amount:</label>' +
+        '<input type="number" readonly step="0.01" name="listOfUcDto[' + index + '].workOrderAmount" id="workOrderValue' + index + '"  value="'+total+'" class="form-control form-control-sm workOrderAmount"  required />' +
+        '</div>' +
+        '</div>' +
+
+        <!-- Cumulative Amount -->
+        '<div class="col-md-3">' +
+        '<div class="form-group">' +
+        '<label class="required">Cumulative Amount:</label>' +
+        '<input type="number" step="0.01" maxlength="10" name="listOfUcDto[' + index + '].cumulativeAmount" id="cummulativeAmount' + index + '" class="form-control form-control-sm cumulativeAmount" required />' +
+        '</div>' +
+        '</div>' +
+
+        <!-- UC Submission Date -->
+        '<div class="col-md-2">' +
+        '<div class="form-group">' +
+        '<label class="required">UC Submission Date:</label>' +
+        '<input type="date" name="listOfUcDto[' + index + '].ucSubmissionDate" id="submissionDate' + index + '" class="form-control form-control-sm" required />' +
+        '</div>' +
+        '</div>' +
+
+        <!-- UC Document -->
+        '<div class="col-md-3">' +
+        '<div class="form-group">' +
+        '<label class="required">UC Document:</label>' +
+        '<input type="file" name="listOfUcDto[' + index + '].ucDocument" id="ucDocument' + index + '" class="form-control form-control-sm" accept=".pdf,.doc,.docx" />' +
+        '</div>' +
+        '</div>' +
+
+        <!-- Remove Button -->
+       	'<div class="col-md-1 ">' +
+        	'<label class="d-block" for="">&nbsp;</label>' +
+        '<button type="button" class="btn btn-danger btn-sm" onclick="removeUcRecordRow(' + index + ')">' +
+        '<i class="fa fa-trash"></i>' +
+        '</button>' +
+        '</div>' +
+        '</div>';
+
+    $("#appendUcRecord").append(html);
+}
+
+
+function removeUcRecordRow(index) {
+    if ($("#appendUcRecord .workOrderRow").length > 1) {
+        $("#ucRecordsContainer" + index).remove();
+        reindexFundReleaseRows();
+    } else {
+        bootbox.alert("At least one fund release row is required.");
+    }
+}
+
+function reindexFundReleaseRows() {
+    $("#appendUcRecord .workOrderRow").each(function(newIndex) {
+        let oldIndex = $(this).attr('id').replace('ucRecordsContainer', '');
+        $(this).attr('id', 'ucRecordsContainer' + newIndex);
+        
+        $(this).find('select, input').each(function() {
+            let name = $(this).attr('name');
+            let id = $(this).attr('id');
+            
+            if (name) {
+                name = name.replace(/listOfUcDto\[\d+\]/, 'listOfUcDto[' + newIndex + ']');
+                $(this).attr('name', name);
+            }
+            
+            if (id) {
+                id = id.replace(/\d+$/, newIndex);
+                $(this).attr('id', id);
+            }
+        });
+        
+        $(this).find('button').attr('onclick', 'removeUcRecordRow(' + newIndex + ')');
+    });
+}
+
+function validateLastUcRecordRow() {
+    let rowCount = $("#appendUcRecord .workOrderRow").length;
+
+    if (rowCount === 0) return true; 
+
+    let index = rowCount - 1;
+
+    let ucDocument = $("#ucDocument" + index).val();
+    var existingucDocument= $("#ucDocument"+ index).data("existing");
+    let submissionDate = $("#submissionDate" + index).val();
+    let cummulativeAmount = $("#cummulativeAmount" + index).val();
+    let workOrderValue = $("#workOrderValue" + index).val();
+
+   
+    if (!workOrderValue || workOrderValue.trim() === "") {
+        bootbox.alert("First Select The Building.");
+        return false;
+    }
+    if (!cummulativeAmount || cummulativeAmount.trim() === "") {
+        bootbox.alert("Please select Cummulative Amount in the last row.");
+        return false;
+    }
+    if (!submissionDate || submissionDate.trim() === "") {
+        bootbox.alert("Please enter Submission Date in the last row.");
+        return false;
+    }
+    
+    if ((!ucDocument || ucDocument.trim() === "") && !existingucDocument) {
+        bootbox.alert("Please select UC Document in the last row.");
+        return false;
+    }
+    return true;
+}
+
+function handleCumulativeAmount(e) {
+debugger;
+    if (!e.target.id.startsWith("cumulativeAmount")) {
+        return;
+    }
+
+    let index = parseInt(e.target.id.replace("cumulativeAmount", ""));
+    let workOrderInput = document.getElementById("workOrderAmount" + index);
+    let cumInput = e.target;
+
+    let work = parseFloat(workOrderInput.value) || 0;
+    let cum = parseFloat(cumInput.value) || 0;
+
+    // validation
+    if (cum > work) {
+        bootbox.alert("Cumulative Amount cannot be greater than Work Order Value.");
+        cumInput.value = "";
+        cumInput.focus();
+        return;
+    }
+
+    let remaining = work - cum;
+
+    nextWorkOrderPendingValue = remaining;
+
+    let nextIndex = index + 1;
+    let nextWorkOrderInput = document.getElementById("workOrderAmount" + nextIndex);
+
+    if (nextWorkOrderInput) {
+        nextWorkOrderInput.value = nextWorkOrderPendingValue;
+        nextWorkOrderPendingValue = null; 
+    }
+}
+
+
+</Script>
+
+
+<Script>
+
+function LoadWorkOrderValue(buildingId) {
+	debugger;
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/uc/get-work-order-value",
+        data: { buildingId: buildingId },
+        success: function (res) {
+        	
+        	if (!res.data || res.data == 0) {
+        	    bootbox.alert("Work Order Value is 0");
+        	    $("#workOrderValue0").val("");
+        	    return;
+        	}
+
+            if (!res.data) {
+                bootbox.alert("Work Order Value Is Not Available According Building,Reselect Building Again..");
+                $("#workOrderValue0").val("");
+                return;
+            }
+
+            $("#workOrderValue0").val(res.data);
+
+            $("[id^='workOrderValue']").each(function () {
+                $(this).val(res.data);
+            });
+        },
+        error: function (err) {
+            console.error("Error fetching work order value:", err);
+            bootbox.alert("Something went wrong. Please try again.");
+        }
+    });
+}
+
+function uploadFileCheck(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const allowedExtensions = ["pdf", "doc", "docx"];
+    const maxSize = 5 * 1024 * 1024; // 5 MB
+
+    const fileName = file.name.toLowerCase();
+    const fileExt = fileName.split(".").pop();
+
+    if (!allowedExtensions.includes(fileExt)) {
+        bootbox.alert("Invalid file format! Only PDF, DOC, DOCX files are allowed.");
+        input.value = ""; 
+        return;
+    }
+
+    if (file.size > maxSize) {
+        bootbox.alert("File size exceeds 5 MB limit. Please upload a smaller file.");
+        input.value = ""; 
+        return;
+    }
+
+    console.log("Uploaded:", fileName, "Size:", file.size);
+}
+
+
+
+</Script>
+
+<script>
+ document.addEventListener("input", function (e) {
+    if (e.target.id.startsWith("cummulativeAmount")) {
+
+        let index = e.target.id.replace("cummulativeAmount", "");
+
+        let workOrderInput = document.getElementById("workOrderValue" + index);
+        let cumInput = e.target;
+
+        let work = parseFloat(workOrderInput.value) || 0;
+        let cum = parseFloat(cumInput.value) || 0;
+
+        if (cum > work) {
+            bootbox.alert("Cummulative Amount cannot be greater than Work Order Value.");
+            cumInput.value = "";
+            cumInput.focus();
+        }
+    }
+}); 
+
+
+    
+    
+
+
+  function submitPlanningForm(status) {
+	    debugger;
+
+	     if (!validateLastUcRecordRow()) {
+	        return;
+	    } 
+	    /* const payload = collectUcRecords(); 
+	    $("#cipherText1").val(enc_password(JSON.stringify(payload)));*/
+	    bootbox.confirm("Do You Want To "+status+" ?", function(result) {
+	        if (result) {
+	            showLoader();
+	            $("#submitForm").submit();
+	        }
+	    });
+	}
+
+  
+	
+	function collectUcRecords() {
+		debugger;
+		const ucDetails = [];
+
+		$("#appendUcRecord .workOrderRow").each(function () {
+		    const row = $(this);
+
+		    const item = {
+		        workOrderValue: parseFloat(row.find("input[name*='workOrderAmount']").val()) || 0,
+		        cummulativeAmount: parseFloat(row.find("input[name*='cumulativeAmount']").val()) || 0,
+		        ucSubmissionDate: row.find("input[name*='ucSubmissionDate']").val() || null,
+		        fundDistributionId: parseFloat(row.find("input[name*='fundDistributionId']").val()) || 0,
+		    };
+
+		    ucDetails.push(item);
+		});
+
+		const data = {
+			    buildingId: $("#buildingId").val(),
+			    /* status: "${empty fundObj ? 'SAVE' : 'UPDATE'}", */
+			    fundReleaseDtoList: fundReleaseDetails
+			};
+	    
+	    return data;
+	}
+	
+/* 	  function editRecord(buildingId) {
+		  debugger;
+		  $("#buildingId").val(buildingId);
+		  var bizContent = $("#editForm").serializeArray();
+		  $("#ucCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+		  bootbox.confirm("Do you want to Edit ?",function(result){
+			  if(result){
+				  showLoader();
+				  $("#editForm").submit();
+			  }
+		  })
+	} */
+	
+	function editRecord(buildingId) {
+	    $("#editBuildingId").val(buildingId);
+
+	    var bizContent = $("#editForm").serializeArray();
+
+	    $("#ucCipherText").val(
+	        enc_password(JSON.stringify(convertFormToJSONArray(bizContent)))
+	    );
+
+	    bootbox.confirm("Do you want to Edit ?", function (result) {
+	        if (result) {
+	            showLoader();
+	            $("#editForm").submit();
+	        }
+	    });
+	}
+
+</script>

@@ -1,0 +1,300 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<style>
+    .frezz {
+        pointer-events: none;
+        background-color: #e9ecef !important;
+        color: #495057 !important;
+    }
+    .card-title-add {
+        font-size: 14px;
+        margin: 0;
+        color: #000 !important;
+        font-weight: 500;
+    }
+    .btns {
+        border-radius: 0.2rem;
+        line-height: 14px;
+        padding: 6px 7px 6px 6px;
+        font-size: 13px;
+    }
+    /* Ensure dropdown fits within sector */
+    select.form-control-sm {
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">DWO-Progress</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Progress Report</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">DWO / ITDA / All - Progress Report</h5>
+    </div>
+    <div class="card-body">
+         <div class="row">
+             <!-- From Date -->
+             <div class="col-md-2">
+              <label class="form-label required">From Date :</label>
+              <div class="datepicker-box">
+                  <input type="text" id="fromDate" name="fromDate" value="${selectedFromDate}" class="form-control form-control-sm datepicker" required readonly>
+              </div>
+          </div>
+          
+           <!-- To Date -->
+          <div class="col-md-2">
+			<label class="form-label required">To Date :</label>
+              <div class="datepicker-box">
+                  <input type="text" id="toDate" name="toDate" value="${SelectedToDate}" class="form-control form-control-sm datepicker" required readonly>
+              </div>
+          </div>
+             
+           <!-- Executing Agency -->
+           <div class="col-md-2">
+               <label class="form-label">Select Agency Type:</label>
+               <select class="form-control form-control-sm" id="agencyType" name="agencyType" onchange="fetchAgencyBySelectedType(this.value)">
+               	<option value="ALL">- Select -</option>
+                   <c:forEach items="${agencyTypeList}" var="type" varStatus="index">
+                       <option value="${type.valueEn}" ${ type.valueEn eq selectedAgencyType ? 'selected' : ''}>${type.valueEn}</option>
+                   </c:forEach>
+               </select>
+           </div>
+           
+            <div class="col-md-2">
+                <label class="form-label">Executing Agency :</label>
+                <select class="form-control form-control-sm select2" id="agencyId" name="agencyId">
+                	<option value="0">- Select -</option>
+                	<c:if test="${selectedAgencyType ne null}">
+	                	<c:forEach var="agency" items="${agencyList}">
+							<option value="${agency.agencyId}" ${agency.agencyId eq selectedAgencyId ? 'selected' : ''}>${agency.agencyName}</option>
+						</c:forEach>
+                	</c:if>
+                </select>
+            </div>
+            
+             <!-- Project -->
+             <div class="col-md-2">
+                 <label class="form-label">Project Name :</label>
+                 <select class="form-control form-control-sm select2" id="projectId" name="projectId">
+                 	<option value="0">- Select -</option>
+                      <c:forEach var="project" items="${projectList}">
+						<option value="${project.projectId}" ${project.projectId eq selectedProjectId ? 'selected' : ''}>${project.projectName}</option>
+					</c:forEach>
+                 </select>
+             </div>
+             
+             <!-- Project -->
+             <div class="col-md-2">
+                 <label class="form-label">School Name :</label>
+                 <select class="form-control form-control-sm select2" id="schoolId" name="schoolId">
+                 	<option value="0">- Select -</option>
+                      <c:forEach var="school" items="${schoolList}">
+						<option value="${school.schoolId}" ${school.schoolId eq selectedSchoolId ? 'selected' : ''}>${school.schoolName}</option>
+					</c:forEach>
+                 </select>
+             </div>
+         </div>
+         
+        <div class="row mt-4">
+            <div class="col-md-12 text-center">
+                <button type="button" class="btn btn-success" onclick="filterData()">Filter</button>
+                <a href="${contextPath}/home" type="button" class="btn btn-warning btn-sm">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4" id="expenditure-report">
+    <div class="card-header">
+        <h5 class="card-title">DWO / ITDA / All - Progress Details</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+			<table class="table table-bordered table-striped exportbtn" id="dwoAnditdaTable">
+			    <thead>
+			        <tr>
+			            <th class="text-center">Sl.No.</th>
+			            <th>Executing Agency</th>
+			            <th>Sanctioned Year</th>
+			            <th>Scheme Name</th>
+			            <th>Project Name </th>
+			            <th>Date Of Commencement</th>
+			            <th>Due Date Of Completion</th>
+			            <th>Administrative Approval Amount (1st Phase)</th>
+			            <th>Letter No /Letter Date (1st Phase)</th>
+			            <th>Administrative Approval Amount (2nd Phase)</th>
+			            <th>Letter No /Letter Date  (2nd Phase)</th>
+			            <th>Administrative Approval Amount (3rd Phase)</th>
+			            <th>Letter No /Letter Date (3rd Phase)</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			        <c:choose>
+			            <c:when test="${not empty reportDataList}">
+			                <c:forEach items="${reportDataList}" var="project" varStatus="status">
+			                    <tr>
+			                        <td class="text-center">${status.index + 1}</td>
+			                        <td>${empty project.agencyName ? 'N/A' : project.agencyName}</td>
+			                        <td>${empty project.sanctionedYear ? 'N/A' : project.sanctionedYear}</td>
+			                        <td>${empty project.schemeName ? 'N/A' : project.schemeName}</td>
+			                        <td>${empty project.projectName ? 'N/A' : project.projectName}</td>
+			                        <td>${empty project.dateOfCommencement ? 'N/A' : project.dateOfCommencement}</td>
+			                        <td>${empty project.dueDateOfCompletion ? 'N/A' : project.dueDateOfCompletion}</td>
+			
+			                        <c:forEach items="${project.onGoingProjectDataList}" var="projectData" varStatus="count">
+			                            <td>
+			                                ${empty projectData.administrativeApprovalAmount 
+			                                    ? 'N/A' 
+			                                    : projectData.administrativeApprovalAmount}
+			                            </td>
+			                            <td>
+			                                ${empty projectData.letterNo ? 'N/A' : projectData.letterNo}
+			                                /
+			                                ${empty projectData.letterDate ? 'N/A' : projectData.letterDate}
+			                            </td>
+			                        </c:forEach>
+			
+			                        <c:forEach begin="${fn:length(project.onGoingProjectDataList) + 1}" end="3">
+			                            <td>N/A</td>
+			                            <td>N/A</td>
+			                        </c:forEach>
+			                    </tr>
+			                </c:forEach>
+			            </c:when>
+			
+			            <c:otherwise>
+			                <tr>
+			                    <td colspan="15" class="text-center text-muted">
+			                        No records found for the selected criteria.
+			                    </td>
+			                </tr>
+			            </c:otherwise>
+			        </c:choose>
+			    </tbody>
+			</table>
+        </div>
+    </div>
+</div>
+
+
+<form id="filterForm" action="${contextPath}/report/dwo-and-itda-and-all-progress" method="GET">
+    <input type="hidden" name="cipherText" id="hiddenCipherText">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" id="hiddenFromDate" name="fromDate">
+    <input type="hidden" id="hiddenToDate" name="toDate">
+    <input type="hidden" id="hiddenAgencyType" name="agencyType">
+    <input type="hidden" id="hiddenAgencyId" name="agencyId">
+    <input type="hidden" id="hiddenProjectId" name="projectId">
+    <input type="hidden" id="hiddenSchoolId" name="schoolId">
+</form>
+
+<script>
+
+function fetchAgencyBySelectedType(agencyType) {
+    $.ajax({
+        url: "${contextPath}/report/getAgencyBySelectedType",
+        type: "GET",
+        data: { agencyType: agencyType },
+        success: function (agencys) {
+
+            var agencySelect = $("#agencyId");
+            agencySelect.empty(); 
+            agencySelect.append('<option value="0">- Select -</option>');
+
+            $.each(agencys, function(index, agency) {
+                var selected = (agency.agencyId == "${selectedAgencyId}") ? "selected" : "";
+                agencySelect.append('<option value="' + agency.agencyId + '" ' + selected + '>' + agency.agencyName + '</option>');
+            });
+        },
+        error: function (error) {
+            bootbox.alert("Error fetching Agency: " + error);
+        }
+    });
+}
+
+function filterData() {
+    debugger;
+
+    var fromDate    = $("#fromDate").val();
+    var toDate      = $("#toDate").val();
+    var agencyType  = $("#agencyType").val() || 'ALL';
+    var agencyId    = $("#agencyId").val() || 0;
+    var projectId   = $("#projectId").val() || 0;
+    var schoolId    = $("#schoolId").val() || 0;
+
+    // Assign values to hidden form fields
+    $("#hiddenFromDate").val(fromDate);
+    $("#hiddenToDate").val(toDate);
+    $("#hiddenAgencyType").val(agencyType);
+    $("#hiddenAgencyId").val(agencyId);
+    $("#hiddenProjectId").val(projectId);
+    $("#hiddenSchoolId").val(schoolId);
+
+    // Show loader (assuming you have this function)
+    showLoader();
+
+    // Encrypt the form data before submitting
+    var bizContent = $("#filterForm").serializeArray();
+    var jsonData = JSON.stringify(convertFormToJSONArray(bizContent));
+
+    $("#hiddenCipherText").val(enc_password(jsonData));
+
+    // Submit the form
+    $("#filterForm").submit();
+}
+
+
+
+
+$(document).ready(function () {
+    var today = new Date();
+    var oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+
+    $(".datepicker").datepick({
+        dateFormat: "dd-mm-yyyy",
+        onShow: $.datepick.monthOnly,
+        yearRange: "c-20:c+10",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+    });
+
+    if (!$("#fromDate").val()) {
+        $('#fromDate').datepick('setDate', oneMonthAgo);
+    }
+    if (!$("#toDate").val()) {
+        $('#toDate').datepick('setDate', today);
+    }
+    
+    var $table = $("#dwoAnditdaTable");
+
+    if ($table.find("tbody tr td").hasClass("text-muted")) {
+        $table.removeClass("exportbtn");
+    } else {
+        $table.addClass("exportbtn");
+    }
+
+ });
+ 
+</script>

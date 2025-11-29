@@ -1,0 +1,264 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet"
+	href="${contextPath}/assets/js/plugin/jquery_autocomplete/jquery.autocomplete.css" />
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="resources/javascripts/common.js"></script>
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+<script src="${contextPath}/assets/appJs/validation/invoice.js"></script>
+<%@ page import="com.aashdit.fams.utils.ApplicationStringUtilsFams" %>
+<style>
+.vertical-content{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.vertical-content strong{
+    margin-right: 10px;
+}
+</style>
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Running Bill</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+	        <ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home" title="Home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Running Bill</li>
+			</ol>
+        </nav>
+     </div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title">Deviation Statement</h6>
+            </div>
+        <div class="card-body">
+            <div class="col-md-12">
+                <form action="${contextPath}/deviation/running-bill" method="POST" id="devStatementForm" autocomplete="off" enctype="multipart/form-data">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <input type="hidden" name="actionCode" id="actionCode" value="ADD"/>
+                    <input type="hidden" name="msmntMstId" value="${mainData.msmntMstId}" />
+                    <input type="hidden" name="deviationId" value="${mainData.deviationId}" />
+                    <input type="hidden" id="cipherText" name="cipherText">
+                        <div class="row">
+                            <div class="col-md-12 mt-2 mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 vertical-content">
+                                        <div class="item">
+                                            <strong>Project Name:</strong> <span>${mainData.projectName}</span>
+                                        </div>
+                                        <div class="item">
+                                            <strong>Date of Workorder:</strong> <span><fmt:formatDate value="${mainData.workorderDate}" pattern="dd/MM/yyyy"/></span>
+                                        </div>
+                                        <div class="item">
+                                            <strong>Workorder No:</strong> <span>${mainData.workorderNo}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 vertical-content">
+                                        <div class="item">
+                                            <strong>Date of BOQ Upload:</strong> <span><fmt:formatDate value="${mainData.boqUploadDate}" pattern="dd/MM/yyyy"/></span>
+                                        </div>
+                                        <div class="item">
+                                            <strong>Measurement No:</strong> <span>${mainData.measurementCode}</span>
+                                        </div>
+                                        <div class="item">
+                                            <strong>Date of Measurement:</strong> <span><fmt:formatDate value="${mainData.measurementDate}" pattern="dd/MM/yyyy"/></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <hr/>
+                        <div class="table-responsive">
+                            <table id="boq-table" class="table table-bordered ">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2">Sl. No.</th>
+                                        <th rowspan="2">Item Name</th>
+                                        <th rowspan="2">Description of Work</th>
+                                        <th rowspan="2">Unit</th>
+                                        <th rowspan="2">Rate</th>
+                                        <th rowspan="2">Quantity Executed Up-to-Date as per M.Book</th>
+                                        <th colspan="2">Payment on the Basis of Actual Measurement</th>
+                                        <th rowspan="2">Net Bill</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Up to Date</th>
+                                        <th>Since Previous Bill</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="tbd" class="appendBox">
+                                    <c:set var="billValue" value="0"></c:set>
+                                    <c:forEach items="${mainData.particulars}" var="prticlrs" varStatus="count">
+                                    <input type="hidden" name="particulars[${count.index}].prtclrId" value="${prticlrs.prtclrId}" />
+                                        <tr>
+                                            <td>${count.count}</td>
+                                            <td>${prticlrs.measurementBookData.boqItem.itemName}</td>
+                                            <td>${prticlrs.measurementBookData.boqItem.description}</td>
+                                            <td>${prticlrs.measurementBookData.boqItem.unitType.unitTypeName}</td>
+                                            <td>${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(prticlrs.measurementBookData.boqItem.ratePerUnit)}</td>
+                                            <td>${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(prticlrs.measurementBookData.totalPrtclrQnty)}</td>
+                                            <td>${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(prticlrs.measurementBookData.totalPrtclrAmt)}</td>
+                                            <td>0.00</td>
+                                            <td>${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(prticlrs.measurementBookData.totalPrtclrAmt)}</td>
+                                        </tr>
+                                        <c:set var="billValue" value="${billValue + prticlrs.measurementBookData.totalPrtclrAmt}"></c:set>
+                                    </c:forEach>
+                                    <tr>
+                                        <th colspan="3"></th>
+                                        <th colspan="5">Bill Value</th>
+                                        <th><input type="text" class="form-control" name="billVal" id="billVal" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(billValue)}" readonly="readonly"/></th>
+                                    </tr>
+                                    <!-- <tr>
+                                        <th colspan="3"></th>
+                                        <th colspan="1">Is GST Included</th>
+                                        <th><input type="radio" name="gstIncude" value="true"> Yes</th>
+                                        <th><input type="radio" name="gstIncude" value="false" checked="checked"> No</th>
+                                        <th>
+                                            <select class="form-select freez" name="gstPercnt" id="gstPercnt">
+                                                <option value="5">5 %</option>
+                                                <option value="12">12 %</option>
+                                                <option value="18" selected>18 %</option>
+                                                <option value="28">28 %</option>
+                                            </select>
+                                        </th>
+                                        <th><input type="text" class="form-control" name="gstAmt" id="gstAmt" value="0" readonly="readonly"/></th>
+                                    </tr> -->
+                                    <%-- <tr>
+                                        <th colspan="3"></th>
+                                        <th colspan="4">Total Bill Value</th>
+                                        <th><input type="text" class="form-control" name="totalBillVal" id="totalBillVal" value="${billValue}" readonly="readonly"/></th>
+                                    </tr> --%>
+                                </tbody>
+                                </table>
+                        </div>
+
+                <!-- 		<div class="table-responsive">
+                            <table id="boq-table" class="table-bordered exportbtn">
+                                <thead>
+                                    <tr>
+                                        <th>Head Applicable</th>
+                                        <th>Rate Type</th>
+                                        <th>Value Applied</th>
+                                        <th>Remark</th>
+                                        <th>Amount to be Deducted</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbd" class="appendBox">
+
+                                </tbody>
+                                </table>
+                        </div> -->
+
+                        <div class="row">
+                            <div class="col-sm-12" style="margin-top: 30px;">
+                                <div class="form-group text-center">
+                <%-- 				<c:set var="dynamicFromId" value="devStatementForm" scope="request" /> --%>
+                <%-- 		        <c:set var="wonFunction" value="submitFormData()"/> --%>
+                <%-- 	            <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%> --%>
+                <!-- 					 <input type="button" class="btn btn-success" onclick="submitFormData()" value="Save" /> -->
+                                     <input type="button" class="btn btn-danger" onclick="history.back()" value="Back" />
+
+                                     <input type="button" class="btn btn-success" onclick="redirectToInvoice(${mainData.deviationId})" value="Invoice" />
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+ <form class="" id="invoice" action="${contextPath}/ipms/invoice/add" method="GET">
+ <input type="hidden" class="remove" name="deviationId" id="deviationIdHd" />
+ </form>
+ 
+<script>
+function redirectToInvoice(deviationId){
+	
+	 $('#deviationIdHd').val(deviationId);
+		
+		if(validateForm()){
+			 if(encryptFormData('invoice', tableOrTbodyIDS, tableOrTbodyKeys)){
+					 confirmation('invoice');
+				 }
+			}
+	
+	
+}
+
+function submitFormData(){
+		bootbox.confirm({
+	        message: "Do you want to save all the details ?",
+	        buttons: {
+	            confirm: {
+	                label: 'Yes',
+	                className: 'btn-success'
+	            },
+	            cancel: {
+	                label: 'No',
+	                className: 'btn-danger'
+	            }
+	        },
+	        callback: async (result) => {
+	            if (result) {
+	            	showLoader();
+// 	            	$("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray($("#devStatementForm").serializeArray()))));
+	            	$("#devStatementForm").submit();
+	            }
+	        }
+	    });
+}
+
+
+/* $(document).ready(function () {
+	
+    function calculateGST() {
+        let total = parseFloat($('#billVal').val());
+        let gst = parseFloat($('#gstPercnt').val());
+        
+        if (!isNaN(total) && !isNaN(gst)) {
+            let gstAmount = (total * gst) / 100;
+            let totalWithGst = total + gstAmount;
+
+            $('#gstAmt').val(gstAmount);
+            $('#totalBillVal').val(totalWithGst);
+        }
+    }
+
+    $('input[type="radio"][name="gstIncude"]').on('change', function () {
+    	debugger;
+        let selectedValue = $('input[type="radio"][name="gstIncude"]:checked').val();
+        if (selectedValue == 'true') {
+            $('#gstPercnt').removeClass('freez');
+            calculateGST();
+        }
+        else{
+        	$('#gstPercnt').addClass('freez');
+        	$('#gstAmt').val(0.00);
+            $('#totalBillVal').val($('#billVal').val());
+        }
+    });
+
+    $('#gstPercnt').on('change', function () {
+        calculateGST();
+    });
+}); */
+
+</script>

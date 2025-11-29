@@ -1,0 +1,616 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+ <style>
+      fieldset {
+        position: relative;
+        border: 1px solid #ffd0bc;
+        background-color: #29a8ff;
+        padding: 30px 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        margin-top: 15px;
+      }
+
+      .field-one {
+        position: absolute;
+        left: 18px;
+        top: -12px;
+        padding: 5px 15px;
+        background: #29a8ff;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 16px;
+        margin-top: 10px;
+      }
+
+ 
+
+      input,
+      select {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #f6c73b;
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.4);
+      }
+
+      .text-danger {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      /* Additional improvements */
+      input[type="date"] {
+        cursor: pointer;
+      }
+
+      select {
+        cursor: pointer;
+        background-color: white;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+    </style>
+<body>
+
+  
+  <div class="circle"></div>
+    <div class="circle-follow"></div>
+      <header class="app_header">
+        
+      </header>
+      <div class="page_body_wrapper">
+        <div class="sidebar_wrapper">
+          
+        </div>
+
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="">
+                  <div class="row">
+        
+                <div class="col-md-12">
+                  <ol class="breadcrumb">
+                    
+                  </ol>
+                </div>
+              </div>
+               </div>
+          </div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="card">
+            	<div class="card-header">
+            		<h5 class="card-title">Fund Distribution</h5>
+            	</div>
+                <div class="card-body">
+              
+          <div class="row">
+  
+  <fieldset>
+    <span class="field-one">Fund Release</span>
+    <button type="button" class="btn btn-success btn-sm" style="float: inline-end;position: absolute; right: 13px; top: 5px;" onclick="addFundReleaseRow()">
+        <i class="fa fa-plus"></i>
+    </button>
+    
+    <form action="${contextPath}/fund/save-distribution" id="fundRelease" method="post" class="row mt-3">
+        <%-- <input type="hidden" name="fundDistributionId" id="fundDistributionId" value="${fundObj.fundDistributionId}"> --%>
+        <input type="hidden" id="cipherText1" name="cipherText1" value="">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+        <input type="hidden" id="buildingId" name="buildingId" value="${buildingId}" />
+
+        <!-- Container for dynamic rows -->
+        <div id="fundReleaseContainer">
+    <!-- Initial row will be here -->
+    
+<c:choose>
+    <c:when test="${not empty fundObj}">
+        <c:forEach var="fund" items="${fundObj}" varStatus="loop">
+
+        <div class="fund-release-row border p-3 mb-3" id="fundRow${loop.index}">
+            <div class="row">
+
+                <div class="col-md-2">
+                    <label>Fund Release Type :</label>
+                    <select name="fundReleases[${loop.index}].fundReleaseType"
+                            id="fundReleaseType${loop.index}"
+                            class="form-select">
+                        <option value="">--Select--</option>
+
+                        <c:forEach var="frt" items="${fundRelease}">
+                            <option value="${frt.valueCode}"
+                                <c:if test="${fund.fundReleaseType == frt.valueCode}">
+                                    selected="selected"
+                                </c:if>>
+                                ${frt.valueEn}
+                            </option>
+                        </c:forEach>
+                    </select>
+                </div>
+                
+                
+                    <input type="hidden"
+                           class="form-control fundDistributionId"
+                           data-index="${loop.index}"
+                           name="fundReleases[${loop.index}].fundDistributionId"
+                           id="fundDistributionId${loop.index}"
+                           value="${fund.fundDistributionId}"
+                           required />
+                
+                     <input type="hidden"
+                           class="form-control buildingId"
+                           data-index="${loop.index}"
+                           name="fundReleases[${loop.index}].buildingId"
+                           id="buildingId${loop.index}"
+                           value="${fund.buildingId}"
+                           required /> 
+                
+
+                <div class="col-md-2">
+                    <label>Work Order Value :<span class="text-danger">*</span></label>
+                    <input type="number"
+                           class="form-control workOrderValue"
+                           data-index="${loop.index}"
+                           name="fundReleases[${loop.index}].workOrderValue"
+                           id="workOrderValue${loop.index}"
+                           value="${fund.workOrderValue}"
+                           required />
+                </div>
+
+                 <fmt:formatDate value="${fund.lastReleasedDates}"
+                pattern="yyyy-MM-dd"
+                var="formattedDate" />
+
+
+                <div class="col-md-2">
+                    <label>Last Released Date :<span class="text-danger">*</span></label>
+                    <input type="date"
+                           class="form-control"
+                           name="fundReleases[${loop.index}].lastReleasedDates"
+                           id="lastReleasedDate${loop.index}"
+                           value="${formattedDate}"
+                           required />
+                </div>
+
+                <div class="col-md-3">
+                    <label>Cumulative Amount So Far :<span class="text-danger">*</span></label>
+                    <input type="number"
+                           class="form-control cummulativeAmount"
+                           data-index="${loop.index}"
+                           name="fundReleases[${loop.index}].cummulativeAmount"
+                           id="cummulativeAmount${loop.index}"
+                           value="${fund.cummulativeAmount}"
+                           required />
+                </div>
+
+                <div class="col-md-2">
+                    <label>Cumulative (%) :</label>
+                    <input type="number"
+                           class="form-control"
+                           name="fundReleases[${loop.index}].cummulativePercentage"
+                           id="cummulativePercentage${loop.index}"
+                           value="${fund.cummulativePercentage}"
+                           readonly />
+                </div>
+
+                <div class="col-md-1">
+                	<div class="form-group">
+                    	<label style="display:block;">&nbsp;</label>
+	                    <button type="button"
+	                            class="btn btn-danger btn-sm"
+	                            onclick="removeFundReleaseRow(${loop.index})">
+	                        <i class="fa fa-trash"></i>
+	                    </button>
+	               	</div>
+                </div>
+
+            </div>
+        </div>
+
+        </c:forEach>
+    </c:when>
+
+		<c:otherwise>
+		<div class="fund-release-row border p-3 mb-3" id="fundRow0">
+        <div class="row">
+            <div class="col-md-2">
+                <label>Fund Release Type :</label>
+                <select name="fundReleases[0].fundReleaseType" id="fundReleaseType0" class="form-select">
+                    <option value="">--Select--</option>
+                    <c:forEach var="frt" items="${fundRelease}">
+                        <option value="${frt.valueCode}" <c:if test="${fundObj.fundReleaseType == frt.valueCode}">selected="selected"</c:if>>
+                            ${frt.valueEn}
+                        </option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group mb-3">
+                    <label>Work Order Value :<span class="text-danger">*</span></label>
+                    <input type="number" 
+                           class="form-control workOrderValue text-end" 
+                           data-index="0"
+                           name="fundReleases[0].workOrderValue"
+                           id="workOrderValue0"
+                           value="${fundObj.workOrderValue}"
+                           placeholder="Enter Amount" 
+                           maxlength="8"
+                           required />
+                </div>
+            </div>
+
+            <fmt:formatDate value="${fundObj.lastReleasedDates}" pattern="yyyy-MM-dd" var="formattedDate" />
+            
+            <div class="col-md-2">
+                <div class="form-group mb-3">
+                    <label>Last Released Date :<span class="text-danger">*</span></label>
+                    <input type="date" 
+                           class="form-control" 
+                           value="${formattedDate}"
+                           name="fundReleases[0].lastReleasedDate" 
+                           id="lastReleasedDate0"
+                           required />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group mb-3">
+                    <label>Cumulative Amount So Far :<span class="text-danger">*</span></label>
+                    <input type="number" 
+                           class="form-control cummulativeAmount text-end" 
+                           data-index="0"
+                           name="fundReleases[0].cummulativeAmount"
+                           id="cummulativeAmount0"
+                           value="${fundObj.cummulativeAmount}"
+                           placeholder="Enter Amount" 
+                           maxlength="8"
+                           required />
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="form-group mb-3">
+                    <label>Cumulative (%) :</label>
+                    <input type="number" 
+                           class="form-control text-end" 
+                           name="fundReleases[0].cummulativePercentage"
+                           id="cummulativePercentage0"
+                           value="${fundObj.cummulativePercentage}"
+                           placeholder="%" 
+                           readonly />
+                </div>
+            </div>
+
+            <div class="col-md-1">
+                <div class="form-group">
+                    <label style="display:block;">&nbsp;</label>
+	                <button type="button" class="btn btn-danger btn-sm" onclick="removeFundReleaseRow(0)">
+	                    <i class="fa fa-trash"></i>
+	                </button>
+	            </div>
+            </div>
+        </div>
+        </div>
+        </c:otherwise>
+        </c:choose>
+    </div>
+        
+
+    </form>
+</fieldset>
+
+  <div class="row">
+    <div class="col-12 text-end mt-4">
+      <c:choose>
+    <c:when test="${empty fundObj}">
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitPlanningForm()">
+            <i class="fa fa-save me-1"></i> Save
+        </button>
+    </c:when>
+
+    <c:otherwise>
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitPlanningForm()">
+            <i class="fa fa-save me-1"></i> Update
+        </button>
+    </c:otherwise>
+</c:choose>
+
+	      <button type="reset" class="btn btn-secondary btn-sm">
+	        <i class="fa fa-undo me-1"></i> Reset
+	      </button>
+    </div>
+  </div>
+</div>
+
+
+        
+                </div>
+              </div>
+            </div>
+      </div>
+
+    </div>
+    
+      
+    </div>
+
+  <script>
+    $(document).ready(function () {
+      $('.exportbtn').DataTable({
+        dom: 'lBfrtip',
+        responsive: true,
+        pageLength: 10,
+        // lengthMenu: [0, 5, 10, 20, 50, 100, 200, 500],
+      });
+
+    });
+
+  $( document ).ready(function() {
+    $('.datepicker_con>input').datepick({
+      dateFormat: 'dd/mm/yyyy', 
+          showOnFocus: true,
+      showTrigger: '<button type="button" class="trigger">' +
+      '<i class="fa fa-calendar"></i></button>',
+  });
+    
+});
+  </script>
+  
+  <script>
+  function calculateCumulativePercent(index) {
+	    let woValue = parseFloat(document.getElementById("workOrderValue" + index).value);
+	    let cumulativeAmount = parseFloat(document.getElementById("cummulativeAmount" + index).value);
+
+	    if (!isNaN(woValue) && woValue > 0 && !isNaN(cumulativeAmount)) {
+
+	        if (cumulativeAmount > woValue) {
+	            bootbox.alert("Cumulative Amount cannot be greater than Work Order Value!");
+	            document.getElementById("cummulativeAmount" + index).value = "";
+	            document.getElementById("cummulativePercentage" + index).value = "";
+	            return;
+	        }
+
+	        // Calculate pending percentage
+	        let pendingAmount = woValue - cumulativeAmount;
+	        let pendingPercent = (pendingAmount / woValue) * 100;
+
+	        if (pendingPercent < 0) pendingPercent = 0;
+
+	        document.getElementById("cummulativePercentage" + index).value = pendingPercent.toFixed(2);
+
+	    } else {
+	        document.getElementById("cummulativePercentage" + index).value = "";
+	    }
+	}
+
+
+	$(document).on("input", ".workOrderValue", function () {
+		debugger
+	    const index = $(this).attr("data-index");
+	    calculateCumulativePercent(index);
+	});
+
+	$(document).on("input", ".cummulativeAmount", function () {
+		debugger;
+	    const index = $(this).attr("data-index");
+	    calculateCumulativePercent(index);
+	});
+  
+  
+  
+  function validateLastFundReleaseRow() {
+	    let rowCount = $("#fundReleaseContainer .fund-release-row").length;
+
+	    if (rowCount === 0) return true; 
+
+	    let index = rowCount - 1;
+
+	    let type = $("#fundReleaseType" + index).val();
+	    let workOrder = $("#workOrderValue" + index).val();
+	    let lastDate = $("#lastReleasedDate" + index).val();
+	    let cumulative = $("#cummulativeAmount" + index).val();
+
+	    if (!type || type.trim() === "") {
+	        bootbox.alert("Please select Fund Release Type in the last row.");
+	        return false;
+	    }
+	    if (!workOrder || workOrder.trim() === "") {
+	        bootbox.alert("Please enter Work Order Value in the last row.");
+	        return false;
+	    }
+	    if (!lastDate || lastDate.trim() === "") {
+	        bootbox.alert("Please select Last Released Date in the last row.");
+	        return false;
+	    }
+	    if (!cumulative || cumulative.trim() === "") {
+	        bootbox.alert("Please enter Cumulative Amount in the last row.");
+	        return false;
+	    }
+
+	    return true;
+	}
+
+
+  function submitPlanningForm() {
+	    debugger;
+
+	    if (!validateLastFundReleaseRow()) {
+	        return;
+	    }
+	    const payload = collectFundReleaseData();
+	    $("#cipherText1").val(enc_password(JSON.stringify(payload)));
+	    bootbox.confirm("Do You Want To Save ?", function(result) {
+	        if (result) {
+	            showLoader();
+	            $("#fundRelease").submit();
+	        }
+	    });
+	}
+
+	
+	
+  function addFundReleaseRow() {
+	    if (!validateLastFundReleaseRow()) {
+	        return; 
+	    }
+
+	    let rowCount = $("#fundReleaseContainer .fund-release-row").length;
+	    let index = rowCount;
+
+	    let html = '<div class="fund-release-row border p-3 mb-3" id="fundRow' + index + '">' +
+	        '<div class="row">' +
+	        
+	        '<div class="col-md-2">' +
+	        '<label>Fund Release Type</label>' +
+	        '<select name="fundReleases[' + index + '].fundReleaseType" id="fundReleaseType' + index + '" class="form-select">' +
+	        '<option value="">--Select--</option>' +
+	        '<c:forEach var="frt" items="${fundRelease}">' +
+	        '<option value="${frt.valueCode}">${frt.valueEn}</option>' +
+	        '</c:forEach>' +
+	        '</select>' +
+	        '</div>' +
+	        
+	       
+	            '<input type="hidden" ' +
+	            'name="fundReleases[' + index + '].fundDistributionId" ' +
+	            'id="fundDistributionId' + index + '" ' +
+	            'class="form-control" />' +
+	        
+	            
+	            '<input type="hidden" ' +
+	            'name="fundReleases[' + index + '].buildingId" ' +
+	            'id="buildingId' + index + '" ' +
+	            'class="form-control buildingId" ' +
+	            'required />' +
+
+
+	        '<div class="col-md-2">' +
+	        '<div class="form-group mb-3">' +
+	        '<label>Work Order Value <span class="text-danger">*</span></label>' +
+	        '<input type="number" name="fundReleases[' + index + '].workOrderValue" id="workOrderValue' + index + '" class="form-control workOrderValue text-end" data-index="' + index + '" required />' +
+	        '</div>' +
+	        '</div>' +
+
+	        '<div class="col-md-2">' +
+	        '<div class="form-group mb-3">' +
+	        '<label>Last Released Date <span class="text-danger">*</span></label>' +
+	        '<input type="date" name="fundReleases[' + index + '].lastReleasedDate" id="lastReleasedDate' + index + '" class="form-control" required />' +
+	        '</div>' +
+	        '</div>' +
+
+	        '<div class="col-md-3">' +
+	        '<div class="form-group mb-3">' +
+	        '<label>Cumulative Amount <span class="text-danger">*</span></label>' +
+	        '<input type="number" name="fundReleases[' + index + '].cummulativeAmount" id="cummulativeAmount' + index + '" class="form-control cummulativeAmount text-end" data-index="' + index + '" required />' +
+	        '</div>' +
+	        '</div>' +
+
+	        '<div class="col-md-2">' +
+	        '<div class="form-group mb-3">' +
+	        '<label>Cumulative (%)</label>' +
+	        '<input type="number" name="fundReleases[' + index + '].cummulativePercentage" id="cummulativePercentage' + index + '" class="form-control text-end" readonly />' +
+	        '</div>' +
+	        '</div>' +
+
+	        '<div class="col-md-1 d-flex align-items-center">' +
+	        '<button type="button" class="btn btn-danger btn-sm" onclick="removeFundReleaseRow(' + index + ')">' +
+	        '<i class="fa fa-trash"></i>' +
+	        '</button>' +
+	        '</div>' +
+
+	        '</div></div>';
+
+	    $("#fundReleaseContainer").append(html);
+	}
+
+	function removeFundReleaseRow(index) {
+	    if ($("#fundReleaseContainer .fund-release-row").length > 1) {
+	        $("#fundRow" + index).remove();
+	        reindexFundReleaseRows();
+	    } else {
+	        bootbox.alert("At least one fund release row is required.");
+	    }
+	}
+
+	function reindexFundReleaseRows() {
+	    $("#fundReleaseContainer .fund-release-row").each(function(newIndex) {
+	        let oldIndex = $(this).attr('id').replace('fundRow', '');
+	        $(this).attr('id', 'fundRow' + newIndex);
+	        
+	        $(this).find('select, input').each(function() {
+	            let name = $(this).attr('name');
+	            let id = $(this).attr('id');
+	            
+	            if (name) {
+	                name = name.replace(/fundReleases\[\d+\]/, 'fundReleases[' + newIndex + ']');
+	                $(this).attr('name', name);
+	            }
+	            
+	            if (id) {
+	                id = id.replace(/\d+$/, newIndex);
+	                $(this).attr('id', id);
+	            }
+	        });
+	        
+	        $(this).find('button').attr('onclick', 'removeFundReleaseRow(' + newIndex + ')');
+	    });
+	}
+	
+	
+	function collectFundReleaseData() {
+		
+		const fundReleaseDetails = [];
+
+		$("#fundReleaseContainer .fund-release-row").each(function () {
+		    const row = $(this);
+
+		    const item = {
+		        fundReleaseType: row.find("select[name*='fundReleaseType']").val() || null,
+		        workOrderValue: parseFloat(row.find("input[name*='workOrderValue']").val()) || 0,
+		        fundDistributionId: parseFloat(row.find("input[name*='fundDistributionId']").val()) || 0,
+		        buildingId: parseFloat(row.find("input[name*='buildingId']").val()) || 0,
+		        lastReleasedDate: row.find("input[name*='lastReleasedDate']").val() || null,
+		        cummulativeAmount: parseFloat(row.find("input[name*='cummulativeAmount']").val()) || 0,
+		        cummulativePercentage: parseFloat(row.find("input[name*='cummulativePercentage']").val()) || 0
+		    };
+
+		    fundReleaseDetails.push(item);
+		});
+
+		const data = {
+			    buildingId: $("#buildingId").val(),
+			    status: "${empty fundObj ? 'SAVE' : 'UPDATE'}",
+			    fundReleaseDtoList: fundReleaseDetails
+			};
+	    
+	    return data;
+	}
+
+</script>
+  
+</body>
+
+</html>

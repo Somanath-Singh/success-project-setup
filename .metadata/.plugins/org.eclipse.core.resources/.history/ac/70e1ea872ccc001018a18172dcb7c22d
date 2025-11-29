@@ -1,0 +1,59 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<header>
+        <div class="container">
+         <div class="row">
+            <div class="col-lg-5">
+                <div class="logo-section">
+                    <img src="${contextPath}/assets/img/odishaLogo.svg" alt="">
+                    <div>
+	                    <h3 class="website-name mb-0">IPMS Portal</h3>
+	                    <p> <small> Department of Higher Education, Government of Odisha</small></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-7 d-flex justify-content-end align-items-center">
+                <c:if test="${isLoginShow}">
+                <button class="main-button-login btn-sm" title="Existing User Login Here" class="main-button-login btn-sm"
+                data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login </button>
+                <a href="${contextPath}/public/add-reg" class="main-button-register btn-sm " title="New User Register Here"> <i class="fa-regular fa-address-card"></i> Register</a>
+                </c:if>
+                <c:if test="${isLoginShow ne 'TRUE'}">
+                	<div class="new_user position-relative">
+                      <p>
+                        <span style="margin-right: 10px;">Already have an Account?</span>
+                        <button class="main-button-login btn-sm" title="Existing User Login Here" class="main-button-login btn-sm"  onclick="getLoginModal();"
+                			data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</button>
+                         <!-- <a href="#"  onclick="getLoginModal();" data-bs-toggle="modal" data-bs-target="#
+                        exampleModal" style="cursor: pointer"> Login Here</a> -->
+                      </p>
+                    </div>
+               </c:if>
+            </div>
+         </div>
+        </div>
+    </header>
+    <%--    <section class="banner-sec">
+        <div class="banner-slider owl-carousel">
+	        <c:forEach items="${sliderImgList}" var="sliderImg">
+	        <div>
+                <!-- <img src="${contextPath}/public/image/viewDocuments?moduleName=SLIDER-IMG&filePath=${sliderImg.imagePath}" alt="" class="img-fluid"> -->
+            </div>
+	        </c:forEach>
+       </div>
+      </section> --%>
+<script>
+function getLoginModal() {
+	debugger;
+    window.location.href = "${contextPath}/home";
+	$('#exampleModal').modal('show');
+	
+}
+</script>

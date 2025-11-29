@@ -1,0 +1,1252 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<style>
+    .frezz {
+        pointer-events: none;
+        background-color: #e9ecef !important;
+        color: #495057 !important;
+    }
+    .card-title-add {
+        font-size: 14px;
+        margin: 0;
+        color: #000 !important;
+        font-weight: 500;
+    }
+    .btns {
+        border-radius: 0.2rem;
+        line-height: 14px;
+        padding: 6px 7px 6px 6px;
+        font-size: 13px;
+    }
+    /* Ensure dropdown fits within sector */
+    select.form-control-sm {
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">DWO-Progress</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">DWO-Progress</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">DWO-Progress</h5>
+    </div>
+    <div class="card-body">
+        <form class="form-horizontal" id="dwoProgressForm">
+            <div class="row">
+                <!-- From Date -->
+                <div class="col-md-3 mb-3">
+                    <label class="form-label required">From Date :</label>
+                    <input type="date" class="form-control form-control-sm" id="fromDate" name="fromDate">
+                </div>
+                <!-- To Date -->
+                <div class="col-md-3 mb-3">
+                    <label class="form-label required">To Date :</label>
+                    <input type="date" class="form-control form-control-sm" id="toDate" name="toDate">
+                </div>
+                <!-- Executing Agency -->
+                <div class="col-md-3 mb-3">
+                    <label class="form-label required">Executing Agency :</label>
+                    <select class="form-control form-control-sm" id="executingAgency" name="executingAgency">
+                        <option selected disabled>- Select -</option>
+                        <option>DWO, BALANGIR</option>
+                        <option>PWD</option>
+                        <option>Ex-Engr. RWD, Sunabeda</option>
+                        <option>SE, R & B, Balangir</option>
+                        <option>SE, R & B, Kantabanji</option>
+                        <option>RWD, Balangir</option>
+                        <option>Additional Chief Enginner, Rural Works Division (RD), Jaleswar</option>
+                        <option>Additional Chief Enginner, Rural Works Division (RD), Balasore - II</option>
+                        <option>BDO, Paikmal</option>
+                        <option>BDO, Ambabhona</option>
+                        <option>BDO, Padampur</option>
+                        <option>BDO, Bargarh</option>
+                        <option>BDO, Bijepir</option>
+                        <option>BDO, Barpali</option>
+                        <option>BDO, Attabira</option>
+                        <option>RWSS</option>
+                        <option>DWO Boudh</option>
+                        <option>Ex.Engineer, Rural Works, Deogarh</option>
+                        <option>Ex.Eng(R & B) Divn, Dkl</option>
+                        <option>BDO, Kamakhyanagar</option>
+                        <option>Supertending Engineer, RWD, Bhawanipatna</option>
+                        <option>RD Bhawnipatana</option>
+                        <option>DWO Kendrapara</option>
+                        <option>Executive Engineer, R&B, Khordha Division</option>
+                        <option>BDO</option>
+                        <option>R&B Khariar</option>
+                        <option>R & B, Division, Sonepur</option>
+                        <option>Rural Works Division, Sonepur</option>
+                    </select>
+                </div>
+                <!-- Project Name & Location -->
+                <div class="col-md-3 mb-3">
+                    <label class="form-label required">Project Name & Location :</label>
+                    <select class="form-control form-control-sm" id="projectName" name="projectName">
+                        <option selected disabled>- Select -</option>
+                        <option>Rajendra University, Bolangir</option>
+                        <option>Govt. Women's HSS, Titilagarh</option>
+                        <option>DAV College, Titilagarh</option>
+                        <option>Jawaharlal College, Patnagarh</option>
+                        <option>Patneswari Women's HSS, Patnagarh</option>
+                        <option>Tusra HSS, Tusra</option>
+                        <option>Women's Degree College, Kantabanji</option>
+                        <option>Mukundilal Agrawal Women's HSS, Kantabanji</option>
+                        <option>SSD H.S Rampur ST Girls Hostel</option>
+                        <option>Ranasinghpur Ashram Hostel, Balasore</option>
+                        <option>Kupari Nodal High School Hostel, Khaira</option>
+                        <option>Mituani Girls High School Hostel, Khaira</option>
+                        <option>Mahendra Sachi Girls Hostel, Nuagaonbad</option>
+                        <option>Kabatghati Ashram Hostel & Classrooms, Balasore</option>
+                        <option>Bijadihi Ashram Hostel, Paikmal</option>
+                        <option>Kapsira GP High School Hostel, Ambadhona</option>
+                        <option>Women's Degree College, Padampur</option>
+                        <option>Anchal Degree College, Padampur</option>
+                        <option>Trust Fund Degree College, Bargarh</option>
+                        <option>Bijepur Degree College, Bijepur</option>
+                        <option>Jagabandhu Dash Women's College, Barpali</option>
+                        <option>Attabira Degree College, Bijepur</option>
+                        <option>Baliorada Hostel</option>
+                        <option>Boudh Panchayat College Hostel</option>
+                        <option>Pitabasha High School Hostel, Jharagogua</option>
+                        <option>Bapuji HSS Hostel, Gadapalasuni</option>
+                        <option>Bhuban Women's Degree College Hostel</option>
+                        <option>Kamakhyanagar College (Boys)</option>
+                        <option>Kamakhyanagar College (Girls)</option>
+                        <option>Kamakhya Nagar Women's College Hostel</option>
+                        <option>R.K Hostel & RKM PG Hostel, Ganjam</option>
+                        <option>Vinayak Acharaya College, Ganjam</option>
+                        <option>Sashibhusana Rath Women's College</option>
+                        <option>Priyadarshani Indira College, Junagarh</option>
+                        <option>Karlapada Degree College Hostel</option>
+                        <option>Karlapada Panchayat HSS Hostel</option>
+                        <option>Biyayananda HSS Hostel, Tulapada</option>
+                        <option>Kendrapara Autonomous College</option>
+                        <option>Tulasi Women's College, Kendrapara</option>
+                        <option>P.N College Hostel, Khordha</option>
+                        <option>Unit-I Hostel, Khordha</option>
+                        <option>Thuba UP School Hostel, Nandapur</option>
+                        <option>Odogaon Hostel</option>
+                        <option>Daspall Hostel</option>
+                        <option>Nayagarh Hostel</option>
+                        <option>Portipada High School Hostel</option>
+                        <option>Autonomous College, Khariar</option>
+                        <option>National College, Nuapada</option>
+                        <option>Nimapada Autonomous College, Puri</option>
+                        <option>Talana UGHS Hostel, Gunupur</option>
+                        <option>Kumakhal Village Hostel, Kashipur</option>
+                        <option>Padmapur Village Hostel</option>
+                        <option>Jagannath Girls High School Hostel, Gumuda</option>
+                        <option>Nakiti UG High School Girls Hostel</option>
+                        <option>Nakiti UG High School Boys Hostel</option>
+                        <option>Biju Pattanaik Women's College, Sonepur</option>
+                        <option>Siddhartha Degree College, Tarbha</option>
+                        <option>AES Degree College Hostel, Tarbha</option>
+                        <option>Mukundapur Ashram Hostel</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+        <div class="row mt-4">
+            <div class="col-md-12 text-center">
+                <button type="button" class="btn btn-success" onclick="filterData()">Filter</button>
+                <a href="${contextPath}/home" type="button" class="btn btn-warning btn-sm">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4" id="expenditure-report">
+    <div class="card-header">
+        <h5 class="card-title">DWO-Progress Details</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped exportbtn" id="expenditureTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Sl.No.</th>
+                        <th>Name of the executing agency</th>
+                        <th>Name of the District</th>
+                        <th>Year of Sanctioned</th>
+                        <th>Scheme Name</th>
+                        <th>Name of the projects and Location</th>
+                        <th>Agreement Amount (In Rs.)</th>
+                        <th>Project approval Letter No. & Date</th>
+                        <th>Funds released (in 1st phase) (In Rs.)</th>
+                        <th>Sanction order / Date</th>
+                        <th>Funds Released (2nd Phase)</th>
+                        <th>Sanction Order / Date</th>
+                        <th>Funds Released (3rd Phase)</th>
+                        <th>Sanction Order / Date</th>
+                        <th>Present Status</th>
+                    </tr>
+                </thead>
+                <tbody id="expenditureTableBody">
+                    <tr>
+                        <td>1</td>
+                        <td>DWO, BALANGIR</td>
+                        <td>BALANGIR</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Rajendra University, Bolangir</td>
+                        <td>3,00,00,000</td>
+                        <td>257 / 03.01.2024</td>
+                        <td>75,00,000</td>
+                        <td>739 / 08.01.24</td>
+                        <td>20051202</td>
+                        <td>21333 dt.04.09.2025</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Finishing work in progress</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>PWD</td>
+                        <td>BALANGIR</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Govt. Women's HSS, Titilagarh</td>
+                        <td>3,00,00,000</td>
+                        <td>3096 / 21.02.2023</td>
+                        <td>1,17,00,000</td>
+                        <td>3615 / 27.02.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Land issue</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>PWD</td>
+                        <td>BALANGIR</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>DAV (Autonomous) College, Titilagarh</td>
+                        <td>6,00,00,000</td>
+                        <td>3096/ 21.02.2023</td>
+                        <td>2,34,00,000</td>
+                        <td>3615 / 27.02.2023</td>
+                        <td>16142525</td>
+                        <td>20281 Dt. 27.09.2024</td>
+                        <td>3908677</td>
+                        <td>21333 dt.04.09.2025</td>
+                        <td>Finishing work in progress</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>PWD</td>
+                        <td>BALANGIR</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Jawaharlal College, Patnagarh</td>
+                        <td>6,00,00,000</td>
+                        <td>3096/ 21.02.2023</td>
+                        <td>2,34,00,000</td>
+                        <td>3615 / 27.02.2023</td>
+                        <td>20051202</td>
+                        <td>21333 dt.04.09.2025</td>
+                        <td></td>
+                        <td></td>
+                        <td>Ground Floor Roof Level</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Ex-Engr. RWD, Sunabeda</td>
+                        <td>BALANGIR</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Patneswari Women's HSS, Patnagarh</td>
+                        <td>3,00,00,000</td>
+                        <td>18417/02.09.23 &amp; 21224/11.10.23 (Revised)</td>
+                        <td>75,00,000</td>
+                        <td>19848/ 25.09.23</td>
+                        <td>20051202</td>
+                        <td>21333 dt.04.09.2025</td>
+                        <td></td>
+                        <td></td>
+                        <td>Ground Floor Roof Level</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>SE, R &amp; B , Balangir</td>
+                        <td>BALANGIR</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Tusra HSS, Tusra</td>
+                        <td>3,00,00,000</td>
+                        <td>16766/SSD Dt. 01.09.2021</td>
+                        <td>99,48,798</td>
+                        <td>3615 Dt. 27.02.2023</td>
+                        <td>20051202</td>
+                        <td>14807 dt.24.06.2025</td>
+                        <td></td>
+                        <td></td>
+                        <td>Finishing work in progress</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>SE, R &amp; B , Kantabanji</td>
+                        <td>BALANGIR</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Women's Degree College, Kantabanji</td>
+                        <td>3,00,00,000</td>
+                        <td>16766/SSD Dt. 01.09.2021</td>
+                        <td>99,48,798</td>
+                        <td>3615 Dt. 27.02.2023</td>
+                        <td>20051202</td>
+                        <td>14807 dt.24.06.2025</td>
+                        <td></td>
+                        <td></td>
+                        <td>Finishing work in progress</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>SE, R &amp; B , Kantabanji</td>
+                        <td>BALANGIR</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Mukundilal Agrawal Women's HSS, Kantabanji</td>
+                        <td>3,00,00,000</td>
+                        <td>16766/SSD Dt. 01.09.2021</td>
+                        <td>99,48,798</td>
+                        <td>3615 Dt. 27.02.2023</td>
+                        <td>20051202</td>
+                        <td>14807 dt.24.06.2025</td>
+                        <td></td>
+                        <td></td>
+                        <td>Finishing work in progress</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>RWD, Balangir</td>
+                        <td>BALANGIR</td>
+                        <td>2022-23</td>
+                        <td>IDF</td>
+                        <td>Model 120 seated ST Girls Hostel at SSD H.S Rampur</td>
+                        <td>3,00,00,000</td>
+                        <td>3723 Dt. 01.03.2023</td>
+                        <td>3,00,00,000</td>
+                        <td>3723 Dt. 01.03.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Foundation excavated and piller work started</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Additional Chief Enginner, Rural Works Division (RD), Jaleswar</td>
+                        <td>BALASORE</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST new girls hostel Ranasinghpur Ashram Vidyalaya</td>
+                        <td>3,00,00,000</td>
+                        <td>18417 dt.02.09.2023</td>
+                        <td>75,00,000</td>
+                        <td>21224 / 11.10.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Tender under process</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>Additional Chief Enginner, Rural Works Division (RD), Balasore - II</td>
+                        <td>BALASORE</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Hostel, Kupari Nodal High School, Khaira</td>
+                        <td>3,00,00,000</td>
+                        <td>18417 / 02.09.23</td>
+                        <td>75,00,000</td>
+                        <td>21225 / 11.10.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Roof Level</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>Additional Chief Enginner, Rural Works Division (RD), Balasore - II</td>
+                        <td>BALASORE</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 ST Girls Hostel at Mituani Girls High School, Khaira</td>
+                        <td>3,00,00,000</td>
+                        <td>22684 / 31.10.23</td>
+                        <td>75,00,000</td>
+                        <td>21226 / 11.10.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Roof Level</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>Additional Chief Enginner, Rural Works Division (RD), Balasore - II</td>
+                        <td>BALASORE</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Girls Hostel at Mahendra Sachi Girls High School, Nuagaonbad, Khaira Block, Balasore</td>
+                        <td>3,00,00,000</td>
+                        <td>18417 / 02.09.23</td>
+                        <td>75,00,000</td>
+                        <td>23302 / 08.11.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Gread beam lelvel</td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>Additional Chief Enginner, Rural Works Division (RD), Jaleswar</td>
+                        <td>BALASORE</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 240 seated ST Boys Hostel at Kabatghati Ashram School, Balasore AND Construction of 5(five) additional Class Rooms at Kabatghati Ashram School, Balasore</td>
+                        <td>7,00,00,000</td>
+                        <td>23664 / 13.11.23</td>
+                        <td>1,75,00,000</td>
+                        <td>25349 / 05.12.23</td>
+                        <td>24200000</td>
+                        <td>1340 dt.21.01.2025</td>
+                        <td>Nill</td>
+                        <td>Nill</td>
+                        <td>Tender under process</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>BDO, Paikmal</td>
+                        <td>BARGARH</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Const.of 120 seated new ST Girls Hostel at Ashram School Bijadihi, Paikmal Block</td>
+                        <td>3,00,00,000</td>
+                        <td>18417 / 02.09.23</td>
+                        <td>75,00,000</td>
+                        <td>19848 / 25.09.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Tender under process</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td>BDO, Ambabhona</td>
+                        <td>BARGARH</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Boys Hostel at Gram Panchayat High School, Kapsira, Ambadhona Block, Bargarh</td>
+                        <td>3,00,00,000</td>
+                        <td>22684 / 31.10.23</td>
+                        <td>75,00,000</td>
+                        <td>23302 / 08.11.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Tender under process</td>
+                    </tr>
+                    <tr>
+                        <td>17</td>
+                        <td>BDO, Padampur</td>
+                        <td>BARGARH</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Women's Degree College, Padampur</td>
+                        <td>3,00,00,000</td>
+                        <td>3096 / 21.02.23</td>
+                        <td>1,17,00,000</td>
+                        <td>3615 / 27.02.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Plinth Level</td>
+                    </tr>
+                    <tr>
+                        <td>18</td>
+                        <td>BDO, Padampur</td>
+                        <td>BARGARH</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Anchal Degree College, Padampur</td>
+                        <td>3,00,00,000</td>
+                        <td>3096 / 21.02.23</td>
+                        <td>1,17,00,000</td>
+                        <td>3615 / 27.02.23</td>
+                        <td>8100000</td>
+                        <td>13543 dt.11.06.2025</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Roof Level</td>
+                    </tr>
+                    <tr>
+                        <td>19</td>
+                        <td>BDO, Bargarh</td>
+                        <td>BARGARH</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Trust Fund Degree College, Bargarh</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/ 21.02.23</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/ 27.02.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Plinth Level</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>BDO, Bijepir</td>
+                        <td>BARGARH</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Bijepur Degree College, Bijepur</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/ 21.02.23</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/ 27.02.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Roof Level</td>
+                    </tr>
+                    <tr>
+                        <td>21</td>
+                        <td>BDO, Barpali</td>
+                        <td>BARGARH</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Jagabandhu Dash Women's Degree College, Barpali</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/ 21.02.23</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/ 27.02.23</td>
+                        <td>8100000</td>
+                        <td>13543 dt.11.06.2025</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Roof Level</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td>BDO, Attabira</td>
+                        <td>BARGARH</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Attabira Degree College, Bijepur</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/ 21.02.23</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/ 27.02.23</td>
+                        <td>8100000</td>
+                        <td>13543 dt.11.06.2025</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Roof Level</td>
+                    </tr>
+                    <tr>
+                        <td>23</td>
+                        <td>RWSS</td>
+                        <td>BHADRAK</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Baliorada</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/ 21.02.2023</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/ 27.02.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Work not started due to public agitation</td>
+                    </tr>
+                    <tr>
+                        <td>24</td>
+                        <td>DWO Boudh</td>
+                        <td>BOUDH</td>
+                        <td>2023-24</td>
+                        <td>CUMH</td>
+                        <td>100 seated Composite Urban Modern Hostel at Boudh Panchayat College</td>
+                        <td>3,00,00,000</td>
+                        <td>257/ 03.01.2024</td>
+                        <td>75,00,000</td>
+                        <td>739/ 08.01.24</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Work has been assigned to OPHWC by Collector Boudh. Revised Estimate to be submitted by OPHWC.</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>Ex.Engineer, Rural Works, Deogarh</td>
+                        <td>DEOGARH</td>
+                        <td>2022-23</td>
+                        <td>Special ST Hostel</td>
+                        <td>Const. of 120 seated ST Girls hostel in Pitabasha High School, Jharagogua.</td>
+                        <td>3,00,00,000</td>
+                        <td>25851/08.12.23</td>
+                        <td>75,00,000</td>
+                        <td>25945/11.12.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Tender completed.</td>
+                    </tr>
+                    <tr>
+                        <td>26</td>
+                        <td>Ex.Eng(R &amp; B) Divn, Dkl</td>
+                        <td>DHENKANAL</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Girls Hostel at Bapuji Higher Secondary School, Gadapalasuni</td>
+                        <td>3,00,00,000</td>
+                        <td>22684/31.10.2023</td>
+                        <td>75,00,000</td>
+                        <td>23302/08.11.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Work Started</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>Ex.Eng(R &amp; B) Divn, Dkl</td>
+                        <td>DHENKANAL</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Girls Hostel at Bhuban Women's Degree College</td>
+                        <td>3,00,00,000</td>
+                        <td>22684/31.10.2023</td>
+                        <td>75,00,000</td>
+                        <td>23302/08.11.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Work Started</td>
+                    </tr>
+                    <tr>
+                        <td>28</td>
+                        <td>BDO, Kamakhyanagar</td>
+                        <td>DHENKANAL</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Kamakhyanagar, College, Kamakhynagar (B)</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/21.02.2023</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/27.02.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Roof Casting(1st Floor)</td>
+                    </tr>
+                    <tr>
+                        <td>29</td>
+                        <td>BDO, Kamakhyanagar</td>
+                        <td>DHENKANAL</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Kamakhyanagar, College, Kamakhynagar (G)</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/21.02.2023</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/27.02.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>NIil</td>
+                        <td>Nil</td>
+                        <td>Roof Casting (1st Floor)</td>
+                    </tr>
+                    <tr>
+                        <td>30</td>
+                        <td>Ex.Eng(R &amp; B) Divn, Dkl</td>
+                        <td>DHENKANAL</td>
+                        <td>2023-24</td>
+                        <td>CUMH</td>
+                        <td>100 seated Composite Urban Modern Hostel at Kamakhya Nagar Womens College (Girls)</td>
+                        <td>3,00,00,000</td>
+                        <td>257/SSD,dt.03.01.2024</td>
+                        <td>75,00,000</td>
+                        <td>739/08.01.2024</td>
+                        <td>NIL</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Tender under Process</td>
+                    </tr>
+                    <tr>
+                        <td>31</td>
+                        <td>PWD</td>
+                        <td>GANJAM</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>R. K Hostel premises & RKM PG hostel premises</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/ 21.02.2023</td>
+                        <td>1,17,00,000</td>
+                        <td>3615 / 27.02.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Land issue</td>
+                    </tr>
+                    <tr>
+                        <td>32</td>
+                        <td>PWD</td>
+                        <td>GANJAM</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Vinayak Acharaya College +3 Govt. College</td>
+                        <td>6,00,00,000</td>
+                        <td>3096/ 21.02.2023</td>
+                        <td>2,34,00,000</td>
+                        <td>3615 / 27.02.2023</td>
+                        <td>17441238</td>
+                        <td>20272 dt.27.09.2024</td>
+                        <td></td>
+                        <td></td>
+                        <td>70% work completed</td>
+                    </tr>
+                    <tr>
+                        <td>33</td>
+                        <td>PWD</td>
+                        <td>GANJAM</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Sashibhusana Rath Govt.Womens College</td>
+                        <td>6,00,00,000</td>
+                        <td>3096/ 21.02.2023</td>
+                        <td>2,34,00,000</td>
+                        <td>3615 / 27.02.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Land not available</td>
+                    </tr>
+                    <tr>
+                        <td>34</td>
+                        <td>Supertending Engineer, RWD, Bhawanipatna</td>
+                        <td>KALAHANDI</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Const. of 120 seated ST Girls Priyadarshani Indira Degree College, Junagarh</td>
+                        <td>3,00,00,000</td>
+                        <td>2648/SSD, dt-25.10.2023</td>
+                        <td>75,00,000</td>
+                        <td>19848, dt-25.09.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>1st floor upto lintel level</td>
+                    </tr>
+                    <tr>
+                        <td>35</td>
+                        <td>RD Bhawnipatana</td>
+                        <td>KALAHANDI</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Const. of 120 seated ST Boys Hostel at +3 Degree College Karlapada</td>
+                        <td>3,00,00,000</td>
+                        <td>2648/SSD, dt-25.10.2023</td>
+                        <td>75,00,000</td>
+                        <td>19848, dt-25.09.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>1st floor upto roof level</td>
+                    </tr>
+                    <tr>
+                        <td>36</td>
+                        <td>RD Bhawnipatana</td>
+                        <td>KALAHANDI</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Const. of 120 seated ST Girls Hostel at Panchayat samiti Higher Secondary School, Karlapada</td>
+                        <td>3,00,00,000</td>
+                        <td>2648/SSD, dt-25.10.2023</td>
+                        <td>75,00,000</td>
+                        <td>19848, dt-25.09.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Upto ground Floor</td>
+                    </tr>
+                    <tr>
+                        <td>37</td>
+                        <td>RD Bhawnipatana</td>
+                        <td>KALAHANDI</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Const. of 120 seated ST Girls Hostel at Biyayananda Higher Secondary School Tulapada</td>
+                        <td>3,00,00,000</td>
+                        <td>2648/SSD, dt-25.10.2023</td>
+                        <td>75,00,000</td>
+                        <td>19848, dt-25.09.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>roof level of ground floor</td>
+                    </tr>
+                    <tr>
+                        <td>38</td>
+                        <td>DWO Kendrapara</td>
+                        <td>KENDRAPARA</td>
+                        <td>2023-24</td>
+                        <td>CUMH</td>
+                        <td>Kendrapara Autonomous College, Kendrapara</td>
+                        <td>6,00,00,000</td>
+                        <td>16323 / 07.08.23</td>
+                        <td>6,00,00,000</td>
+                        <td>17391 / 21.08.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>The fund was lapsed due to non submission of Gharabari land kisam by the College as ADM (Gen.) instructed the Kisam of land should be of Gharabari Kisam</td>
+                    </tr>
+                    <tr>
+                        <td>39</td>
+                        <td>DWO Kendrapara</td>
+                        <td>KENDRAPARA</td>
+                        <td>2023-24</td>
+                        <td>CUMH</td>
+                        <td>Tulasi Womens College</td>
+                        <td>3,00,00,000</td>
+                        <td>16323 / 07.08.23</td>
+                        <td>3,00,00,000</td>
+                        <td>17391 / 21.08.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>The fund was lapsed due to non submission of Gharabari land kisam by the College as ADM (Gen.) instructed the Kisam of land should be of non agricultural land Gharabari</td>
+                    </tr>
+                    <tr>
+                        <td>40</td>
+                        <td>Executive Engineer, R&amp;B, Khordha Division</td>
+                        <td>KHORDHA</td>
+                        <td>2023-24</td>
+                        <td>CUMH</td>
+                        <td>200 seated for Boys and 200 seated for Girls at P.N College</td>
+                        <td>5,75,05,000</td>
+                        <td>19232/ 14.09.2023</td>
+                        <td>4,68,00,000</td>
+                        <td>202228524884/ 24.02.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Construction under progress. Work completed upto plinth level.</td>
+                    </tr>
+                    <tr>
+                        <td>41</td>
+                        <td>PWD</td>
+                        <td>KHORDHA</td>
+                        <td>2023-24</td>
+                        <td>CUMH</td>
+                        <td>800 seated at Unit-I</td>
+                        <td>24,00,00,000</td>
+                        <td>8325 / 29.04.2023</td>
+                        <td>7,92,00,000</td>
+                        <td>9382/ 11.05.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Finishing work in progress</td>
+                    </tr>
+                    <tr>
+                        <td>42</td>
+                        <td>EE, RWD, Sunabeda</td>
+                        <td>KORAPUT</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Boys Hostel at UP School (S&amp;ME), Thuba of Nandapur</td>
+                        <td>3,00,00,000</td>
+                        <td>18417/02.09.23 &amp; 21224/11.10.23 (Revised)</td>
+                        <td>75,00,000</td>
+                        <td>19848/ 25.09.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Not started</td>
+                    </tr>
+                    <tr>
+                        <td>43</td>
+                        <td>BDO</td>
+                        <td>NAYAGARH</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Odogaon</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/Dt. 21.02.2023</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/ Dt. 27.02.2023</td>
+                        <td>18300000</td>
+                        <td>2761/Dt. 25.02.2025</td>
+                        <td></td>
+                        <td></td>
+                        <td>Finishing Stage</td>
+                    </tr>
+                    <tr>
+                        <td>44</td>
+                        <td>BDO</td>
+                        <td>NAYAGARH</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Daspall</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/Dt. 21.02.2023</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/ Dt. 27.02.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Tender under process</td>
+                    </tr>
+                    <tr>
+                        <td>45</td>
+                        <td>BDO</td>
+                        <td>NAYAGARH</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Nayagarh</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/Dt. 21.02.2023</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/ Dt. 27.02.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>2nd floor roof casted</td>
+                    </tr>
+                    <tr>
+                        <td>46</td>
+                        <td>R&amp;B Khariar</td>
+                        <td>NUAPADA</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Hostel at Portipada High School</td>
+                        <td>3,00,00,000</td>
+                        <td>18417/ Dt.02.09.2023</td>
+                        <td>75,00,000</td>
+                        <td>19848/ Dt.25.09.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Plinth Level</td>
+                    </tr>
+                    <tr>
+                        <td>47</td>
+                        <td>R&amp;B Khariar</td>
+                        <td>NUAPADA</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Autonomous College, Khariar</td>
+                        <td>3,00,00,000</td>
+                        <td>3096 / Dt.21.02.2023</td>
+                        <td>1,17,00,000</td>
+                        <td>3615 / Dt.27.02.2023</td>
+                        <td>28300000 (Incorrect)</td>
+                        <td>6470 / Dt.07.03.2025</td>
+                        <td></td>
+                        <td></td>
+                        <td>2nd floor roof casted</td>
+                    </tr>
+                    <tr>
+                        <td>48</td>
+                        <td>R&amp;B Khariar</td>
+                        <td>NUAPADA</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>National College, Nuapada</td>
+                        <td>3,00,00,000</td>
+                        <td>3096 / Dt.21.02.2023</td>
+                        <td>1,17,00,000</td>
+                        <td>3615 / Dt.27.02.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Tender process initiated</td>
+                    </tr>
+                    <tr>
+                        <td>49</td>
+                        <td>BDO</td>
+                        <td>PURI</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Autonomous College, Nimapada, Puri</td>
+                        <td>3,00,00,000</td>
+                        <td>letter No.3096/SSD dt. 21.02.2023</td>
+                        <td>1,17,00,000</td>
+                        <td>660/SSD dt.13.04.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Obtained technical and administrative approval. Ready for tender process.</td>
+                    </tr>
+                    <tr>
+                        <td>50</td>
+                        <td>BDO</td>
+                        <td>RAYAGADA</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Boys Hostel at UGHS Talana Gram Panchayat, Gunupur</td>
+                        <td>3,00,00,000</td>
+                        <td>18417/02.09.23 &amp; 21224/11.10.23 (Revised)</td>
+                        <td>75,00,000</td>
+                        <td>19848/ 25.09.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Not started</td>
+                    </tr>
+                    <tr>
+                        <td>51</td>
+                        <td>BDO</td>
+                        <td>RAYAGADA</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated Hostel at Kumakhal Village, Kashipur</td>
+                        <td>3,00,00,000</td>
+                        <td>18417/02.09.23 &amp; 21224/11.10.23 (Revised)</td>
+                        <td>75,00,000</td>
+                        <td>19848/ 25.09.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Not started</td>
+                    </tr>
+                    <tr>
+                        <td>52</td>
+                        <td>BDO</td>
+                        <td>RAYAGADA</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Girls Hostel at Padmapur Village Padmapur</td>
+                        <td>3,00,00,000</td>
+                        <td>18417/02.09.23 &amp; 21224/11.10.23 (Revised)</td>
+                        <td>75,00,000</td>
+                        <td>19848/ 25.09.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Not started</td>
+                    </tr>
+                    <tr>
+                        <td>53</td>
+                        <td>BDO</td>
+                        <td>RAYAGADA</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Girls Hostel at Jagannath Girls High School at Gumuda, Ramanaguda Block, Rayagada</td>
+                        <td>3,00,00,000</td>
+                        <td>22684 / 31.10.23</td>
+                        <td>75,00,000</td>
+                        <td>23302 / 08.11.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Not started</td>
+                    </tr>
+                    <tr>
+                        <td>54</td>
+                        <td>BDO</td>
+                        <td>RAYAGADA</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Girls Hostel at Govt. UG High School, Nakiti, Rayagada</td>
+                        <td>3,00,00,000</td>
+                        <td>22684 / 31.10.23</td>
+                        <td>75,00,000</td>
+                        <td>23302 / 08.11.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Not started</td>
+                    </tr>
+                    <tr>
+                        <td>55</td>
+                        <td>BDO</td>
+                        <td>RAYAGADA</td>
+                        <td>2023-24</td>
+                        <td>Special ST Hostel</td>
+                        <td>Construction of 120 seated ST Boys Hostel at Govt. UG High School, Nakiti, Rayagada</td>
+                        <td>3,00,00,000</td>
+                        <td>22684 / 31.10.23</td>
+                        <td>75,00,000</td>
+                        <td>23302 / 08.11.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td></td>
+                        <td></td>
+                        <td>Not started</td>
+                    </tr>
+                    <tr>
+                        <td>56</td>
+                        <td>R &amp; B, Division, Sonepur</td>
+                        <td>SUBARNAPUR</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Construction of 100 seated Composite Urban Modern Hostels at Biju Pattanaik Womenâs Degree College, Sonepur</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/ 21.02.23</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/ 27.02.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Finishing work is under progress</td>
+                    </tr>
+                    <tr>
+                        <td>57</td>
+                        <td>R &amp; B, Division, Sonepur</td>
+                        <td>SUBARNAPUR</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Construction of 100 seated Composite Urban Modern Hostels at Siddhartha Degree College, Tarbha</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/ 21.02.23</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/ 27.02.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Finishing work is under progress</td>
+                    </tr>
+                    <tr>
+                        <td>58</td>
+                        <td>R &amp; B, Division, Sonepur</td>
+                        <td>SUBARNAPUR</td>
+                        <td>2022-23</td>
+                        <td>CUMH</td>
+                        <td>Construction of 100 seated Composite Urban Modern Hostels at AES, Degree College, Tarbha</td>
+                        <td>3,00,00,000</td>
+                        <td>3096/ 21.02.23</td>
+                        <td>1,17,00,000</td>
+                        <td>3615/ 27.02.23</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>2nd Floor roof slab rod binding work is under progress. Ground Floor &amp; First Floor brick work is under progress</td>
+                    </tr>
+                    <tr>
+                        <td>59</td>
+                        <td>Rural Works Division, Sonepur</td>
+                        <td>SUBARNAPUR</td>
+                        <td>2022-23</td>
+                        <td>IDF</td>
+                        <td>Model 120 seated ST Girls Hostel at Mukundapur Ashram School</td>
+                        <td>3,00,00,000</td>
+                        <td>21752/15.12.2022</td>
+                        <td>3,00,00,000</td>
+                        <td>3718/ 01.03.23 &amp; 3728/01.02.2023</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Nil</td>
+                        <td>Not Started</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default date range to last month
+    const today = new Date();
+    const lastMonth = new Date();
+    lastMonth.setMonth(today.getMonth() - 1);
+
+    // Format dates to YYYY-MM-DD
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    document.getElementById('fromDate').value = formatDate(lastMonth);
+    document.getElementById('toDate').value = formatDate(today);
+
+    // Update existing filterData function to use new field IDs
+    function filterData() {
+        var fromDate = $("#fromDate").val();
+        var toDate = $("#toDate").val();
+        var executingAgency = $("#executingAgency").val();
+        var projectName = $("#projectName").val();
+
+        $('#hiddenStartDate').val(fromDate);
+        $('#hiddenEndDate').val(toDate);
+        $('#hiddenExecutingAgency').val(executingAgency);
+        $('#hiddenProjectName').val(projectName);
+
+        showLoader();
+
+        var bizContent = $("#dwoProgressForm").serializeArray();
+        $("#hiddenCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+        $("#dwoProgressForm").submit();
+    }
+});
+</script>

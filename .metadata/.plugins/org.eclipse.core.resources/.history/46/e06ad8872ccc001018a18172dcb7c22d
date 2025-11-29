@@ -1,0 +1,716 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/AadharVaidator.js"></script>
+
+<style>
+
+</style>
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Staff Details</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+	        <ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Staff Details</li>
+			</ol>
+        </nav>
+     </div>
+</div>
+<div class="container-fluid">
+    <div class="row mt-2">
+
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title">Staff Details</h6>
+                </div>
+                <div class="card-body">
+                <input type="hidden" value="true" id="labelmsg" name="labelmsg">
+<!--                 <input type="hidden"  id="staffNameMSG" name="staffNameMSG" value="COSTUME: STAF NAME SHOULD NOT BE EMPTY"> -->
+	                <ul class="nav nav-tabs" id="myTab" role="tablist">
+					  <li class="nav-item" role="tabBasicDetails">
+					    <button class="nav-link active" id="tabBasicDetails-tab" data-bs-toggle="tab" data-bs-target="#tabBasicDetails" type="button" role="tab" aria-controls="tabBasicDetails" aria-selected="true">Basic Details</button>
+					  </li>
+					  <li class="nav-item" role="tabEmployment">
+					    <button class="nav-link ${empty staffDetails.staffId ? 'frezz' : ''}" id="tabEmployment-tab" data-bs-toggle="tab" data-bs-target="#tabEmployment" type="button" role="tab" aria-controls="tabEmployment" aria-selected="false">Employment</button>
+					  </li>
+					  <li class="nav-item" role="tabfamily">
+					    <button class="nav-link ${empty staffDetails.staffId ? 'frezz' : ''}" id="tabfamily-tab" data-bs-toggle="tab" data-bs-target="#tabfamily" type="button" role="tab" aria-controls="tabfamily" aria-selected="false">Family</button>
+					  </li>
+					  <li class="nav-item" role="tabAddress">
+					    <button class="nav-link ${empty staffDetails.staffId ? 'frezz' : ''}" id="tabAddress-tab" data-bs-toggle="tab" data-bs-target="#tabAddress" type="button" role="tab" aria-controls="tabAddress" aria-selected="false">Address</button>
+					  </li>
+					  <li class="nav-item" role="tabEducation">
+					    <button class="nav-link ${empty staffDetails.staffId ? 'frezz' : ''}" id="tabEducation-tab" data-bs-toggle="tab" data-bs-target="#tabEducation" type="button" role="tab" aria-controls="tabEducation" aria-selected="false">Education</button>
+					  </li>
+					  <li class="nav-item" role="tabImportantDocument">
+					    <button class="nav-link ${empty staffDetails.staffId ? 'frezz' : ''}" id="tabImportantDocument-tab" data-bs-toggle="tab" data-bs-target="#tabImportantDocument" type="button" role="tab" aria-controls="tabImportantDocument" aria-selected="false">Important Document</button>
+					  </li>
+					</ul>
+ 
+                    <div class="tab-content mt-3">
+                    	<div id="tabBasicDetails" class="tabBasicDetails tab-pane fade show active">
+	                        <jsp:include page="/WEB-INF/views/staffOnBoarding/staffBasicDetails.jsp" />
+	                    </div>
+	                    <div id="tabEmployment" class="tab-pane fade">
+	                        <jsp:include page="/WEB-INF/views/staffOnBoarding/staffEmploymentDetails.jsp" />
+	                    </div>
+	                    <div id="tabfamily" class="tab-pane fade">
+	                        <jsp:include page="/WEB-INF/views/staffOnBoarding/staffFamilyDetails.jsp" />
+	                    </div>
+	                    <div id="tabAddress" class="tab-pane fade">
+	                        <jsp:include page="/WEB-INF/views/staffOnBoarding/staffAddressDetails.jsp" />
+	                    </div>
+	                    <div id="tabEducation" class="tab-pane fade">
+	                        <jsp:include page="/WEB-INF/views/staffOnBoarding/staffEducationDetails.jsp" />
+	                    </div>
+	                    <div id="tabImportantDocument" class="tab-pane fade">
+	                        <jsp:include page="/WEB-INF/views/staffOnBoarding/staffImportantDocument.jsp" />
+	                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Include JavaScript utility -->
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+
+<!-- jQuery UI -->
+<script src="${contextPath}/assets/js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+<script src="${contextPath}/assets/js/plugin/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"></script>
+<script src="${contextPath}/assets/js/plugin/datatables/datatables.min.js"></script>
+<script src="${contextPath}/assets/js/moment.js"></script>
+<!-- jQuery Scrollbar -->
+<script src="${contextPath}/assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+<script>
+
+$( document ).ready(function() {
+	var bankId= '${staffDetails.bankId.bankId}'
+		var branchId='${staffDetails.branchId.bankBranchId}'
+		if(bankId!=''){
+			getBankBranchByBankId('bankName','branchName');
+		}
+	
+});
+
+
+	/*FORM VALIDATE START  */
+	function submitForm(formId){//*
+		MAX_FILE_SIZE=2097152;
+		if(validateFormByFormID(formId)){
+			//bootbox.alert("Work in progress");
+			confirmation(formId);
+		}
+			
+			
+		}
+	/*FORM VALIDATE END */
+
+	
+	function handleFamillySelection() {//*
+    var isValid = true;
+    var selectedRelationships = []; // Keep track of selected relationships
+    var fatherCount = 0;
+    var motherCount = 0;
+
+    $('div[id^="row"]').each(function () {
+        var selectElement = $(this).find('[id^="relationship"]').get(0);
+        
+        // Add a check to ensure selectElement is defined
+        if (selectElement) {
+            var selectedOption = selectElement.options[selectElement.selectedIndex];
+            var relationship = selectedOption.value;
+            
+            // Check if the relationship is "father" or "mother"
+            if (relationship === "1") {
+                fatherCount++;
+            } else if (relationship === "2") {
+                motherCount++;
+            }
+
+            // Check if all required fields are filled
+            isValid = isValid && checkRequiredFields(
+                'firstNameF' + status.index,
+                'birthDate' + status.index,
+                'contactNumber' + status.index
+                // Add more fields if needed
+            );
+
+            // Keep track of selected relationships other than "father" or "mother"
+            if (relationship !== "1" && relationship !== "2") {
+                selectedRelationships.push(relationship);
+            }
+        }
+    });
+
+    // Check if "father" or "mother" is selected more than once
+    if (fatherCount > 1 || motherCount > 1) {
+        alert("You cannot select 'Father' or 'Mother' more than once.");
+        isValid = false;
+    }
+
+    // Check if any other relationship is repeated
+    /* var uniqueRelationships = new Set(selectedRelationships);
+    if (uniqueRelationships.size !== selectedRelationships.length) {
+        alert("You cannot select the same relationship more than once, except for 'Father' and 'Mother'.");
+        isValid = false;
+    }
+ */
+    return isValid;
+
+    function checkRequiredFields() {//*
+        for (var i = 0; i < arguments.length; i++) {
+            var element = document.getElementById(arguments[i]);
+            if (!element || element.value === "") {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+	
+	
+	function deleteFamily(rowId) {
+	    var rowToDelete = "#row" + rowId;
+	    $(rowToDelete).remove();
+		renumberRowsFamily();
+	}
+
+function renumberRowsFamily() {
+	var numIdInputs = $(".validIdIndex").length;
+	var numAreaInputs = $(".validAreaIndex").length;
+	var numFacInputs=  $(".validFacIndex").length;
+	var numMokInputs=  $(".validMokIndex").length;
+	var numDumInputs=  $(".validDumIndex").length;
+	for (var i = 0; i < numIdInputs; i++) {
+		var input = $(".validIdIndex")[i];
+        $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+		$(input).attr("name", "staffFamilyDetailsList["+i+"].familyId");
+	}
+
+	for (var i = 0; i < numAreaInputs; i++) {
+		var input = $(".validAreaIndex")[i];
+        $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+		$(input).attr("name", "staffFamilyDetailsList["+i+"].familyMemberName");
+	}
+
+	for (var i = 0; i < numFacInputs; i++) {
+		var input = $(".validFacIndex")[i];
+        $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+		$(input).attr("name", "staffFamilyDetailsList["+i+"].relationshipId");
+	}
+
+	for (var i = 0; i < numMokInputs; i++) {
+		var input = $(".validMokIndex")[i];
+        $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+		$(input).attr("name", "staffFamilyDetailsList["+i+"].dob");
+	}
+
+	for (var i = 0; i < numDumInputs; i++) {
+		var input = $(".validDumIndex")[i];
+        $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+		$(input).attr("name", "staffFamilyDetailsList["+i+"].contactNumber");
+	}
+}
+
+	// function reindexFamilyRows() {//*
+	//     for (var i = 0; i < cnt; i++) {
+	//         var currentRow = "#row" + i;
+	//         $(currentRow).attr("id", "row" + i);
+	//
+	//         // Update other elements as needed
+	//         $("#firstNameF" + i).attr("id", "firstNameF" + i);
+	//         $("#birthDate" + i).attr("id", "birthDate" + i);
+	//         $("#relationship" + i).attr("name", "staffFamilyDetailsList[" + i + "].relationshipId");
+	//
+	//     }
+	// }
+	
+
+	
+	
+	function imageCheck2(that) {//*
+		  var ValidFileExtension = ['jpg', 'jpeg', 'png'];
+		  if ($(that).val().split('.').length == 2) {
+			if ($.inArray($("#" + that.id).val().split('.').pop().toLowerCase(), ValidFileExtension) == -1) {
+			  $("#" + that.id).val("");
+			  bootbox.alert("Please upload only .jpg/.jpeg/.png files.");
+			  event.preventDefault();
+			  return false;
+			}
+			if (that.files[0].size > 1048576) { // Maximum size of 1 MB (1 MB = 1048576 bytes)
+			  $(that).val("");
+			  bootbox.alert("File size exceeds the maximum image size of 1 MB!");
+			  return false;
+			}
+		  } else {
+			bootbox.alert("Unsupported file format. Please check the file.");
+			$(that).val("");
+		  }
+		}
+		
+	function uploadFileCheck(that){//*
+		
+	var ValidFileExtension = ['pdf','jpg', 'jpeg', 'png'];
+
+	if($(that).val().split('.').length == 2 ) {
+		  if ($.inArray($(that).val().split('.').pop().toLowerCase(), ValidFileExtension) == -1) {
+				bootbox.alert("Please upload only .pdf, .jpg/.jpeg/.png files.");
+				$(that).val("");
+				return false;
+			}
+			if ((that.files[0].size) > 2097152) {
+				bootbox.alert("File size exceeds maximun file size of 2 MB!");
+				$(that).val("");
+				return false;
+			}
+		}else{
+	  	   bootbox.alert("Unsupported file format,Please check your file extension");
+	  	   $(that).val("");
+	 }
+	}
+	
+
+	function checkPanCard() {//*
+	    var panNo = $("#panNo").val();
+
+	    var responseContainer = $("#response-message");
+	    var errorContainer = $("#error-message");
+
+	    $.ajax({
+	        url: "${contextPath}/staff/check-panCard",
+	        method: "GET",
+	        data: { panNo: panNo }, // Update parameter name to 'panNo'
+	        success: function(response) {
+	            if (response === "No") {
+	                errorContainer.text(""); 
+	            } else {
+	                bootbox.alert("Pan card is already in staff Master. Please choose another pan card.");
+	                responseContainer.text(""); 
+	                $("#panNo").val("");
+	            }
+	        },
+	        error: function(jqXHR, textStatus, errorThrown) {
+	            console.log("AJAX request failed: " + errorThrown);
+	            errorContainer.text("Error checking PAN card. Please try again."); // Display a generic error message
+	        }
+	    });
+	}
+
+	function checkPassportNo() {//*
+	    var passportNo = $("#passportNo").val();
+
+	    var responseContainer = $("#response-message");
+	    var errorContainer = $("#error-message");
+
+	    $.ajax({
+	        url: "${contextPath}/staffOnboard/check-passportNo",
+	        method: "GET",
+	        data: { passportNo: passportNo }, // Update parameter name to 'panNo'
+	        success: function(response) {
+	            if (response === "No") {
+	                errorContainer.text(""); 
+	            } else {
+	                bootbox.alert("Passport No. is already in staff Master. Please choose another passport No.");
+	                responseContainer.text(""); 
+	                $("#passportNo").val("");
+	            }
+	        },
+	        error: function(jqXHR, textStatus, errorThrown) {
+	            console.log("AJAX request failed: " + errorThrown);
+	            errorContainer.text("Error checking passport No. Please try again."); // Display a generic error message
+	        }
+	    });
+	}
+
+	function checkDrivingLicNo() {//*
+	    var drivingLicNo = $("#drivingLicNo").val();
+
+	    var responseContainer = $("#response-message");
+	    var errorContainer = $("#error-message");
+
+	    $.ajax({
+	        url: "${contextPath}/staffOnboard/check-drivingLicNo",
+	        method: "GET",
+	        data: { drivingLicNo: drivingLicNo }, // Update parameter name to 'panNo'
+	        success: function(response) {
+	            if (response === "No") {
+	                errorContainer.text(""); 
+	            } else {
+	                bootbox.alert("DrivingLic No. is already in staff Master. Please choose another drivingLic No.");
+	                responseContainer.text(""); 
+	                $("#drivingLicNo").val("");
+	            }
+	        },
+	        error: function(jqXHR, textStatus, errorThrown) {
+	            console.log("AJAX request failed: " + errorThrown);
+	            errorContainer.text("Error checking drivingLic No. Please try again."); // Display a generic error message
+	        }
+	    });
+	}
+
+	
+	function getValidCheckData(valid,data){//*
+		  if(data != ""){
+				if(data.length < 12 && valid == "BNF_ADH"){
+					bootbox.alert("Aadhaar No. should be 12 digit");
+					$("#adharId").val("");
+					return false;
+				}else if(data.length < 10 && valid == "BNF_MOB"){
+					bootbox.alert("Please provide valid mobile no");
+					$("#mobileNo").val("");
+					return false;
+				}
+				else if(valid == "BNF_ADH" && !ValidAadhaarNo(data)){
+					bootbox.alert('Invalid Aadhaar No.');
+					$("#adharId").val("");
+					return false;
+				}
+				else{
+					$.ajax({
+						url: '${contextPath}/staffOnboard/getDuplicateCheck',
+						data: {
+							"data": data,
+							"validCall": valid,
+//		 						"registrationCode" : $("#registrationCodeData").val() ? $("#registrationCodeData").val() : '',
+						},
+						cache : false,
+					    asynch : false,
+						success: function(response) {
+							var data = response;
+							if (data != null) {
+								if(data == "yes" && valid == "BNF_ACC"){
+									bootbox.alert("Account Number already exists");
+									$("#accNo").val("");
+									return false;
+								}else if(data == "yes" && valid == "BNF_ADH"){
+									bootbox.alert("Aadhaar No. already registered.");
+									$("#adharId").val("");
+									return false;
+								}
+								else if(data == "yes" && valid == "BNF_MOB"){
+									bootbox.alert("Mobile no. already registered.");
+									$("#mobileNo").val("");
+									return false;
+								}
+							} else {
+								bootbox.alert("Data not found");
+//		 							$('#loader').addClass('hidden');
+							}
+						},
+					});
+			    } 
+		  }
+		  
+	}
+
+
+/* AJAX CALL START */
+function getBankBranchByBankId(id,idToAppend){//*
+	var html="<option value='0'>--Select--</option>";
+	var bank=$("#"+id).val();
+	if(bank != "0"){
+		showLoader();
+		$.ajax({
+			url : '${contextPath}/api/allow/getBranchBybankId',
+			type : 'GET',
+			data : ({
+				"bankId" : bank,
+			}),
+			cache : true,
+			asynch : false,
+			success : function(response) {
+				hideLoader();
+				var jsondata=JSON.parse(response);
+				var obj = jsondata.data;
+					 $.each(obj, function(key,value) {
+						 html += "<option value='"+value.bankBranchId+"'>"+value.branchName+"</option>";
+					}); 
+					$("#"+idToAppend).empty().append(html);
+					debugger
+					var branchIdd='${staffDetails.branchId.bankBranchId}';
+					if(branchIdd!=''){
+						$("#"+idToAppend).val(branchIdd);
+					}
+				},
+			error : function(error) {
+				hideLoader();
+				bootbox.alert(error);
+			}
+		});
+	}else{
+		$("#"+idToAppend).empty().append(html);
+	}
+}
+function getIFSCByBranchId(val,idToSet) {//*
+	var branchId=val;
+	if(branchId != "0"){
+		showLoader();
+		$.ajax({
+			url : '${contextPath}/api/allow/getIfscByBranchId',
+			type : 'GET',
+			data : ({
+				branchId : branchId
+			}),
+			cache : false,
+			asynch : false,
+			success : function(response) {
+			   hideLoader();
+				var jsondata=JSON.parse(response);
+				var obj = jsondata.data;
+				$("#"+idToSet).val(obj.ifscCode);
+			},
+			error : function(error) {
+				hideLoader();
+				bootbox.alert(error);
+			}
+		});
+	}else{
+		$("#"+idToSet).val("");
+	}
+
+}
+/* AJAX CALL END */
+</script>
+
+
+
+<script>
+
+
+
+/* function updatePayBandList() {
+    var selectedPayCommTypeId = $('#paycommType0').val();
+
+    $.ajax({
+        type: 'GET',
+        url: '${contextPath}/staffOnboard/getPayBandOptions',
+        data: { payCommTypeId: selectedPayCommTypeId },
+        success: function (data) {
+            var html = "<option value='0'>-Select-</option>";
+            
+            if (data && data.length > 0) {
+                $.each(data, function (index, value) {
+                    html += "<option value='" + value.paybandId + "'>" + value.paybandName + "</option>";
+                });
+            }
+
+            $('#payBand0').empty().append(html);
+            
+            $('#loader').addClass('hidden');
+        },
+        error: function (error) {
+            $('#loader').addClass('hidden');
+            bootbox.alert("No pay band Found");
+        }
+    });
+} */
+
+
+	// function updatePayBandListDept() {
+	// 	    var selectedPayCommTypeId = $('#paycommTypes').val();
+		
+	// 	    $.ajax({
+	// 	        type: 'GET',
+	// 	        url: '${contextPath}/staffOnboard/getPayBandOptions',
+	// 	        data: { payCommTypeId: selectedPayCommTypeId },
+	// 	        success: function (data) {
+	// 	            var html = "<option value='0'>-Select-</option>";
+		            
+	// 	            if (data && data.length > 0) {
+	// 	                $.each(data, function (index, value) {
+	// 	                    html += "<option value='" + value.paybandId + "'>" + value.paybandName + "</option>";
+	// 	                });
+	// 	            }
+		
+	// 	            $('#payBands').empty().append(html);
+		            
+	// 	            $('#loader').addClass('hidden');
+	// 	        },
+	// 	        error: function (error) {
+	// 	            $('#loader').addClass('hidden');
+	// 	            bootbox.alert("No pay band Found");
+	// 	        }
+	// 	    });
+	// 	} 
+	
+/* function pwdCheck(that){
+	 //var thiss =  value;
+	 if (that === "true") {
+       $("#uploadFileSection").show();
+   } else {
+       $("#uploadFileSection").hide();
+   }
+}
+$(document).ready(function () {
+	var thiss =  ('${empeBasicDetails.staffMaster.isPwd}');
+	 if (thiss === "true") {
+      $("#uploadFileSection").show();
+  } else {
+      $("#uploadFileSection").hide();
+  }
+}); */
+
+//var previousSelections = {};
+
+//var selectedCombinations = [];
+
+/* function disableSameCombination(index) {
+    var collegeValue = document.querySelector(`#college${index}`).value;
+    var departmentValue = document.querySelector(`#department${index}`).value;
+    var roleValue = document.querySelector(`#role${index}`).value;
+
+    if (hasDuplicateCombination(index, collegeValue, departmentValue, roleValue)) {
+        document.querySelector(`#college${index}`).value = selectedCombinations[index].college;
+        document.querySelector(`#department${index}`).value = selectedCombinations[index].department;
+        document.querySelector(`#role${index}`).value = selectedCombinations[index].role;
+    } else {
+        selectedCombinations[index] = { college: collegeValue, department: departmentValue, role: roleValue };
+    }
+}
+
+function hasDuplicateCombination(currentIndex, currentCollege, currentDepartment, currentRole) {
+    for (var i = 0; i < currentIndex; i++) {
+        var combination = selectedCombinations[i];
+        if (combination && combination.college === currentCollege && combination.department === currentDepartment && combination.role === currentRole) {
+            return true;
+        }
+    }
+    return false;
+} */
+
+
+
+
+	/* function enableDisableRadioButtons() {
+	var universityRadio = document.querySelector('input[name="staffMaster.staffPerfType"][value="UNV"]');
+	var departmentRadio = document.querySelector('input[name="staffMaster.staffPerfType"][value="DEPT"]');
+	
+	if (universityRadio.checked || departmentRadio.checked) {
+	    // Disable College radio button
+	    document.querySelector('input[name="staffMaster.staffPerfType"][value="COLG"]').disabled = true;
+	} else {
+	    // Enable College radio button
+	    document.querySelector('input[name="staffMaster.staffPerfType"][value="COLG"]').disabled = false;
+	}
+	} */
+	/* function validateEmail(email) {
+	var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	return emailRegex.test(email);
+	} */
+	
+	
+	/* function checkAcAndBankName(that) {
+	var accNo = $('#accNo').val().trim();
+	var bankId = $('#bankName').val(); // Assuming bankName is the ID of the bank dropdown
+	
+	var responseContainer = $("#response-message");
+	var errorContainer = $("#error-message");
+	
+	$.get("${contextPath}/staffOnboard/check-accNo-bankName", { accNo: accNo, bankId: bankId }, function (response) {
+	    if (response === "No") {
+	        errorContainer.text("");
+	    } else {
+	        bootbox.alert("The account number and bank name already exist in the staff records. Please choose another account number or select a different bank.");
+	        responseContainer.text("");
+	        $("#accNo").val("");
+	        $('#bankName').val("");
+	    }
+	}).fail(function (jqXHR, textStatus, errorThrown) {
+	    console.log("AJAX request failed: " + errorThrown);
+	}); 
+	}*/
+	
+	
+	
+	/*  function checkhrmsCode() {
+    var hrngsCode = $("#hrngsCode").val();
+
+    var responseContainer = $("#response-message");
+    var errorContainer = $("#error-message");
+
+    $.ajax({
+        url: "${contextPath}/staffOnboard/check-hrngsCode",
+        method: "GET",
+        data: { hrngsCode: hrngsCode },
+        success: function(response) {
+            if (response === "No") {
+                errorContainer.text(""); 
+            } else {
+                bootbox.alert("HRMS Code is already in staff Master. Please choose another HRMS Code.");
+                responseContainer.text(""); 
+                $("#hrngsCode").val("");
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log("AJAX request failed: " + errorThrown);
+            errorContainer.text("Error checking HRMS Code. Please try again."); // Display a generic error message
+        }
+    });
+}  */
+
+
+/* 	function disableRelationshipDropdown(selectElement) {
+	    var index = getIndex(selectElement);
+	    if (hasDuplicateSelection(index, selectElement.value)) {
+	        selectElement.value = '';
+	    } else {
+	        previousSelections[index] = selectElement.value;
+	    }
+	}
+	
+	function getIndex(selectElement) {
+	    var nameAttribute = selectElement.name;
+	    var match = nameAttribute.match(/\[(\d+)\]/);
+	    return match ? match[1] : null;
+	}
+	
+	function hasDuplicateSelection(currentIndex, selectedValue) {
+	    for (var index in previousSelections) {
+	        if (index !== currentIndex && previousSelections[index] === selectedValue) {
+	            return true;
+	        }
+	    }
+	    return false;
+	} */
+
+
+</script>
+
+
+<!-- Field validation functions -->
+<script>
+	document.getElementById("fileUpload0").addEventListener("change", function () {
+		var fileInput = this;
+		var file = fileInput.files[0];
+	
+		if (file) {
+			var allowedExtensions = /(\.pdf|\.png|\.jpg|\.jpeg)$/i;
+			var maxSize = 2 * 1024 * 1024; // 2MB in bytes
+	
+			if (!allowedExtensions.test(file.name)) {
+				alert("Invalid file type! Only .pdf, .png, .jpg, and .jpeg are allowed.");
+				fileInput.value = ""; // Clear the input
+				return;
+			}
+	
+			if (file.size > maxSize) {
+				alert("File size exceeds 2MB. Please upload a smaller file.");
+				fileInput.value = ""; // Clear the input
+			}
+		}
+	});
+	</script>
+	

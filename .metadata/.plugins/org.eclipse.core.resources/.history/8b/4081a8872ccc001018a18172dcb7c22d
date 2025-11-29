@@ -1,0 +1,293 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+
+<style>
+.is-invalid {
+	border-color: red;
+}
+
+table.tableizer-table {
+	width: 100%;
+	font-size: 13px;
+	border: 1px solid #CCC;
+	letter-spacing: -0.75px;
+	font-family: "Open Sans", Arial, sans-serif;
+}
+
+.tableizer-table td {
+	padding: 1px 2px 1px 3px;
+	border: 1px dotted #CCC;
+}
+
+.tableizer-table th {
+	padding: 1px;
+	margin: 1px;
+	border: 1px dotted #CCC;
+	font-weight: bold;
+}
+
+.tableizerTitleRow {
+	text-align: left;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+.table>tbody>tr>td {
+	word-break: break-all;
+}
+
+.datepicker_con>input {
+	width: 100%;
+	border-radius: 3px;
+	border: 1px solid #aaaaaa;
+}
+
+.datepicker_con>button {
+	display: none;
+}
+
+.autocomplete-suggestions {
+	width: 345px !important;
+}
+
+.searchParamDiv1 {
+	width: 14%;
+}
+
+.searchParamDiv1 label {
+	font-weight: 600;
+}
+
+.searchParamDiv2 {
+	width: 04%;
+	text-align: center;
+	padding-top: 26px;
+}
+
+.searchParamDiv2 label {
+	font-weight: bold;
+	font-size: 15px !important;
+}
+
+#partyListTable>tbody>tr>td {
+	font-size: 13.5px;
+}
+
+#partyListTable>thead>tr>th {
+	background: #d8d8d8;
+}
+</style>
+
+<script>
+$(function()
+{
+	$('#datatable-default').dataTable({
+ 		"bSort": false,
+ 		"autoWidth": false
+	});
+})
+</script>
+<div class="breadcrumb_conatiner">
+ 	<div class="col-md-6">
+		<h4 class="change-color">Listing Payment Voucher</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Listing Payment Voucher</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+<%-- <%@ include file="/WEB-INF/views/entityIdAndUserLevelListDrp.jsp"%> --%>
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+                <h5 class="card-title">Listing Payment Voucher</h5>
+            </div>
+			<div class="card-body">
+			    <div class="row">
+				 <div class="col-md-3 col-sm-3">
+				        <div class="form-group">
+				            <label for="status" class="required">WorkFlow Status</label>
+				            <div class="col-md-12">
+				                <select class="form-control form-select require" id="statusId" name="status">
+				                   <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+				                    <option value="Submit" ${status eq 'Submit' ? 'selected' : '' }>Submit and Send For Approval</option>
+				                    <option value="Verify"   ${status eq 'Verify' ? 'selected' : '' }>Verify and Send For Approval</option>
+				                    <option value="Draft"   ${status eq 'Draft' ? 'selected' : '' }>Draft</option>
+				                    <option value="Approve" ${status eq 'Approve' ? 'selected' : '' }>Approve</option>
+				                    <option value="Reject" ${status eq 'Reject' ? 'selected' : '' }>Reject</option>
+				                    <option value="Revert" ${status eq 'Revert' ? 'selected' : '' }>Revert</option>
+				                </select>
+				            </div>
+				        </div>
+				    </div>
+				     <c:set var="ownFunctions" value="getSelectedLowerEntity" />
+				    <c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+					<c:set var="upperOrDown" value="down" />
+					<c:set var="functionList2" value="workFlowStatus();"/>
+					<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+				     <div class="col-md-2" style="margin-top:18px;">
+						<div class="form-group">
+							<button type="button" class="btn btn-success" onclick="workFlowStatus();"><spring:message code="COMMON.BUTTON.FILTER"></spring:message></button>
+						</div>
+					</div>
+				    </div> 
+			
+				  <h6 class="mt-3"><u>Payment Voucher Transaction Table</u></h6>
+					<div class="row">
+
+								    <div class="col-md-12">
+								       <table class="table table-bordered" id="datatable">
+											<thead>
+								                <tr>
+								                    <th class="text-center">Sl. No.</th>
+								                    <th>Financial Year</th>
+								                    <th>Provincial No.</th>
+								                    <th>Provincial Date</th>
+								                    <th>Voucher No.</th>
+								                    <th>Voucher Date</th>
+								                    <th>Status</th> 
+								                    <th>Action</th>
+								                </tr>
+								          </thead>
+								            <tbody>
+								                <c:forEach items="${voucherList}" var="vou" varStatus="recCount">
+								                    <tr class="gradeX">
+								                        <td class="text-center">${recCount.index + 1}</td>
+								                        <td>${vou.finanicalYear.finYear ne null ? vou.finanicalYear.finYear : 'NA'}</td>
+								                        <td>${vou.voucherNo ne null ? vou.voucherNo : 'NA'}</td>
+								                        
+								                        <td>
+														  <c:choose>
+														    <c:when test="${vou.voucherDate ne null}">
+														      <fmt:formatDate value="${vou.voucherDate}" pattern="dd/MM/yyyy" />
+														    </c:when>
+														    <c:otherwise>
+														      NA
+														    </c:otherwise>
+														  </c:choose>
+														</td>
+								                        <td>${vou.finalVoucherNo ne null ? vou.finalVoucherNo : 'NA'}</td>
+								                        
+								                        <td>
+														  <c:choose>
+														    <c:when test="${vou.finalVoucherDate ne null}">
+														      <fmt:formatDate value="${vou.finalVoucherDate}" pattern="dd/MM/yyyy" />
+														    </c:when>
+														    <c:otherwise>
+														      NA
+														    </c:otherwise>
+														  </c:choose>
+														</td>
+
+								                         <c:if test="${status eq 'Draft'}">
+														    <td>Draft</td>
+														</c:if>
+														<c:if test="${status eq 'Submit'}">
+														    <td>Pending Approval </td>
+														</c:if>
+														<c:if test="${status eq 'Approve'}">
+														    <td>Approved </td>
+														</c:if>
+														<c:if test="${status eq 'Reject'}">
+														    <td>Rejected</td>
+														</c:if>
+														<c:if test="${status eq 'Revert'}">
+														    <td>Reverted </td>
+														</c:if>
+														<td style="text-align: center;">
+														<button onclick="editVoucher(${vou.voucherId});" class="btn btn-primary" title="Edit"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+														
+														<button class="btn btn-success ${not empty vou.finalVoucherNo ? '' : 'redIcon'}" title="${not empty vou.finalVoucherNo ? 'Final voucher PDF' :'Provisional Voucher PDF'}" onclick="miscVouchersPDF(${vou.voucherId},'${vou.finalVoucherNo}')">
+                                                        <i class='fas fa-print'></i></button>
+														
+								                        </td>
+								                    </tr>
+								                </c:forEach>
+								            </tbody>
+								        </table>
+								    </div>
+								</div>
+								
+							</section>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+  <form action="${contextPath}/voucher/payment/edit" method="get" id="editForm">
+	  <input type="hidden" class="remove" name="voucherId" id="voucherId"/>
+  </form>
+ <form action="${contextPath}/voucher/payment/paymentVoucherworkFlow" method="get" id="filter">
+   <input type="hidden" name="status" id="statusIdd" />
+   <input type="hidden" name="entityIdLevelCombo" id="entityIdLevelCombo" />
+</form>   
+
+ <form action="${contextPath}/miscVouchersPDF.htm" method="POST" id="generatepdf" target="_blank">	
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+<input type="hidden" id="printVoucherId" name="printVoucherId"/>	 
+ <input type="hidden" name="voucherType" value="FINANCE"/>	  
+</form>
+
+
+<form action="${contextPath}/provVouchersPDF.htm" method="POST" id="generateProvPdf" target="_blank">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="printVoucherId" id="voucherIdProv" />
+    <input type="hidden" name="voucherType" value="FINANCE"/>
+</form>
+
+<script>
+
+function  miscVouchersPDF(voucherId,fnVoucherNo){
+	 debugger
+	 $("#printVoucherId").val(voucherId);
+	 $("#voucherIdProv").val(voucherId);
+	 
+	 
+	 if(fnVoucherNo !=""){
+		 $("#generatepdf").submit();
+	 }else{
+		 $("#generateProvPdf").submit();
+	 }
+	  
+}
+
+function editVoucher(voucherId){
+	
+	$("#voucherId").val(voucherId);
+	 if (encryptFormData('editForm', tableOrTbodyIDS, tableOrTbodyKeys)){
+		 confirmation('editForm');
+	 }
+}
+
+function workFlowStatus() {
+debugger
+	var status = $("#statusId").val();
+	$("#statusIdd").val(status);
+	var entityIdLevelCombo=$("#upperEntityId").val();
+	$("#entityIdLevelCombo").val(entityIdLevelCombo);
+	
+	$("#filter").submit();
+}
+function getSelectedLowerEntity(){
+	var entityIdLevelCombo= '${entityIdLevelCombo}';
+	 $("#upperEntityId").val(entityIdLevelCombo);
+ }
+</script>

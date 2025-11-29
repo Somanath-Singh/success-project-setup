@@ -1,0 +1,259 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<style>
+.modaltabledata th {
+	line-height: 16px;
+	font-size: 13px !important;
+	font-weight: 400;
+}
+
+.tablemodal .modal-footer {
+	padding: 0;
+}
+
+.tablemodal .modal-footer .btn-submit {
+	margin-top: 7px;
+}
+
+.tablemodal .modal-footer .btn-exit {
+	margin-top: 7px;
+}
+
+.modaltop-data {
+	font-size: 14px;
+}
+
+.tablemodal .modal-body {
+	padding-bottom: 0;
+}
+
+.lftdata {
+	width: 50%;
+	float: left;
+	font-size: 14px;
+}
+
+.rgtdata {
+	width: 50%;
+	float: right;
+	margin-bottom: 10px;
+	font-size: 14px;
+}
+</style>
+
+<div class="container-fluid">
+<!-- Start::row-1 -->
+ <div class="row">
+ <div class="col-xl-12">
+ <div class="card custom-card">
+ <div class="top-left"></div>
+ <div class="top-right"></div>
+ <div class="bottom-left"></div>
+ <div class="bottom-right"></div>
+ <div class="card-body">
+ 
+					<h4 class="accordion-header" id="headingOne">
+						<span>Add Phase</span>
+					</h4>
+
+						<div id="collapseOne" class="accordion-collapse collapse show"
+							aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+							<div class="accordion-body">
+								<div class="panel-body" style="display: block">
+									<div class="col-md-12">
+										<form class="form-horizontal form-bordered"  action="${contextPath}/mst/savePhase" method="POST" id="finalSubmit">
+											<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+												<input type="hidden" name="phaseId" id="phaseId" value="${data.phaseId}" />
+												 <input id="encodedDatafinalSubmit" name="encodedDatafinalSubmit" type="hidden" />
+						
+											<div class="row">
+										        <div class="col-md-3 col-sm-3">
+													<div class="form-group">
+														<label class="col-md-12">Phase Name</label>
+														<div class="col-md-12">
+															<input type="text" class="form-control require" name="phaseName" id="phaseNameId" value="${data.phaseName}"
+															onchange="checkDuplicatePhaseName(this.value)" maxlength="10">
+														</div>
+												    </div>
+												</div>
+						
+											     <div class="col-md-3 col-sm-3">
+													<div class="form-group">
+														<label class="col-md-12">Phase Code</label>
+														<div class="col-md-12">
+															<input type="text" class="form-control require" name="phaseCode" id="phaseCodeId" value="${data.phaseCode}" 
+															onchange="checkDuplicatePhaseCode(this.value)" maxlength="10" >
+														</div>
+													</div>
+												  </div>
+													 
+						                           <div class="col-md-3 col-sm-3">
+													<div class="form-group">
+														<label class="col-md-12">Phase Type:</label>
+														<select class="form-control require" name="phaseType" id="phaseTypeId">
+											                <option value="">SELECT</option>
+											                <option value="D" ${data.phaseType eq 'D' ? 'selected="selected"' : ''}>Delivery</option>
+											                <option value="P" ${data.phaseType eq 'P' ? 'selected="selected"' : ''}>Payment</option>
+											            </select>
+													 </div>
+												  </div>
+																
+												<div class="col-md-3 col-sm-3">
+													<div class="form-group">
+														<label class="col-md-12">Status:</label>
+														<div class="col-md-12">
+															<select class="form-control require" name="isActive"
+																id="isActive" >
+																<option value="true"
+																	${data.isActive eq 'true' ? 'selected="selected"' : 'true'}>Active</option>
+																<option value="false"
+																	${data.isActive eq 'false' ? 'selected="selected"' : 'false'}>InActive</option>
+															</select>
+														</div>
+													</div>
+												</div>
+						                      </div>
+						
+											<div class="row">
+												<div class="col-sm-12" style="margin-top: 10px;">
+													<div class="form-group text-center">
+														<button type="button" class="btn btn-sm btn-success"
+															onclick="saveDetails()">
+															<c:choose>
+														    <c:when test="${empty data.phaseId}">
+														        <spring:message code="COMMON.BUTTON.SUBMIT" />
+														    </c:when>
+														    <c:otherwise>
+														        <spring:message code="COMMON.BUTTON.UPDATE" />
+														    </c:otherwise>
+														</c:choose>
+						
+														</button>
+														<a href="${contextPath}/home"><input type="button"
+															class="btn btn-sm btn-danger"
+															value="<spring:message code="COMMON.BUTTON.BACK"></spring:message>"></a>
+													</div>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<h4 class="accordion-header" id="headingOne">
+							<span>Phase Details list</span>
+						</h4>
+					
+						<div class="col-md-12">
+								<table class="table table-bordered table-striped mb-none"
+									id="datatable-default">
+									<thead>
+										<tr>
+											<th>Phase Name</th>
+											<th>Phase Code</th>
+											<th>Phase Type</th>
+											<th>status</th>
+											<th>Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach items="${phaseList}" var="data">
+											<tr class="gradeX">
+												<td>${data.phaseName}</td>
+												<td>${data.phaseCode}</td>
+												<td>${data.phaseType}</td>
+												<td>${data.isActive}</td>
+											<td>
+										<%-- 	<a class="btn btn-xs btn-circle btn-warning text-white btn-sm" onclick="edit('${data.phaseId}')"> 
+										<i class="fa fa-pencil" aria-hidden="true" title=<spring:message code="COMMON.LABEL.EDIT"/>></i>
+										</a> --%>
+										<a href="${contextPath}/mst/editPhaseDetails?hdnId=${data.phaseId}" class="btn btn-xs btn-circle btn-warning" title="Edit">
+													    <i class="fa fa-pencil" aria-hidden="true"></i> Edit
+										 </a>
+										</td>
+											</tr>
+										</c:forEach>
+									</tbody>
+								</table>
+							</div>
+				       </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+
+<script>
+
+function saveDetails(){
+	debugger
+	   var tableOrTbodyIDS = [];
+	    var tableOrTbodyKeys = [];
+		if (encryptFormData('finalSubmit', tableOrTbodyIDS, tableOrTbodyKeys)) {
+	        confirmation('finalSubmit');
+	    }
+    }
+ 
+function checkDuplicatePhaseName() {
+	  debugger; 
+	        var phaseName = $('#phaseNameId').val();
+	        var phaseId= $('#phaseId').val();
+	    
+	            $.ajax({
+	                url: './checkDuplicatePhaseName',
+	                type: 'GET',
+	                data: ({
+	                "phaseName": phaseName,
+	                "phaseId":phaseId
+	                }),
+	                cache: false,
+	                async: false, 
+	                success: function (response) {
+	                    if (response != "") {
+	                        if (response == 'FOUND') {
+	                            bootbox.alert("This Phase Name is already exist, Please try with a different Phase Name.");
+	                            $('#phaseNameId').val('');
+	                            return false;
+	                        } else {
+	                            return true;
+	                        }
+	                    }
+	                }
+	            });
+	     
+	    }
+
+
+function checkDuplicatePhaseCode() {
+	  debugger;
+	        var phaseCode = $('#phaseCodeId').val();
+	        var phaseId= $('#phaseId').val();
+	            $.ajax({
+	                url: './checkDuplicatePhasesCode',
+	                type: 'GET',
+	                data: ({
+	                "phaseCode": phaseCode,
+	                "phaseId":phaseId
+	                }),
+	                cache: false,
+	                async: false, // Note: Corrected the spelling to async
+	                success: function (response) {
+	                    if (response != "") {
+	                        if (response == 'FOUND') {
+	                            bootbox.alert("This Phase Code is already exist, Please try with a different Phase code.");
+	                            $('#phaseCodeId').val('');
+	                            return false;
+	                        } else {
+	                            return true;
+	                        }
+	                    }
+	                }
+	            });
+	    }
+ </script>

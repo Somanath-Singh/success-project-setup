@@ -1,0 +1,126 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+		
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+		<%-- <script src="${contextPath}/assets/vendor/bootbox5/bootbox.js"></script>
+		<script src="${contextPath}/assets/vendor/bootbox5/bootbox.min.js"></script> --%>
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/assets/fonts/css/all.css">
+ --%>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+.but-al{
+margin-top:27px !important;
+}
+ table.dataTable tbody th, table.dataTable tbody td {
+    padding: 4px 10px !important;
+    text-align:left
+}
+</style>
+
+<div class="breadcrumb_conatiner">
+<!--               <div class="col-md-6"> -->
+<!--                 <h4 class="change-color">Manage Activity</h4> -->
+<!--               </div> -->
+              <div class="col-md-12">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                      <a href="#">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Agency List</li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+
+    <div class="card">
+     <div class="card-header">
+      <h5 class="card-title">Vendor List</h5>
+   </div>
+    	
+		<div class="card-body">
+		<%@ include file="/WEB-INF/views/message.jsp"%>
+			<div class="col-md-12">		
+			<div class="table-responsive">
+				<table id="agencyTable" class="table table-striped exportbtn">
+					<thead>
+						<tr>
+							<th>Sl no</th>
+							<th>Vendor Name</th>
+							<th>Vendor Type</th>
+							<th>GST</th>
+							<th>PAN</th>
+							<th>Address</th>
+							<th>Action:</th>										
+						</tr>
+					</thead>
+					<tbody>
+				 	   <c:forEach items="${agencyList}" var="agency" varStatus="count"> 
+							<tr>
+								<td>${count.count }</td>
+								<td>${agency.agencyName}</td>
+								<td>${agency.agencyType}</td>
+								<td>${agency.gst}</td>
+								<td>${agency.pan}</td>
+								<td>${agency.address}</td>
+								<td> 
+									<button type="button" class="btn btn-primary"  onclick="editAgencyForm('${agency.agencyId}','${agency.agencyCode}')"  title="Edit"><i class='fa fa-pencil'></i></button>
+            					</td>
+							</tr>
+				     </c:forEach> 
+					</tbody>
+				</table>
+				</div>
+			</div>
+		</div>
+</div>
+<div class="col-md-12 mt-3">
+	<a href="${contextPath}/agency/generateAgencyReport?format=pdf"
+		class="btn btn-danger" target="_blank"> <i
+		class="fa fa-file-pdf-o"></i> Export PDF
+	</a> <a href="${contextPath}/agency/generateAgencyReport?format=excel"
+		class="btn btn-primary" target="_blank"> <i
+		class="fa fa-file-excel-o"></i> Export Excel
+	</a>
+</div>
+<form action = "${contextPath}/agency/editAgencyForm" method="GET" id="editForm">
+	<input type="hidden" id="editCipherText" name="cipherText">
+  	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" name="agencyCode" id="agencyCode">
+	<input type="hidden" name="agencyId" id="agencyId">
+<!--     <input type="hidden" id="action" name="action" value="EDIT">	
+ -->		
+	</form>
+<script>
+	function editAgencyForm(agencyId,agencyCode) {
+		debugger;
+		$("#agencyId").val(agencyId);
+		$("#agencyCode").val(agencyCode);
+	 var bizContent = $("#editForm").serializeArray();		
+	$("#editCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent)))); 
+		bootbox.confirm("Do you want to Edit this Agency Details ?", function(
+				result) {
+			if (result) {
+				$("#editForm").submit();
+			}
+		});
+	}	
+	
+	if ($.fn.DataTable.isDataTable('#agencyTable')) {
+		$('#agencyTable').DataTable().clear().destroy();
+	}
+	$(document).ready(function() {		
+		if (!$.fn.DataTable.isDataTable('#agencyTable')) {
+			$('#agencyTable').DataTable({
+				dom : 'lBfrtip',
+				responsive : true,
+				pageLength : 10
+			});
+		}
+	});
+	
+	
+	
+</script>

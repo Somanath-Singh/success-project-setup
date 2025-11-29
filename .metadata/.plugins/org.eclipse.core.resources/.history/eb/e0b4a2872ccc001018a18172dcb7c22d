@@ -1,0 +1,309 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<style>
+.modaltabledata th {
+	line-height: 16px;
+	font-size: 13px !important;
+	font-weight: 400;
+}
+
+.tablemodal .modal-footer {
+	padding: 0;
+}
+
+.tablemodal .modal-footer .btn-submit {
+	margin-top: 7px;
+}
+
+.tablemodal .modal-footer .btn-exit {
+	margin-top: 7px;
+}
+
+.modaltop-data {
+	font-size: 14px;
+}
+
+.tablemodal .modal-body {
+	padding-bottom: 0;
+}
+
+.lftdata {
+	width: 50%;
+	float: left;
+	font-size: 14px;
+}
+
+.rgtdata {
+	width: 50%;
+	float: right;
+	margin-bottom: 10px;
+	font-size: 14px;
+}
+</style>
+
+<spring:message code="ACCOUNT.ACCOUNTGROUP.TITLENAME" />
+
+<div id="collapseOne" class="accordion-collapse collapse show"
+	aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+	<div class="accordion-body">
+		<div class="panel-body" style="display: block">
+			<div class="col-md-12">
+				<form class="form-horizontal form-bordered" id="createAccountGroup"
+				>
+					<input type="hidden" name="${_csrf.parameterName}"
+						value="${_csrf.token}" /> <input type="hidden"
+						name="accountGroupId" id="account_group_id"
+						value="${data.accountGroupId}" />
+
+					<div class="row">
+						<div class="col-md-3 col-sm-3">
+							<div class="form-group">
+								<label for="accountGroupName" class="required"><spring:message
+										code="ACCOUNT.CREATEACCOUNTGROUP.ACCOUNTGROUPNAME" />:</label>
+								<div class="col-md-12">
+									<input type="text" name="accountGroupName" class="form-control"
+										id="accountGroupName" value="${data.accountGroupName}"
+										maxlength="100"
+										onblur="getDisplayNameOfAcGroup(); validateNameAndCode(this)">
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-2 col-sm-2">
+							<div class="form-group">
+								<label for="accountGroupCode" class="required"><spring:message
+										code="ACCOUNT.CREATEACCOUNTGROUP.ACCOUNTGROUPCODE" />:</label>
+								<div class="col-md-12">
+									<input type="text" name="accountGroupCode" class="form-control"
+										id="accountGroupCode" value="${data.accountGroupCode}"
+										maxlength="20" onblur="validateNameAndCode(this)">
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-2 col-sm-2">
+							<div class="form-group">
+								<label for="accountType" class="required"> <spring:message
+										code="ACCOUNT.CREATEACCOUNTGROUP.ACCOUNTTYPE" />:
+								</label> <select class="form-control" name="accountType"
+									id="accountType" data-plugin-selectTwo>
+									<option value="">
+										<spring:message code="COMMON.LABEL.DROPDOWN.SELECT" />
+									</option>
+									<c:forEach items="${accountTypeList}" var="accountType">
+										<option value="${accountType.accountTypeId}"
+											${accountType.accountTypeId eq data.accountType.accountTypeId ? 'selected' : ''}>
+											${accountType.accountType}</option>
+									</c:forEach>
+								</select>
+
+							</div>
+						</div>
+
+
+						<div class="col-md-5 col-sm-5">
+							<div class="form-group">
+								<label class="col-md-12" for="inputDefault"> <spring:message
+										code="ACCOUNT.CREATEACCOUNTGROUP.DISPLAYNAMECHECK" />
+								</label>
+								<div class="col-md-12 row">
+									<div class="col-md-5">
+										<select class="form-control" name="isDisplayStatus"
+											id="isDisplayStatus" onchange="getDisplayNameOfAcGroup();">
+											<option value="Y"
+												${data.isDisplayStatus eq 'Y' ? 'selected' : ''}>
+												<spring:message code="COMMON.LABEL.YES" />
+											</option>
+											<option value="N"
+												${data.isDisplayStatus eq 'N' ? 'selected' : ''}>
+												<spring:message code="COMMON.LABEL.NO" />
+											</option>
+										</select>
+									</div>
+									<div class="col-md-7 col-sm-7" id="displayNameText"
+										style="display: block;">
+										<div class="form-group">
+											<input type="text" name="displayName" class="form-control"
+												id="displayName" placeholder="Enter Display Name"
+												value="${data.displayName}" maxlength="100"
+												onblur="validateNameAndCode(this)">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+
+
+					<div class="row">
+						<div class="col-sm-12" style="margin-top: 30px;">
+							<div class="form-group text-center">
+								<button type="button" class="btn btn-sm btn-success"
+									onclick="checkFormDataOnSubmit('createAccountGroup');">
+									<c:choose>
+								    <c:when test="${empty data.accountGroupId}">
+								        <spring:message code="COMMON.BUTTON.SUBMIT" />
+								    </c:when>
+								    <c:otherwise>
+								        <spring:message code="COMMON.BUTTON.UPDATE" />
+								    </c:otherwise>
+								</c:choose>
+
+								</button>
+								<a href="${contextPath}/home"><input type="button"
+									class="btn btn-sm btn-danger"
+									value="<spring:message code="COMMON.BUTTON.BACK"></spring:message>"></a>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+				<div class="col-md-12">
+					<table class="table table-bordered table-striped mb-none"
+						id="datatable-default">
+						<thead>
+							<tr>
+								<th><spring:message
+										code="ACCOUNT.CREATEACCOUNTGROUP.ACCOUNTGROUPNAME" /></th>
+								<th><spring:message
+										code="ACCOUNT.CREATEACCOUNTGROUP.ACCOUNTGROUPCODE" /></th>
+								<th><spring:message
+										code="ACCOUNT.CREATEACCOUNTGROUP.ACCOUNTTYPE" /></th>
+								<th><spring:message code="COMMON.LABEL.OPTION" /></th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach items="${accountGroupList}" var="accountGroupList">
+								<tr class="gradeX">
+									<td>${accountGroupList.accountGroupName}</td>
+									<td>${accountGroupList.accountGroupCode}</td>
+									<td>${accountGroupList.accountType.accountType}</td>
+								<td><a class="btn btn-xs btn-circle btn-warning text-white btn-sm" onclick="edit('${accountGroupList.accountGroupId}')"> 
+							<i class="fa fa-pencil" aria-hidden="true" title=<spring:message code="COMMON.LABEL.EDIT"/>></i>
+							</a></td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+				
+				
+<form action="${contextPath}/mst/saveAccountGroup" method="POST" id="finalSubmit">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    <input type="hidden" name="encData" id="hdnData"/>
+</form>
+
+
+<form id="editAccountGroup"
+	action="${contextPath}/mst/updateAccountGroup" method="post">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	   <input type="hidden" name="encDataa" id="hdnData1"/>
+<!-- 		<input type="hidden" name="accountGroupId"id="accountGroupId" value="" /> -->
+</form>
+
+
+<form action="${contextPath}/miscVouchersPDF.htm" method="POST"
+	id="generatepdf" target="_blank">
+	<input type="hidden" name="${_csrf.parameterName}"
+		value="${_csrf.token}" /> <input type="hidden" id="printVoucherId"
+		name="printVoucherId" /> <input type="hidden" name="voucherType"
+		value="FINANCE" />
+</form>
+
+<script type="text/javascript">
+function getDisplayNameOfAcGroup() {
+    var isDisplayNameSame = $("#isDisplayStatus").val();
+    var displayNameElement = document.getElementById("displayName");
+    var displayNameTextElement = document.getElementById("displayNameText");
+
+    if (isDisplayNameSame == 'N') {
+        displayNameElement.readOnly = false;
+        $("#displayName").val("");
+        displayNameTextElement.style.display = "block";
+    } else {
+        displayNameElement.readOnly = true;
+        $("#displayName").val($("#accountGroupName").val());
+        displayNameTextElement.style.display = "none";
+    }
+}
+
+const checkFormDataOnSubmit=async(formId)=>
+{
+	  const requiredFields = document.querySelectorAll('.required');
+      let validationFailed = false;
+
+      for (const field of requiredFields) {
+          const inputId = field.getAttribute('for');
+          const inputField = document.getElementById(inputId);
+          if (!inputField.value) {
+              inputField.style.borderColor = 'red';
+              await showNotification(true, field.textContent.replace(/:/g, "") + " is required.");
+              setTimeout(() => {
+                  inputField.style.borderColor = '';
+              }, 3000);
+              validationFailed = true;
+              break;
+          }
+      }
+
+      if (!validationFailed) {
+    const encryptFormDataResult = await encryptHiddenFormData(formId);
+    	debugger
+    	if (encryptFormDataResult) {
+    	    $('#hdnData').val(encryptFormDataResult);
+    	    $('#finalSubmit').submit();
+    	} else {
+    	    showNotification(true, 'Unable to process your request. Please try after some time.');
+    	}
+      }
+}
+
+
+
+
+
+
+function getDisplayNameOfAcGroup()
+{
+	var isDisplayNameSame = $("#isDisplayStatus").val();
+	if(isDisplayNameSame=='N')
+	{
+		document.getElementById("displayName").readOnly = false;
+		$("#displayName").val("");
+		//$("#displayNameText").css("display","block");
+	}
+	else
+	{
+		document.getElementById("displayName").readOnly = true;
+		$("#displayName").val($("#accountGroupName").val());
+		//$("#displayNameText").css("display","none");
+	}
+}
+
+function validateNameAndCode(element)
+{
+	var result = element.value.replace(/[\u200B-\u200D\u201A-\u201E\u2013-\u2122\uFEFF\!@#$^&*+<>\\\/|\?~{}())(\:%]/g,'');
+	element.value =result;
+}
+
+
+ function edit (accountGroupId){
+	    $("#hdnData1").val(AES256.encrypt(accountGroupId));
+	    $("#editAccountGroup").submit();
+ }
+
+
+
+</script>

@@ -1,0 +1,312 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<style>
+    .frezz {
+        pointer-events: none;
+        background-color: #e9ecef !important;
+        color: #495057 !important;
+    }
+    .card-title-add {
+        font-size: 14px;
+        margin: 0;
+        color: #000 !important;
+        font-weight: 500;
+    }
+    .btns {
+        border-radius: 0.2rem;
+        line-height: 14px;
+        padding: 6px 7px 6px 6px;
+        font-size: 13px;
+    }
+    /* Ensure dropdown fits within sector */
+    select.form-control-sm {
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">On-going Project Report</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#"><i class="fa fa-home"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Filter On-going Project Report</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Filter On-going Project Report</h5>
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal" id="projectMstForm">
+                    <div class="row">
+                        <!-- From Date -->
+                        <div class="form-group col-md-3">
+                            <label class="required">From Date :</label>
+                            <div class="datepicker-box"> 
+                            <input type="text" class="form-control form-control-sm datepicker" id="fromDate" name="fromDate" readonly>                         
+                            </div>
+                        </div>
+                        <!-- To Date -->
+						<div class="form-group col-md-3">
+							<label class="required">To Date :</label>
+							<div class="datepicker-box">
+								<input type="text" class="form-control form-control-sm datepicker"
+									id="toDate" name="toDate" readonly>
+							</div>
+						</div>
+						<!-- Executing Agency -->
+                        <div class="form-group col-md-3">
+                            <label>Executing Agency :</label> <select class="form-control form-control-sm form-select"
+								id="agencyId" name="agencyId">
+								<option value="0" selected disabled>- Select -</option>
+								<c:forEach items="${agencyList}" var="agency" varStatus="index">
+									<option value="${agency.agencyId}">${agency.agencyName}</option>
+								</c:forEach>
+							</select>
+						</div>
+                        <!-- Project Name -->
+                        <div class="form-group col-md-3">
+                            <label>Name of the Project :</label> 
+                            <select
+								class="form-control form-control-sm form-select"
+								id="projectId" name="projectId">
+								<option value="0" selected disabled>- Select -</option>
+									<c:forEach items="${projectList}" var="project">
+									<option value="${project.projectId}">
+											${project.projectName}</option>
+								</c:forEach>
+							</select>
+						</div>
+                    </div>
+                </form>
+            </div>
+            <div class="row mt-4 mb-4">
+                <div class="col-md-12 text-center">
+                    <button type="button" class="btn btn-success" onclick="filterData()">Filter</button>
+                    <a href="${contextPath}/home" type="button" class="btn btn-warning btn-sm">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">On-going Project Report List</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+					<table
+						class="table table-bordered table-striped table-sm exportbtn" id="ongoingProjectTable">
+						<thead class="thead-dark">
+							<tr>
+								<th class="text-center" style="min-width: 60px;">Sl.No</th>
+								<th>Agency</th>
+								<th>Scheme</th>
+								<th>Year</th>
+								<th>District</th>
+								<th>Project Name</th>
+								<th>Sanction Amount</th>
+								<th>1st Letter No & Date</th>
+								<th>2nd Letter No & Date</th>
+								<th>3rd Letter No & Date</th>
+								<th>1st Release</th>
+					            <th>2nd Release</th>
+					            <th>3rd Release</th>					           
+					           
+							</tr>
+						</thead>
+
+						<tbody id="onGoingProjectTbody">
+							
+						</tbody>
+					</table>
+
+
+				</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterData() {
+	debugger;
+    const fromDate = $("#fromDate").val();
+    const toDate = $("#toDate").val();
+    const agencyId = $("#agencyId").val();
+    const projectId = $("#projectId").val();
+
+    if (!fromDate) {
+        bootbox.alert("From Date is required.");
+        return false;
+    } else if (!toDate) {
+        bootbox.alert("To Date is required.");
+        return false;
+    }
+    else {
+        getOngoingProjectReport(fromDate, toDate, agencyId,projectId);
+    }
+}
+
+function showLoader() {
+    $(".loader-div").css("display", "flex");
+}
+
+function hideLoader() {
+    $(".loader-div").css("display", "none");
+}
+
+function getOngoingProjectReport(fromDate, toDate, agencyId, projectId) {
+    showLoader();
+
+    $.ajax({
+        url: contextPath + "/report/getOnGoingProjectFilterList",
+        type: "GET",
+        data: {
+            fromDate: fromDate,
+            toDate: toDate,
+            agencyId: agencyId,
+            projectId: projectId
+        },
+        success: function (data) {
+            hideLoader();
+            var html = "";
+            if (!data || data.length === 0) {
+                html = "<tr><td colspan='12' class='text-center text-muted'>No ongoing project records found.</td></tr>";
+                $("#onGoingProjectTbody").html(html);
+                return;
+            }
+
+            for (var i = 0; i < data.length; i++) {
+                var record = data[i];
+                var onGoingData = record.onGoingProjectDataList || [];
+                var sanctionAmount = 0;
+                var letterNo = "N/A";
+                var letterDate = "N/A";
+                var releaseAmounts = [];
+
+                if (onGoingData.length > 0) {
+                    sanctionAmount = onGoingData
+                        .map(x => x.administrativeApprovalAmount || 0)
+                        .reduce((a, b) => a + b, 0);
+
+                    var letter1 = "N/A";
+                    var letter2 = "N/A";
+                    var letter3 = "N/A";
+
+                    if (onGoingData[0]) {
+                        letter1 = (onGoingData[0].letterNo || "N/A") + " / " + (onGoingData[0].letterDate || "N/A");
+                    }
+                    if (onGoingData[1]) {
+                        letter2 = (onGoingData[1].letterNo || "N/A") + " / " + (onGoingData[1].letterDate || "N/A");
+                    }
+                    if (onGoingData[2]) {
+                        letter3 = (onGoingData[2].letterNo || "N/A") + " / " + (onGoingData[2].letterDate || "N/A");
+                    }
+
+                    for (var j = 0; j < onGoingData.length; j++) {
+                        var amt = onGoingData[j].administrativeApprovalAmount || 0;
+                        releaseAmounts.push(amt.toLocaleString());
+                    }
+                }
+
+                html += "<tr>";
+                html += "<td class='text-center align-middle'>" + (i + 1) + "</td>";
+                html += "<td>" + (record.agencyName || "N/A") + "</td>";
+                html += "<td>" + (record.schemeName || "N/A") + "</td>";
+                html += "<td>" + (record.finYear || "N/A") + "</td>";
+                html += "<td>" + (record.districtName || "N/A") + "</td>";
+                html += "<td>" + (record.projectName || "N/A") + "</td>";
+                html += "<td>" + sanctionAmount.toLocaleString() + "</td>";
+                html += "<td>" + letter1 + "</td>";
+                html += "<td>" + letter2 + "</td>";
+                html += "<td>" + letter3 + "</td>";
+
+                html += "<td>" + (releaseAmounts[0] || "N/A") + "</td>";
+                html += "<td>" + (releaseAmounts[1] || "N/A") + "</td>";
+                html += "<td>" + (releaseAmounts[2] || "N/A") + "</td>";
+
+                html += "</tr>";
+            }
+
+
+         if ($.fn.DataTable.isDataTable('#ongoingProjectTable')) {
+             $('#ongoingProjectTable').DataTable().destroy();
+         }
+
+         $("#onGoingProjectTbody").html(html);
+         $('#ongoingProjectTable').DataTable({
+        	 dom: 'lBfrtip',
+             buttons: ['copy', 'excel', 'csv', 'pdf', 'print'],
+             searching: true,
+             paging: true,
+             ordering: true,
+             pageLength: 10,
+             lengthMenu: [
+                 [10, 25, 50, 100, -1],
+                 [10, 25, 50, 100, "All"]
+             ]
+         });
+
+        },
+        error: function (error) {
+            hideLoader();
+            console.error("Error fetching ongoing project data:", error);
+            bootbox.alert("Error fetching ongoing project records.");
+        }
+    });
+}
+
+
+
+$(document).ready(function () {
+    var today = new Date();
+    var oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+
+    $(".datepicker").datepick({
+        dateFormat: "dd-mm-yyyy",
+        onShow: $.datepick.monthOnly,
+        yearRange: "c-20:c+10",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+    });
+
+    if (!$("#fromDate").val()) {
+        $('#fromDate').datepick('setDate', oneMonthAgo);
+    }
+    if (!$("#toDate").val()) {
+        $('#toDate').datepick('setDate', today);
+    }
+    
+    getOngoingProjectReport(
+            $("#fromDate").val(),
+            $("#toDate").val(),
+           
+        );
+
+});
+</script>

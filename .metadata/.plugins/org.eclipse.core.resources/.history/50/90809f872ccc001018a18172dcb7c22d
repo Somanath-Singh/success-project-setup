@@ -1,0 +1,356 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet"
+	href="${contextPath}/assets/js/plugin/jquery_autocomplete/jquery.autocomplete.css" />
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+<style>
+
+</style>
+
+<script>
+					$(function()
+					{
+						$('#datatable-default').dataTable({
+					 		"bSort": false,
+					 		"autoWidth": false
+						});
+					})
+					</script>
+
+
+<!-- Start::row-1 -->
+<div class="breadcrumb_conatiner">
+ 	<div class="col-md-6">
+		<h4 class="change-color">Credit/Debit Note List</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Credit/Debit Note List</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<%--<div class="row">
+  <%@ include file="/WEB-INF/views/entityIdAndUserLevelListDrp.jsp"%> 
+</div>--%>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+                <h5 class="card-title">Credit/Debit Note List</h5>
+            </div>
+			<div class="card-body" id="partyDtlsInRequest">
+								<div class="col-md-12">
+								  <div class="row">
+								
+									<div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 " for="inputDefault">Fin year</label>
+										<div class="col-md-12">
+										<select class="form-select required" name="finyearId" id="finyearId" data-plugin-selectTwo 
+										        onchange=""><!-- getAllfinyearWiseData(); -->
+										    <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+										   <c:forEach items="${finalcialyearList}" var="finnicalyearList">
+											    <option value="${finnicalyearList.finyearId}" ${finyear_Id eq  finnicalyearList.finyearId ? "selected" :""} >
+											        ${finnicalyearList.finYear} 
+											    </option>
+											</c:forEach>
+
+										</select>
+										
+											
+											
+										</div>
+									</div>
+								</div>
+								
+				    <c:set var="ownFunctions" value="getSelectedLowerEntity" />
+				    <c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+					<c:set var="upperOrDown" value="down" />
+					<c:set var="functionList2" value=""/><!-- getAllfinyearWiseData(); -->
+					<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+								
+								
+								 <div class="col-md-2" style="margin-top:20px;">
+						<div class="form-group">
+							<button type="button" class="btn btn-success" onclick="getAllfinyearWiseData();"><spring:message code="COMMON.BUTTON.FILTER"></spring:message></button>
+						</div>
+					</div>
+					</div>
+								
+								
+									 <div class="col-sm-1 mb-2" style="display: flex;align-items: center;gap: 10px;">
+													<label class="col-sm-18">Show </label><!-- onchange="getData(this.value)" -->
+													<select
+															class="form-control form-control-sm rounded-0 col-12"
+															id="rowsPerPage" style="width: 40px;">
+															<option value="10" ${10 eq pageSize? 'selected':''}>10</option>
+															<option value="20" ${20 eq pageSize? 'selected':''}>20</option>
+															<option value="30" ${30 eq pageSize? 'selected':''}>30</option>
+															<option value="50" ${50 eq pageSize? 'selected':''}>50</option>
+																	
+														</select>
+													</div> 
+		                           <div class="table-responsive">	
+										<table id="product-table" class="table table-bordered table-hover">
+											<thead>
+												<tr>
+													<th>Sl no.</th>
+													 <th>Type</th> 
+													<th>Party Code & Party Name</th>
+													<th>Invoice Code</th>
+													<th>Due Issue Date(YYYY-MM-DD)</th>
+													<th style="">Subtotal Amount</th>
+													<th style="">Discount Amount</th>
+													<th style="">Gst Amount</th>
+													<th style="">Total</th>
+													 <th>Status</th> 
+													<th>Action</th>
+												</tr>
+											</thead>
+											<tbody id="tbd">
+											
+											<c:if test="${empty invoiceList}">
+											    
+											    <tr>
+											          <td colspan="12" style="text-align: center;color: red;">No Record Found...</td>
+											        </tr>
+											    
+											</c:if>
+											
+											<c:if test="${not empty invoiceList }">
+											<c:forEach items="${invoiceList}" var="invoiceList" varStatus="status">
+												<tr>
+													<td>${status.count + pageSize * (currentPage-1)}</td>
+													<td>${invoiceList.crDeType eq 'CR' ? 'Credit Note': invoiceList.crDeType eq 'DB' ? 'Debit Note':''}</td>
+													<td>${invoiceList.toParty1.partyCode} |${invoiceList.toParty1.partyName}</td>
+			                                        <td>${invoiceList.invoiceCode}</td>	
+													<td><fmt:formatDate value="${invoiceList.dueIssueDate1}" pattern="yyyy-MM-dd" /></td>
+													  <td style="">
+										                <c:out value="${invoiceList.subTotal != null ? invoiceList.subTotal : '0.00'}" />
+										            </td>
+										            <td style="">
+										                <c:out value="${invoiceList.availDiscount != null ? invoiceList.availDiscount : '0.00'}" />
+										            </td>
+										            <td style="">
+										                <c:out value="${invoiceList.gstAmount != null ? invoiceList.gstAmount : '0.00'}" />
+										            </td>
+										            <td style="">
+										                <c:out value="${invoiceList.totalAmount != null ? invoiceList.totalAmount : '0.00'}" />
+										            </td>
+										           <td>${invoiceList.status}</td> 
+										            <td class="d-flex gap-1">
+										             <a class="btn btn-primary" title="<spring:message code='COMMON.BUTTON.ICONEDIT'/>" onclick="edit('${invoiceList.invoiceId}')">
+										                <i class="fa fa-pencil" aria-hidden="true"></i></a>
+										                
+										                <button class="btn btn-success" title="Tax-Invoice" onclick="convertToPDF(${invoiceList.invoiceId})"><i class='fa fa-file-pdf'></i></button>
+										            
+										            
+										             <button class="btn btn-warning" title="Show History" onclick="featchInvoiceHistory(${invoiceList.invoiceId})"><i class='fa-solid fa-clock-rotate-left'></i></button>
+										            
+										            </td>
+												</tr>
+												</c:forEach>
+												
+												
+												  <div id="ukPagination">
+				                           <ul class="cust-pagi  uk-pagination d-flex gap-3">
+													 
+														<li>
+															<c:if test="${currentPage==1}">
+																<a class="disable">Previous</a>
+															</c:if>
+															<c:if test="${currentPage!=1}">
+																<a href="javascript:getData(${currentPage-1})">Previous</a>
+															</c:if>
+														</li>
+														<li>
+															<c:if test="${not empty currentPage}">
+																<a href="javascript:getData(${currentPage+1})">Next</a>
+															</c:if>
+														</li>
+													</ul> 
+                                            </div>
+                                            </c:if>
+												<!-- Add more rows as needed -->
+											</tbody>
+										</table>
+										</div>
+									
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="invoiceHistoryModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="invoiceHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="invoiceHistoryModalLabel">Invoice History</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="hideModal('invoiceHistoryModal');">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sl. #</th>
+                            <th>Action</th>
+                            <th>Action Taken By & Taken As [Role]</th>
+                            <th>Action Date</th>
+                            <th>Action Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceHistoryTableBody">
+                        <!-- Dynamic rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="hideModal('invoiceHistoryModal');">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+ <form action="${contextPath}/creditDebitNote/edit_credit_debit_note" method="POST" id="editcrdr">
+   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+   <input type="hidden" name="invoice_id" id="invoice_id" class="remove"  />	
+    </form>
+<form action="${contextPath}/creditDebitNote/finyearwiseCreditDebitList" method="get" id="filter">
+    <input type="hidden" name="size"  id="hdnPageSize" value=""  class="remove" />
+    <input type="hidden" name="page" id="hdnPage" value=""  class="remove" />
+     <input type="hidden" name="finyear_Id" id="finyear_Id" value=""   class="remove"/>
+      <input type="hidden" name="entityIdLevelCombo" id="entityIdLevelCombo" class="remove"/>	
+    </form>
+    
+    
+ <form action="${contextPath}/generateTaxInvoicePDF.htm" method="POST" id="invoicePDFForm" target="_blank">
+ <input type="hidden" name="${_csrf.parameterName}"value="${_csrf.token}" />
+<input type="hidden" name="invoiceId"  id="invoicePDFId" value="">
+<input type="hidden" name="invoiceType"  id="invoicePDFType" value="R">
+</form>
+
+<script>
+
+		
+function getData(pageNo){
+	debugger;
+	if (pageNo != -1) {
+	    var rowsPerPage = $('#rowsPerPage').val();
+	    var pageNoStr = pageNo.toString();
+         var finyearId =$("#finyearId").val();
+	    $('#hdnPageSize').val(rowsPerPage);
+	    $('#hdnPage').val(pageNoStr);
+	    $("#finyear_Id").val(inyearId);
+	    
+	    var entityIdLevelCombo = $("#upperEntityId").val();
+	     $("#entityIdLevelCombo").val(entityIdLevelCombo);
+	    if (!entityIdLevelCombo) {
+	        return false;  
+	    }
+	    
+	 if(encryptFormData('filter', tableOrTbodyIDS, tableOrTbodyKeys)){
+		 $("#filter").submit();
+		 }
+	    
+	}
+}
+
+function getAllfinyearWiseData(){
+	  var finyearId = $("#finyearId").val();
+	  $("#finyear_Id").val(finyearId);
+	var entityIdLevelCombo=$("#upperEntityId").val();
+	$("#entityIdLevelCombo").val(entityIdLevelCombo);
+	if (!finyearId) {
+        alert("Please select a financial year.");
+        return false;  
+    }
+	if(!entityIdLevelCombo){
+		alert("Please select down level entity");
+        return false;  
+	}
+	if(encryptFormData('filter', tableOrTbodyIDS, tableOrTbodyKeys)){
+		 confirmation('filter');
+	 }
+	
+}
+
+function edit(invoiceId){
+	$("#invoice_id").val(invoiceId);
+	 if(encryptFormData('editcrdr', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('editcrdr');
+		 }
+}
+
+function convertToPDF(invoiceId){
+    $("#invoicePDFId").val(invoiceId);
+    $("#invoicePDFForm").submit();
+}
+
+function featchInvoiceHistory(invoiceId) {
+	debugger
+    $.ajax({
+        url: "${contextPath}/creditDebitNote/featch_invoice_history",
+        async: false,
+        data: { invoiceId: invoiceId },
+        success: function(response) {
+            if (response && response !== "") {
+                var data = response;
+                
+               
+                // Generate table rows
+                var tableRows = '';
+                $.each(data, function(index, value) {
+                    tableRows += '<tr><td>' + (index + 1) + '</td><td>' + value.action + '</td><td>' + value.actionTakenByAndRole + '</td><td>' + formatDate(value.actionDate) + '</td><td>' + value.actionRemarks + '</td></tr>';
+                });
+
+                // Populate modal table body
+                $('#invoiceHistoryTableBody').html(tableRows);
+                $('#invoiceHistoryModal').modal('show'); // Show the modal
+
+            } else {
+                bootbox.alert("No Data Found");
+            }
+        },
+        error: function() {
+            bootbox.alert("Error fetching data");
+        }
+    });
+}
+
+function formatDate(timestamp) {
+    const date = new Date(timestamp);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+    
+    return day+'/'+month+'/'+year;
+}
+function getSelectedLowerEntity(){
+	var entityIdLevelCombo= '${entityIdLevelCombo}';
+	 $("#upperEntityId").val(entityIdLevelCombo);
+ }
+ 
+function hideModal(id){
+	 $('#'+id).modal('hide'); 
+}
+</script>

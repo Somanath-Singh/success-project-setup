@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="statusWiseCaseDetails" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="62decfdc-b164-4f5d-aaae-55434463fca6">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="corporate_ERP"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="223"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="770"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="629"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="357"/>
+	<parameter name="start_dt" class="java.lang.String" nestedType=""/>
+	<parameter name="end_dt" class="java.lang.String"/>
+	<parameter name="status_nm" class="java.lang.String"/>
+	<parameter name="org_type" class="java.lang.String" nestedType="java.lang.Boolean"/>
+	<parameter name="object_type_id" class="java.lang.Long"/>
+	<queryString>
+		<![CDATA[SELECT * from litigation.status_wise_case_list ($P{start_dt} , $P{end_dt} , $P{status_nm} , $P{org_type} , $P{object_type_id});]]>
+	</queryString>
+	<field name="case_id" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="case_id"/>
+		<property name="com.jaspersoft.studio.field.label" value="case_id"/>
+	</field>
+	<field name="case_type" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="case_type"/>
+		<property name="com.jaspersoft.studio.field.label" value="case_type"/>
+	</field>
+	<field name="case_priority" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="case_priority"/>
+		<property name="com.jaspersoft.studio.field.label" value="case_priority"/>
+	</field>
+	<field name="case_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="case_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="case_name"/>
+	</field>
+	<field name="case_description" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="case_description"/>
+		<property name="com.jaspersoft.studio.field.label" value="case_description"/>
+	</field>
+	<field name="registration_date" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="registration_date"/>
+		<property name="com.jaspersoft.studio.field.label" value="registration_date"/>
+	</field>
+	<field name="respondent_date" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="respondent_date"/>
+		<property name="com.jaspersoft.studio.field.label" value="respondent_date"/>
+	</field>
+	<field name="affidavit_due_date" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="affidavit_due_date"/>
+		<property name="com.jaspersoft.studio.field.label" value="affidavit_due_date"/>
+	</field>
+	<field name="all_det_filled" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="all_det_filled"/>
+		<property name="com.jaspersoft.studio.field.label" value="all_det_filled"/>
+	</field>
+	<field name="object_type" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="object_type"/>
+		<property name="com.jaspersoft.studio.field.label" value="object_type"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="560" height="30" uuid="3e375427-4171-4f8d-b360-5bf12c9ff478"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Status Wise Case Details ]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="90" y="0" width="90" height="30" uuid="b84da165-d813-4e26-ad0a-e0398f74c2b6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9ec0366e-dd01-489d-a094-676b4fe68a17"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[Case Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="0" width="100" height="30" uuid="da91a7db-3d4b-4d09-beda-2e1911f52e5e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1a8952d9-ed4d-4c46-b6a1-546ce317c5f2"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[Case Priority]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="0" width="100" height="30" uuid="5d83cda6-ef95-4d21-bc2c-fa9d79a7242d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="494d5f6f-3b91-40bf-a881-24afa837300e"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[Case Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="380" y="0" width="100" height="30" uuid="b8143326-165d-46b9-8b01-9cef38309685">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="54f95360-e4c3-482f-8a8e-342823affc02"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[Case Description]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="90" y="0" width="90" height="30" uuid="a0fabdb5-c44c-44e2-a144-f27501e65106">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9ec0366e-dd01-489d-a094-676b4fe68a17"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{case_type}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="0" width="100" height="30" uuid="b0af0e04-0ca7-49f9-9508-494c97fb44b4">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1a8952d9-ed4d-4c46-b6a1-546ce317c5f2"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{case_priority}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="0" width="100" height="30" uuid="24cca6a9-58eb-47fb-9935-d7122aab3f5a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="494d5f6f-3b91-40bf-a881-24afa837300e"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{case_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="0" width="100" height="30" uuid="cee7cfc3-729b-4041-a16e-55e37f0ecec1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="54f95360-e4c3-482f-8a8e-342823affc02"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{case_description}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,249 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<link rel="stylesheet" href="${contextPath}/assets/css/dms.css">
+<link rel="stylesheet" href="${contextPath}/assets/bootstrap/css/bootstrap.min.css">
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document Management System</title>
+
+  <style>
+    *{outline: none;}
+
+body{
+  background-color: #607d8b;
+}
+
+.searchbox-wrap{
+  display     : flex; 
+  width       : 610px;  
+  margin-top  : 8%;
+  margin-left : auto;
+  margin-right: auto;
+
+  
+  input{
+     flex                             : 1;
+     padding                          : 30px 20px;
+     font-size                        : 1.1em;
+     
+     -webkit-border-top-left-radius   : 25px;
+     -webkit-border-bottom-left-radius: 25px;
+     -moz-border-radius-topleft       : 25px;
+     -moz-border-radius-bottomleft    : 25px;
+     border-top-left-radius           : 25px;
+     border-bottom-left-radius        : 25px;
+     box-shadow                       : none;
+     border                           : none;
+     box-shadow                       : 2px 4px 6px rgba(0, 0, 0, 0.19);
+
+  }
+  
+  button{
+    padding-right                     : 10px;
+    
+    background-color                  : #fff;
+    -webkit-border-top-right-radius   : 25px;
+    -webkit-border-bottom-right-radius: 25px;
+    -moz-border-radius-topright       : 25px;
+    -moz-border-radius-bottomright    : 25px;
+    border-top-right-radius           : 25px;
+    border-bottom-right-radius        : 25px;
+    box-shadow                        : 5px 4px 6px rgba(0, 0, 0, 0.19);
+    border                            : none;
+    cursor                            : pointer; 
+    cursor                            : hand;
+    
+    span{
+      margin-left     : 50px;
+      padding         : 24px 45px;
+      
+      font-size       : 0.9em;
+      text-transform  : uppercase;
+      font-weight     : 300 ;
+      color           : #fff;
+      background-color: #F54E59;
+      
+      border-radius   : 20px;
+      box-shadow      : 2px 4px 6px rgba(0, 0, 0, 0.19);
+      
+      &:hover{
+        background-color: #d6121f;
+        box-shadow      : 2px 2px 4px rgba(0, 0, 0, 0.19);
+      }
+      
+    }
+  }
+}
+  </style>
+
+</head>
+<body>
+    <!-- c if for error -->
+    <c:if test="${not empty error_msg}">
+        <div class="alert alert-danger" role="alert">
+            <i class='fa fa-exclamation-triangle mr-2'></i> ${error_msg}
+        </div>
+    </c:if>
+    
+    <c:choose>
+        <c:when test="${enterAppKey == 'true'}">
+                <div class="searchbox-wrap">
+                    <input type="text" name="apiKey" id="apiKey" placeholder="Please enter your 'KEY' to access the file" />
+                    <button type="button"><span onclick="validateApiKey()">Send</span> </button>
+                </div>
+        </c:when>
+        <c:otherwise>
+            <section>
+                <div class="mt-2">
+                        <div class="panel-body">
+                            <div class="col-md-12 ">
+                                <div class="row mt-3 mb-3">
+                                    <!-- Card to show details -->
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <h5 class="card-title">Folder/Files</h5>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <ul class="list-group list-group-flush">
+                                                            <li class="list-group-item">Folder Name: ${folderDetails.folderFileName}</li>
+                                                            <li class="list-group-item">Folder Owener: ${folderDetails.owner}</li>
+                                                            <li class="list-group-item">Created Date: ${folderDetails.createdTimeWithAmPm}</li>
+                                                            <input type="hidden" id="PARENT_FOLDER_LINK" value="${folderDetails.folderOrFileLink}" />
+                                                            <input type="hidden" id="API_KEY" value="${apiKey}" />
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <ul class="list-group list-group-flush">
+                                                            <li><button type="button" class="btn btn-primary text-center" onclick="window.history.back();">Back</button></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h1>"${folderAndFiles.size()}"</h1>
+                                    <div class="col-md-12">
+                                        <c:if test="${folderAndFiles.size() <= 0}">
+                                            <div class="col-md-12">
+                                                <div class="alert alert-info" role="alert">
+                                                    <i class='bx bx-info mr-2'></i> No Folder or File Found
+                                                </div>
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${folderAndFiles.size() > 0}">
+                                            <table class="table table-hover" id="gridViewTable">
+                                                <thead class="bagGroundColorRvr">
+                                                    <tr>
+                                                        <th>Sl No.</th>
+                                                        <th>File/Folder Name</th>
+                                                        <th>Size</th>
+                                                        <th>Created Date</th>
+                                                        <th>Owener</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <c:forEach items="${folderAndFiles}" var="folderOrFile" varStatus="loop">
+                                                        <tr class="grid-view-row" id="GRID_ROW_${folderOrFile.folderOrFileLink}" ondblclick="openFolderOrFile('${folderOrFile.folderOrFileLink}', '${folderOrFile.folderOrFile}')" >
+                                                            <td>${loop.index + 1}</td>
+                                                            <td>
+                                                                <div class="d-flex align-items-center">
+                                                                    <i class="${folderOrFile.folderOrFile == 'FILE' ? 'bx bx-file' : 'bx bx-folder'}" style="font-size: 20px;color: #125cbd;"></i>
+                                                                    <span class="titl-text" title="${folderOrFile.folderFileName}" id="NAME_${folderOrFile.folderOrFileLink}">${folderOrFile.folderFileName}</span>
+                                                                    <input type="hidden" id="ICON_${folderOrFile.folderOrFileLink}" value="${folderOrFile.folderOrFile == 'FILE' ? 'bx bx-file' : 'bx bx-folder'}" />
+                                                                </div>
+                                                            </td>
+                                                            <td>${folderOrFile.sizeStr}</td>
+                                                            <td>${folderOrFile.createdTimeWithAmPm}</td>
+                                                            <td>${folderOrFile.owner}</td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </tbody>
+                                            </table>
+                                        </c:if>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <!-- Back Button -->
+                
+            </section>
+
+            
+
+
+        </c:otherwise>
+    </c:choose>
+    <input type="hidden" id="filderFileType" value="${folderFileType}" />
+    <input type="hidden" id="folderOrFileLink" value="${folderOrFileLink}" />
+    <input type="hidden" id="apiKeyHidden" value="${apiKey}" />
+
+    <form action="${contextPath}/dms/viewOrDownloadFileByKey" method="post" id="apiKeyForm">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+        <input type="hidden" name="folderOrFileLink" id="folderOrFileLinkForm1Id" value="" />
+        <input type="hidden" name="apiKey" id="apiKeyForm1Id" value="" />
+    </form>
+
+    <form action="${contextPath}/dms/downloadFile-With-Key" method="get" id="downloadFileApiKeyForm">
+        <input type="hidden" name="fileLink" id="folderOrFileLinkForm2Id" value="" />
+        <input type="hidden" name="apiKey" id="apiKeyForm2Id" value="" />
+    </form>
+    
+<script>
+    function validateApiKey() {
+        var apiKey = document.getElementById("apiKey").value;
+        if (apiKey == "") {
+            alert("Please enter your API key");
+            return false;
+        }
+        // Set the API key to the hidden field
+        document.getElementById("apiKeyHidden").value = apiKey;
+        let folderOrFileLink = document.getElementById("folderOrFileLink").value;
+        let folderFileType = document.getElementById("filderFileType").value;
+        openFolderOrFile(folderOrFileLink, folderFileType);
+
+        
+    }
+
+
+    function openFolderOrFile(folderOrFileLink, folderOrFile) {
+        if (folderOrFile == "FOLDER") {
+            let apiKey = document.getElementById("apiKeyHidden").value;
+            document.getElementById("folderOrFileLinkForm1Id").value = folderOrFileLink;
+            document.getElementById("apiKeyForm1Id").value = apiKey;
+            document.getElementById("apiKeyForm").submit();
+        } else {
+            let apiKey = document.getElementById("apiKeyHidden").value;
+            document.getElementById("folderOrFileLinkForm2Id").value = folderOrFileLink;
+            document.getElementById("apiKeyForm2Id").value = apiKey;
+            document.getElementById("downloadFileApiKeyForm").submit();
+        }
+    }
+
+    function backToParentFolder() {
+        
+    }
+
+
+</script>
+    
+
+
+</body>
+</html>

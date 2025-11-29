@@ -1,0 +1,29 @@
+#---- PRODUCTION PROFILE ----
+spring.datasource.url=jdbc:postgresql://?:5432/?
+spring.datasource.username=?
+spring.datasource.password=?
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+
+UPLOAD.FILE.PATH=/home/heads/assets
+UPLOAD.JASPER.FILE.PATH=/home/ERP_JASPER_REPORT
+
+
+#------------- SMTP Configuration----------------------
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+mail.smtp.host=smtp.gmail.com
+mail.smtp.ssl.trust=smtp.gmail.com
+mail.smtp.port=587
+mail.smtp.ssl.protocols=TLSv1.2
+mail.username=atmosphere.oppro@gmail.com
+mail.password=etnpkzqipiqbfqfb
+
+# 1 minute
+mail.priority.immediate=60000
+# 3 minutes
+mail.priority.high=180000
+# 5 minutes
+mail.priority.medium=300000
+# 10 minutes
+mail.priority.low=600000

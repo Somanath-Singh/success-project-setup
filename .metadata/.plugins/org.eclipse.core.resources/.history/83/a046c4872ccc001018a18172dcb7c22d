@@ -1,0 +1,488 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+<script src="${contextPath}/assets/js/moment.js"></script>
+<link href="${contextPath}/assets/full-calender/bootsrtap-icon.css">
+
+<style>
+button.btn.btn-warning, .btn-success {
+    padding: 4px 14px !important;
+    margin-top: 16px;
+    border-radius: 2px !important;
+    color: #fff !important;
+    text-decoration: none;
+    font-size: 13px;
+}
+.fc .fc-toolbar-title {
+    font-size: 18px;
+    margin: 0px;
+}
+.fc .fc-col-header-cell-cushion {
+    display: inline-block;
+    padding: 2px 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.eventcalanderbody strong {
+    width: 250px;
+    float: left;
+    font-weight:500;
+}
+
+.table-bordered>:not(caption)>*>* {
+    border-width: 0 1px;
+    padding: 8px 3px !important;
+}
+
+
+</style>
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}"/>
+
+<div class="breadcrumb_conatiner">
+              <div class="col-md-6">
+                <h4 class="change-color">Facility</h4>
+              </div>
+              <div class="col-md-6">
+                <nav aria-label="breadcrumb" style="float: right;">
+	         <ol class="breadcrumb">
+	            <li class="breadcrumb-item"><a href="${contextPath}/home">Home</a></li>
+	            <li class="breadcrumb-item active" aria-current="page">Booking Approval Details</li>
+	         </ol>
+	      </nav>
+              </div>
+            </div>
+            
+            
+<div class="card">
+	<div class="card-body">
+	<div class="row">
+	  
+	<div class="col-md-6">
+		<h6 class="headingbg mb-4">Booking Details</h6>
+		 
+		 <c:if test="${not empty bookingReqData}">
+		   <div style="font-size:12px" class="eventcalanderbody table-responsive">
+		   <table class="table table-bordered table-striped">
+			   	<tbody>
+			   		<tr>
+			   			<td><strong>Facility Type :</strong></td>
+			   			<td><span>${bookingReqData.facilitiesId.facilityType.facilityTypeName} (${bookingReqData.facilitiesId.facilityType.typesForFacilityId.facTypeName})</span></td>
+			   		</tr>
+			   		<tr>
+			   			<td><strong>Booking Apply BY: </strong></td>
+			   			<td><span>${bookingReqData.requestedBy}</span></td>
+			   		</tr>
+			   		<tr>
+			   			<td><strong>Purpose of Booking: </strong>  </td>
+			   			<td><span>${bookingReqData.purpose}</span></td>
+			   		</tr>
+			   		<tr>
+			   			<td><strong>Facility Name: </strong> </td>
+			   			<td><span>${bookingReqData.facilitiesId.facilityName}</span></td>
+			   		</tr>
+			   		<tr>
+			   			<td><strong>Building Name: </strong> </td>
+			   			<td><span>${not empty bookingReqData.buildingId.buildingName ? bookingReqData.buildingId.buildingName : 'N/A'}</span></td>
+			   		</tr>
+			   		<tr>
+			   			<td><strong>Block Name: </strong> </td>
+			   			<td><span>${not empty bookingReqData.blockId.blockName ? bookingReqData.blockId.blockName : 'N/A'}</span></td>
+			   		</tr>
+			   		<tr>
+			   			<td><strong>Floor Name: </strong></td>
+			   			<td><span>${not empty bookingReqData.floorId.floorNo ? bookingReqData.floorId.floorNo : 'N/A'}</span></td>
+			   		</tr>
+			   		<tr>
+			   			<td><strong>Booking From Date: </strong>  </td>
+			   			<td><span><fmt:formatDate pattern="dd-MM-yyyy" value="${bookingReqData.bookingFromDate}"/></span></td>
+			   		</tr>
+			   		<tr>
+			   			<td><strong>Start Time Slot: </strong> </td>
+			   			<td><span>${bookingReqData.startTimeSlot}</span></td>
+			   		</tr>
+			   		<tr>
+			   			<td><strong>Booking To Date : </strong>  </td>
+			   			<td><span><fmt:formatDate pattern="dd-MM-yyyy" value="${bookingReqData.bookingToDate}"/></span></td>
+			   		</tr>
+			   		<tr>
+			   			<td><strong>End Time Slot : </strong></td>
+			   			<td><span>${bookingReqData.endTimeSlot}</span></td>
+			   		</tr>
+			   	</tbody>
+		   </table>
+		</div>
+		</c:if>
+		<div class="col-md-12 text-center mb-3">
+				<c:choose>
+					<c:when test="${bookingReqData.status eq 'PENDING'}">
+						<button type="button"
+							onclick="checkSlotAvailableOrNot('${bookingReqData.facilitiesId.facilityId}','${bookingReqData.bookingFromDate}','${bookingReqData.startTimeSlot}','${bookingReqData.bookingToDate}','${bookingReqData.endTimeSlot}');approveBookingReqForm('${bookingReqData.facilityRequestId}','APPROVED')"class="btn btn-success">Approve</button>
+						<button type="button" onclick="cancelRejectBooking('${bookingReqData.facilityRequestId}','REJECTED')" class="btn btn-warning">Reject</button>
+						<button type="button" onclick="cancelBooking('${bookingReqData.facilityRequestId}','CANCEL')" class="btn btn-back">Cancel</button>
+						<button type="button" onclick="back()" class="btn btn-back">Back</button>
+
+					</c:when>
+					<c:when test="${bookingReqData.status eq 'CANCEL'}">
+						<button type="button"
+							onclick="checkSlotAvailableOrNot('${bookingReqData.facilitiesId.facilityId}','${bookingReqData.bookingFromDate}','${bookingReqData.startTimeSlot}','${bookingReqData.bookingToDate}','${bookingReqData.endTimeSlot}');approveBookingReqForm('${bookingReqData.facilityRequestId}','APPROVED')"class="btn btn-submit">Approve</button>
+						<button type="button" onclick="back()" class="btn btn-back">Back</button>
+					</c:when>
+					<c:when test="${bookingReqData.status eq 'REJECTED'}">
+						<button type="button" onclick="back()" class="btn btn-back">Back</button>
+					</c:when>
+					<c:otherwise>
+						<button type="button" onclick="cancelBooking('${bookingReqData.facilityRequestId}','CANCEL')" class="btn btn-back">Cancel</button>
+						<button type="button" onclick="back()" class="btn btn-back">Back</button>
+					</c:otherwise>
+				</c:choose>
+			</div>
+	</div>
+		<div class="col-lg-6">
+			<h6 class="headingbg mb-4">Slot Availability Details</h6>
+			<div id='calendar'></div>
+			
+		</div>	</div>
+	</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="bookingCancelModal" tabindex="-1"
+	aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title text-dark" id="exampleModalLabel">Cancel
+					Booking</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+					aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form class="container row"
+					action="${contextPath}/facility/cancelBooking.htm" method="post"
+					id="cancelEventFormId">
+					<input type="hidden" name="${_csrf.parameterName}"
+						value="${_csrf.token}" />
+						<input type="hidden" name="reqId" id="requestApproveIdId" />
+						<input type="hidden" id="cancelStatusId" name="actionType" />
+						<input type="hidden" id="cipherTextCancelEventFormId" name="cipherText">
+						
+					<div class="form-group col-md-12" id="purposeDiv">
+						<label class="required">Cancel Reason :</label>
+						<div class="col-md-12">
+							<input type="text"
+								class="form-control form-control-sm AlphabetsOnly"
+								name="cancelReason" id="cancelReasonId" value="" />
+						</div>
+					</div>
+
+					<div class="text-center">
+						<button type="button" class="btn btn-submit"
+							onclick="cancelRevertBookingFacility();">Confirm</button>
+						<button type="button" class="btn btn-back" data-bs-dismiss="modal" >Close</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="bookingRejectModal" tabindex="-1"
+	aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title text-dark" id="exampleModalLabel">Reject
+					Booking</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"
+					aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form class="container row"
+					action="${contextPath}/facility/rejectBooking" method="post"
+					id="rejectEventFormId">
+					<input type="hidden" name="${_csrf.parameterName}"
+						value="${_csrf.token}" />
+						<input type="hidden" name="reqId" id="requestRejectId" />
+						<input type="hidden" id="statusId" name="actionType" />
+						<input type="hidden" id="cipherTextRejectEventFormId" name="cipherText">
+						
+					<div class="form-group col-md-12" id="purposeDiv">
+						<label class="required">Reject Reason :</label>
+						<div class="col-md-12">
+							<input type="text"
+								class="form-control form-control-sm AlphabetsOnly"
+								name="cancelReason" id="rejectReasonId" value="" />
+						</div>
+					</div>
+
+					<div class="text-center">
+						<button type="button" class="btn btn-submit"
+							onclick="cancelRevertBookingFacility();">Confirm</button>
+						<button type="button" class="btn btn-back" data-bs-dismiss="modal" >Close</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<form action="${contextPath}/facility/getFacilityBooking" method="GET" id="backToPreviousPage">
+</form>
+
+<form action="${contextPath}/facility/actionOnFacilityBooking.htm" method="post" id="approveBookingReqFormId">
+   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+   <input type="hidden" id="cipherTextApproveReqFormId" name="cipherText">
+   <input type="hidden" name="reqId" id="requestApprovalIdId" />
+   <input type="hidden" name="actionType" id="actionStatusId"/>
+</form>
+
+
+<script type="text/javascript" src="${contextPath}/assets/full-calender/full-calender.js"></script>
+<script type="text/javascript" src="${contextPath}/assets/full-calender/global-full-calender.js"></script>
+
+
+<script>
+
+/* FOR VIEWING SINGLE EVENT IN FULL CALENDAR START */
+
+
+
+// document.addEventListener('DOMContentLoaded', function() {
+// 	  var calendarEl = document.getElementById('calendar');
+
+// 	  var dynamicDate = '${bookingReqData.bookingFromDate}';
+// 	  var dynamicTitle = '${bookingReqData.facilitiesId.facilityName}';
+// 	  var datetimeString = '${bookingReqData.bookingFromDate}';
+// 	  var spaceIndex = datetimeString.indexOf(' ');
+// 	  var startDate = datetimeString.substring(0, spaceIndex);
+// 	  var startTime = '${bookingReqData.startTimeSlot}';
+// 	  var datetimeString1 = '${bookingReqData.bookingFromDate}';
+// 	  var spaceIndex = datetimeString1.indexOf(' ');
+// 	  var endDate = datetimeString1.substring(0, spaceIndex);
+// 	  var endTime = '${bookingReqData.endTimeSlot}';
+
+// 	  var dynamicStart = startDate + 'T' + startTime +':00';
+// 	  var dynamicEnd = endDate + 'T' + endTime +':00';
+	  
+// 	  var calendar = new FullCalendar.Calendar(calendarEl, {
+// 	    initialView: 'timeGridDay',
+
+// 	    /* initialDate: '2024-01-09', */
+// 	    initialDate: dynamicDate,
+// 	    themeSystem: 'bootstrap5',
+// 	    headerToolbar: {
+// 	      left: 'prev,next today',
+// 	      center: 'title',
+// 	      right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+// 	    },
+// 	    weekNumbers: true,
+// 	    dayMaxEvents: true, // allow "more" link when too many events
+// 	    events: [
+// 	      {
+// 	    	  title: dynamicTitle,
+// 		      start: dynamicStart,
+// 		      end: dynamicEnd
+// 	      },
+// 	      {
+// 	        title: 'Click for Google',
+// 	        url: 'http://google.com/',
+// 	        start: '2021-04-28'
+// 	      } 
+// 	    ]
+// 	  });
+// 	  calendar.render();
+// 	});
+	
+/* FOR VIEWING SINGLE EVENT IN FULL CALENDAR END */
+	
+	
+	
+	
+/* FOR VIEWING DYNAMIC EVENT IN FULL CALENDAR START*/	
+document.addEventListener('DOMContentLoaded', function() {
+	
+  var calendarEl = document.getElementById('calendar');
+  var dynamicDate = '${bookingReqData.bookingFromDate}';
+  var dynamicEndDate = '${bookingReqData.bookingToDate}';
+
+  // Assume an asynchronous function to fetch facBookingReqList
+  async function fetchFacBookingReqList() {
+  const url = '${contextPath}/facility/checkStartTimeSlotAvailability?fromDate=${bookingReqData.bookingFromDate}';
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Network response failed IN FULL CALENDAR.');
+    }
+    const jsonArray = await response.json();
+    return jsonArray;
+  } catch (error) {
+    console.error('Error fetching data IN FULL CALENDAR :', error);
+    throw error; // Rethrow the error for further handling
+  }
+}
+
+  // Fetch facBookingReqList asynchronously
+  fetchFacBookingReqList().then(function(facBookingReqList) {
+    var currentDate = dynamicDate; // Assuming all events are on the same date
+    var bookingEndDate = dynamicEndDate;
+    var eventsList = [];
+    console.log('Processing data:', eventsList);
+    facBookingReqList.forEach(function(data) {
+    	
+      var datetimeString = currentDate;
+  	  var spaceIndex = datetimeString.indexOf(' ');
+  	  var startDate = datetimeString.substring(0, spaceIndex);
+  	  
+  	  var datetimeString1 = bookingEndDate;
+	  var spaceIndex1 = datetimeString.indexOf(' ');
+	  var endDate = datetimeString.substring(0, spaceIndex);
+	  
+      var dynamicStart = startDate + 'T' + data.eventStartTime + ':00';
+      var dynamicEnd = endDate + 'T' + data.eventEndTime + ':00';
+
+      eventsList.push({
+        title: ' Booked For - '+data.eventName,
+        start: dynamicStart,
+        end: dynamicEnd
+      });
+    });
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+    	  initialView: 'timeGridWeek', // Set to 'timeGridWeek' for week view
+    	  initialDate: currentDate, // currentDate should be your desired starting date
+    	  themeSystem: 'bootstrap5',
+    	  headerToolbar: {
+    	    left: '',
+    	    center: 'title',
+    	    right: 'prev,title,next', // Add navigation buttons to switch between weeks
+    	  },
+    	  weekNumbers: true,
+    	  dayMaxEvents: true,
+    	  events: eventsList,
+    	});
+
+    	calendar.render();
+  });
+});
+
+/* FOR VIEWING DYNAMIC EVENT IN FULL CALENDAR END*/
+
+
+
+</script>
+
+
+<script>
+
+	function back() {
+		$("#backToPreviousPage").submit();
+	}
+
+	function approveBookingReqForm(id, actionStatus) {
+		var dynamicDate = '${bookingReqData.bookingFromDate}';
+		
+		$("#requestApprovalIdId").val(id);
+		$("#actionStatusId").val(actionStatus);
+		var bizContent = $("#approveBookingReqFormId").serializeArray();
+		$("#cipherTextApproveReqFormId").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+		/* if (actionStatus == 'APPROVED') {
+			checkSlotAvailableOrNot(dynamicDate);
+			return false;
+		} */
+		bootbox.confirm("Do you want to " + actionStatus + " this booking ?",
+				function(result) {
+					if (result) {
+						showLoader();
+						$("#approveBookingReqFormId").submit();
+					}
+				});
+	}
+	
+	
+	function checkSlotAvailableOrNot(facilityName,fromDate,startTime,endDate,endTime) {
+		 $.ajax({
+			    url: "${contextPath}/facility/checkSlotAvailableOrNot",
+			    type: "GET",
+			    data: {
+			      "facilityId": facilityName,
+			      "bookingFromDate": fromDate,
+			      "startTime": startTime,
+			      "endDate": endDate,
+			      "endTime": endTime
+			    },
+			    success: function(response) {
+			    	var data = JSON.parse(response);
+			    	if (data.status == 'AVAILABLE') {
+			    		bootbox.alert("This booking slot already booked .");
+			    		return true;
+					}
+			    },
+			    error: function(error) {
+			      bootbox.alert("Something went wrong.");
+			    }
+			  });
+	}
+	
+
+	function cancelRejectBooking(id, status) {
+		$("#requestRejectId").val(id);
+		$("#statusId").val(status);
+			$("#bookingRejectModal").modal('show');
+	}
+	
+	function cancelBooking(id, status) {
+		$("#requestApproveIdId").val(id);
+		$("#cancelStatusId").val(status);
+			$("#bookingCancelModal").modal('show');
+		
+	}
+
+	function cancelRevertBookingFacility() {
+		var status = '';
+		var rejectStatus = $("#statusId").val();
+		var cancelStatusId = $("#cancelStatusId").val();
+		if (rejectStatus == 'REJECTED') {
+			status = rejectStatus;
+			if ($("#rejectReasonId").val() == '' && status == 'REJECTED') {
+				bootbox.alert("Please give proper " + status + " reason.");
+				return false;
+			}
+			var bizContent = $("#rejectEventFormId").serializeArray();
+			$("#cipherTextRejectEventFormId").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+			bootbox.confirm("Do you want to " + status + " this booking ?",
+					function(result) {
+						if (result) {
+							showLoader();
+							$("#rejectEventFormId").submit();
+						}
+					});
+		} else {
+			status = cancelStatusId;
+			if ($("#cancelReasonId").val() == '' && status == 'CANCEL') {
+				bootbox.alert("Please give proper " + status + " reason.");
+				return false;
+			}
+			var bizContent = $("#cancelEventFormId").serializeArray();
+			 $("#cipherTextCancelEventFormId").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+			bootbox.confirm("Do you want to " + status + " this booking ?",
+					function(result) {
+						if (result) {
+							showLoader();
+							$("#cancelEventFormId").submit();
+						}
+					});
+		}
+	}
+</script>

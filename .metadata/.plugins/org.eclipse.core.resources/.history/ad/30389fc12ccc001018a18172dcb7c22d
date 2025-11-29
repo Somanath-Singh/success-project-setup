@@ -1,0 +1,486 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    .legacy-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 20px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .header {
+      background: linear-gradient(90deg, #714429 -20%, #E1A968 40%, #DE8721 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .header h2 {
+        font-size: 28px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .header p {
+        font-size: 16px;
+        opacity: 0.9;
+    }
+    
+    .content {
+        background: white;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        padding: 30px;
+    }
+    
+    .card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .card h3 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .card h3::before {
+        content: "📋";
+        font-size: 24px;
+    }
+    
+    .success {
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #c3e6cb;
+        margin: 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .success::before {
+        content: "✅";
+        font-size: 18px;
+    }
+    
+    .error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #f5c6cb;
+        margin: 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .error::before {
+        content: "❌";
+        font-size: 18px;
+    }
+    
+    .btns {
+     display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 5px;
+    }
+    
+    .btn-successs {
+      background: #bf7d44 !important;
+        color: white;
+    }
+    a:hover{
+     color: white !important;
+    }
+    
+    .btn-successs:hover {
+        transform: translateY(-2px);
+      /*   box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3); */
+         background: #bf7d44 !important;
+    } 
+    
+    .btn-primarys {
+        background: #bf7d44 !important;
+        color: white;
+    }
+    
+    .btn-primarys:hover {
+        transform: translateY(-2px);
+       /*  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3); */
+         background: #bf7d44 !important;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        border: 2px dashed #ced4da;
+        border-radius: 8px;
+        background: white;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+    }
+    
+    input[type="file"]:hover {
+        border-color: #007bff;
+    }
+    
+    input[type="file"]:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+    
+    .instructions {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #2196f3;
+    }
+    
+    .instructions h4 {
+        color: #1976d2;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .instructions h4::before {
+        content: "📝";
+    }
+    
+    .instructions ol {
+        margin-left: 20px;
+        line-height: 1.8;
+    }
+    
+    .instructions li {
+        margin-bottom: 8px;
+        color: #37474f;
+    }
+    
+    .note {
+        background: #FAE0D0;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+        margin-top: 20px;
+    }
+    
+    .note h4 {
+        color: #856404;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .note p {
+        color: #000000;
+        line-height: 1.0;
+    }
+    
+    .center {
+        text-align: center;
+    }
+    
+    .mt-20 {
+        margin-top: 20px;
+    }
+    
+    .mb-20 {
+        margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .legacy-container {
+            padding: 10px;
+        }
+        
+        .header {
+            padding: 20px;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    table td .btn {
+        padding: 6px !important;
+    }
+    .custom-edit{
+ 
+    background: #d3c5c58c;
+    border-radius: 4px;
+    border: red;
+    font-size: 14px;
+    color: #eb1212;
+    cursor: pointer;
+    width: 28px;
+    height: 26px;
+}
+</style>
+
+<div class="legacy-container">
+    <!-- Header Section -->
+    <div class="header">
+        <h2>Legacy Projects</h2>
+        <p>Excel Template Download & Data Upload System</p>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Success/Error Messages -->
+        <c:if test="${not empty success}">
+            <div class="success">
+                <strong>Success!</strong> ${success}
+            </div>
+        </c:if>
+        
+        <c:if test="${not empty error}">
+            <div class="error">
+                <strong>Error!</strong> ${error}
+            </div>
+        </c:if>
+        
+        <!-- Download Section -->
+        <div class="note">
+        <div class="d-flex gap-3 align-item-center">
+        <img src="assets/images/check.png" class="image-fluid" style="width:30px; height:30px;">
+         <h4>Step 1: Download Template</h4>
+        </div>
+           
+             <div style="margin-left: 48px;">
+            <p>Download the Excel template file with the required format for legacy projects data.</p>
+            </div>
+            <div class="center">
+                <a href="<c:url value='/legacy/download-template' />" class="btns btn-successs">
+                     Download Excel Template
+                </a>
+            </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="note">
+         <div class="d-flex gap-3 align-item-center">
+          
+          <img src="assets/images/check.png" class="image-fluid" style="width:30px; height:30px;">
+          <h4>How to Use:</h4>
+        </div>
+           
+            <ul  style="margin-left: 13px;">
+                <li><p><strong style="color:">Download</strong> the Excel template using the button above</p></li>
+                <li><p><strong>Open</strong> the template in Microsoft Excel or similar spreadsheet software</p></li>
+                <li><p><strong>Fill</strong> in all the required project information in the designated columns</p></li>
+                <li><p><strong>Save</strong> the completed Excel file on your computer</p></li>
+                <li><p><strong>Upload</strong>  the file using the form below to save data to the database></p></li>
+            </ul>
+        </div>
+        
+        <!-- Upload Section -->
+        <div class="note">
+        
+         <div class="d-flex gap-3 align-item-center">
+         
+        <img src="assets/images/check.png" class="image-fluid" style="width:30px; height:30px;">
+         <h4>Step 2: Upload Data</h4>
+        </div>
+           
+            <div style="margin-left: 44px;">
+              <p>Select your completed Excel file to upload and save the Legacy project data to the database.</p>
+            
+            <form action="<c:url value='/legacy/upload' />" method="post" enctype="multipart/form-data" id="uploadForm">
+                <!-- CSRF Token - Essential for Spring Security -->
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                
+                <div class="form-group">
+                    <label for="file">Select Excel File:</label>
+                    <input type="file" name="file" id="file" accept=".xlsx,.xls" required 
+                           onchange="validateFile(this)">
+                </div>
+                <div class="center">
+                    <button type="submit" class="btns btn-primarys" id="submitBtn">
+                         Upload & Save to Database
+                    </button>
+                </div>
+            </form>
+            
+            </div>
+          
+        </div>
+        
+        <!-- Important Notes -->
+        <div class="note">
+         <div class="d-flex gap-3 align-item-center">
+        <img src="assets/images/check.png" class="image-fluid" style="width:30px; height:30px;">
+         <h4>Important Information:</h4>
+        </div>
+           
+            <div style="margin-left: 44px;">
+	            <p>• Only Excel files (.xlsx, .xls) are accepted</p>
+	            <p>• File size must not exceed 10MB</p>
+	            <p>• Ensure the Letter Number must be Unique</p>
+	            <p>• Ensure that the UIDSE code entered corresponds to an existing school code</p>
+	            <p>• Ensure the file follows the template format exactly</p>
+	            <p>• All required fields (marked with *) must be filled</p>
+	            <p>• Data will be validated before saving to the database</p>
+            </div>
+          
+        </div>
+    </div>
+</div>
+
+	<div class="legacy-container">
+	<!-- Revert Section -->
+        <div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Legacy Building List</h5>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table id="basic-datatables"
+						class="table table-bordered table-hover exportbtn">
+						<thead>
+							<tr>
+								<th class="text-center" style="width:60px">Sl.No</th>
+								<th>Building Name</th>
+								<th>Building Code</th>
+								<th>Letter No</th>
+								<th>Estimated Cost</th>
+								<th>District</th>
+								<th>Department</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="legacy" items="${legecyProjectList}" varStatus="count">
+								<tr>
+									<td class="text-center">${count.count}</td>
+									<td>${legacy.projectName}</td>
+									<td>${legacy.projectCode}</td>
+									<td>${legacy.letterNo}</td>
+									<td>${legacy.estimatedCost}</td>
+									<td>${legacy.districtName}</td>
+									<td>${legacy.departmentName}</td>
+									<td class="text-center">
+										<button class="custom-edit"  id="editBtn" data-toggle="tooltip" 
+										onclick="removeLegacyProject(${legacy.projectId})" title="Remove">
+										 <i class="fa-regular fa-trash-can"></i>
+										</button>
+									</td>
+								</tr>
+							</c:forEach>
+						</tbody> 
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<script>
+    function validateFile(input) {
+        const file = input.files[0];
+        if (file) {
+            const fileName = file.name.toLowerCase();
+            const fileSize = file.size;
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            
+            if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+                alert('Error: Only Excel files (.xlsx, .xls) are allowed.');
+                input.value = '';
+                return false;
+            }
+            
+            if (fileSize > maxSize) {
+                alert('Error: File size must not exceed 10MB.');
+                input.value = '';
+                return false;
+            }
+            
+            return true;
+        }
+    }
+    
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        const fileInput = document.getElementById('file');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        if (!validateFile(fileInput)) {
+            e.preventDefault();
+            return;
+        }
+        
+        // Show loading state
+        submitBtn.innerHTML = '⏳ Uploading...';
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.7';
+    });
+    
+    function removeLegacyProject(id) {
+		  $("#projectIdRemove").val(id);
+		  var bizContent = $("#removeForm").serializeArray();
+		  $("#removeCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+		  bootbox.confirm("Do you want to continue ?",function(result){
+			  if(result){
+				  showLoader();
+				  $("#removeForm").submit();
+			  }
+		  });
+	  }
+    
+</script>
+
+<form action="${contextPath}/legacy/remove" method="Post" id="removeForm">
+ <input type="hidden" id="removeCipherText" name="cipherText">
+ <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+ <input type="hidden" name="projectId" id="projectIdRemove" />
+</form>

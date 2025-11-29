@@ -1,0 +1,757 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}"/>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+<style>
+.apnd-btn-role-plus{
+	position: relative;background: #0346e8; color: #fff;font-size: 16px; padding: 2px 6px;border-radius: 3px;cursor: pointer;
+}
+.remove-occ-auth{
+	background: #bf0606;
+    position: relative;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.disabled-input {
+    opacity: 0.5; /* Adjust opacity as needed */
+    pointer-events: none; /* Disable pointer events */
+}
+</style>
+
+
+<section class="main-panel">
+	<div class="content">
+		<div class="breadcrumb_conatiner">
+			<div class="col-md-6">
+				<h4 class="change-color">Staff Workflow Configuration</h4>
+			</div>
+			<div class="col-md-6">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+						<li class="breadcrumb-item active" aria-current="page">Staff Workflow Configuration</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-header">
+						<h6 class="card-title">Staff Workflow</h6>
+					</div>
+					<div class="card-body">
+						<form action="${contextPath}/staff/workFlowDesgn/saveNdUpdateWflowDetails" method="post" id="saveFormId" >
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+							<input type="hidden" name="staffDesgnWorkFlowMaster.workFlowMasterId" value="${staffDesgnWorkflowFetchData.staffDesgnWorkFlowMaster.workFlowMasterId}" id="workFlowMasterId"/>
+							
+						
+							<div class="form-group col-md-4">
+								<label class="required ">Staff Designation</label>
+								<select class="selectpicker" data-live-search="true" id="roleId" name="staffDesgnWorkFlowMaster.roleId" onchange="getStaffDesnByRoleIdAndOrgType('roleId','authRoleId0','authObjType0','','');getAllDefineHearchyLevelDesgnation('roleId')">
+									<option value="0">- Select -</option>
+									<c:forEach items="${staffDesgWorkflowData.roleList}" var="rl">
+										<option value="${rl.roleId}" ${rl.roleId eq staffDesgnWorkflowFetchData.staffDesgnWorkFlowMaster.roleId ? 'selected' : ''}>${rl.displayName}</option>
+									</c:forEach>
+								</select>
+							</div>
+							
+							
+							<div class="text-right hidden" id="changeDesgn">
+								<div class="card-header" style="margin-left:-10px; margin-right:-10px"><h5 class="card-title">Define Hierarchy</h5></div>
+								<div class="row" id="authTableDivId"></div>
+							</div>
+							
+							<h5 class="card-title">Reporting Authority Hierarchy</h5>
+								<div class="" id="changeAuthId">
+									<div class="col-md-12" id="repAuthTableDivId">
+										<table class="table table-bordered mt-2" id="tableIdAuth">
+											<thead>
+												<tr>
+													<th style="width: 30%;"><label class="required"> Organization Type </label></th>
+													<th style="width: 30%;"><label class="required"> Authority Designation </label></th>
+													<th style="width: 25%;"><label class="required"> Section </label></th>
+													<th style="width: 12%;"><label class="required"> Level </label></th>
+													<th style="width: 03%;" class="addRemoveBtnTh text-center"><button type="button" class="btn btn-primary" id="apnd-btn-plus"><i class="fa fa-plus" ></i></button></th>
+												</tr>
+											</thead>
+											<tbody class="append-box-tbody ${staffDesgnWorkflowFetchData.statusCall eq 'VIEW' ? 'frezee' : ''}" id="tableTbodyId">
+												<c:if test="${empty staffDesgnWorkflowFetchData.staffDesgnWorkFlowLevelsList}">
+													<tr class="append-box-tr">
+														<td>
+															<select class="form-select validateOrgType validCheck" id="authObjType0" name="staffDesgnWorkFlowLevelsList[0].orgType" onchange="getStaffDesnByRoleIdAndOrgType('roleId','authRoleId0','authObjType0','sectionId0','secTdId0')">
+																<option value="0">- Select -</option>
+																<option value="OFFICE" ${staffDesgWorkflowData.currObjType eq 'OFFICE' ? 'selected' : ''}>OFFICE</option>
+																<option value="MUNICIPALITY" ${staffDesgWorkflowData.currObjType eq 'MUNICIPALITY' ? 'selected' : ''}>MUNICIPALITY</option>
+																<option value="GOVERNING" ${staffDesgWorkflowData.currObjType eq 'GOVERNING' ? 'selected' : ''}>GOVERNING BODY</option>
+<%-- 														    <option value="RDE" ${staffDesgWorkflowData.currObjType eq 'RDE' ? 'selected' : ''}>RDE</option> --%>
+                                                               <%-- new for testing pp only--%>
+                                                                <option value="CORPORATE" ${staffDesgWorkflowData.currObjType eq 'CORPORATE' ? 'selected' : ''}>CORPORATE</option>
+															</select>
+														</td>
+														<td>
+															<input type="hidden" class="validateDtlsId" name="staffDesgnWorkFlowLevelsList[0].workFlowLevelId" id="workFlowLevelId0" >
+															<select class="form-select validateRepAuthId validCheck" id="authRoleId0" name="staffDesgnWorkFlowLevelsList[0].authRoleId" onchange="getSectionListIfAppl('authObjType0', 'authRoleId0', 'sectionId0', 'secTdId0')">
+																<option value="0">- Select -</option>
+															</select>
+														</td>
+														<td class="frezee validateSectionTd" id="secTdId0">
+															<select class="form-select validateSectionId" id="sectionId0" name="staffDesgnWorkFlowLevelsList[0].departmentId.departmentId" >
+																<option value="0">- Select -</option>
+															</select>
+														</td>
+														<td>
+															<select class="form-select validateLevel validCheck" id="authLevel0" name="staffDesgnWorkFlowLevelsList[0].authLevel" >
+																<option value="0">- Select -</option>
+																<option value="1">1</option>
+																<option value="2">2</option>
+																<option value="3">3</option>
+																<option value="4">4</option>
+																<option value="5">5</option>
+															</select>
+														</td>
+														<c:if test="${staffDesgnWorkflowFetchData.statusCall ne 'VIEW'}">
+															<td class="addRemoveBtnTd text-center"><button type="button" class="btn btn-danger remove-occ frezee"><i class="fa fa-trash "></i></button></td>
+														</c:if> 
+													</tr>
+												</c:if>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							
+								<c:if test="${empty staffWorkflowFetchData}">
+									<div class="row form-group col-md-12">
+										<label style="font-size: 14px;">Select Module(s) below to which the above workflow configuration is applicable :</label>
+									</div>
+									<div class="row ${staffWorkflowFetchData.statusCall eq 'VIEW' ? 'frezee' : ''}" style="margin-left: 0;">
+										<c:forEach items="${staffDesgWorkflowData.moduleMstList}" var="module" varStatus="count">
+											<div class="col-md-2 form-group d-flex" style="">
+												<input type="checkbox" name="moduleIds" class="moduleCheckBox" id="moduleCheckBoxId${module.moduleMstId}"
+												value="${module.moduleMstId}" style="float: left; margin: 0px 5px 0 0px;">
+												<label>${module.moduleMstName}</label>
+											</div>
+										</c:forEach>
+									</div>
+								</c:if>
+
+								<div class="col-md-12 text-center mt-3" style="">
+									<c:if test="${staffDesgnWorkflowFetchData.statusCall ne 'VIEW'}">
+										<button type="button" id="submitBttnId" onclick="submitDetails()" class="btn-submit btn">${empty staffDesgnWorkflowFetchData ? 'Save' : 'Update'}</button>
+									</c:if>
+									<button type="button" onclick="history.back()" class="btn btn-danger">Cancel</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				<%@ include file="/WEB-INF/views/workflow/workFlowDesgnProcessList.jsp"%>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+
+<script>
+
+var count = "1";
+$(document).ready(function()
+{
+//	getStaffDetails('staffId','staffDtlsDiv');
+	renumberRows();
+	$("body").on("click", ".remove-occ", function () {
+		if($('.remove-occ').length > 1){
+			$(this).closest(".append-box-tr").remove();
+			renumberRows();
+		}
+	});
+	
+//	getStaffDetails('staffId','staffDtlsDiv');
+	renumberAuthRows();
+	$("body").on("click", ".remove-occ-auth", function () {
+		if($('.remove-occ-auth').length > 1){
+			$(this).closest(".append-box-auth-tr").remove();
+			renumberAuthRows();
+		}
+	});
+	
+	 $("#apnd-btn-plus").click(function(){
+			
+			if($("#roleId").val() != '0'){
+				if(validCheck()){
+					$(".append-box-tbody").append('<tr class="append-box-tr"><td><select class="form-select validateOrgType validCheck" id="authObjType'+count+'" name="staffDesgnWorkFlowLevelsList['+count+'].orgType" onchange="getStaffDesnByRoleIdAndOrgType(\'roleId\',\'authRoleId'+count+'\',\'authObjType'+count+'\',\'sectionId'+count+'\',\'secTdId'+count+'\')"><option value="0">- Select -</option><option value="OFFICE" ${staffDesgWorkflowData.currObjType eq "OFFICE" ? "selected" : ''}>OFFICE</option><option value="MUNICIPALITY" ${staffDesgWorkflowData.currObjType eq "MUNICIPALITY" ? "selected" : ''}>MUNICIPALITY</option><option value="GOVERNING" ${staffDesgWorkflowData.currObjType eq "GOVERNING" ? "selected" : ''}>GOVERNING</option></select></td><td><input type="hidden" class="validateDtlsId " name="staffDesgnWorkFlowLevelsList['+count+'].workFlowLevelId" id="workFlowLevelId'+count+'" ><select class="form-select validateRepAuthId validCheck" id="authRoleId'+count+'" name="staffDesgnWorkFlowLevelsList['+count+'].authRoleId" onchange="getSectionListIfAppl(\"authObjType'+count+'\", \"authRoleId'+count+'\", \"sectionId'+count+'\", \"secTdId'+count+'\")"><option value="0">- Select -</option></select></td><td class="frezee validateSectionTd" id="secTdId'+count+'"><select class="form-select validateSectionId" id="sectionId'+count+'" name="staffDesgnWorkFlowLevelsList['+count+'].departmentId.departmentId" ><option value="0">- Select -</option></select></td><td><select class="form-select validateLevel validCheck" id="authLevel'+count+'" name="staffDesgnWorkFlowLevelsList['+count+'].authLevel" ><option value="0">- Select -</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></td><td class="addRemoveBtnTd text-center"><button type="button" class="btn btn-danger remove-occ"><i class="fa fa-trash "></i></button></td></tr>');
+					$.getScript("${contextPath}/assets/appJs/validation/common-utils.js");
+					getStaffDesnByRoleIdAndOrgType('roleId','authRoleId'+count+'','authObjType'+count+'','sectionId'+count+'','secTdId'+count+'');
+					count++;
+				}
+	 				renumberRows();
+			}else{
+				bootbox.alert("Please select desigination first to proceed");
+				return false;
+			}
+				
+		});
+});
+
+
+
+function submitDetails(){
+	
+	renumberRows();
+	renumberAuthRows();
+	if($("#roleId").val() == "0")
+	{
+		bootbox.alert("Please select staff desgination");
+		return false;
+	}
+	else
+	{
+
+		var check = false;
+		if($('.tableNo').length > 0)
+		{
+			check = validCheckRole();
+		}
+		else
+		{	
+			check = validCheck() && validateModules();
+		}
+		
+		if(check){
+			bootbox.confirm("Do you want to submit ?",
+				function(result){
+					if(result){
+						showLoader();
+						$("#saveFormId").submit();
+					}
+			});
+		}
+	}	
+}
+
+
+
+ 
+ function validCheck(){
+	 
+		var data = true;
+		$('.validCheck').each(function(index, obj){
+			
+		    if(obj.nodeName == "SELECT" && obj.value == "0"){
+	            bootbox.alert("Please fill up reporting authority hierarchy details to proceed");
+	            data = false;
+	            return data;
+		    }
+		    
+		});
+		return data;
+	}
+ 
+
+
+ function validateModules(){
+	 debugger
+		var data = true;
+		var moduleListSize = "${staffDesgWorkflowData.moduleMstList.size()}";
+		if(moduleListSize != "" && parseFloat(moduleListSize) > 0)
+		{
+		   var count = 0;
+			<c:forEach items="${staffDesgWorkflowData.moduleMstList}" var="modDtls">
+				var moduleId = ${modDtls.moduleMstId};
+				if(document.getElementById('moduleCheckBoxId'+moduleId).checked == true)
+				{
+					count++;
+				}
+			</c:forEach>
+			
+			if(count == 0)
+			{
+				bootbox.alert("At least one module name must be selected to proceed");
+				data = false;
+			}
+		}
+		else
+		{
+			bootbox.alert("No module details found to proceed.Kindly verify module details !");
+			data = false;
+		}
+		
+		return data;
+	}
+ 
+ function getStaffDesnByRoleIdAndOrgType(roleId, apndId, objType,sectionId,sectionTdId)
+ {
+	 debugger
+	 if(sectionId != ''){
+		 $('#'+sectionId).empty().append("<option value='0'>- Select -</option>");
+		 $("#"+sectionId).removeClass("validCheck");
+		 $("#"+sectionId).removeClass("validCheckRole");
+	 }
+	 if(sectionTdId != ''){
+		 $('#'+sectionTdId).addClass("frezee");
+	 }
+	
+	var roleId = $("#"+roleId).val();
+	var orgType = $("#"+objType).val();
+	if(roleId != '0'){
+		showLoader();
+		$.ajax({
+			type : "GET",
+			url : '${contextPath}/staff/workFlowDesgn/getStaffDesnByRoleIdAndOrgType',
+			dataType : "json",
+			data : {
+				"roleId"  : roleId,
+				"objType" : orgType,
+			},
+			success : function(response) {
+				hideLoader();
+				var html = "<option value='0'>- Select -</option>";
+				var data = response;
+				if (data != "" && data != null && data.length > 0) {
+					$.each(data, function(index, value) {
+						html = html + "<option value="+value.roleId+">" + value.displayName + "</option>";
+					});
+				}
+				$('#'+apndId).empty().append(html);
+			},
+			error : function(error) {
+				bootbox.alert("somthing went wrong");
+			}
+		});
+	}
+}
+ 
+ 
+
+
+function renumberRows() {
+	var listSize = $(".validateRepAuthId").length;
+    for (var i = 0; i < listSize; i++) {
+        var input = $(".validateDtlsId")[i];
+        $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+        $(input).attr("name", "staffDesgnWorkFlowLevelsList["+i+"].workFlowLevelId");
+        
+        var input1 = $(".validateRepAuthId")[i];
+        $(input1).attr("id", $(input1).attr("id").replace(/\d+$/, i));
+        $(input1).attr("name", "staffDesgnWorkFlowLevelsList["+i+"].authRoleId");
+        
+        var input3 = $(".validateLevel")[i];
+        $(input3).attr("id", $(input3).attr("id").replace(/\d+$/, i));
+        $(input3).attr("name", "staffDesgnWorkFlowLevelsList["+i+"].authLevel");
+        
+        var input4 = $(".validateOrgType")[i];
+        $(input4).attr("id", $(input4).attr("id").replace(/\d+$/, i));
+        $(input4).attr("name", "staffDesgnWorkFlowLevelsList["+i+"].orgType");
+        
+        var input5 = $(".validateSectionId")[i];
+        $(input5).attr("id", $(input5).attr("id").replace(/\d+$/, i));
+        $(input5).attr("name", "staffDesgnWorkFlowLevelsList["+i+"].departmentId.departmentId");
+        
+        var input6 = $(".validateSectionTd")[i];
+        $(input6).attr("id", $(input6).attr("id").replace(/\d+$/, i));
+        
+        $("#authRoleId"+i).attr("onchange", "getSectionListIfAppl(\'authObjType"+i+"\',\'authRoleId"+i+"\',\'sectionId"+i+"\',\'secTdId"+i+"\')");
+        $("#authObjType"+i).attr("onchange", "getStaffDesnByRoleIdAndOrgType(\'roleId\',\'authRoleId"+i+"\',\'authObjType"+i+"\',\'sectionId"+i+"\', \'secTdId"+i+"\')");
+    }
+}
+
+function renumberAuthRows() {
+	
+	var tableNO =$(".tableNo").length;
+	if(tableNO != "" && parseFloat(tableNO) > 0){
+		for(var t=0;t<tableNO;t++){
+			var listSize = $(".authRoleIdValidDef"+t).length;
+			
+			if(listSize != '' && parseFloat(listSize) > 0){
+				 for (var i = 0; i < listSize; i++){
+					 	var input = $(".wflowLevelIdValidDef"+t)[i];
+				        $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+				        $(input).attr("name", "moduleMstList["+t+"].wflowLevelList["+i+"].workFlowLevelId");
+				        
+				        var input1 = $(".authRoleIdValidDef"+t)[i];
+				        $(input1).attr("id", $(input1).attr("id").replace(/\d+$/, i));
+				        $(input1).attr("name", "moduleMstList["+t+"].wflowLevelList["+i+"].authRoleId");
+				        
+				        var input3 = $(".authLevelValidDef"+t)[i];
+				        $(input3).attr("id", $(input3).attr("id").replace(/\d+$/, i));
+				        $(input3).attr("name", "moduleMstList["+t+"].wflowLevelList["+i+"].authLevel");
+				        
+				        var input4 = $(".orgTypeValidDef"+t)[i];
+				        $(input4).attr("id", $(input4).attr("id").replace(/\d+$/, i));
+				        $(input4).attr("name", "moduleMstList["+t+"].wflowLevelList["+i+"].orgType");
+				        
+				        var input5 = $(".deptIdValidDef"+t)[i];
+				        $(input5).attr("id", $(input5).attr("id").replace(/\d+$/, i));
+				        $(input5).attr("name", "moduleMstList["+t+"].wflowLevelList["+i+"].departmentId.departmentId");
+				        
+				        var input6 = $(".validateDefSectionTd"+t)[i];
+				        $(input6).attr("id", $(input6).attr("id").replace(/\d+$/, i));
+				        
+				        $("#defAuthRoleId"+t+i).attr("onchange", "getSectionListIfAppl(\'defAuthObjType"+t+""+i+"\',\'defAuthRoleId"+t+""+i+"\',\'defSectionId"+t+""+i+"\',\'defSectionTdId"+t+""+i+"\')");
+					    $("#defAuthObjType"+t+i).attr("onchange", "getStaffDesnByRoleIdAndOrgType('roleId', \'defAuthRoleId'"+t+""+i+"'\', \'defAuthObjType'"+t+""+i+"'\', \'defSectionId"+t+""+i+"\',\'defSectionTdId"+t+""+i+"\')");
+				 }
+			}
+		}
+	}
+}
+
+
+
+function getDuplicateCheckReportingAuthority(count){
+	
+	var authority = $("#authRoleId"+count).val();
+	var retCheck=true;
+    if(authority != '0') {
+      var length=$(".validateRepAuthId").length;
+      for ( var i = 0; Math.abs(i)<length; i=(i<=0?Math.abs(i)+1:-i)) {
+       	if($('#authRoleId'+count).val()==$('#authRoleId'+i).val()){
+			if(count != i){
+				bootbox.alert("Please choose another reporting authority");
+				$('#authRoleId'+count).val("0");
+				retCheck = false;
+				return retCheck;
+			}
+          }
+       }
+    }
+	return retCheck;
+}
+
+function getDuplicateCheckReportingDefineAuthority(count){
+	
+	var authority = $("#defAuthRoleId"+count).val();
+	var retCheck=true;
+    if(authority != '0') {
+      var length=$(".validateDefAuthId").length;
+      for ( var i = 0; Math.abs(i)<length; i=(i<=0?Math.abs(i)+1:-i)) {
+       	if($('#defAuthRoleId'+count).val()==$('#defAuthRoleId'+i).val()){
+			if(count != i){
+				bootbox.alert("Please choose another reporting authority");
+				$('#defAuthRoleId'+count).val("0");
+				retCheck = false;
+				return retCheck;
+			}
+          }
+       }
+    }
+	return retCheck;
+}
+
+
+function appndDefinedAuthLevels(id,count)
+{
+	var rowcount = $("#tableId" + count + " tr").length - 2;
+	var catCount = count+''+(rowcount-1);
+	if(validCheckRole())
+	{
+		var defCatCount = count+''+rowcount;
+		$("#tbodyId"+count).append('<tr class="append-box-auth-tr"><td><select class="form-select orgTypeValidDef'+count+' validCheckRole" id="defAuthObjType'+defCatCount+'" name="moduleMstList['+count+'].wflowLevelList['+rowcount+'].orgType" ><option value="0">- Select -</option><option value="OFFICE" ${staffDesgWorkflowData.currObjType eq "OFFICE" ? "selected" : ""}>OFFICE</option><option value="MUNICIPALITY" ${staffDesgWorkflowData.currObjType eq "MUNICIPALITY" ? "selected" : ""}>MUNICIPALITY</option><option value="GOVERNING" ${staffDesgWorkflowData.currObjType eq "GOVERNING" ? "selected" : ''}>GOVERNING BODY</option></select></td><td><input type="hidden" class="wflowLevelIdValidDef'+count+'" name="moduleMstList['+count+'].wflowLevelList['+rowcount+'].workFlowLevelId" id="workDefFlowLevelId'+defCatCount+'" ><select class="form-select authRoleIdValidDef'+count+' validCheckRole" id="defAuthRoleId'+defCatCount+'" name="moduleMstList['+count+'].wflowLevelList['+rowcount+'].authRoleId" ><option value="0">- Select -</option></select></td><td class="frezee validateDefSectionTd'+count+'" id="defSectionTdId'+defCatCount+'"><select class="form-select deptIdValidDef'+count+'" id="defSectionId'+defCatCount+'" name="moduleMstList['+count+'].wflowLevelList['+rowcount+'].departmentId.departmentId" ><option value="0">- Select -</option></select></td><td><select class="form-select authLevelValidDef'+count+' validCheckRole" id="defAuthLevel'+defCatCount+'" name="moduleMstList['+count+'].wflowLevelList['+rowcount+'].authLevel" ><option value="0">- Select -</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></td><td class="addRemoveBtnTd text-center"><button type="button" class="btn btn-danger remove-occ-auth"><i class="fa fa-trash"></i></button></td></tr>');
+	    $.getScript("${contextPath}/assets/appJs/validation/common-utils.js");
+	    $("#defAuthObjType"+defCatCount).attr("onchange", "getStaffDesnByRoleIdAndOrgType('roleId', \'defAuthRoleId"+defCatCount+"\', \'defAuthObjType"+defCatCount+"\',\'defSectionId"+defCatCount+"\',\'defSectionTdId"+defCatCount+"\')");
+        $("#defAuthRoleId"+defCatCount).attr("onchange", "getSectionListIfAppl(\'defAuthObjType"+defCatCount+"\',\'defAuthRoleId"+defCatCount+"\',\'defSectionId"+defCatCount+"\',\'defSectionTdId"+defCatCount+"\')");
+	    getStaffDesnByRoleIdAndOrgType('roleId', 'defAuthRoleId'+defCatCount+'', 'defAuthObjType'+defCatCount+'', 'defSectionId'+defCatCount+'', 'defSectionTdId'+defCatCount+'');
+	}
+}
+
+
+
+function validCheckRole(){
+	 
+	var data = true;
+	if ($('.validCheckRole').length > 0) 
+	{
+		$('.validCheckRole').each(function(index, obj){
+		    if(obj.nodeName == "SELECT" && obj.value == "0"){
+	            bootbox.alert("Please fill up all the authority details to proceed ");
+	            data = false;
+	            return data;
+		    }
+		});
+	}
+	return data;
+}
+
+
+function getAllDefineHearchyLevelDesgnation(roleId) {
+	
+    var roleId = $("#roleId").val();
+   
+    if (roleId != "0") 
+    {
+    	
+        showLoader();
+        $.ajax({
+            url: '${contextPath}/staff/workFlowDesgn/getAllDefineHearchyLevelDesgnation',
+            type: 'GET',
+            data: {
+                "roleId": roleId,
+            },
+            success: function (ajaxResp) {
+                var HTML = "";
+                var hTML ="";
+                var def ="";
+                if (ajaxResp.outcome) {
+                	
+                    var data = ajaxResp.data;
+                    if(data != null && data.length > 0){
+                		$('#changeDesgn').removeClass("hidden");
+                	}else{
+                		$('#changeDesgn').addClass("hidden");
+                	}
+                    if (data != null && data != "") {
+                    	var count = 0;
+                    	
+                        $.each(ajaxResp.data, function (index, value) {
+                        	HTML= HTML+ '<table class="table table-bordered mt-2 tableNo" id="tableId'+count+'"><thead><tr><th>Module Name</th><td><input type="hidden" value="'+(value.moduleMstId)+'" name="moduleMstList['+count+'].moduleMstId" id="moduleDefId' + count + '"><span>'+(value.moduleMstName)+'</span></td><td></td><td></td><td></td></tr><tr><th style="width: 30%;"><label class="required">Organisation Type</label></th><th style="width: 30%;"><label class="required">Authority Designation </label></th><th style="width: 25%;"><label class="required"> Section </label></th><th style="width: 12%;"><label class="required">Level</label></th><th style="width: 03%;" class="addRemoveBtnTh text-center"><i class="fa fa-plus" style="position: relative;background: #0346e8; color: #fff;font-size: 16px; padding: 2px 6px;border-radius: 3px;cursor: pointer;" class="apnd-btn-role-plus-auth" id="apnd-btn-role-plus'+count+'" onclick="appndDefinedAuthLevels(\'apnd-btn-role-plus\','+count+')"></i></th></tr></thead><tbody class="append-box-Auth-tbody'+count+'" id="tbodyId'+ count +'"></tbody></table>';
+                        	count++;
+                        });
+                        
+                        $("#authTableDivId").empty().append(HTML);
+                        
+                        var rcount = 0;
+                        
+                        $.each(ajaxResp.data, function (index, value) {
+                        	
+                        	var moduleId = value.moduleMstId;
+                       		$("#moduleCheckBoxId"+moduleId).prop("","").css("pointer-events","none");
+                       		$("#moduleCheckBoxId"+moduleId).addClass("disabled-input");
+                       		$("#moduleCheckBoxId"+moduleId).next('label').css("color","blue");
+                       	
+                        	var trHTML = "";
+                        	count = 0;
+                       	   	$.each(value.staffDesgnWfList, function (index, value) {
+                       	   		var catCount = rcount+''+count;
+                              	trHTML = trHTML + '<tr class="append-box-auth-tr"><td><select class="form-select orgTypeValidDef'+rcount+' validCheckRole" id="defAuthObjType'+catCount+'" name="moduleMstList['+rcount+'].wflowLevelList['+count+'].orgType" onchange="getStaffDesnByRoleIdAndOrgType(\'roleId\',\'defAuthRoleId'+catCount+'\',\'defAuthObjType'+catCount+'\',\'defSectionId'+catCount+'\',\'defSectionTdId'+catCount+'\')"><option value="0">- Select -</option><option value="OFFICE" >OFFICE</option><option value="MUNICIPALITY" >MUNICIPALITY</option><option value="GOVERNING" >GOVERNING BODY</option></select></td><td><input type="hidden" class="wflowLevelIdValidDef'+rcount+'"  value='+(value.workDefFlowLevelId)+' name="moduleMstList['+rcount+'].wflowLevelList['+count+'].workFlowLevelId" id="workDefFlowLevelId'+catCount+'" ><select class="form-select authRoleIdValidDef'+rcount+' validCheckRole" id="defAuthRoleId'+catCount+'" name="moduleMstList['+rcount+'].wflowLevelList['+count+'].authRoleId" onchange="getSectionListIfAppl(\'defAuthObjType'+catCount+'\', \'defAuthRoleId'+catCount+'\', \'defSectionId'+catCount+'\', \'defSectionTdId'+catCount+'\')"><option value="0">- Select -</option></select></td><td class="frezee validateDefSectionTd'+rcount+'" id="defSectionTdId'+catCount+'"><select class="form-select deptIdValidDef'+rcount+'" id="defSectionId'+catCount+'" name="moduleMstList['+rcount+'].wflowLevelList['+count+'].departmentId.departmentId" ><option value="0">- Select -</option></select></td><td><select class="form-select authLevelValidDef'+rcount+' validCheckRole" id="defAuthLevel'+catCount+'" name="moduleMstList['+rcount+'].wflowLevelList['+count+'].authLevel" ><option value="0">- Select -</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></td><td class="addRemoveBtnTd text-center" ><button type="button" class="btn btn-danger remove-occ-auth"><i class="fa fa-trash"></i></button></td>';
+                              	count++;
+                       	   });
+                       	   
+                       	 	$("#tbodyId"+rcount).empty().append(trHTML);
+                       	 	rcount++;
+                        });
+                        
+                        
+                        rcount = 0;
+						$.each(ajaxResp.data, function (index, module) {
+							count = 0;
+                       	   	$.each(module.staffDesgnWfList, function (index, auth) {
+                       	   		var html ="<option value='0'>- Select -</option>";
+                            	$.each(auth.roleList, function (index, role) {
+                            		html = html + "<option value="+role.roleId+">" + role.displayName + "</option>";
+                            	});
+                            	
+                            	var deptHTML = "<option value='0'>- Select -</option>";
+                            	if(auth.defAuthObjType != null && auth.defAuthObjType === 'DEPT' && auth.departmentId != null)
+                            	{
+                            		if(auth.staffDesnDtls != null){
+                            			if(auth.staffDesnDtls.isSectionAppl)
+                            			{
+                            				$.each(auth.staffDesnDtls.departmentList, function (index, dept) {
+                            					deptHTML = deptHTML + "<option value="+dept.departmentId+">" + dept.departmentName + "</option>";
+                                        	});
+                            				$('#defSectionId'+rcount+count).empty().append(deptHTML);
+                            				$('#defSectionId'+rcount+count).val(auth.departmentId);
+                            				$("#defSectionTdId"+rcount+count).removeClass("frezee");
+                            				$('#defSectionId'+rcount+count).addClass("validCheckRole");
+                            			}
+                            			else
+                            			{
+                            				$("#defSectionTdId"+rcount+count).addClass("frezee");
+                            				$('#defSectionId'+rcount+count).empty().append(deptHTML);
+                            				$('#defSectionId'+rcount+count).removeClass("validCheckRole");
+                            			}
+                            		}
+                            		else
+                            		{
+                            			$("#defSectionTdId"+rcount+count).addClass("frezee");
+                        				$('#defSectionId'+rcount+count).empty().append(deptHTML);	
+                        				$('#defSectionId'+rcount+count).removeClass("validCheckRole");
+                            		}
+                            	}
+                            	else
+                            	{
+                            		$("#defSectionTdId"+rcount+count).addClass("frezee");
+                    				$('#defSectionId'+rcount+count).empty().append(deptHTML);
+                    				$('#defSectionId'+rcount+count).removeClass("validCheckRole");
+                            	}
+                            	
+                            	$('#defAuthRoleId'+rcount+count).empty().append(html);
+                            	$('#defAuthRoleId'+rcount+count).val(auth.defineAuthRoleId);
+                       	 		$('#defAuthLevel'+rcount+count).val(auth.defineRollLevId);
+                       	 		$('#defAuthObjType'+rcount+count).val(auth.defAuthObjType);
+                       	 		count++;
+                       	   });
+                       	   	rcount++;
+                        });
+                        
+                        hideLoader();
+                    }else{
+	                    $(".moduleCheckBox").css("pointer-events","auto");
+	                    $(".moduleCheckBox").prop("checked",false);
+	                   	$(".moduleCheckBox").next('label').css("color","black");
+	                   	$('#authTableDivId').empty();
+                    }
+                } else {
+                    bootbox.alert("Something went wrong");
+                    $('#defSectionId'+rcount+count).removeClass("validCheckRole");
+                    return false;
+                }
+                
+                hideLoader();
+            },
+            error: function () {
+                bootbox.alert("Error");
+            }
+        });
+    }
+}
+
+
+function getSectionListIfAppl(authObjTypeId, authRoleId, authSectionId, authSectionTdId)
+{
+debugger
+	var orgType = $("#"+authObjTypeId).val();
+	if(orgType === "OFFICE")
+	{
+		var authRole = $("#"+authRoleId).val();
+		if(authRole != '0')
+		{
+			showLoader();
+			$.ajax({
+				type : "GET",
+				url : '${contextPath}/staff/workFlowDesgn/getDepartmentListByRoleId',
+				data : {
+					"roleId"  : authRole,
+				},
+				success : function(response) {
+					var html = "<option value='0'>- Select -</option>";
+					if(response.outcome)
+					{
+						var data = response.data;
+						if (data != null) {
+							if(data.isSectionAppl){
+								$.each(data.departmentList, function(index, value) {
+									html = html + "<option value="+value.departmentId+">" + value.departmentName + "</option>";
+								});
+								$("#"+authSectionTdId).removeClass("frezee");
+								$("#"+authSectionId).addClass("validCheck");
+							}
+							else
+							{
+								$("#"+authSectionTdId).addClass("frezee");
+								$("#"+authSectionId).removeClass("validCheck");
+							}
+							$('#'+authSectionId).empty().append(html);
+						}
+					}
+					else
+					{
+						bootbox.alert("Something went wrong. Please try again later");
+						$('#'+authSectionId).empty().append(html);
+						$("#"+authSectionId).removeClass("validCheck");
+						return false;
+					}
+					hideLoader();
+				},
+				error : function(error) 
+				{
+					hideLoader();
+					bootbox.alert("somthing went wrong");
+					$('#'+authSectionId).empty().append(html);
+					$("#"+authSectionId).removeClass("validCheck");
+					return false;
+				}
+			});
+		}
+		else
+		{
+			$("#"+authSectionId).empty().append("<option value='0'>- Select -</option>");
+			$("#"+authSectionId).removeClass("validCheck");
+		}
+	}
+	else
+	{
+		$("#"+authSectionTdId).addClass("frezee");
+		$("#"+authSectionId).empty().append("<option value='0'>- Select -</option>");
+		$("#"+authSectionId).removeClass("validCheck");
+	}
+}
+</script>
+
+
+<!-- Add validation for Leave module work flow configuration page  -->
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Event listener for checkbox selection
+    document.querySelectorAll(".moduleCheckBox").forEach(function (checkbox) {
+        checkbox.addEventListener("change", function () {
+            if (this.checked && this.nextElementSibling.innerText.trim() === "Leave Apply") {
+                enforceLeaveApplyRules();
+            }
+        });
+    });
+
+    // Event listener for Add (+) button
+    document.getElementById("apnd-btn-plus").addEventListener("click", function () {
+        if (isLeaveApplyChecked() && document.querySelectorAll("#tableTbodyId tr").length >= 2) {
+            alert("Only 2 rows are allowed for Leave Apply configuration.");
+            return false;
+        }
+        setTimeout(() => enforceLeaveApplyRules(), 100); // Delay to wait for row addition
+    });
+
+    // Event listener for Remove (-) buttons (delegated)
+    document.getElementById("tableTbodyId").addEventListener("click", function (event) {
+        if (event.target.closest(".remove-occ")) {
+            let rowCount = document.querySelectorAll("#tableTbodyId tr").length;
+            if (isLeaveApplyChecked() && rowCount <= 1) {
+                alert("At least 1 row must be present for Leave Apply.");
+                return false;
+            }
+            setTimeout(() => enforceLeaveApplyRules(), 100); // Delay to wait for row removal
+        }
+    });
+});
+
+// Function to enforce Leave Apply rules
+function enforceLeaveApplyRules() {
+    let tableBody = document.getElementById("tableTbodyId");
+    let rows = tableBody.querySelectorAll("tr");
+
+    if (isLeaveApplyChecked()) {
+        // Remove extra rows, keep only 2
+        while (rows.length > 2) {
+            tableBody.removeChild(rows[rows.length - 1]);
+            rows = tableBody.querySelectorAll("tr"); // Update rows count
+        }
+
+        // Restrict authLevel dropdown values for both rows
+        document.querySelectorAll("[id^='authLevel']").forEach(function (levelDropdown) {
+            levelDropdown.innerHTML = `
+                <option value="0">- Select -</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+            `;
+        });
+
+        alert("Leave Apply selected: Only 2 rows are allowed and level selection is restricted to 1 or 2.");
+    }
+}
+
+// Function to check if "Leave Apply" checkbox is selected
+function isLeaveApplyChecked() {
+    return [...document.querySelectorAll(".moduleCheckBox")].some(
+        (checkbox) => checkbox.checked && checkbox.nextElementSibling.innerText.trim() === "Leave Apply"
+    );
+}
+
+</script>

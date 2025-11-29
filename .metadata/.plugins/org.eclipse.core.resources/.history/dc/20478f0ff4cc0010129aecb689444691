@@ -1,0 +1,48 @@
+package com.aashdit.prod.heads.hims.umt.model;
+
+import com.aashdit.prod.heads.hims.umt.utils.NewAuditable;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@DynamicInsert
+@DynamicUpdate
+@Entity
+@Table(name="t_umt_role_level_map", schema = "public")
+public class RoleLevelMap extends NewAuditable<Long> implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4225796378784615709L;
+	
+	@Id 
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "role_level_map_id")
+	private Long roleLevelId;
+	
+	@Column(name = "role_id")
+	private Long roleId;
+	
+	@Column(name = "role_right_level_id")
+	private Long levelId;
+		
+	
+	
+	@Column(name = "is_active")
+	private Boolean isActive;
+	
+	
+	@Column(name = "max_allocations", columnDefinition = "bigint default -1")
+	private Long maxAllocations = -1L;
+
+
+
+}

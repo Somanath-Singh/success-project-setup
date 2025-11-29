@@ -1,0 +1,259 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<style>
+    .frezz {
+        pointer-events: none;
+        background-color: #e9ecef !important;
+        color: #495057 !important;
+    }
+    .card-title-add {
+        font-size: 14px;
+        margin: 0;
+        color: #000 !important;
+        font-weight: 500;
+    }
+    .btns {
+        border-radius: 0.2rem;
+        line-height: 14px;
+        padding: 6px 7px 6px 6px;
+        font-size: 13px;
+    }
+    /* Ensure dropdown fits within sector */
+    select.form-control-sm {
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Buildings assigned to ITDAs, DWOs</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#"><i class="fa fa-home"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Building assigned to ITDAs, DWOs</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Buildings assigned to ITDAs, DWOs</h5>
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal" id="stHostelProjectForm">
+                    <div class="row">
+                        <!-- From Date -->
+                        <div class="form-group col-md-3">
+                            <label class="required">From Date :</label>
+                            <input type="date" class="form-control form-control-sm" id="fromDate" name="fromDate">
+                        </div>
+                        <!-- To Date -->
+                        <div class="form-group col-md-3">
+                            <label class="required">To Date :</label>
+                            <input type="date" class="form-control form-control-sm" id="toDate" name="toDate">
+                        </div>
+                        <!-- Executing Agency -->
+                        <div class="form-group col-md-3">
+                            <label class="required">Executing Agency :</label>
+                            <select class="form-control form-control-sm" id="executingAgency" name="executingAgency">
+                                <option selected disabled>- Select -</option>
+                                <option>PA, ITDA Jharsuguda</option>
+                                <option>PA, ITDA Sundargarh</option>
+                                <option>PA, ITDA Keonjhar</option>
+                            </select>
+                        </div>
+                        <!-- School Name -->
+                        <div class="form-group col-md-3">
+                            <label class="required">School Name :</label>
+                            <select class="form-control form-control-sm" id="schoolName" name="schoolName">
+                                <option selected disabled>- Select -</option>
+                                <option>Sundargarh Model Hostel</option>
+                                <option>Baliguda Adivasi College Hostel</option>
+                                <option>Baliguda NAC Adivasi Hostel</option>
+                                <option>Jeypore Model Hostel</option>
+                                <option>Nilagiri Model Hostel</option>
+                                <option>Kaptipada Model Hostel</option>
+                                <option>Indira Gandhi Womens College</option>
+                                <option>Th. Rampur Model Hostel</option>
+                                <option>Koraput Girls Model Hostel</option>
+                                <option>Kuchinda Model Hostel</option>
+                                <option>Karanjia NAC Hostel</option>
+                                <option>Nabarangpur Model Hostel</option>
+                                <option>L.N College Boys Hostel</option>
+                                <option>L.N College Girls Hostel</option>
+                                <option>Bhubaneswar 200-Seated Hostel</option>
+                                <option>Rayagada ST Girls Hostel</option>
+                                <option>Malkangiri ST Boys Hostel</option>
+                                <option>Nuapada Model Hostel</option>
+                                <option>Dharamgarh Model Hostel</option>
+                                <option>Bargarh Model Hostel</option>
+                                <option>Kendujhar ST Hostel</option>
+                                <option>Angul ST Hostel</option>
+                                <option>Balangir ST Hostel</option>
+                                <option>Dhenkanal Model Hostel</option>
+                                <option>Jagatsinghpur ST Hostel</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row mt-4 mb-4">
+                <div class="col-md-12 text-center">
+                    <button type="button" class="btn btn-success" onclick="filterData()">Filter</button>
+                    <a href="${contextPath}/home" type="button" class="btn btn-warning btn-sm">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Buildings assigned to ITDAs, DWOs List</h5>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-striped table-sm exportbtn">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Executing Agency</th>
+                            <th>Scheme</th>
+                            <th>District</th>
+                            <th>Name of School/College</th>
+                            <th>Capacity</th>
+                            <th>Type</th>
+                            <th>Unit Cost (Cr)</th>
+                            <th>Administrative Approval L.No.</th>
+                            <th>Funds Released (1st Phase)</th>
+                            <th>Sanction Order / Date</th>
+                            <th>Project Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>NPCC</td>
+                            <td>CUMH</td>
+                            <td>Sundargarh</td>
+                            <td>100 seated Composite Urban Model Hostel at Sundargarh</td>
+                            <td>100</td>
+                            <td>Boys</td>
+                            <td>33.29</td>
+                            <td>6290/14.03.2024</td>
+                            <td>10,987,680</td>
+                            <td>2752 dt.05.02.2025</td>
+                            <td>Tiles work in progress</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>NPCC</td>
+                            <td>CUMH</td>
+                            <td>Kandhamal</td>
+                            <td>Model Hostel Inside Adivasi College, Baliguda</td>
+                            <td>100</td>
+                            <td>Boys</td>
+                            <td>33.18</td>
+                            <td>6290/14.03.2024</td>
+                            <td>10,945,400</td>
+                            <td>11836 dt.20.05.2025</td>
+                            <td>Brickwork in progress</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>NPCC</td>
+                            <td>CUMH</td>
+                            <td>Kandhamal</td>
+                            <td>Model Hostel Inside Adivasi College, Baliguda NAC</td>
+                            <td>100</td>
+                            <td>Boys</td>
+                            <td>33.13</td>
+                            <td>6290/14.03.2024</td>
+                            <td>10,935,870</td>
+                            <td>11836 dt.20.05.2025</td>
+                            <td>Plastering in progress</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>NPCC</td>
+                            <td>CUMH</td>
+                            <td>Koraput</td>
+                            <td>Model Hostel at Jeypore</td>
+                            <td>100</td>
+                            <td>Boys</td>
+                            <td>33.41</td>
+                            <td>6290/14.03.2024</td>
+                            <td>11,025,465</td>
+                            <td>2752 dt.05.02.2025</td>
+                            <td>Plastering work in progress</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>NPCC</td>
+                            <td>CUMH</td>
+                            <td>Balasore</td>
+                            <td>Model Hostel at Nilagiri</td>
+                            <td>100</td>
+                            <td>Boys</td>
+                            <td>33.18</td>
+                            <td>6290/14.03.2024</td>
+                            <td>10,952,370</td>
+                            <td>2752 dt.05.02.2025</td>
+                            <td>Plastering in progress</td>
+                        </tr>
+                        <tr><td>6</td><td>NPCC</td><td>CUMH</td><td>Mayurbhanj</td><td>Model Hostel at Kaptipada</td><td>100</td><td>Boys</td><td>33.36</td><td>6290/14.03.2024</td><td>10,119,35</td><td>11836 dt.20.05.2025</td><td>Slab casting</td></tr>
+                        <tr><td>7</td><td>NPCC</td><td>CUMH</td><td>Mayurbhanj</td><td>Indira Gandhi Womens College</td><td>100</td><td>Girls</td><td>33.36</td><td>6290/14.03.2024</td><td>11,011,935</td><td>11836 dt.20.05.2025</td><td>Brickwork completed</td></tr>
+                        <tr><td>8</td><td>NPCC</td><td>CUMH</td><td>Kalahandi</td><td>Model Hostel at Th. Rampur</td><td>100</td><td>Boys</td><td>33.31</td><td>6290/14.03.2024</td><td>10,992,465</td><td>11836 dt.20.05.2025</td><td>Plastering in progress</td></tr>
+                        <tr><td>9</td><td>NPCC</td><td>CUMH</td><td>Koraput</td><td>Model Hostel at Koraput (Girls)</td><td>100</td><td>Girls</td><td>33.39</td><td>6290/14.03.2024</td><td>11,020,680</td><td>11836 dt.20.05.2025</td><td>Plastering in progress</td></tr>
+                        <tr><td>10</td><td>NPCC</td><td>CUMH</td><td>Sambalpur</td><td>Model Hostel at Kuchinda</td><td>100</td><td>Boys</td><td>33.29</td><td>6290/14.03.2024</td><td>10,986,525</td><td>11836 dt.20.05.2025</td><td>Plastering in progress</td></tr>
+                        <tr><td>11</td><td>NPCC</td><td>CUMH</td><td>Mayurbhanj</td><td>Karanjia NAC</td><td>100</td><td>Boys</td><td>33.27</td><td>6290/14.03.2024</td><td>9,751,679</td><td>22775 dt.16.09.2025</td><td>Finishing work</td></tr>
+                        <tr><td>12</td><td>NPCC</td><td>CUMH</td><td>Nabarangpur</td><td>Model Hostel at Nabarangpur</td><td>100</td><td>Girls</td><td>33.26</td><td>6290/14.03.2024</td><td>10,976,460</td><td>2752 dt.05.02.2025</td><td>Finishing work</td></tr>
+                        <tr><td>13</td><td>NPCC</td><td>CUMH</td><td>Jharsuguda</td><td>L.N College Boys Hostel</td><td>100</td><td>Boys</td><td>33.38</td><td>6290/14.03.2024</td><td>11,018,535</td><td>2752 dt.05.02.2025</td><td>Plastering</td></tr>
+                        <tr><td>14</td><td>NPCC</td><td>CUMH</td><td>Jharsuguda</td><td>L.N College Girls Hostel</td><td>100</td><td>Girls</td><td>33.38</td><td>6290/14.03.2024</td><td>11,018,535</td><td>2752 dt.05.02.2025</td><td>Plumbing work</td></tr>
+                        <tr><td>15</td><td>NPCC</td><td>CUMH</td><td>Khordha</td><td>200 seated Hostel Bhubaneswar</td><td>200</td><td>Boys</td><td>64.14</td><td>6290/14.03.2024</td><td>21,166,200</td><td>11836 dt.20.05.2025</td><td>Completed</td></tr>
+                        <tr><td>16</td><td>NPCC</td><td>CUMH</td><td>Rayagada</td><td>ST Girls Hostel Rayagada</td><td>100</td><td>Girls</td><td>32.50</td><td>6290/14.03.2024</td><td>10,500,000</td><td>11836 dt.20.05.2025</td><td>Ongoing</td></tr>
+                        <tr><td>17</td><td>NPCC</td><td>CUMH</td><td>Malkangiri</td><td>ST Boys Hostel Malkangiri</td><td>100</td><td>Boys</td><td>31.80</td><td>6290/14.03.2024</td><td>10,200,000</td><td>2752 dt.05.02.2025</td><td>Plastering</td></tr>
+                        <tr><td>18</td><td>NPCC</td><td>CUMH</td><td>Nuapada</td><td>Model Hostel Nuapada</td><td>100</td><td>Boys</td><td>30.25</td><td>6290/14.03.2024</td><td>9,800,000</td><td>11836 dt.20.05.2025</td><td>Ongoing</td></tr>
+                        <tr><td>19</td><td>NPCC</td><td>CUMH</td><td>Kalahandi</td><td>Model Hostel Dharamgarh</td><td>100</td><td>Boys</td><td>33.50</td><td>6290/14.03.2024</td><td>11,100,000</td><td>22775 dt.16.09.2025</td><td>Brickwork</td></tr>
+                        <tr><td>20</td><td>NPCC</td><td>CUMH</td><td>Bargarh</td><td>Model Hostel Bargarh</td><td>100</td><td>Girls</td><td>32.75</td><td>6290/14.03.2024</td><td>10,750,000</td><td>11836 dt.20.05.2025</td><td>Ongoing</td></tr>
+                        <tr><td>21</td><td>NPCC</td><td>CUMH</td><td>Kendujhar</td><td>ST Hostel Kendujhar</td><td>100</td><td>Boys</td><td>31.95</td><td>6290/14.03.2024</td><td>10,300,000</td><td>2752 dt.05.02.2025</td><td>Plastering</td></tr>
+                        <tr><td>22</td><td>NPCC</td><td>CUMH</td><td>Angul</td><td>ST Hostel Angul</td><td>100</td><td>Boys</td><td>32.25</td><td>6290/14.03.2024</td><td>10,450,000</td><td>11836 dt.20.05.2025</td><td>Ongoing</td></tr>
+                        <tr><td>23</td><td>NPCC</td><td>CUMH</td><td>Balangir</td><td>ST Hostel Balangir</td><td>100</td><td>Girls</td><td>32.95</td><td>6290/14.03.2024</td><td>10,900,000</td><td>11836 dt.20.05.2025</td><td>Finishing</td></tr>
+                        <tr><td>24</td><td>NPCC</td><td>CUMH</td><td>Dhenkanal</td><td>Model Hostel Dhenkanal</td><td>100</td><td>Boys</td><td>33.05</td><td>6290/14.03.2024</td><td>10,960,000</td><td>2752 dt.05.02.2025</td><td>Completed</td></tr>
+                        <tr><td>25</td><td>NPCC</td><td>CUMH</td><td>Jagatsinghpur</td><td>ST Hostel Jagatsinghpur</td><td>100</td><td>Girls</td><td>33.15</td><td>6290/14.03.2024</td><td>11,000,000</td><td>11836 dt.20.05.2025</td><td>Ongoing</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default date range to last month
+    const today = new Date();
+    const lastMonth = new Date();
+    lastMonth.setMonth(today.getMonth() - 1);
+
+    // Format dates to YYYY-MM-DD
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    document.getElementById('fromDate').value = formatDate(lastMonth);
+    document.getElementById('toDate').value = formatDate(today);
+});
+</script>

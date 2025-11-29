@@ -1,0 +1,484 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="voucherTypee" value="${voucherDto.voucherTypeId}" />
+<c:set var="stageId" value="${voucherStageId}"/>
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+
+<style>
+.modaltabledata th {
+    line-height: 16px;
+    font-size: 13px !important;
+    font-weight: 400;
+}
+.tablemodal .modal-footer{
+padding:0
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-exit{
+margin-top:7px;
+}
+.modaltop-data {
+    font-size: 14px;
+}
+.tablemodal .modal-body {
+    padding-bottom: 0;
+}
+.lftdata {
+    width: 50%;
+    float: left;
+    font-size: 14px;
+}
+.rgtdata {
+    width: 50%;
+    float: right;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+.is-invalid {
+	border-color: red;
+}
+
+table.tableizer-table {
+	width: 100%;
+	font-size: 13px;
+	border: 1px solid #CCC;
+	letter-spacing: -0.75px;
+	font-family: "Open Sans", Arial, sans-serif;
+}
+
+.tableizer-table td {
+	padding: 1px 2px 1px 3px;
+	border: 1px dotted #CCC;
+}
+
+.tableizer-table th {
+	padding: 1px;
+	margin: 1px;
+	border: 1px dotted #CCC;
+	font-weight: bold;
+}
+
+.tableizerTitleRow {
+	text-align: left;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+.table>tbody>tr>td {
+	word-break: break-all;
+}
+
+.datepicker_con>input {
+	width: 100%;
+	border-radius: 3px;
+	border: 1px solid #aaaaaa;
+}
+
+.datepicker_con>button {
+	display: none;
+}
+
+.dif-color {
+	background: #094328;
+}
+
+ .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-left {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header-right {
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .nested-table th, .nested-table td {
+            padding: 5px;
+            font-size: 12px;
+        }
+
+        .nested-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .nested-table th, .nested-table td {
+            border: 1px solid #ddd;
+        }
+
+        .transaction-table-wrapper {
+            padding: 10px 0;
+        }
+
+</style>
+
+<script>
+$(function()
+{
+	$('#datatable-default').dataTable({
+ 		"bSort": false,
+ 		"autoWidth": false
+	});
+})
+</script>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">General Ledger (Party Wise)</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">General Ledger (Party Wise)</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">General Ledger Report (Party Wise)</h5>
+			</div>
+				<div class="card-body" id="partyDtlsInRequest">
+                    <form class="form-horizontal form-bordered" action="${contextPath}/report/getGeneralLedgerPartyWiseReportData" method="get" id="filter" >
+                         <input type="hidden" value="true" id="labelmsg" name="labelmsg">
+                         <div class="row">
+                            <div class="col-md-2 col-sm-3">
+                                <div class="form-group">
+                                    <label for="FinancialYear" class="required">Financial Year :</label>
+                                    <div class="col-md-12">
+                                        <select class="form-control require remove form-select" name="finYearId" id="finYearId" onchange="getFinYearStartEndDates(this.value,'N');" data-plugin-selectTwo>
+                                            <c:forEach items="${loadData.finYearList}" var="fin">
+                                                <option value="${fin.finyearId}" ${fin.finyearId eq finYearId ?'selected':''}>${fin.finYear}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+					                    <c:set var="ownFunctions" value="getSelectedLowerEntity" />
+									    <c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+										<c:set var="upperOrDown" value="down" />
+										<c:set var="functionList2" value=""/>
+										<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+
+												<%-- <div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="FinancialYear" class="required ">Division </label> 
+														  <div class="col-md-12">
+															<select class="form-control  remove" name="officeMasterId" id="officeMasterId" onchange="gettingDepartmentList(this.value,0);" data-plugin-selectTwo>
+										                        <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+										                        <c:forEach items="${loadData.officeMasterList}" var="off">
+																	  <option value="${off.id}">${off.name}</option> 
+																</c:forEach>
+										                 	</select>
+														</div>
+													</div>
+												</div>
+												<div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="Department" class="required">Department :</label>
+														<div class="">
+															<select class="form-control remove form-select" id="departmentId"
+																name="departmentId">
+																<option value="">- Select -</option>
+															</select>
+														</div>
+													</div>
+												</div> --%>
+									            <div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="section" class="required">Account Name :</label>
+														<div class="">
+															<select class="form-control require  remove form-select" id="accountId" name="accountId">
+																 <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+										                        <c:forEach items="${loadData.accountList}" var="acc">
+																	  <option value="${acc.id}"${acc.id eq accountId ?'selected':''}>${acc.name}</option> 
+																</c:forEach>
+															</select>
+														</div>
+													</div>
+												</div>
+												<div class="form-group col-md-2"> 
+		 		                                   <label for="startDate" class="required">Start Date :</label>
+		 		                                   <div class="datepicker-box"> 
+		 		                                       <input type="text" class="form-control datepicker require  remove disabled" id="startDate" name="startDate" value="${startDate}" autocomplete="off" maxlength="25" readonly>
+				                                   </div>
+					                            </div>
+												<div class="form-group col-md-2"> 
+		 		                                   <label for="endDate" class="required">End Date :</label>
+		 		                                   <div class="datepicker-box"> 
+		 		                                       <input type="text" class="form-control datepicker require  remove disabled" id="endDate" name="endDate" value="${endDate}" autocomplete="off" maxlength="25" readonly>
+				                                   </div>
+					                            </div>
+											</div>
+										
+											
+											<div class="row">
+							                    <div class="col-sm-12 mt-3" style="">
+							                    	
+							                    
+							                        <div class="form-group text-center">
+							                            <button type="button" class="btn btn-success" onclick="submitFormData();">
+							                                <spring:message code="COMMON.BUTTON.FILTER" />
+							                            </button>
+							                            <a href="${contextPath}/home">
+							                                <input type="button" class="btn btn-warning" value=<spring:message code="COMMON.BUTTON.BACK"></spring:message>>
+							                            </a>
+							                        </div>
+							                    </div>
+							                </div> 
+							                
+							   
+							    
+									     </form>
+									     <hr>
+									       <div class="col-md-12 col-sm-12" style="text-align:center">
+								<!-- <img src="/fams/assets/image/aashdit-A.png" style="width: 48px;">
+									<h3>AASHDIT TECHNOLOGIES LLP.</h3>
+									<h5>4th floor, Galaxy Mall,Raghunathpur, Bhubaneswar</h5> -->
+									<h5>${loadData.organisationName}</h5>
+								</div>
+							                
+						   <table class="table table-bordered">
+							        <thead>
+							            <tr>
+							                
+						                    <th>Voucher No. & Date</th>
+									        <th>Project Code & Name</th>
+									        <th>Work Code & Name</th>
+									        <th>Narration</th>
+									        <th class="text-end">Debit Amt. (Rs.)</th>
+									        <th class="text-end">Credit Amt. (Rs.)</th>
+							            </tr>
+							        </thead>
+							        <tbody>
+							            <c:forEach items="${partyDetails}" var="party" varStatus="prty">
+							              <tr id="party-${party.partyId}"  class="partydata">
+								           <td colspan="6" class="text-start">
+                                         <input class=""  type="hidden" id="partyIdhd${prty.index}"  value="${party.partyId}"  >
+				                        <a href="javascript:toggleVoucherTable(${party.partyId});" class="link-style" id="toggle-details-${entry.voucherId}">
+				                          ${party.partyCode} | ${party.partyName}
+				                </a>
+				            </td>
+								        </tr>
+								          <tr class="transaction-total partydatatotal">
+								            <th colspan="4">Transaction Total :</th>
+								            <th class="text-end" id="tDr-${party.partyId}"></th>
+								            <th class="text-end" id="tCr-${party.partyId}"></th>
+								        </tr>
+						                </c:forEach>
+							        </tbody>
+							    </table>
+									  </div>
+								   </div>
+							</section>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+  <form action="${contextPath}/miscVouchersPDF.htm" method="POST" id="generatepdf" target="_blank">	
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+<input type="hidden" id="printVoucherId" name="printVoucherId"/>	 
+ <input type="hidden" name="voucherType" value="FINANCE"/>	  
+</form>
+
+<script>
+
+$(document).ready(function() {
+	 var finYear = $("#finYearId").val();
+	 var startDateStr = '${startDate}';
+	 var endDateStr = '${endDate}'
+	
+	if (startDateStr === '' && endDateStr === '') {
+        getFinYearStartEndDates(finYear, 'N');
+    } else {
+        $("#startDate").val(startDateStr);
+        $("#endDate").val(endDateStr);
+    }
+});
+
+function submitFormData(){
+	if($("#upperEntityId").val()==''){
+		bootbox.alert("please select the entity..");
+		return false;
+	}
+	if(validateForm()){
+	 if(encryptFormData('filter', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('filter');
+		 }
+		
+	}
+}
+
+
+
+
+
+function toggleTable(voucherId) {
+	debugger
+    var voucherRow = $("#voucher-" + voucherId);
+
+    if (voucherRow.next("tr.details"+voucherId).length === 0) {
+        $.ajax({
+            type: "GET",
+            url: "${contextPath}/report/get-voucherDtailsByvoucherId",
+            data: {
+                voucherId: voucherId,
+            },
+            success: function (response) {
+                $.each(response, function (index, detail) {
+                	
+                	 var projectCode = detail.projectCode || 'NA';
+                     var projectName = detail.projectName || 'NA';
+                     var projectInfo = projectCode === 'NA' ? 'NA' : projectCode + ' | ' + projectName;
+                     
+                     var workCode= detail.workCode|| 'NA';
+                     var workName= detail.workName|| 'NA';
+                     var workInfo = workCode === 'NA' ? 'NA' : workCode + ' | ' + workName;
+                	
+                	
+                    var html = '<tr class="details'+voucherId+' tableinnerdata"><td>' + detail.finalVoucherNo + ' | ' + detail.finalVoucherDate + '</td><td>' + projectInfo + '</td><td>' + workInfo + '</td><td>' + detail.narration + '</td><td class="text-end">' + detail.debitAmount + '</td><td class="text-end">' + detail.creditAmount + '</td></tr>';
+                    voucherRow.after(html);
+                });
+                
+                var downloadConfirmed = confirm("Do you want to download the PDF?");
+                if (downloadConfirmed) {
+                    downloadPDFFunction(voucherId);
+                }
+                
+            },
+            error: function () {
+                alert("ERROR");
+            }
+        });
+    } else {
+    	var downloadConfirmed = confirm("Do you want to download the PDF?");
+        if (downloadConfirmed) {
+            downloadPDFFunction(voucherId);
+        }
+        $("tr.details"+voucherId).toggleClass('hidden-tr');
+    }
+}
+function toggleVoucherTable(partyId){
+	 
+	 debugger
+	 var tCr=0.00;
+	 var tDr=0.00;
+	
+	var entityIdLevelCombo= $("#upperEntityId").val();
+	var finYear= $("#finYearId").val();
+// 	var division= $("#division").val();
+// 	var department= $("#department").val();
+	var startDate= $("#startDate").val();
+	var endDate= $("#endDate").val();
+	var accountId= $("#accountId").val();
+	
+	 var tCrElement = $("#tCr-" + partyId);
+    var tDrElement = $("#tDr-" + partyId);
+	accountId
+	 var partyRow = $("#party-" + partyId);
+
+	    if (partyRow.next("tr.voucher"+partyId).length === 0) {
+	        $.ajax({
+	            type: "GET",
+	            url: "${contextPath}/report/get-voucherListByPartyIdAndOtherParam",
+	            async:false,
+	            data: {
+// 	            	division: division,
+// 	            	department: department,
+	            	startDate: startDate,
+	            	endDate: endDate,
+	            	accountId: accountId,
+	            	partyId: partyId,
+	            	entityIdLevelCombo:entityIdLevelCombo,
+	            	
+	            },
+	            success: function (response) {
+	                $.each(response, function (index, voucher) {
+	                	debugger
+	                	 var projectCode = voucher.projectCode || 'NA';
+	                     var projectName = voucher.projectName || 'NA';
+	                     var projectInfo = projectCode === 'NA' ? 'NA' : projectCode + ' | ' + projectName;
+	                     
+	                     var workCode= voucher.workCode|| 'NA';
+	                     var workName= voucher.workName|| 'NA';
+	                     var workInfo = workCode === 'NA' ? 'NA' : workCode + ' | ' + workName;
+	                	
+	                    var html = '<tr class="voucher'+partyId+' text-voucher" id="voucher-'+voucher.voucherId+'"><td><a href="javascript:toggleTable('+voucher.voucherId+');" class="link-style">' + voucher.finalVoucherNo + ' | ' + voucher.finalVoucherDate + '</td><td>' + projectInfo + '</td><td>' + workInfo + '</td><td>' + voucher.narration + '</td><td class="text-end">' + voucher.debitAmount + '</td><td class="text-end">' + voucher.creditAmount + '</td></tr>';
+	                    tCr=tCr+ voucher.creditAmount
+	                    tDr=tDr+ voucher.debitAmount
+	                    
+	                    if (tCrElement.length > 0 && tDrElement.length > 0) {
+	                        tCrElement.text(tCr.toFixed(2)); 
+	                        tDrElement.text(tDr.toFixed(2));
+	                    } else {
+	                        console.log("One or both of the <td> elements not found.");
+	                    }
+	                    
+	                    partyRow.after(html);
+	                });
+	            },
+	            error: function () {
+	                alert("ERROR");
+	            }
+	        });
+	    } else {
+	        $("tr.voucher"+partyId).toggleClass('hidden-tr');
+	    }
+	
+}
+
+
+function downloadPDFFunction(voucherId){
+	
+	 $("#printVoucherId").val(voucherId);
+	
+	 $("#generatepdf").submit();
+}
+
+function getSelectedLowerEntity(){
+	var entityIdLevelCombo= '${entityIdLevelCombo}';
+	 $("#upperEntityId").val(entityIdLevelCombo);
+ }
+</script>

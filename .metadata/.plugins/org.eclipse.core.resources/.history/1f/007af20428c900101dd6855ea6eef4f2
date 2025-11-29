@@ -1,0 +1,31 @@
+package com.aashdit.common.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name="t_mst_additional_cost", schema = "hiring")
+public class AdditionalCostMaster {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "additional_cost_name")
+    private String additionalCostName;
+
+    @Column(name = "additional_cost_code")
+    private String additionalCostCode;
+
+    @Column(name = "is_active")
+    private Boolean isActive;
+}

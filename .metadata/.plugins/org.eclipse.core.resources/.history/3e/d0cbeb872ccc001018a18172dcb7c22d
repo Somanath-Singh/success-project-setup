@@ -1,0 +1,636 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<script src="${contextPath}/assets/applicationSpecific/encrypt/aes.js"></script>
+<script src="${contextPath}/assets/applicationSpecific/encrypt/AesUtil.js"></script>
+<script src="${contextPath}/assets/applicationSpecific/encrypt/lbase.js"></script>
+<script src="${contextPath}/assets/applicationSpecific/encrypt/pbkdf2.js"></script>
+<script src="${contextPath}/assets/vendor/bootbox5/bootbox.min.js"></script>
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+
+
+
+<style>
+    .progress-bar {
+    width: 0%;
+    transition: width 0.8s ease-in-out; /* Ensure smooth animation */
+}
+
+.application-status {
+    background: transparent !important; /* Transparent background */
+    height: auto; /* Adjust height automatically */
+    padding: 10px 0; /* Reduce padding */
+}
+
+.new-registration {
+    background: rgba(255, 255, 255, 0.9); /* Light transparent white */
+    border-radius: 8px; /* Rounded corners */
+    padding: 15px; /* Spacing inside */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+.btn-infos{
+    background: #009688;
+    border: none;
+    color: #ffffff;
+    margin: 0;
+    border-radius: 5px !important;
+    border-bottom: 3px solid #009688;
+    border-right: 3px solid #009688;
+    height: 25px;
+    width: 25px;
+    padding: 5px !important;
+    font-size: 10px !important;
+    line-height: 7px !important;
+}
+.btn-ins{
+    background: #007f99;
+    border: none;
+    color: #ffffff;
+    margin: 0;
+    border-radius: 5px !important;
+    border-bottom: 3px solid #007f99;
+    border-right: 3px solid #007f99;
+    height: 25px;
+    width: 25px;
+    padding: 5px !important;
+    font-size: 10px !important;
+    line-height: 7px !important;
+}
+.step-circle-p .step_con{
+    color: #007f99 !important;
+}
+/* Container for Interview Details */
+/* .interview-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Space between each line */
+    align-items: flex-start; /* Align all text to the left */
+} */
+
+/* Ensure the <p> tags are aligned properly */
+.interview-detail p {
+    margin: 0; /* Remove default margins */
+    font-size: 1em; /* Optional, adjust the size */
+}
+
+.interview-detail strong {
+    color: #333; /* Make the label (Date, Time, etc.) stand out */
+}.application-status {
+    color: #dc500a;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.application-id {
+    text-align: right;
+    font-size: 0.9em; /* Smaller text */
+    color: #fc5400;   /* Orange color */
+}
+.tabs-content-width {
+    height: 100% !important;
+    border-radius: 8px !important;
+    width: 100%;
+}
+.card {
+    color: #000;
+    background: #ffffffb8;
+    border-radius: 20px;
+    padding: 10px 30px;
+    box-shadow: 2px 2px 0px 1px #ad4a20, 0px 2px 5px 0px #0000008c;
+}
+.card .card-header {
+    position: relative;
+    background: transparent;
+    padding-left: 6px;
+    border-bottom: none !important;
+}
+.card .card-body {
+    padding: 5px 10px;
+}
+.section-names-style-1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+td .btn.btn-success{
+	background: #00483e;
+    border: none;
+    color: #ffffff;
+    border-radius: 5px !important;
+    border-bottom: 3px solid #00241f !important;
+    border-right: 3px solid #00241f !important;
+    padding: 5px 8px !important;
+    font-size: 14px !important;
+    line-height: 10px !important;
+}
+td .btn.btn-primary{
+	background: #0d6efd;
+    border: none;
+    color: #ffffff;
+    margin: 0;
+    border-radius: 5px !important;
+    border-bottom: 3px solid #074299 !important;
+    border-right: 3px solid #074299;
+    padding: 5px 6px !important;
+    font-size: 14px !important;
+    line-height: 16px !important;
+}
+.bootbox-close-button.close{
+	display: none;
+}
+</style>
+
+
+<section class="candidate-corner-section">
+    <div class="container">
+    	<div class="row mt-3 mb-3">
+    		<div class="col-md-12">
+    			<div class="card">
+    				<div class="card-header">
+		     			<h2 class="section-names-style-1 text-left"> My<span> Application</span></h2>
+		     		</div>
+    				<div class="card-body">
+						<div class="container-inr d-flex align-items-start" style="height: 530px">
+				        	<div class="tab-content p-3 text-danger tabs-content-width" id="pills-tabContent" style="position: relative; width: 100%; background: #ffdec2; padding: 30px 20px !important;">
+				          		<div class="tabs-content-width">
+				          			<div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab" >
+				          				<!-- Hidden Application Status Section -->
+							         	<div id="applicationStatusDiv" style="display: none;" onclick ="toggleApplicationStatus('FRM_DIV')">
+							              	<div class="new-registration">
+							              		<div class="row">
+							              			<div class="col-md-12">
+									                  	<div class="d-flex justify-content-between">
+									                  		<div class="paragh">
+									                  			<p id="applicationNoPID" class="application-status">
+											                        Application Status :
+											                   </p>
+									                  		</div>
+									                  		<div class="paragh">
+									                  			<p id="applicationNoPID" class="application-status ">
+											                      Application No : <span id="applicationNoId" class="application-id"> </span>
+											                   </p>
+									                  		</div>
+									                  	</div>
+							                      		<%@ include file="/WEB-INF/views/message.jsp"%>
+							                      	</div>
+							              			<div class="col-md-12">
+								                      	<form class="form-row" action="${contextPath}/public/save-reg" id="registrationFrmId" enctype="multipart/form-data" method="post" onsubmit="return validateSubmit();">
+							                          		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+								                          	<div class="row mt-4">
+							                          			<div class="col-md-12">
+								                              		<div class="progress px-1" style="height: 3px">
+									                                  	<div class="progress-bar dd" role="progressbar" style="width: 0%; " aria-valuenow="0" aria-valuemin="0" aria-valuemax="60"></div>
+									                              	</div>
+									                              	<div class="step-container step-process d-flex justify-content-between p-0 m-0">
+								                                  		<div class="step-circle-p d-flex flex-column align-items-center justify-content-center"><small>1</small> <span class="step_con">Application Submitted</span></div>
+									                                  	<div class="step-circle-p d-flex flex-column align-items-center justify-content-center"><small>2</small> <span class="step_con">Application Reviewed</span></div>
+									                                  	<div class="step-circle-p d-flex flex-column align-items-center justify-content-center"><small>3</small> <span class="step_con">Interview Schedule</span></div>
+									                                  	<div class="step-circle-p d-flex flex-column align-items-center justify-content-center"><small>4</small> <span class="step_con">Result</span></div>
+									                              	</div>
+									                          	</div>
+								                          	</div>
+									                          
+									                          <div id ="interviewDetails" style="display: none;">
+									                            <p class="application-status">Interview Details :</p>
+									                            <div class="interview-detail row mb-2 mt-2">
+									                            	<div class="col-md-3">
+									                                	<p><strong>Date:</strong> <span id="interviewDateId">N/A</span></p>
+									                                </div>
+									                                <div class="col-md-3">
+									                                	<p><strong>Time:</strong> <span id="interviewTimeId">N/A</span></p>
+									                                </div>
+									                                <div class="col-md-3">
+									                                	<p><strong>Mode:</strong> <span id="interviewModeId">N/A</span></p>
+									                                </div>
+									                                <div class="col-md-3">
+									                                	<p><strong>Venue:</strong> <span id="interviewVenueId">N/A</span></p>
+									                                </div>
+									                            </div>
+								                        	</div>
+								                      	</form>
+								                     </div>
+							                  	</div>
+							              	</div>
+							          	</div>
+				
+						            	<div class="tab-content-inr-style">
+						              		<div class="row">
+								                <!-- <div class="col-md-4">
+								                  <div class="form-group">
+								                    <input type="text" class="form-control" placeholder="Enter Search Term Here">
+								                  </div>
+								                </div>
+								                <div class="col-md-2">
+								                  <button type="button" class="btn btn-sm btn-primary">Search</button>
+								                </div> -->
+						                		<div class="col-md-12 mt-3">
+						                  			<div class="table-responsive">
+						                     			<table class="table table-bordered">
+						                      				<thead>
+					                        					<tr>
+									                          		<th style="text-align: center;">Sl. No</th>
+									                          		<th>Application No.</th>
+									                          		<th>Post Name</th>
+									                          		<th>Subject Name</th>
+									                          		<th>College Name</th>
+									                          		<th>Date of Application</th>
+									                          		<th>Status</th>
+									                          		<th>Remarks</th>
+								                          			<th style="text-align: center;">Action</th>
+						                        				</tr>
+						                      				</thead>
+					            							<tbody>
+							            						<c:choose>
+							                      					<c:when test="${not empty applicationData}">
+																		<c:forEach items="${applicationData}" var = "vac" varStatus="count">
+																			<tr>
+																				<td class="text-center">${count.count}</td>
+																				<td>${vac.applicationNo}</td>
+																				<td>${vac.postName}</td>
+																				<td>${vac.subjectName}</td>
+																				<td>${vac.collegeName}</td>
+																				<td style="text-align: center;"><fmt:formatDate  pattern ="dd/MM/yyyy" value="${vac.applyDate}"/></td>
+														                        <c:if test="${ vac.status eq status_revert }">
+														                          	<td style="text-align: center;">
+															                            <a href="#"  data-toggle="modal"  data-target="#myModal" data-toggle="tooltip" onclick="getAllDocFromProfileNopenModal('${vac.candApplId}','${vac.status}')"
+															                                 style="color: orange; text-decoration: underline; text-decoration-color: orange;"  title="Click view Reverted Documents">
+															                                 ${vac.status}
+															                            </a>
+													                         		</td>
+														                        </c:if>
+														                        <c:if test="${ vac.status ne status_revert }">
+														                            <td>${vac.status}</td>
+														                        </c:if>
+																				<td>${vac.remarks ne null ? vac.remarks : 'N/A'}</td>
+										                        				<td>
+															                        <c:if test="${ vac.status eq status_revert }">
+															                        	<button type="button" class="btn btn-sm btn-primary" style="padding: 8px;" title="Edit" onclick="editProfileByApplicationNo('${vac.applicationNo}','${vac.candApplId}', '${actionCallEdit}')"><i class="fa-solid fa-pencil" style="color: #fff; top: 0px; margin-left: 0px;"></i></button>
+															                        </c:if>
+											                        				<button type="button" class="btn btn-sm btn-primary"  title="View" onclick="editProfileByApplicationNo('${vac.applicationNo}','${vac.candApplId}' ,'${actionCallView}')"><i class="fa fa-eye" style=""></i></button>
+															                        <button type="button" class="btn btn-sm btn-success"  title="Application Status"  onclick ="viewStatusBarAgainstApplication('${vac.candApplId}')">
+															                            <i class="fa fa-check-circle" style=""></i>
+															                        </button>
+										
+										
+										
+										                        					<!-- ---add view button here /UI---- -->
+										                        				</td>
+										                            		</tr>
+										                        		</c:forEach>
+										                        	</c:when>
+									                          		<c:otherwise>
+									                            		<tr>
+										                              		<td colspan="9" class="text-center">
+										                                 		<span class="text-danger" style="font-size: 1rem;">No data available</span>
+										                              		</td>
+									                            		</tr>
+								                          			</c:otherwise>
+									                        	</c:choose> 
+						                      				</tbody>
+						                    			</table>
+						                  			</div>
+						                		</div>
+						              		</div>
+						            	</div>
+						        	</div>
+				          		</div>
+				        	</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+
+
+  <div class="modal fade" id="modalId" tabindex="-1" aria-labelledby="addNewExpModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+        	<div class="modal-header">
+          		<h4 class="modal-title" >View Reverted Documents :</h4>
+        	</div>
+        	<div class="modal-body">
+             	<form id="submitFormId" action="${contextPath}/rejectDocumetApproval" method="post" enctype="multipart/form-data"> 
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+					<input type="hidden" name="candidateId" id="candidateId" >
+					 <input type="hidden" name="certificateName" id="certificateName"> 
+					 <input type="hidden" name="universityId" id="universityId"> 
+					 <input type="hidden" name="certId" id="certId">
+					<input type="hidden" name="status" id="status" >
+					<input type="hidden" name="cycleCode" value="APPLICATION_SCRUTINY" >
+           			<div class="col-md-12">
+                  <div class="table-responsive mt-1">
+                    <table class="datatable table table-striped table-bordered mt-3" id="docListId" style="background: #f1f8e9; border-radius: 8px; font-family: 'Arial', sans-serif; font-size: 1em;">
+                        <tbody id="docListId">
+                            <!-- Document list will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+					</div>
+				</form>
+        	</div>
+        	<div class="modal-footer">
+          		<button type="button" class="btn btn-danger" onclick="dismissModal()">Close</button>
+        	</div>
+      	</div>
+	</div>
+</div>
+
+<!-- GET Form (Not Used for Submission) -->
+<form id="viewFrmId">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="applicationNo" id="applicationNo">
+    <input type="hidden" name="candApplId" id="candApplId">
+    <input type="hidden" name="actionCall" id="actionCall">
+</form>
+
+<!-- POST Form (Correct Form to Submit) -->
+<form id="viewFrmId2" action="${contextPath}/my-profile" method="get">
+    <input type="hidden" name="cipherText" id="cipherText">
+</form>
+
+  
+
+
+
+  <script>
+function editProfileByApplicationNo(applicationNo, candApplId, actionCall) {
+    $("#applicationNo").val(applicationNo);
+    $("#candApplId").val(candApplId);
+    $("#actionCall").val(actionCall);
+
+    // Reset cipherText field
+    $('#cipherText').val("");
+
+    // Serialize and encrypt the form data
+    var bizContent = $("#viewFrmId").serialize();
+    var cipherText = enc_password(bizContent);
+    $('#cipherText').val(cipherText);
+
+    // Submit the correct form (POST request)
+    $("#viewFrmId2").submit();
+}
+
+
+
+  function getAllDocFromProfileNopenModal(candidateId, status) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/getAllCandidateHistoryByCandidateId",
+        dataType: "json",
+        data: {
+            candidateId: candidateId,
+            status: status
+        },
+        success: function(response) {
+            var docList = response;
+            var html = '';
+            var map = new Map();
+
+            //do tab wise grouping undeer date
+            docList.forEach(function(doc) {
+              //use date formater its comming in date 
+                
+                var date = dateFormat(doc.actionTakenOn, "dd/MM/yyyy");
+                var tabName = doc.tabName;
+                var documentName = doc.documentName;
+
+                if (map.has(date)) {
+                    var docs = map.get(date);
+                    docs.push({
+                        tabName: tabName,
+                        documentName: documentName
+                    });
+                    map.set(date, docs);
+                } else {
+                    map.set(date, [{
+                        tabName: tabName,
+                        documentName: documentName
+                    }]);
+                }
+            });
+          // Loop through the map to build HTML
+          map.forEach(function(docs, date) {
+                html += '<tr><th colspan="2" style="text-align: center; background-color: #e3f2f1; font-weight: bold; color: white; font-size: 1em;">' + date + '</th></tr>';
+                
+                    html += '<tr style="background-color: lightGreen;">';
+                    html += '<td style="font-family: Arial, sans-serif; padding: 8px; font-size: 1em;">' + 'Sl .No' + '</td>';
+                    html += '<td style="font-family: Arial, sans-serif; padding: 8px; font-size: 1em;">' + 'Tab Name' + '</td>';
+                    html += '<td style="font-family: Arial, sans-serif; padding: 8px; font-size: 1em;">' + 'Document Name ' + '</td>';
+                    html += '</tr>';
+                docs.forEach(function(doc) {
+                  //create table headaer
+                    html += '<tr>';
+                    html += '<td style="font-family: Arial, sans-serif; color: #424242; padding: 8px; font-size: 1em;">' + (docs.indexOf(doc) + 1) + '</td>';
+                    html += '<td style="font-family: Arial, sans-serif; color: #424242; padding: 8px; font-size: 1em;">' + doc.tabName + '</td>';
+                    html += '<td style="font-family: Arial, sans-serif; color: #424242; padding: 8px; font-size: 1em;">' + doc.documentName + '</td>';
+                    html += '</tr>';
+                });
+            });
+            $("#docListId").html(html);
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+
+    $("#universityId").val(universityId);
+    $("#modalId").modal('show');
+}
+
+function dateFormat(date, format) {
+    var d = new Date(date);
+    var month = '' + (d.getMonth() + 1);
+    var day = '' + d.getDate();
+    var year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return format.replace('dd', day).replace('MM', month).replace('yyyy', year);
+
+}
+
+function dismissModal() {
+    $("#modalId").modal('hide');
+}   
+   
+function viewStatusBarAgainstApplication(candApplId) {
+//debugger;
+    // AJAX call to fetch the latest application status
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/guest/view-application",
+        dataType: "json",
+        data: { id: candApplId },
+        success: function(response) {
+            // Remove loading text and update the div with fresh content
+            $("#applicationStatusDiv").html($("#applicationStatusDiv").html());
+
+            // Update progress and steps
+            var canLyfCycleList = response.candLifeCycleList;
+
+            //add value tp <p> tag
+            if (canLyfCycleList && canLyfCycleList.length > 0) {
+                $("#applicationNoId").html(canLyfCycleList[0].candidateApplyId.applicationNo);
+            }
+            if (Array.isArray(canLyfCycleList) && canLyfCycleList.length > 0) { 
+                validateSubmit(canLyfCycleList);
+            } else {
+                console.error("Lifecycle list is empty or invalid.");
+            }
+        },
+        error: function(error) {
+            console.log("Error fetching application status:", error);
+            $("#applicationStatusDiv").html('<p style="color: red;">Failed to load data....</p>');
+        }
+    });
+}
+
+// Toggle application status div smoothly
+function toggleApplicationStatus(actionFrom) { 
+    var statusDiv = $("#applicationStatusDiv");
+
+    if (actionFrom === "FRM_BUTTON") {
+        //open div
+        if (statusDiv.is(":hidden")) {
+            statusDiv.slideDown(300);
+        }
+    } else if (actionFrom === "FRM_DIV") {
+        // Hide the div smoothly
+        if (statusDiv.is(":visible")) {
+            statusDiv.slideUp(300);
+        }
+    }
+}
+
+
+
+function validateSubmit(canLyfCycleList) {
+//empty all the values in interview details
+     $("#interviewDetails").hide();
+    $("#interviewDateId").html("");
+    $("#interviewTimeId").html("");
+    $("#interviewModeId").html("");
+    $("#interviewVenueId").html("");
+
+    if (!Array.isArray(canLyfCycleList) || canLyfCycleList.length === 0) {
+        console.error("Invalid or empty lifecycle list");
+        return;
+    }
+
+    var maxStep = 1;
+    var finalAppStatus = ""; // Store the status of the final step
+
+    canLyfCycleList.forEach(candLifeCycle => {
+        var lifecycleCode = candLifeCycle.lifeCycleId.lifecycleCode;
+        var appStatus = candLifeCycle.status; // Capture status per lifecycle
+
+        switch (lifecycleCode) {
+            case 'APPLICATION_FINAL_RESULT':
+                maxStep = 4;
+                break;
+            case 'APPLICATION_INTERVIEW_SCHEDULED':
+                //show interview Details
+                $("#interviewDetails").show();
+                //add interview date and time and venue
+                $("#interviewDateId").html(<fmt:formatDate pattern='dd/MM/yyyy' value='${candLifeCycle.interviewDate}' />);
+                $("#interviewTimeId").html(candLifeCycle.interviewTime);
+                $("#interviewModeId").html(candLifeCycle.interviewMode);
+                $("#interviewVenueId").html(candLifeCycle.venue);
+                $("#interviewDateId").html(candLifeCycle.interviewDate);
+                maxStep = Math.max(maxStep, 3);
+                break;
+            case 'APPLICATION_SCRUTINY':
+                maxStep = Math.max(maxStep, 2);
+                break;
+            case 'APPLICATION_SUBMITTED':
+            default:
+                maxStep = Math.max(maxStep, 1);
+        }
+
+        // Always update the final status to the latest processed one
+        finalAppStatus = appStatus;
+    });
+ 
+    // Display the step progress
+    toggleApplicationStatus('FRM_BUTTON');
+    displayStep(maxStep, finalAppStatus);
+}
+
+
+
+function displayStep(stepNumber,finalAppStatus) {
+    if (stepNumber >= 1 && stepNumber <= 4) {
+      $(".step").hide();
+      $(".step-" + stepNumber).show();
+      currentStep = stepNumber;
+      updateProgressBar();
+     updateStepCircle(finalAppStatus);
+          }
+     }
+function updateProgressBar() {
+    var progressPercentage = ((currentStep - 1) / 3) * 100; // Dynamic calculation
+
+        $(".progress-bar").css({
+            "width": progressPercentage + "%", // Update width dynamically
+            "background-color": "rgb(0, 44, 88)", // Deep blue color
+            "transition": "width 0.8s ease-in-out" // Smooth movement
+        });
+    }
+
+ function updateStepCircle(finalAppStatus) {
+    // all status from controller
+    $(".step-circle-p").each(function (index) {
+        let stepText = index + 1; // Default step number
+
+        if (index < currentStep) { 
+            // Change step text based on status, but do not modify existing background color
+            if (finalAppStatus === "APPROVE" || finalAppStatus === "SELECTED" || finalAppStatus === "PENDING") {
+                // Use Font Awesome check icon for approved status
+                stepText = '<i class="fas fa-check" style="color: white; font-size: 20px;"></i>';
+            } else if (finalAppStatus === "REJECT" || finalAppStatus === "REJECTED") {
+                // Use Font Awesome times (cross) icon for rejected status
+                stepText = '<i class="fas fa-times" style="color: white; font-size: 20px;"></i>';
+            }
+        }
+
+        // Only update the text inside the circle with the icon
+        $(this).find("small")
+            .html(stepText) // Insert the Font Awesome icon
+            .css("color", "white"); // Optional: ensure color is white
+    });
+}
+
+
+
+//Prevent copy from any where
+$(document).ready(function() {
+    $('body').bind('cut copy paste', function(e) {
+        e.preventDefault();
+    });
+    $("body").on("contextmenu", function(e) {
+        return false;
+    });
+    //hide interview Details 
+    $("#interviewDetails").hide();
+    
+});
+</script>

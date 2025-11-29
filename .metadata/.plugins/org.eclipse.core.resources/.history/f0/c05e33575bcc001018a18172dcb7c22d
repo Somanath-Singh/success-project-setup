@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+         http://java.sun.com/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+         
+           <session-config>
+        <session-timeout>300</session-timeout>
+        <cookie-config>
+             <name>HIMS</name>
+             <http-only>true</http-only>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+
+    <!-- JSP Compiler Settings -->
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <el-ignored>false</el-ignored>
+            <scripting-invalid>false</scripting-invalid>
+            <compiler-options>
+                <option>-source 1.8</option>
+                <option>-target 1.8</option>
+            </compiler-options>
+        </jsp-property-group>
+    </jsp-config>
+
+    <!-- Display Name -->
+    <display-name>hims_ipms</display-name>
+</web-app>

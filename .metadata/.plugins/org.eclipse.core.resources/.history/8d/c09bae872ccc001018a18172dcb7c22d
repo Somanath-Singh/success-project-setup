@@ -1,0 +1,106 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/js/commonFunctions.js"></script>
+
+
+<h3>Stock Details</h3>
+<section class="">
+	<form method="POST" action="${contextPath}/inventory/store/filter/stock" id="filterForm">
+		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="form-group col-md-2">
+						<label for="inputEmail4">Ware house:</label> 
+                       	<select class="form-select " aria-label="Default select example" id="wireHouse" name="wireHouseId" >
+                            <option value="0">-Select-</option>
+                            <c:forEach items="${wireHouses}" var="house">
+                              <option value="${house.store.storeId}" ${house.store.storeId eq wireHouseId ? 'selected' :''}>${house.store.storeName}</option>
+                            </c:forEach>
+                         </select>
+					</div>
+					<div class="form-group col-md-2">
+						<label for="inputEmail4">Category:<span style="color: red">*</span> </label> 
+						<select class="form-select" aria-label="Default select example" id="category" name="categoryId" onchange="getSubCategoryDetailsByCategoryiD(this.value)">
+							<option value="0">-Select-</option>
+							<c:forEach items="${categoryList}" var="cat">
+								<option value="${cat.categoryId}" ${cat.categoryId eq categoryId ? 'selected' :''}>${cat.categoryName}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div class="form-group col-md-2">
+						<label for="inputEmail4">Sub Category:<span style="color: red">*</span> </label> 
+						<select class="form-select" aria-label="Default select example" id="subcategory" name="subCategoryId">
+							<option value="0">-Select-</option>
+							<c:if test="${not empty item}">
+								<c:forEach items="${lstSubCat}" var="subcat">
+									<option value="${subcat.subCategoryId}" ${subcat.subCategoryId eq subCategoryId ? 'selected' :''}>${subcat.subCategoryName}</option>
+								</c:forEach>
+							</c:if>
+						</select>
+					</div>
+					
+				<div class="col-md-12  text-center">
+					<input type="submit" class="btn-submit" value="Filter" > 
+				</div>
+			</div>
+		</div>
+	</form>
+	<div class="col-md-12">
+		<div class="table-responsive">
+			<table class="datatable table table-striped table-bordered exportbtn mt-3">
+				<thead>
+					<tr>
+						<th>Sl No</th>
+						<th>Item Name</th>
+						<th>Item Code</th>
+						<th>Catagory</th>
+						<th>Location</th>
+						<th>Quantity</th>
+						<th>Last Purchase Cost</th>
+						<th>Weight Avg Cost</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach items="${stockDetails}" var="stock" varStatus="status">
+						<tr>
+							<td>${status.count}</td>
+							<td>${stock.item.itemName}</td>
+							<td>${stock.item.itemCode}</td>
+							<td>${stock.item.category.categoryName}</td>
+							<td></td>
+							<td>${stock.quantity}</td>
+							<td>${stock.lastPurchasePrice}</td>
+							<td>${stock.weightAvgPrice}</td>
+ 							<td>
+<%--  								<a href="${contextPath}/inventory/store/item/add?itemId=${item.itemId}" class="btn button-alert btn-sm" data-toggle="tooltip" title="Edit Item"><i class='fa-regular fa-pen-to-square'></i></a>  --%>
+<%-- 								    <a href="${contextPath}/inventory/store/asset/add?assetId=${item.assetId}" class="btn button-alert btn-sm" data-toggle="tooltip" title="Asset Details"><i class="fa fa-info-circle" aria-hidden="true"></i></a>    --%>
+<%--  								<a class="btn btn-danger btn-sm" data-toggle="tooltip" title="Remove Item" onclick="deleteItem(${item.itemId})"><i class='fa-solid fa-trash'></i></a>  --%>
+ 							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+
+
+<script>
+$(document).ready(function(){
+    if("${categoryId}" != null || "${categoryId}" != ""){
+        getSubCategoryDtlByCategoryid("${categoryId}", ${subCategoryId});
+    }
+});
+</script>
+
+

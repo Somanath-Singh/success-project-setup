@@ -1,0 +1,634 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script type="text/javascript"
+	src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<style>
+.freeze {
+    pointer-events: none;
+    opacity: 0.6; 
+    cursor: not-allowed;
+}
+</style>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">${workBill eq null ? Add : Update} Add Infra Work Bill</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+             	<c:if test="${empty workBill}">
+           	 		<li class="breadcrumb-item active" aria-current="page">Add Infra Work Bill</li>
+             	</c:if>
+             	<c:if test="${not empty workBill}">
+           	 		<li class="breadcrumb-item active" aria-current="page">Update Infra Work Bill</li>
+             	</c:if>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<form class="form-horizontal" action="${contextPath}/work-bill/save-infra-work-bill" method="POST" id="infraWorkBillForm">
+		<div class="col-md-12">
+			<div class="card">
+			<div class="card-header">
+				<c:if test="${empty workBill}">
+	          	 		<h5 class="card-title">Add Infra Work Bill</h5>
+	            	</c:if>
+	            	<c:if test="${not empty workBill}">
+	          	 		<h5 class="card-title">Update Infra Work Bill</h5>
+	            	</c:if>
+			</div>
+			<div class="card-body">
+					<input type="hidden" id="cipherText" name="cipherText" value="">
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+					<input type="hidden" name="workBillId" value="${workBill.workBillId}">
+					<input type="hidden" name="workBillCode" value="${workBill.workBillCode}">
+					<input type="hidden" name="isActive" value="${workBill.isActive}">	
+					<input type="hidden" id="buttonCode" name="buttonCode">	
+					
+					<div class="row">
+	                 <div class="col-md-3">
+	                       <div class="form-group">
+<!-- 	                           <label class="smallInput required" for="projectId">Project</label> -->
+                                <label class="smallInput required" for="projectId">Building</label>
+	                           <div class="">
+	                               <select class="form-control form-control-sm select2 form-select" id="projectId" name="projectId" onchange="LoadProjectEstimationByProjectId(this.value)">
+	                                   	<option value="0" selected disabled>- Select -</option>
+	                                 	<c:forEach items="${projectList}" var="project">
+	                                        <option value="${project.projectId}" ${ project.projectId eq workBill.projectId ? 'selected' : ''}>
+	                                            ${project.projectName}
+	                                        </option>
+	                                   	</c:forEach>
+	                               </select>
+	                           </div>
+	                       </div>
+	                   </div>
+	             		<div class="col-md-3">
+							<div class="form-group">
+								<label class="col-md-12 required" for="prjEstId">Plan Estimation</label>
+								<div class="col-md-12">
+									<select id="prjEstId" name="prjEstId" class="form-control form-control-sm form-select" required="required" onchange="LoadWorkOrderByProjectEstimationId(this.value);CalculateEstimationDataByEtimationId(this.value)">
+										<option value="0" selected disabled>- Select -</option>
+										<c:if test="${not empty workBill}">
+											<c:forEach items="${estimationList}" var="estimation">
+		                                 		<option value="${estimation.estimationId}" ${estimation.estimationId eq workBill.prjEstId ? 'selected' : ''}>${estimation.estimationNo}</option>
+		                             	 	</c:forEach>
+										</c:if>
+									</select>
+								</div>
+							</div>
+						</div>	
+						<div class="col-md-3">
+							<div class="form-group">
+								<label>Work Order Name </label>
+								<div class="col-md-12">
+									<input type="text" id="workOrderName" name="workOrderName" class="form-control form-control-sm" required maxlength="100" value="${workBill.workOrderName}" readonly>
+									<input type="hidden" id="workOrderId" name="workOrderId" class="form-control form-control-sm" required maxlength="100" value="${workBill.workOrderId}">
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="form-group">
+								<label class="required" for="agencyId">Select Inspection</label>
+								<div class="col-md-12">
+									<select id="inspectionId" name="inspectionId" class="form-control form-control-sm form-select" required>
+										<option value="0" selected disabled>- Select -</option>
+										<c:if test="${not empty workBill}">
+											<c:forEach items="${inspectionList}" var="inspection">
+		                                 		<option value="${inspection.inspectionId}" ${inspection.inspectionId eq workBill.inspectionId ? 'selected' : ''}>${inspection.phaseCode}</option>
+		                             	 	</c:forEach>
+										</c:if>
+									</select>
+								</div>
+							</div>
+						</div>	
+					</div>
+				
+					<div class="row">
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="agencyId">Select Agency</label>
+								<div class="col-md-12">
+									<input type="text" id="agencyName" name="agencyName" class="form-control form-control-sm" required maxlength="100" value="${workBill.agencyName}" readonly>
+									<input type="hidden" id="agencyId" name="agencyId" class="form-control form-control-sm" required maxlength="100" value="${workBill.agencyId}">
+								</div>
+							</div>
+						</div>	
+						<div class="col-md-3">
+							<label>Work Order Amount </label>
+							<div class="col-md-12">
+								<input type="text" id="workOrderAmount" name="workOrderAmount" class="form-control form-control-sm text-end NumbersOnly" required readonly maxlength="12" value="${workBill.workOrderAmount}">
+							</div>
+						</div>
+						<div class="col-md-3">
+							<label>Start Date </label>
+							<div class="datepicker-box">
+								<input type="text" id="startDate" name="startDate" class="form-control form-control-sm datepicker freeze " required 
+								value="${workBill.startDate}" readonly>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<label> End Date </label>
+							<div class="datepicker-box">
+								<input type="text" id="endDate" name="endDate" class="form-control form-control-sm datepicker freeze " required 
+								value="${workBill.startDate}" readonly>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		  </div>
+	
+		<div class="col-md-12 mt-3">
+			<div class="card">
+				<div class="card-header">
+					<c:if test="${empty workBill}">
+						<h5 class="card-title">Add Agency Account Details</h5>
+					</c:if>
+					<c:if test="${not empty workBill}">
+						<h5 class="card-title">Update Agency Account Details</h5>
+					</c:if>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-md-3">
+							<div class="form-group">
+								<label class="col-md-12 required" for="agencyBankId">Select Bank Account Number :</label>
+								<div class="col-md-12">
+									<select id="agencyBankId" name="agencyBankId" class="form-control form-control-sm form-select" required onchange="LoadAccountDetailsByAccountNo(this.value)">
+										<option value="0">- Select -</option>
+										<c:if test="${not empty workBill}">
+											<c:forEach items="${agencyBankList}" var="bank">
+												<option value="${bank.agencyBankId}" ${bank.agencyBankId eq workBill.agencyBankId ? 'selected' : '' }>${bank.accountNo}</option>
+											</c:forEach>
+										</c:if>
+									</select>
+								</div>
+							</div>
+						</div>	
+						<div class="col-md-3">
+							<label>Bank Name : </label>
+							<div class="col-md-12">
+								<input type="text" id="bankName" name="bankName" class="form-control form-control-sm NumbersOnly" required readonly maxlength="12" value="${workBill.bankName}">
+							</div>
+						</div>
+						<div class="col-md-3">
+							<label>Branch Name : </label>
+							<input type="text" id="branchName" name="branchName" class="form-control form-control-sm " required 
+								value="${workBill.branchName}" readonly>
+						</div>
+						<div class="col-md-3">
+							<label> IFSC Code : </label>
+							<input type="text" id="ifscCode" name="ifscCode" class="form-control form-control-sm " required 
+								value="${workBill.ifscCode}" readonly>
+						</div>
+						<div class="col-md-3">
+							<label> Account Holders Name : </label>
+							<input type="text" id="accHolName" name="accHolName" class="form-control form-control-sm " required 
+								value="${workBill.accHolName}" readonly>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Tax and Grand Total Section -->
+		<div class="col-md-12 mt-3">
+			<div class="card">
+				<div class="card-body">
+					<div class="row" style="margin: 0 auto; max-width: 580px; margin-right: 95px;">
+						<div class="col-md-12">
+                            <div class="row" style="align-items: center;">
+							    <div class="col-md-7">
+							        <div class="form-group" style="text-align: right;">
+							            <label class="smallInput" for="estimationAmount"><b>ESTIMATE AMOUNT</b></label>
+							        </div>
+							    </div>
+							    <div class="col-md-5">
+							        <div class="form-group">
+							           <input type="text" class="form-control form-control-sm  text-end" id="estimationAmount" name="estimationAmount" readonly value="${workBill.estimationAmount}"/>
+							        </div>
+							    </div>
+							</div>
+							<!-- GST % -->
+							<div class="row" style="align-items: center;">
+							    <div class="col-md-7">
+							        <div class="form-group" style="text-align: right;">
+							            <label class="smallInput" for="gstPercentage"><b>GST %</b></label>
+							        </div>
+							    </div>
+							    <div class="col-md-5">
+							        <div class="form-group">
+							        	<select class="form-control form-control-sm form-select freeze" id="gstPercentage" name="gstPercentage">
+										    <option value="" disabled selected>- Select -</option>
+										    <c:if test="${not empty workBill}">
+										    	<option value="5"  ${workBill.gstPercentage == 5 ? 'selected' : ''}>5 %</option>
+										    	<option value="18" ${workBill.gstPercentage == 18 ? 'selected' : ''}>18 %</option>
+										    	<option value="40" ${workBill.gstPercentage == 28 ? 'selected' : ''}>28 %</option>
+										    </c:if>
+										</select>
+							        </div>
+							    </div>
+							</div>
+							<div class="row" style="align-items: center;">
+							    <div class="col-md-7">
+							        <div class="form-group" style="text-align: right;">
+							             <label class="smallInput" for="sgstPercentage"><b>SGST</b></label>
+							        </div>
+							    </div>
+							    <div class="col-md-5">
+							    	<div class="row">
+							    		 <div class="col-md-6">
+							    		 	<div class="form-group">
+							           			<span><label class="smallInput" for="sgstPercentage" style="font-size: 11px;">SGST (%)</label></span>
+							            		<input type="number" class="form-control form-control-sm" id="sgstPercentage" name="sgstPercentage" readonly value="${workBill.cgstPercentage}"/>
+							        		</div>
+							    		 </div>
+							    		 <div class="col-md-6">
+							    		 	<div class="form-group">
+							    		 		<span><label class="smallInput" for="sgstAmount" style="font-size: 11px;">SGST (Amount)</label></span>
+							            		<input type="number" class="form-control form-control-sm text-end" id="sgstAmount" name="sgstAmount" readonly value="${workBill.sgstAmount}"/>
+							    		 	</div>
+							    		 </div>
+							    	</div>
+							    </div>
+							</div>
+							<div class="row" style="align-items: center;">
+							    <div class="col-md-7">
+							        <div class="form-group" style="text-align: right;">
+							             <label class="smallInput" for="cgstPercentage"><b>CGST</b></label>
+							        </div>
+							    </div>
+							    <div class="col-md-5">
+							    	<div class="row">
+							    		 <div class="col-md-6">
+							    		 	<div class="form-group">
+							           			 <label class="smallInput" for="cgstPercentage" style="font-size: 11px;">CGST (%)</label>
+							            		 <input type="number" class="form-control form-control-sm" id="cgstPercentage" name="cgstPercentage" readonly  value="${workBill.cgstPercentage}"/>
+							        		</div>
+							    		 </div>
+							    		 <div class="col-md-6">
+							    		 	<div class="form-group">
+							    		 		 <label class="smallInput" for="cgstAmount" style="font-size: 11px;">CGST (Amount)</label>
+							            		 <input type="number" class="form-control form-control-sm text-end" id="cgstAmount" name="cgstAmount" readonly value="${workBill.cgstAmount}"/>
+							    		 	</div>
+							    		 </div>
+							    	</div>
+							    </div>
+							</div>
+							<div class="row" style="align-items: center;">
+							    <div class="col-md-7">
+							        <div class="form-group" style="text-align: right;">
+							           <label class="smallInput" for="totalGstAmount"><b>GST TOTAL AMOUNT (INR)</b></label>
+							        </div>
+							    </div>
+							    <div class="col-md-5">
+							        <div class="form-group">
+							           <input type="number" class="form-control form-control-sm text-end" id="totalGstAmount" name="totalGstAmount" readonly  value="${workBill.totalGstAmount}"/>
+							        </div>
+							    </div>
+							</div>
+							<div class="row" style="align-items: center;">
+							    <div class="col-md-7">
+							        <div class="form-group" style="text-align: right;">
+							           <label class="smallInput" for="grandTotal"><b>Grand TOTAL (INR)</b></label>
+							        </div>
+							    </div>
+							    <div class="col-md-5">
+							        <div class="form-group">
+							           <input type="number" class="form-control form-control-sm text-end" id="totalAmount" name="totalAmount" readonly  value="${workBill.totalAmount}"/>
+							        </div>
+							    </div>
+							</div>
+							<div class="row" style="align-items: center;">
+							    <div class="col-md-7">
+							        <div class="form-group" style="text-align: right;">
+							           <label class="smallInput" for="penaltyAmount"><b>PENALTY AMOUNT (INR)</b></label>
+							        </div>
+							    </div>
+							    <div class="col-md-5">
+							        <div class="form-group">
+							           <input type="number" class="form-control form-control-sm text-end" id="penaltyAmount" name="penaltyAmount" onkeyup="checkPenaltyAmount();" value="${workBill.penaltyAmount}"/>
+							        </div>
+							    </div>
+							</div>
+							<!-- Penalty Reason Row (hidden by default) -->
+							<div class="row mt-2" id="penaltyReasonRow" style="display: none;">
+							    <div class="col-md-7">
+							        <div class="form-group" style="text-align: right;">
+							            <label class="smallInput" for="penaltyReason"><b>PENALTY REASON</b></label>
+							        </div>
+							    </div>
+							    <div class="col-md-5">
+							        <div class="form-group">
+							            <textarea class="form-control form-control-sm" 
+							                      id="penaltyReason" 
+							                      name="penaltyReason" 
+							                      rows="2"
+							                      placeholder="Enter reason for penalty"></textarea>
+							        </div>
+							    </div>
+							</div>
+							 <div class="row" style="align-items: center;">
+							    <div class="col-md-7">
+							        <div class="form-group" style="text-align: right;">
+							            <label class="smallInput" for="workBillTotalAmount"><b>WORK BILL TOTAL AMOUNT</b></label>
+							        </div>
+							    </div>
+							    <div class="col-md-5">
+							        <div class="form-group">
+							           <input type="text" class="form-control form-control-sm  text-end" id="workBillTotalAmount" name="workBillTotalAmount" readonly value="${workBill.workBillTotalAmount}"/>
+							        </div>
+							    </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+							
+		<div class="col-md-12 mt-3">				
+			<div class="card">
+				<div class="card-body">
+					<c:set var="dynamicFromId" value="infraWorkBillForm" scope="request" />
+			        <c:set var="wonFunction" value="submitForm()" />
+			        <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp" %>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+	
+<script>
+	function submitForm() {
+       debugger
+        const buttonCode = $("#hdnButtonCode").val();
+		$("#buttonCode").val(buttonCode);
+		const projectId = $("#projectId").val();
+		const prjEstId = $("#prjEstId").val();
+		const inspectionId = $("#inspectionId").val();
+		const agencyBankId = $("#agencyBankId").val();
+
+		if (!projectId || projectId === "0") {
+			bootbox.alert("Please select project.");
+			return false;
+		} else if (!prjEstId || prjEstId === "0") {
+			bootbox.alert("Please select a project estimation.");
+			return false;
+		}  else if (!inspectionId || inspectionId === "0") {
+			bootbox.alert("Please select an inspection.");
+			return false;
+		}  else if (!agencyBankId || agencyBankId === "0") {
+			bootbox.alert("Please select an agency bank account number.");
+			return false;
+		}else {
+			//submit tha form
+			var bizContent = $("#infraWorkBillForm").serializeArray();
+			$("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+			bootbox.confirm("Do You Want To Continue?", function(result) {
+				if (result) {
+					showLoader();
+					$("#infraWorkBillForm").submit();
+				}
+			});
+		}
+	}
+	
+	function LoadProjectEstimationByProjectId(projectId) {
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/common/fetchApprovedProjectEstimationByProject",
+	        data: {
+	        	projectId: projectId,
+	        },
+	        success: function (estimations) {
+	            var prjEstId = $('#prjEstId'); 
+	            prjEstId.empty();
+	            prjEstId.append('<option value="" selected disabled>- Select -</option>');
+
+	            $.each(estimations, function(index, estimation) {
+	            	prjEstId.append('<option value="' + estimation.estimationId + '">' + estimation.estimationNo + '</option>');
+	            });
+	            
+	            //other field empty
+	            var inspectionId = $('#inspectionId'); 
+	        	inspectionId.empty();
+	        	inspectionId.append('<option value="" selected disabled>- Select -</option>');
+
+	            $('#workOrderId').val("");
+				$('#workOrderName').val("");
+				$('#workOrderAmount').val("");
+				$('#startDate').val("");
+				$('#endDate').val("");
+				$('#agencyId').val("");
+				$('#agencyName').val("");
+				
+				var agencyBankId = $('#agencyBankId'); 
+	        	agencyBankId.empty();
+	        	agencyBankId.append('<option value="" selected disabled>- Select -</option>');
+	        	
+	        	$('#bankName').val("");
+				$('#branchName').val("");
+				$('#ifscCode').val("");
+				$('#accHolName').val("");
+				
+				$('#penaltyAmount').val("");
+	        },
+	        error: function (error) {
+	            console.error("Error fetching project estimation:", error);
+	        }
+	    });
+	}
+
+	function LoadWorkOrderByProjectEstimationId(prjEstId) {
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/work-bill/getWorkOrderByProjectEstimationId",
+	        data: {
+	        	projectEstimationId: prjEstId,
+	        },
+	        success: function (workOrder) {
+	        	$('#workOrderId').val(workOrder.workOrderId);
+				$('#workOrderName').val(workOrder.workOrderName);
+				$('#workOrderAmount').val(workOrder.workOrderAmt);
+				$('#startDate').val(workOrder.startDate);
+				$('#endDate').val(workOrder.endDate);
+				$('#agencyId').val(workOrder.agencyId);
+				$('#agencyName').val(workOrder.agencyName);
+				$("#workBillTotalAmount").val(workOrder.workOrderAmt);
+				
+				//other field empty
+				var agencyBankId = $('#agencyBankId'); 
+	        	agencyBankId.empty();
+	        	agencyBankId.append('<option value="" selected disabled>- Select -</option>');
+	        	
+	        	$('#bankName').val("");
+				$('#branchName').val("");
+				$('#ifscCode').val("");
+				$('#accHolName').val("");
+				
+				if(workOrder.workOrderId != null){
+					LoadWorkInspectionByWorkOrderId(workOrder.workOrderId);
+				}else{
+					bootbox.alert("Error occured while fetching Work Inspection Details .");
+					return false;
+				}
+				
+				if(workOrder.agencyId != null){
+					LoadAgencyBankDetailsByAgencyId(workOrder.agencyId);
+				}else{
+					bootbox.alert("Error occured while fetching Bank Details .");
+					return false;
+				}
+			},
+			error : function(error) {
+				console.error("Error fetching work order:", error);
+			}
+		});
+	}
+	
+	function CalculateEstimationDataByEtimationId(prjEstId) {
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/work-bill/getEstimationByProjectEstimationId",
+	        data: {
+	        	projectEstimationId: prjEstId,
+	        },
+	        success: function (estimation) {
+	       	  
+	       	var gstPercentage = $('#gstPercentage'); 
+	       	gstPercentage.empty();
+	       	gstPercentage.append('<option value="" selected disabled>- Select -</option>');
+	       	gstPercentage.append('<option value="' + estimation.gstPercentage + '" selected>' + estimation.gstPercentage + ' % </option>');
+				
+	       	$("#estimationAmount").val(estimation.estimationAmount);
+	        $("#sgstPercentage").val(estimation.sgstPercentage);
+	       	$("#cgstPercentage").val(estimation.cgstPercentage);
+	       	$("#sgstAmount").val(estimation.sgstAmount);
+	       	$("#cgstAmount").val(estimation.cgstAmount);
+	       	$("#totalGstAmount").val(estimation.totalGst);
+	       	$("#totalAmount").val(estimation.totalAmount);
+	       	
+			},
+			error : function(error) {
+				console.error("Error fetching work order:", error);
+			}
+		});
+	}
+	
+	function LoadWorkInspectionByWorkOrderId(workOrderId) {
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/work-bill/getWorkInspectionByWorkOrderId",
+	        data: {
+	        	workOrderId: workOrderId,
+	        },
+	        success: function (workInspection) {
+	        	var inspectionId = $('#inspectionId'); 
+	        	inspectionId.empty();
+	        	inspectionId.append('<option value="" selected disabled>- Select -</option>');
+
+	            $.each(workInspection, function(index, inspection) {
+	            	inspectionId.append('<option value="' + inspection.inspectionId + '" selected>' + inspection.phaseCode + '</option>');
+	            });
+			},
+			error : function(error) {
+				console.error("Error fetching work inspection:", error);
+			}
+		});
+	}
+	
+	function LoadAgencyBankDetailsByAgencyId(agencyId) {
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/work-bill/getAgencyBankDetailsByAgencyId",
+	        data: {
+	        	agencyId: agencyId,
+	        },
+	        success: function (bankDetails) {
+	        	var agencyBankId = $('#agencyBankId'); 
+	        	agencyBankId.empty();
+	        	agencyBankId.append('<option value="" selected disabled>- Select -</option>');
+
+	            $.each(bankDetails, function(index, account) {
+	            	agencyBankId.append('<option value="' + account.agencyBankId + '">' + account.accountNo + '</option>');
+	            });
+			},
+			error : function(error) {
+				console.error("Error fetching Account Details :", error);
+			}
+		});
+	}
+	
+	function LoadAccountDetailsByAccountNo(agencyBankId) {
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/work-bill/getAccountDetailsByAccountNo",
+	        data: {
+	        	agencyBankId: agencyBankId,
+	        },
+	        success: function (accountDetails) {
+	        	$('#bankName').val(accountDetails.bankName);
+				$('#branchName').val(accountDetails.branchName);
+				$('#ifscCode').val(accountDetails.ifscCode);
+				$('#accHolName').val(accountDetails.accHldName);
+			},
+			error : function(error) {
+				console.error("Error fetching Account Holders Details :", error);
+			}
+		});
+	}
+	
+	document.getElementById("penaltyAmount").addEventListener("input", function () {
+	    if (this.value.length > 15) {
+	        this.value = this.value.slice(0, 15);
+	    }
+	});
+	
+	function checkPenaltyAmount() {
+	    const penaltyAmount = parseFloat($("#penaltyAmount").val()) || 0;
+	    const workOrderAmount = parseFloat($("#workOrderAmount").val()) || 0;
+
+	    if (penaltyAmount > workOrderAmount) {
+	        $("#penaltyAmount").val("");
+	        $("#workBillTotalAmount").val(workOrderAmount.toFixed(2));
+	        $("#penaltyReasonRow").hide(); 
+	        bootbox.alert("Penalty amount can't be more than work bill total amount. Rs. " + workOrderAmount);
+	        return;
+	    } else {
+	        calculatePenaltyAmount();
+	    }
+
+	    // Show/hide penalty reason
+	    if (penaltyAmount > 0) {
+	        $("#penaltyReasonRow").show();
+	    } else {
+	        $("#penaltyReasonRow").hide();
+	        $("#penaltyReason").val(""); 
+	    }
+	}
+
+	function calculatePenaltyAmount() {
+	    const workOrderAmount = parseFloat($("#workOrderAmount").val()) || 0;
+	    const penaltyAmount = parseFloat($("#penaltyAmount").val()) || 0;
+	    const finalAmount = workOrderAmount - penaltyAmount;
+
+	    $("#workBillTotalAmount").val(finalAmount.toFixed(2));
+	}
+	  
+	$(document).ready(function () {
+	    $(".datepicker").datepick({
+	        onShow: $.datepick.monthOnly,
+	        dateFormat: "dd-mm-yyyy",
+	        yearRange: "c-20:c+10",
+	        showOnFocus: true,
+	        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+	    });
+	});
+ 
+
+</script>

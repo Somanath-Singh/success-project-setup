@@ -1,0 +1,62 @@
+spring.profiles.active=dev
+auto.login=system
+post.login.url=/home
+post.login.url1=/dashboard
+captcha.options=is
+
+#Uncomment this url for development purpose
+#heads.core.path = http://localhost:6363/heads
+heads.core.path =http://157.245.99.116:8080/core_cas
+#Uncomment this url for development purpose
+
+#Uncomment this url for testing purpose
+#heads.core.path = http://164.164.176.38:8080/i-qa-core 
+#Uncomment this url for testing purpose
+
+spring.datasource.hikari.connection-timeout=10000
+spring.datasource.hikari.maximum-pool-size=20
+spring.datasource.hikari.minimum-idle=8
+spring.datasource.hikari.pool-name=heads
+spring.datasource.platform=postgres
+spring.datasource.hikari.leak-detection-threshold=10000
+
+UPLOAD.FILE.PATH = D:\UPLOAD_FILES
+
+
+spring.jpa.show-sql=false
+spring.jpa.database-platform = org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.enable_lazy_load_no_trans=true
+spring.jpa.properties.hibernate.current_session_context_class=org.springframework.orm.hibernate5.SpringSessionContext
+
+spring.servlet.multipart.max-file-size=20MB
+spring.servlet.multipart.max-request-size=20MB
+
+server.error.include-stacktrace=always
+logging.level.org.springframework=WARN
+logging.level.com.aashdit=DEBUG
+
+
+
+server.error.path=/error
+server.port=3131
+server.servlet.context-path=/heads-ipms
+
+
+app.code=IPMS
+
+# set max header size to 10MB
+server.max-http-header-size=20485760
+
+#Mail Properties
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+mail.smtp.host=smtp.gmail.com
+mail.smtp.ssl.trust=smtp.gmail.com
+mail.smtp.port=587
+mail.smtp.ssl.protocols=TLSv1.2
+mail.username=aashdittechnologies6@gmail.com
+mail.password=yfmx swzj umvs abhw 
+
+
+spring.main.allow-bean-definition-overriding=true
+

@@ -1,0 +1,191 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<sec:authentication var="principal" property="principal" />
+
+<style>
+	.fa-signout-inmenu:before {
+		margin-left: 2px !important;
+	}
+	
+	
+	
+	
+	
+	
+
+/* sidebar width*/
+.navbar-vertical.navbar-expand-lg {
+    display: block;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 350px;
+   overflow-y: auto;
+}
+ 
+
+.navbar-vertical .navbar-nav .nav-link {
+    display: flex;
+    align-items: center;
+   
+}
+
+ .navbar-vertical.navbar-expand-lg .navbar-nav .nav .nav-link {
+    padding-left: 2.25rem;
+}
+
+.navHeading {
+    padding-left: 0.35rem;
+}
+.navPagesSub .nav-item .nav-link {
+    padding-left: 3.25rem!important;
+}
+
+.sidebar-link:hover {
+  background-color: #e6f0ff;
+  color: #003366;
+  transition: 0.2s;
+}
+
+.sidebar-link.active {
+  background-color: #003366;
+  color: white !important;
+ 
+}
+a.sidebar-link.active {
+    color: #0097ff !important;
+   background: #fff;
+     
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    min-height: 30px;
+}
+.logoName{
+	background-color: #36a2eb;
+    color: white;
+    font-weight: bold;
+    font-size: 36px;
+    width: 100%;
+    line-height: 50px;
+    padding: 18px 0;
+}
+</style>
+
+<!-- Sidebar -->
+    <aside id="sidebar" class="style-3">
+    
+    
+    
+    
+    
+    
+         <div class="">
+            <div class="sidebar-logo">
+                <a href="${contextPath}/home">
+                    
+                    <c:choose>
+                        <c:when test="${!empty principal.currentUserVo.icon && principal.currentUserVo.icon.length() > 0}">
+                            <c:set var="appIcon" value="${principal.currentUserVo.icon}" />
+                            <img src="${contextPath}/document/view-documents?doc=${appIcon}&module=ICON" alt="logo" class="logo" />
+                        </c:when>
+                        <c:otherwise>
+                            <img src="${contextPath}/assets/images/favicon.png" alt="logo" class="logo" />
+                        </c:otherwise>
+                    </c:choose>
+
+                    <span>
+                        <c:choose>
+                            <c:when test="${!empty principal.currentUserVo.gbOrMunName && principal.currentUserVo.gbOrMunName.length() > 0}">
+                                ${principal.currentUserVo.gbOrMunName}
+                            </c:when>
+                            <c:otherwise>
+                                ${principal.currentUserVo.entityName}
+                            </c:otherwise>
+                        </c:choose>
+                        <b>Enterprise Resource Planning</b>
+                    </span> 
+                </a>
+            </div>
+            <!-- Sidebar Navigation -->
+            
+ <%--    <ul class="sidebar-nav">
+               <li class="sidebar-item">
+                    <a href="${contextPath}/home" class="active sidebar-link">
+                        <i class="fa-solid fa-sliders pe-2"></i> Dashboard
+                    </a>
+                </li>
+                <sec:authorize access="isAuthenticated()">
+                    <c:forEach items="${sessionScope.USER_MENUS}" var="menu" varStatus="count">
+                        <c:if test="${menu.parent == null}">
+                            <c:set var="node" value="${menu}" scope="request" />
+                            <jsp:include page="node.jsp" />
+                        </c:if>
+                    </c:forEach>
+                </sec:authorize>
+            </ul> --%>
+            
+            
+            <ul class="sidebar-nav bg-light vh-100 p-0 m-0" style="list-style: none; width: 250px; border-right: 1px solid #ddd;">
+  
+  <!-- 🔹 Top Box Heading -->
+  <li class="text-center py-3 logoName">
+    BAMS
+  </li>
+
+  <!-- 🔹 Dashboard Link -->
+  <li class="sidebar-item">
+    <a href="${contextPath}/home" class="sidebar-link d-flex align-items-center px-3 py-2 active" style="text-decoration: none; color: #333;">
+      <i class="fa-solid fa-sliders pe-2"></i>
+      <span>Dashboard</span>
+    </a>
+  </li>
+
+<!--   <hr class="my-2" /> -->
+
+  <!-- 🔹 Dynamic Menus (only for authenticated users) -->
+  <sec:authorize access="isAuthenticated()">
+    <c:forEach items="${sessionScope.USER_MENUS}" var="menu" varStatus="count">
+      <c:if test="${menu.parent == null}">
+        <c:set var="node" value="${menu}" scope="request" />
+        <jsp:include page="node.jsp" />
+      </c:if>
+    </c:forEach>
+  </sec:authorize>
+</ul>
+
+        </div> 
+    </aside>
+        <!-- Main Component -->
+        
+
+<form method="post" action="${contextPath}/umt/switchRole" id="switchFrm">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" name="roleId" id="switchRoleId" value="" />
+	<input type="hidden" name="appCode" id="switchAppCode" value="" />
+</form>
+
+
+  <script>
+
+	function switchRole() {
+	    var roleId = $("#roleId").val();
+		var appCode = $("#appCode").val();
+		$("#switchRoleId").val(roleId);
+		$("#switchAppCode").val(appCode);
+		$("#switchFrm").submit();
+
+	}
+	
+  </script>
+
+        
+

@@ -1,0 +1,118 @@
+package com.aashdit.prod.heads.common.model;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PostLoad;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import com.aashdit.prod.heads.hims.umt.specs.ParentObjectId;
+import com.aashdit.prod.heads.hims.umt.specs.ParentObjectLevel;
+import com.aashdit.prod.heads.hims.umt.utils.Auditable;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+
+@DynamicInsert
+@DynamicUpdate
+@Entity
+@Table(name = "t_adm_mst_municipality", schema = "public")
+public class Municipality extends Auditable<Long> implements Serializable {
+
+	private static final long serialVersionUID = 3564519581695874915L;
+
+	@Id
+	@Column(name = "municipality_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long municipalityId;
+
+	@Column(name = "municipality_name")
+	private String municipalityName;
+	
+	@Column(name = "municipality_code")
+	private String municipalityCode;
+
+	@ManyToOne
+	@JoinColumn(name = "district_id")
+	private District district;
+
+	
+	@Column(name = "is_active")
+	private Boolean isActive;
+
+	@Column(name = "remarks")
+	private String remarks;
+	
+	
+	@Column(name = "email_id")
+	private String emailId;
+	
+	@Column(name = "phone_no")
+	private String phoneNo;
+	
+	@Column(name = "website")
+	private String website;
+	
+	@Column(name = "pincode")
+	private Long pincode;
+	
+	@Column(name = "address_line")
+	private String addressLine;
+	
+	
+	@ManyToOne
+	@JoinColumn(name = "governing_body_id")
+	private GoverningBody governingBodyId;
+
+	@Column(name = "app_icon")
+	private String appIcon;
+
+
+	
+	@Transient
+	private List<Long> moduleIds;
+
+	@ParentObjectId
+	@Column(name = "parent_object_id")
+	private Long parentObjectId;
+
+	@ParentObjectLevel
+	@Column(name = "parent_object_type")
+	private String parentObjectType;
+
+	@Transient
+	private String parentObjectIdAndType;
+
+	@PostLoad
+	private void onLoad() {
+		if(parentObjectId!=null && parentObjectType!=null) {
+			parentObjectIdAndType = parentObjectId+"##"+parentObjectType;
+		}
+	}
+
+	@Column(name = "primary_role_code")
+	private String primaryRoleCode;
+
+	@Column(name = "icon")
+	private String icon;
+
+
+}
+	

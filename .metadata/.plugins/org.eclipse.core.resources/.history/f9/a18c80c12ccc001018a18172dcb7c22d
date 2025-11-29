@@ -1,0 +1,116 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+
+				<!-- #######################################################  IMPORTANT DOCUMENT TAB  ####################################################### -->
+					
+						<form action="${contextPath}/staff/saveStaffDetails" id="importantDoc" method="post" enctype="multipart/form-data"> <!-- onsubmit="return checkForm8()" -->
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+							<input type="hidden" id="staffId" name="staffId" value="${staffDetails.staffId}" />
+	                         <input type="hidden" name="pageCode" id="pageCode" value="importantDoc"/> 
+							<h6 class="headingbg mb-4" style="margin-top: 25px;">Important Document Upload :
+							</h6>
+							<div class="row">
+								<div class="col-md-3">
+									<div class="form-group">
+										<label class="col-sm-12" for="">Upload Photo:</label>
+										<div class="col-sm-12 position-relative">
+											<input type="file" name="photo" id="fileUpload1" class="form-control form-control-sm" onchange="imageCheck2(this);"/>
+											<p style="font-size: 12px;color:#0000ffb8;">(.png, .jpg &amp; .jpeg, max 1 MB)</p>
+											<c:if test="${not empty staffDetails.profilePicPath}">
+												<a class="download-doc-href btn btn-primary position-absolute" title="Download" target="_blank" href="${contextPath}/staff/downloadDoc/${staffDetails.staffCode}/photo" style="right: 0; top:0; padding:8px;">
+													<i class="fa-solid fa-download"></i>
+												</a>
+											</c:if>
+											<div id="image-holder1"></div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label class="col-sm-12"><span>Upload Aadhar Card Copy:</span></label>
+										<div class="col-sm-12 position-relative">
+											<input type="file" name="aadhar" id="aadhar" class="form-control form-control-sm" onchange="uploadFileCheck(this);"/>
+											<p style="font-size: 12px;color:#0000ffb8;">(.pdf, .png, .jpg and .jpeg, max 2 MB)</p>
+											<c:if test="${not empty staffDetails.aadharFilePath}">
+												<a class="download-doc-href btn btn-primary position-absolute" title="Download" target="_blank" href="${contextPath}/staff/downloadDoc/${staffDetails.staffCode}/aadhar" style="right: 0; top:0; padding:8px;">
+													<i class="fa-solid fa-download"></i>
+												</a>
+											</c:if>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label class="col-sm-12"><span>Upload Pan Card Copy:</span></label>
+										<div class="col-sm-12 position-relative">
+											<input type="file" name="panCard" id="panCard" class="form-control form-control-sm" onchange="uploadFileCheck(this);"/>
+											<p style="font-size: 12px;color:#0000ffb8;">(.pdf, .png, .jpg and .jpeg, max 2 MB)</p>
+											<c:if test="${not empty staffDetails.panFilePath}">
+												<a class="download-doc-href  btn btn-primary position-absolute" title="Download" target="_blank" href="${contextPath}/staff/downloadDoc/${staffDetails.staffCode}/panCard" style="right: 0; top:0; padding:8px;">
+													<i class="fa-solid fa-download"></i>
+												</a>
+											</c:if>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label class="col-sm-12"><span>Upload Driving Licence Copy:</span></label>
+										<div class="col-sm-12 position-relative">
+											<input type="file" name="drivingLic" id="driving" class="form-control form-control-sm" onchange="uploadFileCheck(this);"/>
+											<p style="font-size: 12px;color:#0000ffb8;">(.pdf, .png, .jpg and .jpeg, max 2 MB)</p>
+											<c:if test="${not empty staffDetails.drivLicFilePath}">
+												<a class="download-doc-href  btn btn-primary position-absolute" target="_blank" title="Download" href="${contextPath}/staff/downloadDoc/${staffDetails.staffCode}/drivingLic" style="right: 0; top:0; padding:8px;">
+													<i class="fa-solid fa-download"></i>
+												</a>
+											</c:if>
+										</div>
+									</div>
+								</div>
+<%-- 								<c:if test="${empeBasicDetails.staffMaster.isPwd eq 'true'}"> --%>
+									<div class="col-md-3">
+										<div class="form-group">
+											<label class="col-sm-12" for="">Upload Disability Certificate:</label>
+											<div class="col-sm-12 position-relative">
+												<input type="file" name="pwdFile" id="pwdFileUpload" class="form-control form-control-sm" onchange="uploadFileCheck(this);"/>
+												<p style="font-size: 12px;color:#0000ffb8;">(.pdf, .png, .jpg and .jpeg, max 2 MB)</p>
+												<c:if test="${not empty staffDetails.pwdFilePath}">
+													<a class="download-doc-href  btn btn-primary position-absolute" target="_blank" title="Download" href="${contextPath}/staff/downloadDoc/${staffDetails.staffCode}/pwdFile" style="right: 0; top:0; padding:8px;">
+														<i class="fa-solid fa-download"></i>
+													</a>
+												</c:if>
+												<input type="hidden" id="isPwd" value="${staffDetails.isPwd}" />
+												<input type="hidden" id="pwdFilePath" value="${staffDetails.pwdFilePath}" />
+												
+											</div>
+										</div>
+									</div> 
+<%-- 								</c:if> --%>
+							</div>
+							<div id="staffSkillContainer"></div>
+			                <%-- <div class="col-md-12 text-center">
+			                    <hr style="margin-top: 15px;" />
+			                    <div class="form-group">
+									<c:if test="${_StaffDetails.serviceStatusCode eq 'ONSERVICE' || _StaffDetails.serviceStatusCode eq 'SUSPENDED'}">
+			                        <button type="button" class="btn-submit" onclick="validateImportantDocument();">Update</button>
+				                    </c:if>
+			                        <a href="" class="btn btn-cancel">Cancel</a>
+			                    </div>
+				            </div> --%>
+				            <div class="col-md-12 text-center" style="margin-top: 15px;">
+	                  <hr style="margin-top: 5px;" />
+	                  <div class="form-group">
+	                     <button type="button" onclick="submitForm('importantDoc');" class="btn btn-success btn-sm">Save</button>
+						 <a href="${contextPath}/staff/staffMemberList" class="btn btn-warning btn-sm">Back to List</a>
+	                  </div>
+	               </div>
+						</form>
+
+	         
+	         

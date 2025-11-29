@@ -1,0 +1,1053 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/applicationSpecific/encrypt/aes.js"></script>
+<script src="${contextPath}/assets/applicationSpecific/encrypt/AesUtil.js"></script>
+<script src="${contextPath}/assets/applicationSpecific/encrypt/lbase.js"></script>
+<script src="${contextPath}/assets/applicationSpecific/encrypt/pbkdf2.js"></script>
+<script src="${contextPath}/assets/vendor/bootbox5/bootbox.min.js"></script>
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+<%@ include file="/WEB-INF/views/message.jsp"%>
+<style>
+.note {
+    color: red;
+    display: flex;
+    gap: 10px;
+    font-size: 12px;
+}
+
+
+.carousel-inner>.item>img, .carousel-inner>.item>a>img {
+	display: block;
+	height: auto;
+	max-width: 100%;
+	line-height: 1;
+	width: 100%;
+	//
+	Add
+	this
+}
+body {
+	background: #bdbdbd1f !important;
+	/* background-size: 100% 100%; */
+	/* font-family: Poppins, sans-serif !important; */
+	overflow: scroll;
+}
+.copyright-sec {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	z-index: 9;
+	background: #1f1d1d;
+	padding: 8px 0;
+	color: #fff;
+	text-align: center;
+}
+.copyright-sec p {
+	margin-bottom: 0;
+	font-size: 12px;
+}
+.copyright-sec p a {
+	color: #f53400;
+}
+.copyright-sec p:hover a {
+	text-decoration: none;
+}
+.copyright-sec p {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+.container-wa .floating-button {
+	position: fixed;
+	bottom: 10px;
+	left: 12px;
+	width: 60px;
+	height: 60px;
+	background-color: #fa592d;
+	color: white;
+	border-radius: 50px;
+	text-align: center;
+	font-size: 35px;
+	cursor: pointer;
+	box-shadow: 0px 2px 5px #666;
+	z-index: 1000;
+}
+.container-wa .floating-button:hover {
+	background-color: #1fad53;
+}
+.container-wa .floating-button .icon {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	line-height: 60px;
+	text-align: center;
+	transition: all 0.3s;
+}
+.container-wa .floating-button .icon.wa {
+	animation: wa-out 0.3s;
+}
+.container-wa .floating-button .icon.close {
+	opacity: 0;
+	margin: auto;
+	transform: rotateZ(-70deg);
+	animation: close-out 0.3s;
+}
+.container-wa .card {
+	font-family: 'Quicksand', sans-serif;
+	position: absolute;
+	width: 280px;
+	height: auto;
+	background-color: white;
+	border-radius: 5px;
+	left: 40px;
+	bottom: 88px;
+	display: none;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	z-index: 10000;
+}
+.container-wa .card .banner-header {
+	background-image:
+		url("../../investio.com.br/images/banner/bg-chat-whatsapp.jpg");
+	background-size: cover;
+	color: white;
+	padding: 20px;
+	padding-bottom: 40px;
+	background-color: #075e54;
+}
+.container-wa .card .banner-body {
+	flex-grow: 1;
+	background-color: #eaeaea;
+	padding: 15px;
+}
+.container-wa .card .banner-body .card-atendente {
+	margin-top: -50px;
+	background-color: white;
+	padding: 15px;
+	display: flex;
+	flex-direction: column;
+	border-radius: 15px;
+}
+.container-wa .card .banner-body .card-atendente .dados-atendente {
+	display: flex;
+}
+.container-wa .card .banner-body .card-atendente .dados-atendente .avatar
+	{
+	padding: 15px;
+}
+.container-wa .card .banner-body .card-atendente .dados-atendente .avatar img
+	{
+	border-radius: 50%;
+}
+.container-wa .card .banner-body .card-atendente .dados-atendente .informacoes
+	{
+	padding: 15px;
+}
+.container-wa .card .banner-body .card-atendente .botao-atendente {
+	display: flex;
+}
+.container-wa .card .banner-body .card-atendente .botao-atendente .btn {
+	color: white;
+	background-color: #d3b924;
+	border-radius: 15px;
+	width: 100%;
+	padding: 10px;
+	text-align: center;
+	text-decoration: none;
+}
+.container-wa.is-opened .icon.wa {
+	animation: wa-in 0.15s linear;
+	animation-fill-mode: forwards;
+}
+.container-wa.is-opened .icon.close {
+	animation: close-in 0.2s;
+	animation-delay: 0.1s;
+	animation-fill-mode: forwards;
+}
+.container-wa.is-opened .card {
+	display: flex;
+	flex-direction: column;
+	position: fixed;
+}
+.container-wa.is-opened .icon.wa {
+	animation: wa-in 0.15s linear;
+	animation-fill-mode: forwards;
+}
+.container-wa.is-opened .icon.close {
+	animation: close-in 0.2s;
+	animation-delay: 0.1s;
+	animation-fill-mode: forwards;
+}
+@
+keyframes close-in {from { opacity:0;
+	transform: rotateZ(-70deg);
+}
+to {
+	opacity: 1;
+	transform: rotateZ(0deg);
+}
+}
+@
+keyframes close-out {from { opacity:1;
+	transform: rotateZ(0deg);
+}
+to {
+	opacity: 0;
+	transform: rotateZ(-70deg);
+}
+}
+@
+keyframes wa-in {from { opacity:1;
+	transform: rotateZ(0deg);
+}
+to {
+	opacity: 0;
+	transform: rotateZ(180deg);
+}
+}
+@
+keyframes wa-out {from { opacity:0;
+	transform: rotateZ(180deg);
+}
+to {
+	opacity: 1;
+	transform: rotateZ(0deg);
+}
+}
+.card ul {
+	padding: 0 15px;
+	margin: 0;
+	text-align: left;
+}
+.card ul li {
+	color: rgb(0, 0, 0);
+	text-decoration: none;
+	list-style: none;
+	padding: 10px 0;
+	border-bottom: 1px solid rgba(145, 143, 143, 0.336);
+}
+.card ul li:nth-child(1) {
+	text-align: left;
+}
+.container-wa .card .card-head p {
+	text-align: center;
+	text-decoration: underline;
+	font-size: 20px;
+	font-weight: 600;
+	color: #000;
+}
+.container-wa .card .card-head {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.nav-pills .nav-link {
+	background: 0 0;
+	border: 0;
+	border-radius: .25rem;
+	color: #fff !important;
+	padding: 12px 11px;
+	font-size: 12px;
+	box-shadow: inset -5px -5px 10px #0000006b, inset 5px 5px 9px #ffffff2e;
+}
+.otp-field {
+	/* display: inline-block;
+	width: 3rem;
+	height: 3rem;
+	font-size: 1rem;
+	line-height: 2rem;
+	text-align: center;
+	 border-bottom: 2px solid var(--bs-secondary); 
+	outline: none; */
+	display: inline-block;
+	width: 3rem;
+	/* height: 3rem; */
+	/* font-size: 2rem; */
+	/* line-height: 2rem; */
+	text-align: center;
+	/* border-bottom: 1px solid var(--bs-secondary); */
+	/* outline: none; */
+	/* display: block; */
+	/* width: 100%; */
+	height: calc(1.5em + 0.75rem + 2px);
+	/* padding: 0.375rem 0.75rem; */
+	/* font-size: 1rem; */
+	/* font-weight: 400; */
+	/* line-height: 1.5; */
+	/* color: #495057; */
+	background-color: #fdfafa;
+	/* background-clip: padding-box; */
+	border: 1px solid #9daab8;
+	border-radius: 0.25rem;
+}
+.otp-field:focus {
+	border-bottom-color: var(- -bs-dark);
+}
+.hidden {
+	display: none;
+}
+/*  -------sasmita added---------- */
+.banner_wlcm {
+	position: absolute;
+	left: 41%;
+	bottom: 0;
+}
+.dis {
+	padding: 25px 20px;
+	width: 250px;
+	height: 80px;
+	background: #000;
+	color: #fff;
+	font-size: 20px;
+	border-radius: 35px;
+	display: block;
+	text-align: center;
+	overflow: hidden;
+	position: relative;
+	transition: color 0.8s ease;
+}
+.dis:before, .dis:after, .dis span:before, .dis span:after {
+	content: "";
+	position: absolute;
+	top: 0;
+	width: 25.25%;
+	height: 0;
+	background-color: #fff;
+	transition: height 0.8s ease;
+}
+.dis:before {
+	left: 0;
+}
+.dis:after {
+	left: 50%;
+}
+.dis span:before, .dis span:after {
+	top: auto;
+	bottom: 0;
+}
+.dis span:before {
+	left: 25%;
+}
+
+.dis span:after {
+	left: 75%;
+}
+.dis:hover {
+	color: #fff;
+}
+.dis:hover:before, .dis:hover:after, .dis:hover span:before, .dis:hover span:after
+	{
+	height: 80px;
+}
+.banner .animate-vector3 svg {linearGradient { stop{ stop-color:#0B473B!important;
+}
+}
+}
+.path-square { //
+	stroke: #516755 !important;
+	stroke-width: 2;
+	fill: none
+}
+.sm-circle {
+	fill: #6D8470 !important;
+	stroke: #6D8470 !important;
+}
+
+.sm-circle2 {
+	fill: #fff;
+	stroke: #fff;
+	opacity: .1;
+}
+}
+/* .tabs-width { */
+/* 	padding-top: 0; */
+/* 	background: url("./hims-recruitment/src/main/webapp/assets/img/sidebar-img.jpg") rgba(17 , 120, 107, .8) !important; */
+/*     background-blend-mode: screen !important; */
+/* 	height: 100% !important; */
+/* } */
+.nav {
+	padding-top: 20px !important;
+}
+.nav .nav-item button.active {
+	color: #fff !important;
+}
+.tab-content-inr-style .rows-style h4 {
+	width: 80px !important;
+	font-size: 9px;
+	flex: 0 0 80px;
+}
+.tab-content-inr-style .rows-style h4 span {
+	font-size: 30px !important;
+	position: relative;
+}
+li.nav-item {
+	padding: 5px 20px;
+}
+pills .nav-link svg {
+	color: #fff !important;
+}
+.nav-item>button.active {
+	/* background: linear-gradient(21deg, #DC3545 7.42%, #DC3545 91.76%) !important; */
+	color: #fff !important;
+	background: #f35e0a !important;
+}
+.nav-item>button {
+	background: #50505057 !important;
+	color: #000 !important
+}
+.nav .nav-item button.active::after {
+	border-right: none !important;
+}
+.tab-content-inr-style .rows-style a {
+	min-width: 90px !important;
+	font-size: 12px !important;
+}
+.tabs-content-width {
+	height: calc(100% - 100px) !important;
+    border-radius: 8px !important;
+    width: 100%;
+}
+.text-danger {
+	color: #002c58 !important;
+}
+.tab-content-inr-style .rows-style p {
+	font-size: 12px !important;
+}
+.accordion-button {
+	font-size: 14px;
+	position: relative;
+}
+.accordion-button span {
+	position: absolute;
+	right: 5%;
+	top: 25%;
+	font-size: 14px;
+}
+.accordion-body {
+	font-size: 12px !important;
+}
+.accordion-button p {
+	font-size: 14px !important;
+}
+.container-inr {
+	margin-top: 50px;
+	background: #F5F5F5;
+	/*  box-shadow: 0px 3px 4px 0px rgba(0, 0, 0, 0.03) !important; */
+	box-shadow: 0 4px 20px 1px rgba(0, 0, 0, .06), 0 1px 4px
+		rgba(0, 0, 0, .08) !important;
+}
+.bnr-img img {
+	width: 100%;
+}
+button.accordion-button {
+	padding: 5px !important;
+}
+.date span:after {
+	content: '';
+	position: absolute;
+	left: 0;
+	bottom: 3;
+	width: 100%;
+	height: 1px;
+	background: #00000017;
+}
+table.dataTable th {
+	padding: 8px 15px !important;
+}
+th.dt-orderable-asc.dt-orderable-desc.dt-ordering-asc {
+	font-size: 12px !important x;
+}
+.dt-info {
+	font-size: 12px !important;
+}
+.banner {
+	background-color: #FFDEC2;
+	position: relative;
+	/* 	height: 450px; */
+	overflow: hidden;
+	padding: 40px 0;
+}
+.shape1 {
+	top: 0;
+	right: 0;
+	opacity: 0.2;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+}
+.shape1 img {
+	width: 100%;
+	height: 100%;
+}
+.districtcon .form-control{
+    height: 40px !important;
+    font-size: 14px;
+}
+/* 
+.hero-img {
+	position: absolute;
+	top: -20px;
+	right: 8%;
+	width: 100%;
+	max-width: 320px;
+}
+
+.hero-img img {
+	width: 100%;
+	object-fit: cover;
+}
+
+.hero-img2 {
+	position: absolute;
+	bottom: 0;
+	left: 5%;
+	width: 100%;
+	max-width: 280px;
+}
+
+.hero-img2 img {
+	max-width: 100%;
+} */
+.banner-content h2 {
+	color: #fff;
+	padding: 120px 0;
+	font-size: 40px;
+}
+.shape2 {
+	top: 0px;
+	left: -1%;
+	opacity: 0.2;
+	position: absolute;
+	transform: translateY(-50%);
+	animation: banner-shape 3s infinite linear alternate-reverse;
+}
+.shape2 img {
+	max-width: 100%;
+}
+.section_names_style h2 {
+	color: #484848;
+	font-size: 52px;
+}
+.section_names_style span {
+	color: #f35e0a;
+}
+.recruitment img {
+	width: 60%;
+	position: relative;
+	object-fit: cover;
+}
+.icon_img1 {
+	position: absolute;
+	top: 23%;
+	left: 13%;
+	border-radius: 50%;
+	background: #fff;
+	height: 70px;
+	width: 70px;
+}
+.icon_img1 img {
+	width: 70%;
+	object-fit: cover;
+	position: relative;
+	top: 7px;
+}
+.icon_img2 {
+	position: absolute;
+	left: 12%;
+	border-radius: 50%;
+	background: #fff;
+	height: 70px;
+	width: 70px;
+	bottom: 18%;
+}
+.icon_img2 img {
+	width: 70%;
+	object-fit: cover;
+	position: relative;
+	top: 7px;
+}
+.icon_img3 {
+	position: absolute;
+	top: 5%;
+	left: 27%;
+	border-radius: 50%;
+	background: #fff;
+	height: 70px;
+	width: 70px;
+}
+.icon_img3 img {
+	width: 70%;
+	object-fit: cover;
+	position: relative;
+	top: 7px;
+}
+.icon_img4 {
+	position: absolute;
+	border-radius: 50%;
+	background: #fff;
+	height: 70px;
+	width: 70px;
+	right: 18%;
+	top: 25%;
+}
+.icon_img4 img {
+	width: 70%;
+	object-fit: cover;
+	position: relative;
+	top: 7px;
+}
+.icon_img5 {
+	position: absolute;
+	border-radius: 50%;
+	background: #fff;
+	height: 70px;
+	width: 70px;
+	right: 30%;
+	top: 0%;
+}
+.icon_img5 img {
+	width: 70%;
+	object-fit: cover;
+	position: relative;
+	top: 7px;
+}
+
+.arrow-1 {
+	position: absolute;
+	top: 11%;
+	left: 10%;
+}
+
+.arrow-1 img {
+	width: 100%;
+}
+
+.arrow-2 {
+	position: absolute;
+	bottom: 0%;
+	right: 0%;
+}
+
+.arrow-2 img {
+	width: 100%;
+}
+
+.animate-vector {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	filter: hue-rotate(219deg);
+	opacity: 0.1
+}
+
+.banner .animate-vector3 {
+	position: absolute !important;
+	right: 0 !important;
+	bottom: 0 !important;
+	filter: hue-rotate(219deg);
+	opacity: 0.1
+}
+.banner .animate-vector svg {linearGradient { stop{ stop-color:#0B473B;
+}
+.path-square { //
+	stroke: #516755;
+	stroke-width: 2;
+	fill: none
+}
+.sm-circle {
+	fill: #6D8470;
+	stroke: #6D8470;
+}
+.sm-circle2 {
+	fill: #fff;
+	stroke: #fff;
+	opacity: .1;
+}
+}
+
+</style>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<div class="container">
+	<div style="height: 530px;">
+		
+  </div>
+</div>
+<form action="${contextPath}/public/filter" method="get" id="filterFormId">
+	
+	<input type="hidden" id="cipherTextDoc" name="cipherText" value="23" />
+	<input type="hidden" name="universityId" id="universityId" />
+	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"  style="width: 400px;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 style="text-align: center;">Login</h5>
+					<button type="button" class="btn-close" style="filter: invert(1);" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12 col-sm-12 col-xs-12">
+							<div class="districtcon">
+								<!-- <c:if test="${not empty success_msg}">
+                                <div class="alert alert-danger" style="width: 50%; margin-left: 17%; text-align: center;" id="errorMsg">
+                                    ${err_msg}
+                                </div>
+                            </c:if>
+                            <c:if test="${not empty err_msg}">
+                                <div class="alert alert-danger" style="width: 50%; margin-left: 17%; text-align: center;" id="errorMsg">
+                                    ${err_msg}
+                                </div>
+                            </c:if> -->
+								<div id="messageDiv"></div>
+								<div class="fieldBox row">
+									<div class="form-group col-md-12" id="unm">
+										<label class="col-sm-12" for="email" style="font-size: 15px;">User Name :</label>
+										<div class="col-sm-12">
+											<input placeholder="" class="form-control plc" id="username" type="text" autocomplete="false" required="required"> <input type="hidden" id="textUserName" name="userName" value="">
+										</div>
+									</div>
+									<div id="unmMessage"></div>
+									<div class="form-group col-md-12" id="pas">
+										<label class="col-sm-12" for="pwd" style="font-size: 15px;">Password :</label>
+										<div class="col-sm-12" style="position: relative;">
+											<input placeholder="********" class="form-control plc" id="textPassword" type="password" autocomplete="off" required="required">
+
+											<!-- Hidden input to store the password -->
+											<input type="hidden" id="password" name="password" value="">
+
+											<!-- Eye icon to toggle visibility -->
+											<span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
+												<i class="fa fa-eye" id="togglePassword" onclick="showpassword()"></i>
+											</span>
+										</div>
+									</div>
+
+									<div class="form-group col-md-12 hidden" id="otp">
+										<label class="col-sm-12" for="pwd">OTP :</label> 
+										<input class="otp-field" type="text" name="opt-field[]" maxlength=1>
+										<input class="otp-field" type="text" name="opt-field[]" maxlength=1> <input class="otp-field" type="text" name="opt-field[]" maxlength=1> 
+										<input class="otp-field" type="text" name="opt-field[]" maxlength=1>
+										<input class="otp-field" type="text" name="opt-field[]" maxlength=1> 
+										<input class="otp-field" type="text" name="opt-field[]" maxlength=1>
+									</div>
+
+									<div class="col-md-7 captchabox">
+										<label class="col-sm-12" for="pwd" style="font-size: 15px;">Enter Captcha :</label>
+										<input name="captcha" type="text" placeholder="" required maxlength="5" id="captcha" class="form-control plc" autocomplete="off">
+									</div>
+
+									<div class="col-sm-5 captcha" onmousedown="return false" style="margin-top: 27px;">
+										<img style="height: 40px;width: 80%;" id="captchaImage" src="${contextPath}/captcha/5" /> <i class="fa fa-refresh" id="Image1" onclick="refreshCaptcha();" causesvalidation="false" style="font-size: 18px; position: relative; top: 5px; color: #f35e0a; cursor: pointer;"></i>
+									</div>
+									<div class="form-group col-md-12 d-flex align-items-center mt-2">
+									    <label class="me-2 mb-0" style="font-size: 14px;">
+									        Don't have an account ? 
+									        <a href="${contextPath}/public/add-reg" style="font-size: 14px; text-decoration: none;">Register now</a>
+									    </label>
+									</div>
+                                  
+									<div class="form-footer col-sm-12 mt-2 text-center">
+										<button type="button" class="btn btn-success" id="btn_submit" style="padding: 5px 22px !important;"
+											onClick="submitUserForm()">Login</button>
+										<!--                                         <button type="button" id="getOTP" style="line-height: 19px;" -->
+										<!--                                             class="btn btn-lg btn-success">Login with OTP</button> -->
+									</div>
+
+									<div class="btm-footer">
+										<!-- Additional footer elements can be added here -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+<form class="form-horizontal" id="login-window" method="POST"
+	action="${contextPath}/overwrite/umt/login">
+	<input type="hidden" name="loginType" id="loginType"> <input
+		type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" name="appCode" value="EUTP" />
+</form>
+
+<%--  <form class="form-horizontal loginbox" id="login-window_rec">
+			<input type="hidden" name="${_csrf.parameterName}"value="${_csrf.token}" /> 
+			<input type="hidden" id="hdnencryptData" name="hdnencryptData" />
+			</form> --%>
+
+<%-- 			 <form class="form-horizontal" id="login-window" method="POST" action="${contextPath}/overwrite/umt/login" autocomplete="off" onsubmit="return  submitUserForm()"> --%>
+<!--                                 <input type="hidden" name="loginType" id="loginType">  -->
+<!--                                 <input type="hidden" id="hdnencryptData" name="hdnencryptData" /> -->
+<%--                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> --%>
+
+<script src="${pageContext.request.contextPath}/assets/applicationSpecific/encrypt/AesUtil.js"></script>
+<script src="${pageContext.request.contextPath}/assets/applicationSpecific/encrypt/aes.js"></script>
+<script src="${pageContext.request.contextPath}/assets/applicationSpecific/encrypt/pbkdf2.js"></script>
+<script src="${pageContext.request.contextPath}/assets/applicationSpecific/encrypt/lbase.js"></script>
+
+<script>
+	var n = 2;
+	function square(num) {
+		var ans = num * num;
+		return ans;
+	}
+	var square2 = square(n);
+	var square4 = square(4);
+</script>
+
+<script type="text/javascript">
+	$(".floating-button").click(function() {
+		$(this).closest('.container-wa').toggleClass('is-opened');
+	})
+</script>
+
+<script type="text/javascript">
+	var err = '${err_msg}';
+	if (err != "") {
+		setTimeout(function() {
+			$('#errorMsg').fadeOut('slow');
+		}, 3000);
+	}
+
+	function verifyOTP() {
+		$("#pymntformId").submit();
+	}
+
+	function submitUserForm() {
+		debugger;
+		var username = $("#username").val();
+		var password = $("#textPassword").val();
+		var generateCaptcha = $("#captcha").val();
+
+		if (username == "") {
+			bootbox.alert("Username Can't Be Empty");
+			return false;
+		}
+		if (password == "") {
+			bootbox.alert("Password Can't Be Empty");
+			return false;
+		}
+		if (generateCaptcha == "") {
+			bootbox.alert("Please enter the CAPTCHA");
+			return false;
+		}
+		else {
+			showLoader();
+			$("#username").val(enc_password(username));
+			$("#textPassword").val(enc_password(password));
+
+			var dataToEncode = {
+				username : $("#username").val(),
+				password : $("#textPassword").val(),
+				captcha : generateCaptcha,
+			};
+			var encryptedData = btoa(JSON.stringify(dataToEncode));
+			$("#loginType").val(encryptedData);
+			$("#login-window").submit();
+			return false;
+		}
+	};
+</script>
+
+<script>
+	document.onkeydown = function(e) {
+		/* Block F12 */
+		if (event.keyCode == 123) {
+			return false;
+		}
+		/* CTRL + SHIFT + I */
+		if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+			return false;
+		}
+		/* CTRL + SHIFT + J */
+		if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+			return false;
+		}
+		/* CTRL + SHIFT + C */
+		if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+			return false;
+		}
+		/* CTRL + U */
+		if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+			return false;
+		}
+	}
+
+	$(document).ready(function() {
+		$(document).bind("contextmenu", function(e) {
+			return false;
+		});
+	});
+
+	$('input').on("cut copy paste", function(e) {
+		e.preventDefault();
+	});
+</script>
+<script>
+	$(document).ready(function() {
+		$(".otp-field *:input[type!=hidden]:first").focus();
+		let otp_fields = $(".otp-field"), otp_value_field = $("#textPassword");
+		otp_fields.on("input", function(e) {
+			$(this).val($(this).val().replace(/[^0-9]/g, ""));
+			let opt_value = "";
+			otp_fields.each(function() {
+				let field_value = $(this).val();
+				if (field_value != "")
+					opt_value += field_value;
+			});
+			otp_value_field.val(opt_value);
+		}).on("keyup", function(e) {
+			let key = e.keyCode || e.charCode;
+			if (key == 8 || key == 46 || key == 37 || key == 40) {
+				// Backspace or Delete or Left Arrow or Down Arrow
+				$(this).prev().focus();
+			} else if (key == 38 || key == 39 || $(this).val() != "") {
+				// Right Arrow or Top Arrow or Value not empty
+				(this).next().focus();
+			}
+		}).on("paste", function(e) {
+			let paste_data = e.originalEvent.clipboardData.getData("text");
+			let paste_data_splitted = paste_data.split("");
+			$.each(paste_data_splitted, function(index, value) {
+				otp_fields.eq(index).val(value);
+			});
+		});
+	});
+
+	$("#getOTP").click(function() {
+		var userName = $("#username").val();
+		if (userName != "") {
+			$('#getOTP').prop('disabled', true);
+			$.ajax({
+				type : "GET",
+				url : "${contextPath}/public/getOtp/byUserName",
+				data : {
+					"userName" : userName,
+				},
+				success : function(response) {
+					if (response.outcome) {
+						$("#loginType").val("OTP");
+						$("#pas").addClass("hidden");
+						$("#otp").removeClass("hidden");
+						showMessage(response.message);
+						updateTimer();
+						sessionStorage.setItem("OTPSENT", userName);
+					} else {
+						showMessage(response.message);
+						$('#getOTP').prop('disabled', false);
+					}
+				},
+				error : function(error) {
+					//bootbox.alert("Failure");
+				}
+			});
+		} else {
+			showMessage("Please enter user name");
+			return false;
+		}
+	});
+
+	function showMessage(message) {
+		$("#messageDiv")
+				.empty()
+				.append(
+						'<div class="alert alert-warning alert-dismissible fade show" role="alert">'
+								+ message
+								+ '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+	}
+
+	var fadeOutTime = 60000;
+	var currentTime = fadeOutTime / 1000;
+
+	function updateTimer() {
+		$("#getOTP").text(currentTime);
+		currentTime--;
+		if (currentTime <= 0) {
+			$("#getOTP").text("OTP");
+			('#getOTP').prop('disabled', false);
+			resetOTP();
+		} else {
+			setTimeout(updateTimer, 1000);
+		}
+	}
+
+	$(document).ready(function() {
+		resetOTP();
+	});
+
+	function resetOTP() {
+		const userName = sessionStorage.getItem("OTPSENT");
+		if (userName != null) {
+			$.ajax({
+				type : "GET",
+				url : "${contextPath}/public/resetOTP/byUserName",
+				data : {
+					"userName" : userName,
+				},
+				success : function(response) {
+					if (response != 'ERROR') {
+						sessionStorage.removeItem("OTPSENT");
+					}
+				},
+				error : function(error) {
+					bootbox.alert("Failure");
+				}
+			});
+		}
+	}
+
+	function filterForm() {
+		var unvId = $("#unvId").val();
+		$('#universityId').val(unvId);
+		$('#cipherTextDoc').val("");
+		var bizContent = $("#filterFormId").serialize();
+		var cipherText = enc_password(bizContent);
+		$('#cipherTextDoc').val(cipherText);
+		$('#filterFormId').submit();
+	}
+
+	
+	$(document).ready(function() {
+	    $('#vacancy-tab').tab('show');
+	});
+	
+	
+	//onclick of the button vacancy tab include vaccancy.jsp
+	$('#vacancy-tab').click(function() {
+
+	});
+
+	function showpassword() {
+		var x = document.getElementById("textPassword");
+		if (x.type === "password") {
+			x.type = "text";
+			$('#togglePassword').removeClass('fa-eye');
+			$('#togglePassword').addClass('fa-eye-slash');
+		} else {
+			x.type = "password";
+			$('#togglePassword').removeClass('fa-eye-slash');
+			$('#togglePassword').addClass('fa-eye');
+
+		}
+	}
+	function refreshCaptcha() {
+		var image = document.getElementById("captchaImage");
+		image.src = '${contextPath}/captcha/5';
+	}
+	
+	$(document).ready(function() {
+		 $('#exampleModal').modal('show');
+	});
+	
+	
+</script>

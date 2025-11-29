@@ -1,0 +1,215 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+
+
+.ReportGroupName {
+	font-size: 20px;
+	font-weight: bold;
+	color: #da1111;
+	text-decoration: underline;
+}
+.rptRadioClass a{
+    text-align: center;
+    display: block;
+    border: 1px solid #ccc;
+    border-top: 2px solid #0b3b65;
+    padding: 20px 10px;
+    background: #ffffff;
+    color: #0f0e47;
+    font-weight: 500;
+    height: 145px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: all 0.3s;
+}
+.rptRadioClass a:hover{
+    background: #00ffffb5;
+    white-space: normal;
+}
+.rptRadioClass a img {
+    width: 50px;
+    margin-bottom: 15px;
+}
+.rptRadioClass i{
+    font-size: 35px;
+    margin-right: 5px;
+    color: #0f0e47 !important;
+    }
+    .rptRadioClass{
+        font-size: 14px;
+
+    }
+</style>
+
+<script>
+					$(function()
+					{
+						$('#datatable-default').dataTable({
+					 		"bSort": false,
+					 		"autoWidth": false
+						});
+					})
+					</script>
+
+
+
+<!-- Start::row-1 -->
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Report</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Report</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Report List</h5>
+			</div>
+			<div class="card-body" id="partyDtlsInRequest">
+                                    <div class="row">
+
+                                        <form class="form-horizontal form-bordered" id="uploadExcel" action="${contextPath}/fams/report" method="POST" enctype="multipart/form-data">
+                                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                            <input type="hidden" value="true" id="labelmsg" name="labelmsg">
+
+                                            <div class="col-md-12">
+                                            
+                                            <div class="" style="">
+								<div class="col-md-12 col-sm-12">
+									<div class="form-group text-center">
+										<span class="ReportGroupName">FAMS REPORTS</span>
+									</div>
+								</div>
+							
+
+							<div class="row reportRow rptOddRowDiv align-items-stretch">
+								<div class="col-md-2 col-sm-4 rptRadioClass form-group">
+									<a href="../report/bankCashReport" title='Bank Cash Report' data-toggle="tooltip" data-placement="top" target="_blank">
+										<img src="${contextPath}/assets/images/report.png"><br>
+											Bank Cash Report
+										</a>
+								</div>
+								<div class="col-md-2 col-sm-4 rptRadioClass form-group">
+									<a href="../report/incomeExpenditure" title='Income Expenditure Report' data-toggle="tooltip" data-placement="top" target="_blank">
+										<img src="${contextPath}/assets/images/report.png">
+										<br>
+											Income Expenditure Report
+                                    </a>
+								</div>
+								<div class="col-md-2 col-sm-4 rptRadioClass form-group">
+										<a href="../report/trialBalanceLedgerwise" title='Trial Balance Ledger Wise Report' data-toggle="tooltip" data-placement="top" target="_blank">
+										    <img src="${contextPath}/assets/images/report.png"><br>
+											Trial Balance Ledger Wise Report
+										</a>
+								</div>
+								<div class="col-md-2 col-sm-4 rptRadioClass form-group">
+                                    <a href="../report/getGeneralLedgerReport" title='General Ledger Report' data-toggle="tooltip" data-placement="top" target="_blank">
+										<img src="${contextPath}/assets/images/report.png"><br>
+											General Ledger Report
+                                    </a>
+								</div>
+								<div class="col-md-2 col-sm-4 rptRadioClass form-group">
+                                    <a href="../report/getGeneralLedgerPartyWiseReport" title='General Ledger Party Wise Report' data-toggle="tooltip" data-placement="top" target="_blank">
+										<img src="${contextPath}/assets/images/report.png"><br>
+											General Ledger Party Wise Report
+                                    </a>
+								</div>
+								<div class="col-md-2 col-sm-4 rptRadioClass form-group">
+                                    <a href="../report/voucherAmntMismatch" title='Voucher Amount Mismatch Report' data-toggle="tooltip" data-placement="top" target="_blank">
+										<img src="${contextPath}/assets/images/report.png"> <br>
+											Voucher Amount Mismatch Report
+                                    </a>
+								</div>
+							</div>
+							
+							
+							<!--  -->
+							
+							<div class="row reportRow rptOddRowDiv align-items-stretch">
+							<div class="row" style="text-align: center;">
+								<div class="col-md-12 col-sm-12">
+									<div class="form-group">
+										<span class="ReportGroupName">GST RELATED REPORTS</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-md-2 col-sm-4 rptRadioClass form-group">
+										<a href="../gstRpt/GR1.htm?r1t=R1B2B" title='GST R-1 (B2B) Summary' data-toggle="tooltip" data-placement="top" target="_blank">
+											<img src="${contextPath}/assets/images/report.png"><br>
+											GST R-1 (B2B) Summary
+										</a>
+								</div>
+								<div class="col-md-2 col-sm-4 rptRadioClass form-group">
+										<a href="../gstRpt/GR1.htm?r1t=R1B2C" title='GST R-1 (B2C) Summary' data-toggle="tooltip" data-placement="top" target="_blank">
+											<img src="${contextPath}/assets/images/report.png"><br>
+											GST R-1 (B2C) Summary
+										</a>
+								</div>
+								<div class="col-md-2 col-sm-4 rptRadioClass form-group">
+										<a href="../gstRpt/GR1.htm?r1t=R1B2CS" title='GST R-1 (B2CS) Summary' data-toggle="tooltip" data-placement="top" target="_blank">
+											<img src="${contextPath}/assets/images/report.png"><br>
+											GST R-1 (B2CS) Summary
+										</a>
+							</div>
+
+							<div class="col-md-2 col-sm-4 rptRadioClass form-group">
+										<a href="../gstRpt/GR1.htm?r1t=R1B2CL" title='GST R-1 (B2CL) Summary' data-toggle="tooltip" data-placement="top" target="_blank">
+											<img src="${contextPath}/assets/images/report.png"><br>
+										    GST R-1 (B2CL) Summary
+										</a>
+								</div>
+								<div class="col-md-2 col-sm-4 rptRadioClass form-group">
+										<a href="../gstRpt/GR1.htm?r1t=R1B2B2" title='GSTINwise R-1 Summary' data-toggle="tooltip" data-placement="top" target="_blank">
+											<img src="${contextPath}/assets/images/report.png"><br>
+											GSTINwise R-1 Summary
+										</a>
+								</div>
+								<!-- <div class="col-md-2 col-sm-4 rptRadioClass form-group">
+										<a href="../gstRpt/GR2.htm" title='GST R-2 (B2B) Summary' data-toggle="tooltip" data-placement="top" target="_blank">
+											<label>GST R-2 (B2B) Summary</label>
+										</a>
+							         </div> -->
+
+							<!-- <div class="col-md-2 col-sm-4 rptRadioClass form-group">
+										<a href="../gstRpt/taxInvoice.htm" title='Tax Invoice' data-toggle="tooltip" data-placement="top" target="_blank">
+											<label>Tax Invoice</label>
+										</a>
+								</div> -->
+							</div>
+							<!--  -->
+							
+								</div>
+										</div>
+                                     </form>
+                                       
+                				</div>
+            				</div>
+            			
+        			</div>
+    			</div>
+			</div>
+		
+<!--End::row-1 -->
+
+

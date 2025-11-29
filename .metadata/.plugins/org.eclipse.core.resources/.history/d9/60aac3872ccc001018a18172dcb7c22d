@@ -1,0 +1,861 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+<script src="${contextPath}/assets/js/moment.js"></script>
+
+
+<link href="${contextPath}/assets/full-calender/bootsrtap-icon.css">
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}"/>
+
+
+
+
+<div class="breadcrumb_conatiner">
+                <div class="col-md-6">
+	      <h4 class="change-color">Request For Facility Booking</h4>
+	   </div>
+	   <div class="col-md-6">
+	      <nav aria-label="breadcrumb" style="float: right;">
+	         <ol class="breadcrumb">
+	            <li class="breadcrumb-item">
+                    <a href="${contextPath}/home"><i class="fa fa-home"></i></a>
+                </li>
+	            <li class="breadcrumb-item active" aria-current="page">Request For Facility Booking</li>
+	         </ol>
+	      </nav>
+	   </div>
+            </div>
+
+	   
+	   
+	   
+<div class="card">
+<div class="card-header"><h5 class="card-title">Request For Facility Booking</h5></div>
+	<div class="card-body">		     			
+		 
+		<form action="${contextPath}/facility/saveNupdateFacilityData.htm" method="post" id="saveEventFormId">
+<!-- 			<input type="hidden" id="cipherText" name="cipherText"> -->
+		   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+		   <input type="hidden" name="statusCall" value="SUBMIT" />
+		   <input type="hidden" name="hiddenBookingRqst" value="${fac.facilityRequestId}" id="hiddenBookingRqst"/>
+		   
+		    <input type="hidden" name="orgId" value="${fac.organization }" id="orgId"/>
+		    <input type="hidden" name="dowlLvlId" value="${fac.dowlLvl}" id="dowlLvlId"/>
+		     <input type="hidden" name="buttonCode" id="buttonCode"/>
+		    
+		   <div class="row ${not empty collgeMasterData && collgeMasterData.statusCall eq 'VIEW' ? 'frezee' : ''}">
+
+               <c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+						<c:set var="upperOrDown" value="down" />
+						<c:set var="functionList2" value="getFacilities(this.value)"/>
+						<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+
+				
+				 <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="facilityId" class="col-sm-12 required">Facility:</label>
+				            <select name="facilityId" id="facilityId"  class="form-control form-select requiredField">
+				                <option value="">---select---</option>
+				            </select>
+				        </div>
+				    </div>
+				
+				<div class="form-group col-md-2" id="purposeDiv">
+					<label class="required" >Purpose :</label>
+					<div class="col-md-12">
+						<input type="text" class="form-control form-control-sm AlphabetsOnly" onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || (event.charCode == 32)" placeholder="" name="purpose" id="purposeId" value="${fac.purpose}" maxlength="30"/>
+					</div>
+				</div>
+				
+				<div class="form-group col-md-2 is-datepik" id="bookFromDateDiv">
+					<label class="required" >From Date :</label>
+					<div class="col-md-12 datepicker-box">
+<%-- 						<input type="text" class="form-control form-control-sm bookFromDate"  name="bookingFromDate" id="fromDate" readonly value="${fac.fromDate}"> --%>
+					      <fmt:formatDate value="${fac.fromDate}" pattern="yyyy-MM-dd" var="formattedFromDate" />
+							<input type="text" class="form-control form-control-sm bookFromDate"  
+							       name="bookingFromDate" id="fromDate" readonly 
+							       value="${formattedFromDate}">
+					</div>
+				</div>
+				
+				<div class="form-group col-md-2" id="timeSlotDiv">
+					<label class="required" for="appt">Start Time Slot:</label>
+					<div class="col-md-12">
+						<input class="form-control form-control-sm" type="time" id="startTimeSlotId" name="startTimeSlot" style="width:100%" value="${fac.startTimeSlot}">
+					</div>
+				</div>
+				
+				<div class="form-group col-md-2 is-datepik" id="bookToDateDiv">
+					<label class="required" >To Date :</label>
+					<div class="col-md-12 datepicker-box">
+					<fmt:formatDate value="${fac.toDate}" pattern="yyyy-MM-dd" var="formattedToDate" />
+						<input type="text" class="form-control form-control-sm bookToDate"  name="bookingToDate" id="toDate" readonly value="${formattedToDate}">
+					</div>
+				</div>
+
+				<div class="form-group col-md-2" id="timeSlotDiv">
+					<label class="required" for="appt">End Time Slot:</label>
+					<div class="col-md-12">
+						<input class="form-control form-control-sm" type="time" id="endTimeSlotId" name="endTimeSlot" style="width:100%" value="${fac.endTimeSlot}">
+					</div>
+				</div>
+				
+			</div>
+			
+<!-- 		   <div class="col-md-12 text-center" style="margin-top: 10px;"> -->
+<%-- 			    <button type="button" onclick="submitForm('${empty collgeMasterData ? 'SUBMIT' : 'UPDATE'}')" class="btn btn-submit">${empty collgeMasterData ? 'Submit' : 'Update'}</button> --%>
+<!-- 			    <button type="button" onclick="history.back()" class="btn btn-back">Back</button> -->
+<!-- 			</div> -->
+								<c:set var="dynamicFromId" value="saveEventFormId" scope="request" />
+								 <c:set var="wonFunction" value="submitForm()"/>
+								 <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+		</form>
+	</div>
+</div>
+<!-- <div class="card cardContainerNotFirst"> -->
+
+<!-- <div class="card-header"><h5 class="card-title">Booking Request Details</h5></div> -->
+<!-- 	<div class="card-body">		 -->
+<!-- 		<div class="col-md-12" id="tabs"> -->
+<!-- 			<ul class="nav nav-tabs mb-3"> -->
+<!-- 				<li class="nav-item"><a class="nav-link active" -->
+<!-- 					data-bs-toggle="tab" href="#pending">Pending</a></li> -->
+<!-- 				<li class="nav-item"><a class="nav-link" data-bs-toggle="tab" -->
+<!-- 					href="#approved">Approved</a></li> -->
+<!-- 				<li class="nav-item"><a class="nav-link" data-bs-toggle="tab" -->
+<!-- 					href="#reject">Reject</a></li> -->
+<!-- 				<li class="nav-item"><a class="nav-link" data-bs-toggle="tab" -->
+<!-- 					href="#cancel">Cancel</a></li> -->
+<!-- 			</ul> -->
+<!-- 			<div class="tab-content"> -->
+<!-- 				<div class="tab-pane fade show active" id="pending"> -->
+<!-- 					<div class="col-md-12"> -->
+<!-- 						<table -->
+<!-- 							class="datatable table table-striped table-bordered exportbtn"> -->
+<!-- 							<thead> -->
+<!-- 								<tr> -->
+<!-- 									<th>Sl No</th> -->
+<!-- 									<th>Booking By</th> -->
+<!-- 									<th>Booking Purpose</th> -->
+<!-- 									<th>Facility Name</th> -->
+<!-- 									<th>Booking From</th> -->
+<!-- 									<th>Start Time Slot</th> -->
+<!-- 									<th>Booking UpTo</th> -->
+<!-- 									<th>End Time Slot</th> -->
+<!-- 									<th>Booking Apply On</th> -->
+<!-- 									<th>Status</th> -->
+<%-- <%-- 									<c:if test="${roleCode eq 'ROLE_ADMIN_COLG'}"> --%>
+<!-- 									<th>Action</th> -->
+<%-- <%-- 									</c:if> --%> 
+<!-- 								</tr> -->
+<!-- 							</thead> -->
+<!-- 							<tbody> -->
+<%-- 							<c:set var="pendingCount" value="1" /> --%>
+<%-- 								<c:forEach items="${facBookingRequestList}" var="dataList" --%>
+<%-- 									varStatus="count"> --%>
+<%-- 									<c:if test="${dataList.status eq 'PENDING'}"> --%>
+<!-- 										<tr> -->
+<%-- 										<td>${pendingCount}</td> --%>
+<%-- 											<td>${count.count}</td> --%>
+<%-- 											<td>${dataList.requestedBy}</td> --%>
+<%-- 											<td>${dataList.purpose}</td> --%>
+<%-- 											<td>${dataList.facilityName}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.bookingFromDate}" /></td> --%>
+<%-- 											<td>${dataList.startTimeSlot}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.bookingToDate}" /></td> --%>
+<%-- 											<td>${dataList.endTimeSlot}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.createdOn}" /></td> --%>
+<%-- 											<td>${dataList.status}</td> --%>
+<%-- <%-- 											<c:if test="${roleCode eq 'ROLE_ADMIN_COLG'}"> --%> 
+<!-- 											<td> -->
+												
+<%-- <%-- 												<a href="#" class="btn btn-primary" onclick="showApprovalModal('${dataList.facilityRequestId}','${dataList.bookingFromDate}','${dataList.bookingToDate}','${dataList.startTimeSlot}','${dataList.endTimeSlot}');" --%> 
+<!-- <!-- 												 title="Action"><i class="fa fa-pen"></i></a> -->
+<%-- 											<button title="Edit" type="button" onclick="editBookinhgFacilityDetails('${dataList.facilityRequestId}')" class="btn btn-xs btn-warning"> --%> 
+<!-- 													<i class="fas fa-edit"></i> -->
+<!-- 											</button> -->
+<!-- 											</td> -->
+<%-- <%-- 											</c:if> --%> 
+<!-- 										</tr> -->
+<%-- 										<c:set var="pendingCount" value="${pendingCount + 1}" /> --%>
+<%-- 									</c:if> --%>
+<%-- 								</c:forEach> --%>
+<!-- 							</tbody> -->
+<!-- 						</table> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 				<div class="tab-pane fade" id="approved"> -->
+<!-- 					<div class="col-md-12"> -->
+<!-- 						<table -->
+<!-- 							class="datatable table table-striped table-bordered exportbtn"> -->
+<!-- 							<thead> -->
+<!-- 								<tr> -->
+<!-- 									<th>Sl No</th> -->
+<!-- 									<th>Booking By</th> -->
+<!-- 									<th>Booking Purpose</th> -->
+<!-- 									<th>Facility Name</th> -->
+<!-- 									<th>Building Name</th> -->
+<!-- 									<th>Block Name</th> -->
+<!-- 									<th>Floor Number</th> -->
+<!-- 									<th>Booking From</th> -->
+<!-- 									<th>Start Time Slot</th> -->
+<!-- 									<th>Booking UpTo</th> -->
+<!-- 									<th>End Time Slot</th> -->
+<!-- 									<th>Booking Apply On</th> -->
+<!-- 									<th>Status</th> -->
+<%-- 									<c:if test="${roleCode eq 'ROLE_ADMIN_COLG'}"> --%>
+<!-- 									<th>Action</th> -->
+<%-- 									</c:if> --%>
+<!-- 								</tr> -->
+<!-- 							</thead> -->
+<!-- 							<tbody> -->
+<%-- 							<c:set var="pendingCount" value="1" /> --%>
+<%-- 								<c:forEach items="${facBookingRequestList}" var="dataList" --%>
+<%-- 									varStatus="count"> --%>
+<%-- 									<c:if test="${dataList.status eq 'APPROVED'}"> --%>
+<!-- 										<tr> -->
+<%-- 											<td>${count.count}</td> --%>
+<%-- 											<td>${pendingCount}</td> --%>
+<%-- 											<td>${dataList.requestedBy}</td> --%>
+<%-- 											<td>${dataList.purpose}</td> --%>
+<%-- 											<td>${dataList.facilityName}</td> --%>
+<%-- 											<td>${not empty dataList.buildingId.buildingName ? dataList.buildingId.buildingName : 'N/A'}</td> --%>
+<%-- 											<td>${not empty dataList.blockId.blockName ? dataList.blockId.blockName : 'N/A'}</td> --%>
+<%-- 											<td>${not empty dataList.floorId.floorNo ? dataList.floorId.floorNo : 'N/A'}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.bookingFromDate}" /></td> --%>
+<%-- 											<td>${dataList.startTimeSlot}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.bookingToDate}" /></td> --%>
+<%-- 											<td>${dataList.endTimeSlot}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.createdOn}" /></td> --%>
+<%-- 											<td>${dataList.status}</td> --%>
+<%-- <%-- 											<c:if test="${roleCode eq 'ROLE_ADMIN_COLG'}"> --%> 
+<!-- 											<td> -->
+<!-- <!-- 												<a href="#" class="btn btn-primary" -->
+<%-- <%-- 												onclick="showApprovalModal('${dataList.facilityRequestId}','${dataList.bookingFromDate}','${dataList.bookingToDate}','${dataList.startTimeSlot}','${dataList.endTimeSlot}');" --%> 
+<!-- <!-- 												 title="Action"><i class="fa fa-pen"></i></a> --> 
+<%--  												<button title="Edit" type="button" onclick="editBookinhgFacilityDetails('${dataList.facilityRequestId}')" class="btn btn-xs btn-warning"> --%> 
+<!-- 													<i class="fas fa-edit"></i> -->
+<!-- 												</button> -->
+<!-- 											</td> -->
+<%-- <%-- 											</c:if> --%> 
+<!-- 										</tr> -->
+<%-- 										<c:set var="pendingCount" value="${pendingCount + 1}" /> --%>
+<%-- 									</c:if> --%>
+<%-- 								</c:forEach> --%>
+<!-- 							</tbody> -->
+<!-- 						</table> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 				<div class="tab-pane fade" id="reject"> -->
+<!-- 					<div class="col-md-12"> -->
+<!-- 						<table -->
+<!-- 							class="datatable table table-striped table-bordered exportbtn"> -->
+<!-- 							<thead> -->
+<!-- 								<tr> -->
+<!-- 									<th>Sl No</th> -->
+<!-- 									<th>Booking By</th> -->
+<!-- 									<th>Booking Purpose</th> -->
+<!-- 									<th>Facility Name</th> -->
+<!-- 									<th>Booking From</th> -->
+<!-- 									<th>Start Time Slot</th> -->
+<!-- 									<th>Booking UpTo</th> -->
+<!-- 									<th>End Time Slot</th> -->
+<!-- 									<th>Booking Apply On</th> -->
+<!-- 									<th>Status</th> -->
+<!-- 									<th>Revert Reason</th> -->
+<%-- <%-- 									<c:if test="${roleCode eq 'ROLE_ADMIN_COLG'}"> --%> 
+<!-- 									<th>Action</th> -->
+<%-- <%-- 									</c:if> --%>
+<!-- 								</tr> -->
+<!-- 							</thead> -->
+<!-- 							<tbody> -->
+<%-- 							<c:set var="pendingCount" value="1" /> --%>
+<%-- 								<c:forEach items="${facBookingRequestList}" var="dataList" --%>
+<%-- 									varStatus="count"> --%>
+<%-- 									<c:if test="${dataList.status eq 'REJECTED'}"> --%>
+<!-- 										<tr> -->
+<%-- 											<td>${count.count}</td> --%>
+<%-- 											<td>${pendingCount}</td> --%>
+<%-- 											<td>${dataList.requestedBy}</td> --%>
+<%-- 											<td>${dataList.purpose}</td> --%>
+<%-- 											<td>${dataList.facilitiesId.facilityName}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.bookingFromDate}" /></td> --%>
+<%-- 											<td>${dataList.startTimeSlot}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.bookingToDate}" /></td> --%>
+<%-- 											<td>${dataList.endTimeSlot}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.createdOn}" /></td> --%>
+<%-- 											<td>${dataList.status}</td> --%>
+<%-- 											<td>${dataList.cancelReason}</td> --%>
+<%-- <%-- 											<c:if test="${roleCode eq 'ROLE_ADMIN_COLG'}"> --%> 
+<!-- 											<td> -->
+<!-- <!-- 												<a href="#" class="btn btn-primary" --> 
+<%-- <%-- 												onclick="showApprovalModal('${dataList.facilityRequestId}','${dataList.bookingFromDate}','${dataList.bookingToDate}','${dataList.startTimeSlot}','${dataList.endTimeSlot}');" --%> 
+<!-- <!-- 												 title="Action"><i class="fa fa-pen"></i></a> --> 
+<%-- 											   <button title="Edit" type="button" onclick="editBookinhgFacilityDetails('${dataList.facilityRequestId}')" class="btn btn-xs btn-warning"> --%> 
+<!-- 													<i class="fas fa-edit"></i> -->
+<!-- 											   </button> -->
+<!-- 											</td> -->
+<%-- <%-- 											</c:if> --%> 
+<!-- 										</tr> -->
+<%-- 										<c:set var="pendingCount" value="${pendingCount + 1}" /> --%>
+<%-- 									</c:if> --%>
+<%-- 								</c:forEach> --%>
+<!-- 							</tbody> -->
+<!-- 						</table> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 				<div class="tab-pane fade" id="cancel"> -->
+<!-- 					<div class="col-md-12"> -->
+<!-- 						<table -->
+<!-- 							class="datatable table table-striped table-bordered exportbtn"> -->
+<!-- 							<thead> -->
+<!-- 								<tr> -->
+<!-- 									<th>Sl No</th> -->
+<!-- 									<th>Booking By</th> -->
+<!-- 									<th>Booking Purpose</th> -->
+<!-- 									<th>Facility Name</th> -->
+<!-- 									<th>Booking From</th> -->
+<!-- 									<th>Start Time Slot</th> -->
+<!-- 									<th>Booking UpTo</th> -->
+<!-- 									<th>End Time Slot</th> -->
+<!-- 									<th>Booking Apply On</th> -->
+<!-- 									<th>Status</th> -->
+<!-- 									<th>Cancel Reason</th> -->
+<%-- 									<c:if test="${roleCode eq 'ROLE_ADMIN_COLG'}"> --%>
+<!-- 									<th>Action</th> -->
+<%-- 									</c:if> --%>
+<!-- 								</tr> -->
+<!-- 							</thead> -->
+<!-- 							<tbody> -->
+<%-- 							<c:set var="pendingCount" value="1" /> --%>
+<%-- 								<c:forEach items="${facBookingRequestList}" var="dataList" --%>
+<%-- 									varStatus="count"> --%>
+<%-- 									<c:if test="${dataList.status eq 'CANCEL'}"> --%>
+<!-- 										<tr> -->
+<%-- 											<td>${count.count}</td> --%>
+<%-- 											<td>${pendingCount}</td> --%>
+<%-- 											<td>${dataList.requestedBy}</td> --%>
+<%-- 											<td>${dataList.purpose}</td> --%>
+<%-- 											<td>${dataList.facilitiesId.facilityName}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.bookingFromDate}" /></td> --%>
+<%-- 											<td>${dataList.startTimeSlot}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.bookingToDate}" /></td> --%>
+<%-- 											<td>${dataList.endTimeSlot}</td> --%>
+<%-- 											<td><fmt:formatDate pattern="dd-MM-yyyy" --%>
+<%-- 													value="${dataList.createdOn}" /></td> --%>
+<%-- 											<td>${dataList.status}</td> --%>
+<%-- 											<td>${dataList.cancelReason}</td> --%>
+<%-- <%-- 											<c:if test="${roleCode eq 'ROLE_ADMIN_COLG'}"> --%> 
+<!-- 											<td> -->
+<%-- <%-- 												<a href="#" class="btn btn-primary" onclick="showApprovalModal('${dataList.facilityRequestId}','${dataList.bookingFromDate}','${dataList.bookingToDate}','${dataList.startTimeSlot}','${dataList.endTimeSlot}');" --%> 
+<!-- <!-- 												 title="Action"><i class="fa fa-pen"></i></a> --> 
+
+
+<%-- 											<button title="Edit" type="button" onclick="editBookinhgFacilityDetails('${dataList.facilityRequestId}')" class="btn btn-xs btn-warning"> --%> 
+<!-- 													<i class="fas fa-edit"></i> -->
+<!-- 											</button> -->
+<!-- 											</td> -->
+<%-- <%-- 											</c:if> --%> 
+<!-- 										</tr> -->
+<%-- 										<c:set var="pendingCount" value="${pendingCount + 1}" /> --%>
+<%-- 									</c:if> --%>
+<%-- 								</c:forEach> --%>
+<!-- 							</tbody> -->
+<!-- 						</table> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+<!-- 	</div> -->
+<!-- </div> -->
+
+<form action="${contextPath}/facility/editBookinhgFacilityDetails" method="get" id="editBookinhgFacilityDetails">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+<input type="hidden" name="hdnBkRqstId"  id="hdnBkRqstId" value="">
+</form>
+
+<form action="${contextPath}/facility/updateStatusFacility" method="post" id="statusForm">
+   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+   <input type="hidden" name="requestId" id="departmentIdStatus" />
+   <input type="hidden" name="status" id="isActiveStatus" />
+</form>
+
+<form action="${contextPath}/facility/bookingBySlotAvailability.htm" method="Post" id="actionForm">
+   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+<!--    <input type="hidden" id="cipherTextActionForm" name="cipherText"> -->
+   <input type="hidden" name="reqId" id="requestApproveId" />
+   <input type="hidden" name="bookingFromDate" id="bookingFromDateId" />
+</form>
+
+<script type="text/javascript" src="${contextPath}/assets/full-calender/full-calender.js"></script>
+<script type="text/javascript" src="${contextPath}/assets/full-calender/global-full-calender.js"></script>
+<script>
+// function submitForm(status) {
+// 	debugger
+//     if($("#facilityId").val() == "0"){
+//    		bootbox.alert("Please select facility name.");
+//    		return false;
+//   	}else if($("#purposeId").val().trim() == ""){
+//    		bootbox.alert("Please provide purpose of booking.");
+//    		return false;
+//    	}
+//    	else if($("#fromDate").val() == ""){
+//    		bootbox.alert("Please select date of booking.");
+//    		return false;
+//    	}
+//    	else if($("#startTimeSlotId").val() == ""){
+//    		bootbox.alert("Please select starting time of booking.");
+//    		return false;
+//    	}
+//    	else if($("#toDate").val() == ""){
+//    		bootbox.alert("Please select date upto booking.");
+//    		return false;
+//    	}
+//    	else if($("#endTimeSlotId").val() == ""){
+//    		bootbox.alert("Please select ending time of booking.");
+//    		return false;
+//    	}else if ($("#startTimeSlotId").val() > $("#endTimeSlotId").val()) {
+//    		bootbox.alert("End Time should not be prior to that of Start Time.");
+//    		return false;
+// 	}
+    
+//     $("#orgId").val($("#orgIdAndTypeId").val());
+//     $("#dowlLvlId").val($("#upperEntityId").val());
+//     $("#buttonCode").val($("#hdnButtonCode").val());
+    
+// 	 var bizContent = $("#saveEventFormId").serializeArray();
+// 	 $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+//    		var msg = status === "SUBMIT" ? "submit" : "update";
+//    		bootbox.confirm("Do you want to "+msg+" facility booking details ?" ,
+//    			function(result){
+//    				if(result){
+//    					showLoader();
+//    					$("#saveEventFormId").submit();
+//    				}
+// 	   	});
+// };
+
+
+function submitForm(status) {
+    debugger;
+    
+    if ($("#facilityId").val() == "0" || $("#facilityId").val() == "") {
+        bootbox.alert("Please select facility name.");
+        $("#facilityId").val(""); // Clear the field
+        return false;
+    } else if ($("#purposeId").val().trim() == "") {
+        bootbox.alert("Please provide purpose of booking.");
+        $("#purposeId").val(""); // Clear the field
+        return false;
+    } else if ($("#fromDate").val() == "") {
+        bootbox.alert("Please select date of booking.");
+        $("#fromDate").val(""); // Clear the field
+        return false;
+    } else if ($("#startTimeSlotId").val() == "") {
+        bootbox.alert("Please select starting time of booking.");
+        $("#startTimeSlotId").val(""); // Clear the field
+        return false;
+    } else if ($("#toDate").val() == "") {
+        bootbox.alert("Please select date upto booking.");
+        $("#toDate").val(""); // Clear the field
+        return false;
+    } else if ($("#endTimeSlotId").val() == "") {
+        bootbox.alert("Please select ending time of booking.");
+        $("#endTimeSlotId").val(""); // Clear the field
+        return false;
+    }
+
+    // Date & Time Validation
+    let fromDate = new Date($("#fromDate").val());
+    let toDate = new Date($("#toDate").val());
+    let startTime = $("#startTimeSlotId").val();
+    let endTime = $("#endTimeSlotId").val();
+
+    if (toDate < fromDate) {
+        bootbox.alert("End Date must be greater than or equal to Start Date.");
+//         $("#toDate").val(""); // Clear the end date field
+        return false;
+    }
+
+    if (fromDate.getTime() === toDate.getTime() && startTime >= endTime) {
+        bootbox.alert("For the same date, End Time should be greater than Start Time.");
+//         $("#endTimeSlotId").val(""); // Clear the end time field
+        return false;
+    }
+
+    $("#orgId").val($("#orgIdAndTypeId").val());
+    $("#dowlLvlId").val($("#upperEntityId").val());
+    $("#buttonCode").val($("#hdnButtonCode").val());
+
+    var bizContent = $("#saveEventFormId").serializeArray();
+    $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+
+    bootbox.confirm("Do you want to take any action against facility booking details?", function(result) {
+        if (result) {
+            showLoader();
+            $("#saveEventFormId").submit();
+        }
+    });
+}
+
+
+  function getFacilityListByFacilityType(typeId) {
+	 var encodedTypeId = btoa(typeId);
+	 $.ajax({
+			type : "GET",
+			url : '${contextPath}/facility/getFacilityListByFacilityType',
+			dataType: "json",
+			data : {
+				"typeId" : encodedTypeId,							
+			},
+			success: function (response) {
+	            try {
+	            	 var data = response;
+	                var html = "<option value='0'>--select--</option>";
+	                $.each(data, function (index, value) {
+	                    html += "<option value=" + value.facilityId + ">" + value.facilityName + "</option>";
+	                });
+	                $('#facilityId').empty().append(html);
+	            } catch (error) {
+	                bootbox.alert("Error parsing response.");
+	            }
+	        },
+	        error: function (error) {
+	            bootbox.alert("FacilityList Not Found.");
+	        }
+		});
+}
+ 
+function getBlockListByBuildingId(buildingId) {
+	var encodedBuildingId = btoa(buildingId);
+	$.ajax({
+		type : "GET",
+		url : '${contextPath}/facility/getBlockListByBuildingId',
+		dataType: "json",
+		data : {
+			"buildingId" : encodedBuildingId,							
+		},
+		success: function(response) {
+		      var data = response;
+		      var html = "<option value='0'>--select--</option>";
+		      $.each(data, function(index, value) {
+			        html = html + "<option value=" + value.blockId + ">" + value.blockName + "</option>";
+			      });
+		      $('#blockId').empty().append(html);
+		    },error: function(error){
+			bootbox.alert("No Block Found Against this BuildingId"); 
+		}
+	});
+}
+
+function getFloorListByBlockId(blockId) {
+	var encodedBlockId = btoa(blockId);
+	$.ajax({
+		type : "GET",
+		url : '${contextPath}/facility/getFloorListByBlockId',
+		datatype : "json",
+		data : {
+			"blockId" :encodedBlockId,
+		},
+		success : function(response) {
+			var data = JSON.parse(response);
+			var html = "<option value='0'>---select---</option>";
+			$.each(data, function(index, value) {
+		        html = html + "<option value=" + value.floorId + ">" + value.floorNo + "</option>";
+		      });
+	      $('#floorId').empty().append(html);
+		},error : function(error) {
+			bootbox.alert("No Floor Found Against This BlockId.");
+		}
+	});
+}
+
+
+	$(function () {
+		$('.bookFromDate').datepick({
+			onShow: $.datepick.monthOnly, dateFormat: 'yyyy-mm-dd', yearRange: 'c-100:c+5', showOnFocus: true,
+			showTrigger: '<button type="button" id="fromDateCls" class="trigger fromDateCls frezee"> <i class="fa fa-calendar"></i></button>',
+			minDate: new Date()
+// 			onClose: function(){
+// 			checkStartTimeSlotAvailability();
+// 			}
+		});
+
+		$('.bookToDate').datepick({
+			onShow: $.datepick.monthOnly, dateFormat: 'yyyy-mm-dd', yearRange: 'c-100:c+5', showOnFocus: true,
+			showTrigger: '<button type="button" id="toDateBtn" class="trigger toDateCls frezee"> <i class="fa fa-calendar"></i></button>',
+			minDate: new Date()
+// 			onClose: function(){
+// 				validateFromDateToDate();
+// 				}
+		});
+	});
+
+	function validateFromDateToDate() {
+	var fromDate = $("#fromDate").val();
+		var toDate = $("#toDate").val();
+		if (fromDate > toDate) {
+			bootbox.alert("Please provide to date greater then equa from date.");
+	   		return false;
+		} 
+	}
+	
+	function showApprovalModal(requestId,bookingFromADate,bookingUpTo,startTimeSlot,endTimeSlot) {
+		$("#requestApproveId").val(requestId);
+		var inputDate = new Date(bookingFromADate);
+		var formattedDateString = inputDate.toISOString().split('T')[0];
+		$("#bookingFromDateId").val(formattedDateString);
+// 		 var bizContent = $("#actionForm").serializeArray();
+// 		 $("#cipherTextActionForm").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+		 bootbox.confirm("Would you like to take action on this request?",
+					function(result){
+						if(result){
+							showLoader();
+							$("#actionForm").submit();
+						}
+					});
+	}
+
+	function approveBookingFacility() {
+		 bootbox.confirm("Do you want to confirm this booking ?",
+					function(result){
+						if(result){
+							showLoader();
+							$("#approveEventFormId").submit();
+						}
+					});
+	}
+	
+	function statusActiveInActive(id,status) {
+		 document.getElementById("departmentIdStatus").value=id;
+		 var msg="";
+		 if(status){
+		   		$("#isActiveStatus").val(false);
+		   		msg="Deactivate this event booking"
+		  	 } else {
+		   		$("#isActiveStatus").val(true);
+		   		msg="Activate this event booking"
+		  	 }
+		 bootbox.confirm("Do you want to "+msg+" ?",
+					function(result){
+						if(result){
+							showLoader();
+							 $("#statusForm").submit();
+						}
+					});
+	}
+	
+	function checkStartTimeSlotAvailability() {
+		var fromDate = $("#fromDate").val();
+		$.ajax({
+			type : "GET",
+			url : '${contextPath}/facility/checkStartTimeSlotAvailability',
+			datatype : "json",
+			data : {
+				"fromDate" :fromDate,
+			},
+			success : function(response) {
+				var data = JSON.parse(response);
+				var html = "<input type='time'>";
+				$.each(data, function(index, value) {
+			        html = html + "<input type='time' value=" +value.eventStartTime+ " readonly/>";
+			      });
+				 $('#startTimeSlotId').empty().append(html);
+			},error : function(error) {
+				bootbox.alert("Something went wrong!");
+			}
+		});
+	}
+	
+	function showHideFieldTypeWise(value) {
+		var isIndoor = getIndoorOrOutdoorByFacilityId(value);
+		if (isIndoor) {
+			$("#buildingDivId").show();
+			$("#blockDivId").show();
+			$("#floorDivId").show();
+			$("#roomDivId").show();
+		}else {
+			$("#buildingDivId").hide();
+			$("#blockDivId").hide();
+			$("#floorDivId").hide();
+			$("#roomDivId").hide();
+		}
+	}
+	
+	function validatePurpose(string) {
+		 var letters = /^[A-Za-z]+$/;
+		   if(string.value.match(letters))
+		     {
+		      return true;
+		     }else {
+		    	bootbox.alert("Only Alphabets allowed.");
+		    	$("#purposeId").val('');
+		    	return false;
+			}
+	}
+	
+	function formatDateString(inputDateString) {
+	    var inputDate = new Date(inputDateString);
+	    var formattedDateString = inputDate.toISOString().split('T')[0];
+	    return formattedDateString;
+	}
+	var inputDateString = '2024-01-24T12:34:56.789Z';
+	var formattedDate = formatDateString(inputDateString);
+	console.log(formattedDate); // Output: '2024-01-24'
+
+	
+	
+/* 	function getIndoorOrOutdoorByFacilityId(value){
+		var status = '';
+		showLoader();
+			if(value != 0){
+				$.get(window.ctxPath+'/facilityManagement/getIndoorOrOutdoorByFacilityId', {facilityId: value}, function(data) {
+					var resp = data;
+					if(resp.length > 0){
+						if(resp.split('(')[1].split(')')[0] == 'INDOOR'){
+							status = true;
+						} else {
+							status = false;
+						}
+					}
+				}).fail(function(xhr, status, error) {
+				    console.error("Something went wrong.");
+				});
+			}
+			hideLoader();
+			return status;
+	} */
+	
+	
+	function getIndoorOrOutdoorByFacilityId(value) {
+	    var status = '';
+	    showLoader();
+	    if (value != 0) {
+	        $.ajax({
+	            url: window.ctxPath + '/facilityManagement/getIndoorOrOutdoorByFacilityId',
+	            method: 'GET',
+	            data: { facilityId: value },
+	            async: false, // Set async to false to make the request synchronous
+	            success: function(data) {
+	                var resp = data;
+	                if (resp.length > 0) {
+	                    if (resp.split('(')[1].split(')')[0] == 'INDOOR') {
+	                        status = true;
+	                    } else {
+	                        status = false;
+	                    }
+	                }
+	            },
+	            error: function(xhr, status, error) {
+	                console.error("Something went wrong.");
+	            }
+	        });
+	    }
+	    hideLoader();
+	    return status;
+	}
+
+	function getFacilities(selFacId){
+		debugger
+		
+		var selOrg='${fac.organization}';
+		var selDwnLvl='${fac.dowlLvl}';
+		
+		var orgId=$("#orgIdAndTypeId").val();
+		var dowlLvlId=$("#upperEntityId").val();
+		
+		if(selOrg!='' && selDwnLvl!=''){
+			var orgId=selOrg;
+			var dowlLvlId=selDwnLvl;
+		}
+		
+		$.ajax({
+			url: "${contextPath}/facility/getFacilityByOrgAndDownlvl",
+			type: "GET",
+			data: {
+				"orgId": orgId,
+				"dowlLvlId": dowlLvlId
+			},
+			success: function(response){
+				if(response.outcome){
+					var html = "<option value='' selected>--Select--</option>";
+					var data = response.data;
+					if(data != "" && data != null && data.length > 0){
+						$.each(data, function(index, value){
+//	 						let selected = "";
+//	 						if(value.parentId == parentIdHiddenId){
+//	 							selected = "selected";
+//	 						}
+							html += '<option value="' + value.parentId + '">' + value.parentName + '</option>';
+						});
+					}
+					$('#facilityId').empty().append(html);
+					if(selFacId!=''){
+						$('#facilityId').val(selFacId);
+					}
+				}
+			},
+			error: function(error){
+				//bootbox.alert("Failure"); 
+			}
+		});
+		
+	}
+
+	$(document).ready(function() {
+		debugger
+		var selFacId='${fac.facilityId.facilitiesMapId}'
+		//setTimeout(getFacilities, 2000);
+		setTimeout(function() {
+		    getFacilities(selFacId);
+		}, 2000);
+
+	});
+	
+	$(document).ready(function() {
+		debugger
+		var selOrg='${fac.organization}';
+		var selDwnLvl='${fac.dowlLvl}';
+		
+		if(selOrg!='' && selDwnLvl!=''){
+			$("#orgIdAndTypeId").val(selOrg);
+			$("#upperEntityId").val(selDwnLvl);
+		}
+		
+		setTimeout(function() {
+			   var upperEntityId=$("#upperEntityId").val();
+			   var check ='${not empty fac}';
+			   if(check!='false'){
+				   $("#upperEntityId").val(selDwnLvl);
+			   }
+			  
+			}, 2000);
+
+	});
+	
+	function editBookinhgFacilityDetails(hdnBkRqstId){
+		debugger
+		 $("#hdnBkRqstId").val(hdnBkRqstId);
+		 $("#editBookinhgFacilityDetails").submit();
+	}
+</script>
+

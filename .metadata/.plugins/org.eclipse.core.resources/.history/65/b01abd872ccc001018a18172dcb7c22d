@@ -1,0 +1,238 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/AadharVaidator.js"></script>
+<%--<jsp:useBean id="strUtils" class="com.aashdit.demography.utils.ApplicationStringUtils"/>--%> 
+            <div class="content">
+                <div class="panel-header bg-primary-gradient">
+					<div class="page-inner">
+						<div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+ 							<div>
+								<h2 class="text-blue pb-2 fw-bold">Fund Transaction</h2>
+							</div> 
+							<div class="ml-md-auto py-1 py-md-0">
+								<a href="${contextPath}" class="btn btn-sm btn-border btn-blue btn-round mr-2"><i class="fa fa-home"></i></a>
+								<a href="#" class="btn btn-sm btn-border btn-blue btn-round mr-2">/ Fund Transaction</a>
+							</div>
+						</div>
+					</div>
+				</div>
+                <div class="page-inner">
+                    <div class="row mt--2">
+                        <div class="col-md-12">
+                            <div class="card full-height">
+                                <div class="card-header">
+                                    <h4 class="card-title">${not empty income ? 'Fund Transaction' : 'Fund Transaction' }</h4>
+                                    <div class="panel-actions">
+                                        <a href="#" class="fa fa-caret-down"></a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                
+                                  <form class="form-horizontal" action="${contextPath}/fnd/fund/transaction/add" method="post" enctype="multipart/form-data" id="transactionForm">
+								    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+								    <input type="hidden" name="incomeId" value="${income.incomeId}"/>
+								    <input type="hidden" name="status" id="status"/>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="col-md-12 smallInput required" for="">Financial Year :</label>
+                                                <div class="col-md-12">
+                                                    <select class="form-control form-control-sm" id="finyearId" name="finyear.finyearId" >
+                                                        <option value="">--Select--</option>
+                                                        <c:forEach items="${lstFinyear}" var="finyear">
+															 <option value="${finyear.finyearId}" ${(finyear.finyearId eq income.finyear.finyearId) or (finyear.currFinYear eq true) ?'selected':'' }>${finyear.finYear}</option> 
+															<%-- <option value="${finyear.finyearId}" ${finyear.finyearId eq income.finyear.finyearId  ?'selected':'' }>${finyear.finYear}</option> --%>
+														</c:forEach>
+                                                        
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="col-md-12 smallInput required" for="">Scheme Component Name :</label>
+                                                <div class="col-md-12">
+                                                    <select class="form-control form-control-sm" name="schemeId" id="schemeId" onchange="findEntityBeneficiaryMapListBySchemeIdAndBenfId()">
+                                                       <option value="">--Select--</option>
+                                                        <c:forEach items="${mstSchemeList}" var="mstScheme">
+															<option value="${mstScheme.schemeId}" ${mstScheme.schemeId eq income.entitySchemeMapping.scheme.schemeId ?'selected':'' }>${mstScheme.schemeName}</option>
+														</c:forEach>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="col-md-3 ">
+                                            <div class="form-group">
+                                                <label class="col-md-12 smallInput required" for="">Entity Type :</label>
+                                                <div class="col-md-12">
+                                                    <select class="form-control form-control-sm" id="entityTypeId" name="entitySchemeMapping.entitySchemeId" onchange="getEntityNameByEntityTypeOrDistrictId();">
+                                                        <option value="">--Select--</option>
+                                                       <c:forEach items="${lstEntitySchemeMapping}" var="entitySchemeMapping">
+															<option value="${entitySchemeMapping.entitySchemeId}" ${entitySchemeMapping.entitySchemeId eq fund.entitySchemeMapping.entitySchemeId ?'selected':'' }>${entitySchemeMapping.cboType.valueEn}</option>
+														</c:forEach>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="required">Amount :</label>
+                                                <div class="col-md-12">
+                                                    	<input type="hidden" class="form-control form-control-sm x-turnover" id="turnover1"  value="${income.amount}" maxlength="15">
+												<input type="text" class="form-control form-control-sm x-turnover NumbersOnlyForAmount" name="amount" id="turnover1Converted" value="${strUtils.convertAmountToINRFormat(income.amount)}" maxlength="15" onchange="currencyConverter(this.value,'turnover1Converted')">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 mt-3 text-center">
+                                           <button type="button"  value="PENDING" class="btn btn-sm btn-success" onclick="saveTransactionForm(this.value);">Submit</button>
+                                        <a href="${contextPath}/fnd/income/list" class="btn btn-sm btn-danger">Back</a>
+                                    </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+ <script>
+ 
+ $(function() {
+	 $('.disbursDate').datepick({
+				onShow : $.datepick.monthOnly,
+				dateFormat : 'dd/mm/yyyy',
+				yearRange : "-100:+20",
+				maxDate: '0',
+				showOnFocus : true,
+				showTrigger : '<button type="button" class="trigger">'
+						+ '<i class="fa fa-calendar"></i></button>',
+			   onSelect: function(selected) {
+			     var date = new Date(selected);
+			  
+			     
+					var fyear= $("#finyearId option:selected").text().split("-");
+				    	var firstDate = 01 + "/" + 04 + "/" +fyear[0];
+				    	var lastDate =  31 + "/" + 03 + "/" +fyear[1];	
+					
+					var sDate = firstDate.replace(/(\d+[/])(\d+[/])/, '$2$1');
+					var tDate = lastDate.replace(/(\d+[/])(\d+[/])/, '$2$1');
+					var data1 = new Date(sDate);
+					var data2 = new Date(tDate);
+				    if((date <= data2 && date >= data1)) {
+				    //alert(this.id);
+				    }else{
+				    	 $("#"+this.id).val("");
+				    	 bootbox.alert("Please select date between the financial year .")
+				    }
+			    }
+			}); 
+	 findEntityBeneficiaryMapListBySchemeIdAndBenfId();
+}); 
+ 
+ 
+ 
+ 
+ function findSubHeadListByHeadId(headId){
+		$.ajax({
+			type : "GET",
+			url : '${contextPath}/ecashcommon/findSubHeadListByHeadId',
+			dataType : "json",
+			data : {
+				"headId" : headId,
+			},
+			success : function(response) {
+				var html = "<option value='' selected>-Select-</option>";
+				var data = response;
+				if (data != "" && data != null && data.length > 0) {
+					$.each(data, function(index, value) {
+						html = html + "<option value="+value.subHeadId+">"
+								+ value.subHeadName + "</option>";
+					});
+				}
+				$('#subHeadId').empty().append(html);
+			},
+			error : function(error) {
+				bootbox.alert("Something went wrong !!!");
+			}
+		});
+}
+ 
+
+ 
+ function findEntityBeneficiaryMapListBySchemeIdAndBenfId(){
+	 var schemeId= $("#schemeId").val();
+	 if(schemeId != ""){
+	 $.ajax({
+			type : "GET",
+			url : '${contextPath}/fnd/income/findEntityBeneficiaryMapListBySchemeIdAndBenfId',
+			dataType : "json",
+			data : {
+				"schemeId" : schemeId,
+			},
+			success : function(response) {
+				var html = "<option value='' selected>-Select-</option>";
+				var data = response;
+				if (data != "" && data != null && data.length > 0) {
+					$.each(data, function(index, value) {
+						html = html + "<option value="+value.entityBenfId+">"
+								+ value.entityName + "</option>";
+					});
+				}
+				$('#entityTypeId').empty().append(html);
+				$("#entityTypeId").val('${income.entityBeneficiaryMapping.entityBeneficiaryId}');
+			},
+			error : function(error) {
+				bootbox.alert("Something went wrong !!!");
+			}
+		});
+	 }
+ }
+ 
+ 
+ 
+ $('.NumbersOnlyForAmount').keypress(
+			function(event) {
+				var regex = new RegExp("^[0-9.]+$");
+				var key = String.fromCharCode(!event.charCode ? event.which
+						: event.charCode);
+				if (!regex.test(key)) {
+					event.preventDefault();
+					return false;
+				}
+});
+ 
+
+ 
+ function saveTransactionForm(status){
+	 if($("#finyearId").val() == ""){
+		bootbox.alert("Please Select Financial Year.");
+		$("#accountNo").focus();
+		return false;
+	 }else if($("#schemeId").val() == ""){
+			bootbox.alert("Please select scheme component name.");
+			$("#schemeId").focus();
+			return false;	
+	 }else if($("#entityTypeId").val() == ""){
+			bootbox.alert("Please select Entity Type.");
+			$("#entityTypeId").focus();
+			return false;		
+	 }else if($("#turnover1Converted").val() == "0.00" || $("#turnover1Converted").val() == ""){
+		bootbox.alert("Please enter amount .");
+		$("#turnover1Converted").focus();
+		return false;
+	 }else{
+		 var flag = window.confirm("Do you want to continue ?");
+	  		if (flag == true) {
+	  			$('#transactionForm select').prop('disabled', false);
+	  			$("#transactionForm").submit();
+	  		}else{
+	  			e.preventDefault();
+	  		} 
+	 }
+ }
+ </script>           
+    

@@ -1,0 +1,160 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<!-- Card Form -->
+<div class="card mt-3">
+    <div class="card-header">
+        <c:choose>
+            <c:when test="${not empty building}">
+                <h5 class="card-title">Update Building Planning</h5>
+            </c:when>
+            <c:otherwise>
+                <h5 class="card-title">Add Building Planning</h5>
+            </c:otherwise>
+        </c:choose>
+    </div>
+    <div class="card-body">
+        <div class="container-fluid mt-3">
+            <!-- Progress Bar + Step Circles -->
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="progress px-1" style="height: 4px">
+                        <div class="progress-bar" 
+                             role="progressbar" 
+                             style="width: 0%; background-color: rgb(169 78 38)"
+                             aria-valuenow="0" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <div class="step-container d-flex justify-content-between p-0 m-0">
+                        <div class="step-circle" onclick="displayStep(1)">1</div>
+                        <div class="step-circle" onclick="displayStep(2)">2</div>
+                    </div>
+                    <div class="step-container d-flex justify-content-between p-0 m-0"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- STEP 1: Site Details -->
+                    <div class="step step-1" style="display: block">
+                        <div class="text-center mb-4" style="width: 100%">
+                            <h3 class="instruction-heading mb-0 text-center">Add Site Details</h3>
+                        </div>
+                        <fieldset class="p-3">
+                            <%@ include file="/WEB-INF/views/BAMS/building-planning-details/tab1-planning.jsp"%>
+                        </fieldset>
+                    </div>
+
+                    <!-- STEP 2: Building Details -->
+                    <div class="step step-2" style="display: none">
+                        <div class="text-center mb-4" style="width: 100%">
+                            <h3 class="instruction-heading mb-0 text-center">Add Building Details</h3>
+                        </div>
+                        <fieldset class="p-3">
+                            <%@ include file="/WEB-INF/views/BAMS/building-planning-details/tab2-sanction.jsp"%>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="tabId" name="tabId" value="${tabId}" />
+<input type="hidden" id="isEditMode" name="isEditMode" value="${building.buildingDTO.isEditMode}" />
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var isEditMode = document.getElementById("isEditMode").value === "true";
+    var currentStep = 1;
+    var backendTabId = parseInt(document.getElementById("tabId").value) || 1;
+
+    // Make sure backendTabId is safe
+    if (backendTabId < 1) backendTabId = 1;
+    if (backendTabId > 2) backendTabId = 2;
+
+    window.displayStep = function(stepNumber) {
+        var targetStep = parseInt(stepNumber);
+
+        // ========== EDIT MODE → FREE ACCESS ==========
+        if (isEditMode) {
+            if (targetStep >= 1 && targetStep <= 2) {
+                $(".step").hide();
+                $(".step-" + targetStep).show();
+                currentStep = targetStep;
+                updateProgressBar();
+                updateStepCircle();
+            }
+            return;
+        }
+
+        var currentAllowedStep = parseInt($('#tabId').val()) || 1;
+
+        // Block jumping ahead
+        if (targetStep > currentAllowedStep) {
+            bootbox.alert("Please complete and save the previous step first.");
+            return;
+        }
+
+        // Validate before going from Step 1 → Step 2
+        if (currentStep === 1 && targetStep === 2) {
+            if (typeof submitFormData === 'function') {
+                if (!submitFormData()) {
+                    bootbox.alert("Please correct all errors in Site Details before proceeding.");
+                    return;
+                }
+            }
+        }
+
+        // All good → show the step
+        $(".step").hide();
+        $(".step-" + targetStep).show();
+        currentStep = targetStep;
+        updateProgressBar();
+        updateStepCircle();
+    };
+
+    $(document).ready(function () {
+        // DO NOT force show Step 1 blindly!
+
+        var stepToShow;
+
+        if (isEditMode) {
+            // In edit mode → trust backend tabId fully
+            stepToShow = backendTabId;
+        } else {
+            // In normal mode → only allow up to what's saved
+            var allowedStep = parseInt($('#tabId').val()) || 1;
+            stepToShow = (backendTabId <= allowedStep) ? backendTabId : 1;
+        }
+
+        // Now safely show the correct step
+        $(".step").hide();
+        $(".step-" + stepToShow).show();
+        currentStep = stepToShow;
+        updateProgressBar();
+        updateStepCircle();
+    });
+});
+
+function updateProgressBar() {
+    var progressPercentage = ((currentStep - 1) / 1) * 100; // 2 steps
+    $(".progress-bar").css("width", progressPercentage + "%");
+}
+
+function updateStepCircle() {
+    $(".step-circle").each(function (index) {
+        var stepIndex = index + 1;
+        if (stepIndex <= currentStep) {
+            $(this).css({ "background-color": "#a34b25", "color": "white" });
+        } else {
+            $(this).css({ "background-color": "#fff", "color": "black" });
+        }
+    });
+}
+</script>

@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MrnReport" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="71458d02-1ae0-433e-9e95-d423f0247c1c">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="296"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="696"/>
+	<subDataset name="Dataset1" uuid="27b3c306-b730-44ff-9f5d-80783e06afdf">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter (3)"/>
+		<queryString language="SQL">
+			<![CDATA[]]>
+		</queryString>
+	</subDataset>
+	<parameter name="CollegeName" class="java.lang.String"/>
+	<parameter name="fromDate" class="java.lang.String"/>
+	<parameter name="toDate" class="java.lang.String"/>
+	<parameter name="supplierId" class="java.lang.Long"/>
+	<parameter name="entityId" class="java.lang.Long"/>
+	<parameter name="entityLevel" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select * from asset_mgmt.fun_procurement_mrn($P{fromDate}, $P{toDate},$P{supplierId}  , $P{entityId}  , $P{entityLevel} )]]>
+	</queryString>
+	<field name="mrn_no" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="mrn_no"/>
+		<property name="com.jaspersoft.studio.field.label" value="mrn_no"/>
+	</field>
+	<field name="mrn_date" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="mrn_date"/>
+		<property name="com.jaspersoft.studio.field.label" value="mrn_date"/>
+	</field>
+	<field name="remarks" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="remarks"/>
+		<property name="com.jaspersoft.studio.field.label" value="remarks"/>
+	</field>
+	<field name="received_quantity" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="received_quantity"/>
+		<property name="com.jaspersoft.studio.field.label" value="received_quantity"/>
+	</field>
+	<field name="po_no" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="po_no"/>
+		<property name="com.jaspersoft.studio.field.label" value="po_no"/>
+	</field>
+	<field name="po_approved_date" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="po_approved_date"/>
+		<property name="com.jaspersoft.studio.field.label" value="po_approved_date"/>
+	</field>
+	<field name="vendor_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="vendor_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="vendor_name"/>
+	</field>
+	<field name="store_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="store_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="store_name"/>
+	</field>
+	<field name="item_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="item_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="item_name"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="92" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="550" height="20" uuid="ea8f93a2-5d0d-4b0d-a228-28fbadb43915"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="13" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CollegeName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="20" width="550" height="20" uuid="c3673a84-7037-4a1e-8060-b59b1e1bcac4"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Material Register Report"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="60" y="40" width="100" height="20" uuid="d09c4584-72e6-4dd7-a989-49b0bd7fa7bc"/>
+				<textFieldExpression><![CDATA[$P{fromDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="40" width="60" height="20" uuid="57464e89-49ce-4d49-bc48-54675a73e98f"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[From Date : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="60" width="60" height="20" uuid="785b18a5-6193-47f5-83d2-3751b080d434"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[To Date : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="60" y="60" width="100" height="20" uuid="0380e1dc-9031-468a-853d-ecf8fa3b8aa3"/>
+				<textFieldExpression><![CDATA[$P{toDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="420" y="40" width="60" height="20" uuid="8c91dc57-bbe1-4447-b5c3-f712c3834bdc"/>
+				<text><![CDATA[Run Date : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="420" y="60" width="60" height="20" uuid="9b144910-be53-4bda-84e5-d08434324b43"/>
+				<text><![CDATA[Run Time : ]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="480" y="40" width="70" height="20" uuid="36d2d43f-7770-4991-a27b-3b1d50c5bffb"/>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd/MM/yyyy").format(new Date())]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH:mm">
+				<reportElement x="480" y="60" width="70" height="20" uuid="9812e8fb-acc7-4fae-8b17-b31c7fc9fbdb"/>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("hh:mm:ss a").format(new Date())]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="31" splitType="Stretch">
+			<staticText>
+				<reportElement x="60" y="0" width="70" height="31" uuid="9b498597-a75e-4952-90aa-b16355a18aa6"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[MRN No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="130" y="0" width="70" height="31" uuid="733b20a2-9dc2-4b60-a994-5e8fd7a1bd90"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[MRN Date	]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="0" width="90" height="31" uuid="627c218f-433d-40fc-9f65-0d31d0b75790"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PO No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="290" y="0" width="70" height="31" uuid="8bb3793c-8ce1-4732-a7a9-7ecb378b9dcd"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PO Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="360" y="0" width="70" height="31" uuid="18e9bce2-191c-4b48-a091-4231e302bf65"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Supplier Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="430" y="0" width="45" height="31" uuid="d8a3a8fc-c5f4-439c-8265-d4e87082dfc7"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[MRN Quantity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="475" y="0" width="75" height="31" uuid="4b3d86b1-f25f-455a-98c2-b16f950d340b"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Remarks]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="60" height="30" uuid="36a98053-ff0d-4ac7-8be3-385c6bea3b79"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sl No.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="70" splitType="Stretch">
+			<textField>
+				<reportElement x="140" y="0" width="410" height="20" uuid="bd4f4aff-23d1-40e9-a791-39be7f263c29"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  " +$F{store_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="60" y="0" width="80" height="20" uuid="1645363b-c6b0-4126-8345-74e170989e31"/>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Store Name ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="60" y="20" width="80" height="20" uuid="acf4abed-49b2-4666-8fc6-604dec2cce97"/>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Item Name ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="140" y="20" width="410" height="20" uuid="514d9102-c125-4863-a910-7b518d285175"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  " +$F{item_name}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="60" y="41" width="70" height="29" uuid="1477fbc2-0ae1-4a6c-bfb9-3d820a0ff5f8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a07b1f26-6f3d-4470-a544-fe7b80db5fdb"/>
+				</reportElement>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{mrn_no}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="130" y="41" width="70" height="29" uuid="38dbf944-f71e-4b44-a918-006bda171cb7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="506479f7-0f57-438d-bf78-5aaf9ad4b6b8"/>
+				</reportElement>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{mrn_date})]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="200" y="41" width="90" height="29" uuid="a5f907ac-335b-432c-a2a2-aa6440ec1820">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="976e9697-7a17-4f24-899a-fb1dd577340d"/>
+				</reportElement>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{po_no}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="290" y="41" width="70" height="29" uuid="10ead968-ea29-4f41-9476-1388d83c415d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1ed7f62c-c498-4065-88c4-93671bb7a8bd"/>
+				</reportElement>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{po_approved_date})]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="360" y="41" width="70" height="29" uuid="abeafa2a-7f91-4d4a-b5be-dad4382a46a1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bb4a3003-3a7c-4683-bcf7-accd7b64eb11"/>
+				</reportElement>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{vendor_name}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="430" y="41" width="45" height="29" uuid="6775bc4b-d185-4311-8536-db6bdb1e9c21">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9d59d6d4-a820-4a6a-a0bd-2d6fd474831d"/>
+				</reportElement>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.text.DecimalFormat("0.00").format($F{received_quantity})]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="475" y="41" width="75" height="29" isPrintWhenDetailOverflows="true" uuid="9d77fec9-be3b-45ae-b327-c004770498cd">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0d349971-7f2b-42f6-b560-6802a5d5b207"/>
+				</reportElement>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None"/>
+				<textFieldExpression><![CDATA[$F{remarks} != null  || $F{remarks} != "" ?  $F{remarks} : "N/A"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="60" height="70" uuid="e3165b4d-5640-49d3-ae22-17ebb3014df3"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

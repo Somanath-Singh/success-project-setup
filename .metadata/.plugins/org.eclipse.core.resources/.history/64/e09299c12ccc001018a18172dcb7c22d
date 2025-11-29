@@ -1,0 +1,367 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+
+<!-- Breadcrumb -->
+<%-- <div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">WEO Inspection List</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i
+						class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active">WEO Inspection List</li>
+			</ol>
+		</nav>
+	</div>
+</div> --%>
+<input type="hidden" id="cipherText" name="cipherText" />
+<input type="hidden" name="${_csrf.parameterName}"
+	value="${_csrf.token}" />
+
+<!-- Image Zoom Modal -->
+<div class="modal fade" id="imageZoomModal" tabindex="-1" aria-labelledby="imageZoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="text-white" id="imageZoomModalLabel">Geo-tagged Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="zoomedImage" src="" alt="Zoomed Image" class="img-fluid" style="max-height: 70vh; object-fit: contain;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a id="downloadImage" href="#" class="btn btn-primary" download>Download</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- WEO Inspection List -->
+<div class="col-md-12 mt-3">
+	<div class="card">
+		<div class="card-header">
+			<h5 class="card-title">WEO Inspection List</h5>
+		</div>
+
+		<div class="row m-3">
+
+		    <div class="col-md-3">
+		        <label class="required">From Date :</label>
+		        <div class="datepicker-box">
+		            <input type="text"
+		                   id="fromDate"
+		                   class="form-control form-control-sm datepicker"
+		                   value="${startDateStr}"
+		                   readonly />
+		        </div>
+		    </div>
+
+		    <div class="col-md-3">
+		        <label class="required">To Date :</label>
+		        <div class="datepicker-box">
+		            <input type="text"
+		                   id="toDate"
+		                   class="form-control form-control-sm datepicker"
+		                   value="${endDateStr}"
+		                   readonly />
+		        </div>
+		    </div>
+
+			<!-- District -->
+			<div class="form-group col-md-3">
+				<label>District :</label> <select
+					class="form-control form-control-sm form-select" id="districtId"
+					onchange="LoadBlockByDistrict(this.value,'blockId')">
+					<option value="0" disabled selected>- Select -</option>
+					<c:forEach var="d" items="${districtList}">
+						<option value="${d.districtId}"
+							${d.districtId eq selectedDistrictId ? 'selected' : ''}>
+							${d.districtName}</option>
+					</c:forEach>
+				</select>
+			</div>
+
+			<!-- Block -->
+			<div class="form-group col-md-3">
+				<label>Block :</label> 
+				<select id="blockId"
+					class="form-control form-control-sm form-select"
+					onchange="LoadGrampanchayatByBlock(this.value,'gpId')">
+					<option value="0" disabled selected>- Select -</option>
+				</select>
+			</div>
+
+			<!-- GP -->
+			<div class="form-group col-md-3">
+				<label>GP :</label> 
+				<select id="gpId"
+					class="form-control form-control-sm form-select"
+					onchange="LoadVillageByGrampanchayat(this.value,'villageId')">
+					<option value="0" disabled selected>- Select -</option>
+				</select>
+			</div>
+
+			<!-- Village -->
+			<div class="form-group col-md-3">
+				<label>Village :</label> <select id="villageId"
+					class="form-control form-control-sm form-select">
+					<option value="0" disabled selected>- Select -</option>
+				</select>
+			</div>
+
+			<!-- WEO Name -->
+			<div class="form-group col-md-3">
+				<label>WEO Name :</label> 
+				<select id="weoName"
+					class="form-control form-control-sm form-select">
+					<option value="">- Select -</option>
+					<c:forEach var="w" items="${weoNameList}">
+						<option value="${w}" ${w eq selectedWeoName ? 'selected' : ''}>${w}</option>
+					</c:forEach>
+				</select>
+			</div>
+
+			<!-- Filter -->
+			<div class="col-md-12 mt-3 text-end">
+				<button type="button" class="btn btn-primary btn-sm"
+					onclick="submitWEOForm()"><i class="fa fa-filter"></i> Filter</button>
+				<a href="${contextPath}/home" class="btn btn-warning btn-sm"><i class="fa fa-rotate-left"></i> Back</a>
+			</div>
+		</div>
+	</div>
+	<div class="card mt-3">
+
+		<!-- Table -->
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="basic-datatables"
+					class="table table-bordered table-hover exportbtn">
+					<thead>
+						<tr>
+							<th class="text-center" style="width: 60px">Sl. No</th>
+							<th>District</th>
+							<th>Block</th>
+							<th>GP</th>
+							<th>Village</th>
+							<th>WEO Name</th>
+							<th>Mobile</th>
+							<th>Location</th>
+							<!-- <th>Created On</th> -->
+							<th>Geo-tagged Image</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+
+					<tbody>
+						<c:forEach var="row" items="${inspectionList}" varStatus="count">
+							<tr>
+								<td class="text-center">${count.count}</td>
+								<td>${row.districtName}</td>
+								<td>${row.blockName}</td>
+								<td>${row.gpName}</td>
+								<td>${row.villageName}</td>
+								<td>${row.weoName}</td>
+								<td>${row.mobileNumber}</td>
+								<td>${row.locationName}</td>
+								<%-- <td>${row.createdOn}</td> --%>
+								<td>
+									<img src="${pageContext.request.contextPath}/weo/fetchGeoImageByInspectionId?inspectionId=${row.weoInspectionId}"
+										style="width: 60px; height: 60px; object-fit: cover; cursor: zoom-in;"
+										class="zoomable-image"
+										data-image-src="${pageContext.request.contextPath}/weo/fetchGeoImageByInspectionId?inspectionId=${row.weoInspectionId}"
+										onclick="zoomImage(this)"
+										title="Click to zoom">
+								</td>
+								<td class="text-center">
+									<button class="btn btn-primary btn-sm"
+										onclick="editWEOInspection(${row.weoInspectionId})"
+										title="Edit">
+										<i class="fa-solid fa-eye"></i>
+									</button>
+								</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<form action="${contextPath}/weo/filterWEOInspection" method="get"
+	id="weoFilterForm">
+	<input type="hidden" name="${_csrf.parameterName}"
+		value="${_csrf.token}"> <input type="hidden" name="cipherText"
+		id="cipherFilter">
+  <input type="hidden" id="hidFromDate" name="fromDate">
+    <input type="hidden" id="hidToDate" name="toDate">
+</form>
+
+<form id="editWEOForm" action="${contextPath}/weo/inspection/edit"
+	method="post">
+	<input type="hidden" id="inspectionEditId" name="weoInspectionId">
+	<input type="hidden" id="editCipherText" name="cipherText"> <input
+		type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+</form>
+
+
+<script>
+function zoomImage(imgElement) {
+    const imageSrc = imgElement.getAttribute('data-image-src');
+    const zoomedImage = document.getElementById('zoomedImage');
+    const downloadLink = document.getElementById('downloadImage');
+    
+    zoomedImage.src = imageSrc;
+    
+    downloadLink.href = imageSrc;
+    downloadLink.download = 'geo-tagged-image.jpg';
+    
+    const modal = new bootstrap.Modal(document.getElementById('imageZoomModal'));
+    modal.show();
+}
+
+document.addEventListener('keydown', function(event) {
+    const modal = document.getElementById('imageZoomModal');
+    if (modal.classList.contains('show')) {
+        if (event.key === 'Escape') {
+            bootstrap.Modal.getInstance(modal).hide();
+        }
+    }
+});
+
+$(document).ready(function () {
+	
+    var selectedDistrictId = "${selectedDistrictId}";
+    var selectedBlockId = "${selectedBlockId}";
+    var selectedGpId = "${selectedGpId}";
+    var selectedVillageId = "${selectedVillageId}";
+
+    if(selectedDistrictId){
+        LoadBlockByDistrict(selectedDistrictId);
+
+        setTimeout(function(){
+            $("#blockId").val(selectedBlockId);
+
+            if(selectedBlockId){
+                LoadGrampanchayatByBlock(selectedBlockId);
+
+                setTimeout(function(){
+                    $("#gpId").val(selectedGpId);
+
+                    if(selectedGpId){
+                        LoadVillageByGrampanchayat(selectedGpId);
+
+                        setTimeout(function(){
+                            $("#villageId").val(selectedVillageId);
+                        }, 500);
+                    }
+                }, 500);
+            }
+        }, 500);
+    }
+});
+
+function editWEOInspection(id) {
+    let jsonData = {
+        weoInspectionId: id,
+        _csrf: $("input[name='_csrf']").val()
+    };
+
+    $("#editCipherText").val(
+        enc_password(JSON.stringify(jsonData))
+    );
+
+    bootbox.confirm("Do you want to continue?", function (result) {
+        if (result) {
+            $("#editWEOForm").submit();
+        }
+    });
+}
+
+function submitWEOForm() {
+    let fd = $("#fromDate").val();
+    let td = $("#toDate").val();
+
+    // Update hidden fields so backend doesn't erase state
+    $("#hidFromDate").val(fd);
+    $("#hidToDate").val(td);
+
+    let data = {
+        districtId: $("#districtId").val(),
+        blockId: $("#blockId").val(),
+        gpId: $("#gpId").val(),
+        villageId: $("#villageId").val(),
+        weoName: $("#weoName").val(),
+        fromDate: convertDateForBackend(fd),
+        toDate: convertDateForBackend(td),
+        _csrf: $("input[name='_csrf']").val()
+    };
+
+    $("#cipherFilter").val(enc_password(JSON.stringify(data)));
+    $("#weoFilterForm").submit();
+}
+
+function viewInspection(id) {
+    let jsonData = {
+        weoInspectionId: id,
+        _csrf: $("input[name='_csrf']").val()
+    };
+
+    $("#cipherView").val(enc_password(JSON.stringify(jsonData)));
+    $("#viewForm").submit();
+}
+
+$(document).ready(function () {
+    if (typeof $.datepick !== 'undefined') {
+      $(".datepicker").datepick({
+        dateFormat: "dd-mm-yyyy",
+        yearRange: "c-20:c+10",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger btn btn-sm"><i class="fa fa-calendar"></i></button>'
+      });
+    } else {
+      console.warn("jQuery Datepick plugin not loaded. Datepicker disabled.");
+    }
+});
+
+
+
+function convertDateForBackend(dateStr) {
+    if (!dateStr) return null;
+    const parts = dateStr.split("-");
+    return `${parts[2]}-${parts[1]}-${parts[0]}`; // yyyy-MM-dd
+}
+
+/* $("#filterForm").on("submit", function () {
+    $("#fromDateServer").val(convertToServerFormat($("#fromDate").val()));
+    $("#toDateServer").val(convertToServerFormat($("#toDate").val()));
+}) */;
+
+
+
+
+
+$(document).ready(function () {
+    let from = "${startDateStr}";
+    let to = "${endDateStr}";
+
+    if (from && from !== "--") {
+        $("#fromDate").val(from);
+        $("#hidFromDate").val(from);
+    }
+    if (to && to !== "--") {
+        $("#toDate").val(to);
+        $("#hidToDate").val(to);
+    }
+});
+
+
+
+</script>

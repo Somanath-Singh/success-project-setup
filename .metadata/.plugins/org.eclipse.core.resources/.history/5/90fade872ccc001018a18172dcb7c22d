@@ -1,0 +1,28 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<div class="modal fade" id="wflowModal" tabindex="-1" role="dialog" aria-labelledby="wflowModalLabel" aria-hidden="true" data-backdrop="static" >
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-info"><h5 class="modal-title" id="incomeModalLabel">Staff Authority Details </h5></div>
+				<div class="modal-body" id="modal-details-body">
+			         <c:forEach items="${staffDesnWflowDetails}" var="wrkFlwDtls" varStatus="wcount">
+						<h6 class="headingbg mb-4">${wrkFlwDtls.staffWflowDetailsList} Authority Level : ${wrkFlwDtls.repAuthLevel} (${wrkFlwDtls.staffDesgn}) ${wrkFlwDtls.isSectionAvl ? '(' : ''}  ${wrkFlwDtls.isSectionAvl ? wrkFlwDtls.departmentName : ''} ${wrkFlwDtls.isSectionAvl ? ')' : ''}</h6>
+						<input type="hidden" name="staffDesnWflowAuthDetailsList[${wcount.count-1}].repAuthLevel" value="${wrkFlwDtls.repAuthLevel}">
+					 	<input type="hidden" name="staffDesnWflowAuthDetailsList[${wcount.count-1}].moduleCode" value="${wrkFlwDtls.moduleCode}">
+					 	<input type="hidden" name="staffDesnWflowAuthDetailsList[${wcount.count-1}].orgType" value="${wrkFlwDtls.orgType}">
+					 	<input type="hidden" name="staffDesnWflowAuthDetailsList[${wcount.count-1}].orgTypeId" value="${wrkFlwDtls.orgTypeId}">
+					 	
+				 	<c:forEach items="${wrkFlwDtls.staffWflowDetailsList}" var="stfWrkFlwDtls" varStatus="scount">
+							<input type="checkbox" checked id="checkBoxId${wcount.count-1}${scount.count-1}" name="staffDesnWflowAuthDetailsList[${wcount.count-1}].staffWflowDetailsList[${scount.count-1}].staffId" 
+								style="float: left; margin: 1px 2px 0 0px; pointer-events: none;" value="${stfWrkFlwDtls.staffId}" >
+							<Label style="color : blue">${stfWrkFlwDtls.staffName} (${stfWrkFlwDtls.staffCode}) </Label><br>
+						</c:forEach> 
+					</c:forEach>
+	      		</div>                      
+	      		<div class="modal-footer">
+	        		<button type="button" class="btn btn-submit btn-sm" id="wfSubmitBtn" onclick="submitWflowForm()">Submit</button>
+	        		<button type="button" class="btn btn-danger btn-sm"  data-bs-dismiss="modal">Close</button>
+	      		</div>
+    		</div>
+  	  </div>
+</div>

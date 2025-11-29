@@ -1,0 +1,367 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="voucherTypee" value="${voucherDto.voucherTypeId}" />
+<c:set var="stageId" value="${voucherStageId}"/>
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+
+<style>
+.modaltabledata th {
+    line-height: 16px;
+    font-size: 13px !important;
+    font-weight: 400;
+}
+.tablemodal .modal-footer{
+padding:0
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-exit{
+margin-top:7px;
+}
+.modaltop-data {
+    font-size: 14px;
+}
+.tablemodal .modal-body {
+    padding-bottom: 0;
+}
+.lftdata {
+    width: 50%;
+    float: left;
+    font-size: 14px;
+}
+.rgtdata {
+    width: 50%;
+    float: right;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+.is-invalid {
+	border-color: red;
+}
+
+.tableizer-table td {
+	border: 1px dotted #CCC;
+}
+
+.tableizerTitleRow {
+	text-align: left;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+.table>tbody>tr>td {
+	word-break: break-all;
+}
+
+.datepicker_con>input {
+	width: 100%;
+	border-radius: 3px;
+	border: 1px solid #aaaaaa;
+}
+
+.datepicker_con>button {
+	display: none;
+}
+
+.dif-color {
+	background: #094328;
+}
+
+ .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-left {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header-right {
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .nested-table th, .nested-table td {
+            padding: 5px;
+            font-size: 12px;
+        }
+
+        .nested-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .nested-table th, .nested-table td {
+            border: 1px solid #ddd;
+        }
+
+        .transaction-table-wrapper {
+            padding: 10px 0;
+        }
+
+</style>
+
+<script>
+$(function()
+{
+	$('#datatable-default').dataTable({
+ 		"bSort": false,
+ 		"autoWidth": false
+	});
+})
+</script>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Income & Expenditure Report</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Income & Expenditure Report</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Income & Expenditure Report</h5>
+			</div>
+            <div class="card-body"id="partyDtlsInRequest">
+                <form class="form-horizontal form-bordered" action="${contextPath}/report/income_expenditure" method="get" id="filter" >
+                     <input type="hidden" value="true" id="labelmsg" name="labelmsg">
+                         <div class="row">
+										<c:set var="ownFunctions" value="getSelectedLowerEntity" />
+									    <c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+										<c:set var="upperOrDown" value="down" />
+										<c:set var="functionList2" value=""/>
+										<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+												<div class="col-md-2 col-sm-3">
+												    <div class="form-group">
+												        <label for="FinancialYear" class="required">Select Financial Year :</label>
+												        <div class="col-md-12">
+												            <select class="form-control require remove form-select" name="finYearId" id="finYearId" onchange="getFinYearStartEndDates(this.value,'N');" data-plugin-selectTwo>
+												                <c:forEach items="${loadData.finYearList}" var="fin">
+												                    <option value="${fin.finyearId}" ${fin.finyearId eq reportData.finYearId ?'selected':''}>${fin.finYear}</option>
+												                </c:forEach>
+												            </select>
+												        </div>
+												    </div>
+												</div>
+
+											<%-- 	<div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="FinancialYear" class="required ">Division </label> 
+														  <div class="col-md-12"><!-- onchange="gettingDepartmentList(this.value,0);"  -->
+															<select class="form-control require remove form-select" name="officeMasterId" id="officeMasterId" data-plugin-selectTwo>
+										                        <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+										                        <c:forEach items="${loadData.officeMasterList}" var="off">
+																	  <option value="${off.id}">${off.name}</option> 
+																</c:forEach>
+										                 	</select>
+														</div>
+													</div>
+												</div> --%>
+												<div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="VoucherDate">Start Date :</label>
+															 <input class="form-control form-control-sm require remove disabled"  type="text" id="startDate" name="startDate" value="${voucherMasterDto.finalVoucherDate}" readonly>
+													</div>
+												</div>
+												<div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="VoucherDate">End Date :</label>
+															 <input class="form-control form-control-sm require remove disabled"  type="text" id="endDate" name="endDate" value="${voucherMasterDto.finalVoucherDate}" readonly>
+													</div>
+												</div>
+											</div>
+											
+											
+											<div class="row mt-3">
+							                    <div class="col-sm-12" style="">
+							                        <div class="form-group text-center">
+							                            <button type="button" class="btn btn-success" onclick="submitFormData();">
+							                                <spring:message code="COMMON.BUTTON.FILTER" />
+							                            </button>
+							                            <a href="${contextPath}/home">
+							                                <input type="button" class="btn btn-warning" value=<spring:message code="COMMON.BUTTON.BACK"></spring:message>>
+							                            </a>
+							                        </div>
+							                    </div>
+							                </div> 
+							                <hr>
+							   
+							    
+									     </form>
+								 <div class="col-md-12 col-sm-12" style="text-align:center">
+								<!-- <img src="/fams/assets/image/aashdit-A.png" style="width: 48px;">
+									<h3>AASHDIT TECHNOLOGIES LLP.</h3>
+									<h5>4th floor, Galaxy Mall,Raghunathpur, Bhubaneswar</h5> -->
+									<h5>${loadData.organisationName}</h5>
+								</div>
+								<div class="row m-2">
+									<div class="col-md-12 text-center"><h3 style="text-decoration: underline;color: black;">Income & Expenditure</h3></div>
+								</div>
+							    <div class="row">             
+							       <div class="col-md-6">
+                                        
+                                        <table class="table table-bordered">
+
+                                            <thead>
+                                            <tr>
+                                        		<td colspan="5" class="text-center" style="background: #00ffff80;"><h5 style="margin: 0;color: #0f0e47;font-weight: 600;">Income</h5></td>
+                                        	</tr>
+                                                <tr>
+                                                    <th style="min-width: 107px;">Voucher Date</th>
+                                                    <th style="min-width: 107px;">Voucher No</th>
+                                                    <th style="min-width: 107px;">Voucher Type</th>
+                                                    <th style="min-width: 107px;">Particular</th>
+                                                    <th>Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:forEach var="income" items="${reportData.incomeList}">
+                                                    <tr>
+                                                        <td>${income.voucher_approved_on}</td>
+                                                        <td>${income.voucher_no} - ${income.final_voucher_no}</td>
+                                                        <td>${income.voucher_type_name}</td>
+                                                        <td>${income.account_code} | ${income.account_group_name}</td>
+                                                        <td class="text-end">
+                                                            <c:choose>
+                                                                <c:when test="${income.credit_amount > 0.00}">
+                                                                    ${income.credit_amount}
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    ${income.debit_amount}
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Table for Expenditure Section -->
+                                    <div class="col-md-6">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <tr>
+                                        		<td colspan="5" class="text-center" style="background: #00ffff80;"><h5 style="margin: 0;color: #0f0e47;font-weight: 600;">Expenditure</h5></td>
+                                        	</tr>
+                                                <tr>
+                                                    <th style="min-width: 107px;">Voucher Date</th>
+                                                     <th style="min-width: 107px;">Voucher No</th>
+                                                    <th style="min-width: 107px;">Voucher Type</th>
+                                                    <th style="min-width: 107px;">Particular</th>
+                                                    <th>Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:forEach var="expenditure" items="${reportData.expenditureList}">
+                                                    <tr>
+                                                        <td>${expenditure.voucher_approved_on}</td>
+                                                        <td>${expenditure.voucher_no} - ${expenditure.final_voucher_no}</td>
+                                                        <td>${expenditure.voucher_type_name}</td>
+                                                        <td>${expenditure.account_code} | ${expenditure.account_group_name}</td>
+                                                        <td class="text-end">
+                                                            <c:choose>
+                                                                <c:when test="${expenditure.credit_amount > 0.00}">
+                                                                    ${expenditure.credit_amount}
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    ${expenditure.debit_amount}
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+ 
+
+<script>
+
+$(document).ready(function() {
+
+    var finYear = $("#finYearId").val();
+    var startDateStr = '${reportData.startDateStr}';
+    var endDateStr = '${reportData.endDateStr}';
+    var officeMasterId = '${reportData.officeMasterId}';
+
+    if (startDateStr === '' && endDateStr === '') {
+        getFinYearStartEndDates(finYear, 'N');
+    } else {
+        $("#startDate").val(startDateStr);
+        $("#endDate").val(endDateStr);
+    }
+    
+    if (officeMasterId != '') {
+        $("#officeMasterId").val(officeMasterId);
+    }
+
+});
+
+
+
+function submitFormData(){
+	if($("#upperEntityId").val()==''){
+		bootbox.alert("please select the entity..");
+		return false;
+	}
+	
+	if(validateForm()){
+	 if(encryptFormData('filter', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('filter');
+		 }
+	}
+	
+}
+
+function getSelectedLowerEntity(){
+	var entityIdLevelCombo= '${entityIdLevelCombo}';
+	 $("#upperEntityId").val(entityIdLevelCombo);
+ }
+
+</script>

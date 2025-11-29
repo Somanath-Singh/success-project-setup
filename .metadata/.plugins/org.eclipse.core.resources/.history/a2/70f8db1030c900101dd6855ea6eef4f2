@@ -1,0 +1,395 @@
+package com.aashdit.prod.heads.hims.ipms.service;
+
+import java.util.Comparator;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.aashdit.prod.heads.hims.ipms.dto.GenericDTO;
+import com.aashdit.prod.heads.hims.ipms.dto.GenericMenuDTO;
+import com.aashdit.prod.heads.hims.ipms.dto.UserVO;
+import com.aashdit.prod.heads.hims.ipms.model.District;
+import com.aashdit.prod.heads.hims.ipms.model.MST_State;
+import com.aashdit.prod.heads.hims.ipms.model.MasterType;
+import com.aashdit.prod.heads.hims.ipms.model.Year;
+import com.aashdit.prod.heads.hims.ipms.repository.DistrictRepository;
+import com.aashdit.prod.heads.hims.ipms.repository.MasterTypeRepository;
+import com.aashdit.prod.heads.hims.ipms.repository.StateRepository;
+import com.aashdit.prod.heads.hims.ipms.repository.YearRepository;
+import com.aashdit.prod.heads.hims.ipms.utils.ApplicationConstants;
+import com.aashdit.prod.heads.hims.ipms.utils.SecurityHelper;
+import com.aashdit.prod.heads.hims.ipms.utils.ServiceOutcome;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class CommonServiceImpl implements CommonService {
+	
+	@Value("${heads.core.path}")
+	 private String coreUrl ;
+
+	@Autowired
+	private MasterTypeRepository masterTypeRepository;
+
+	@Value("${heads.core.path}")
+    private String customProperty;
+	
+	@Autowired
+	private RestTemplate restTemplate;
+	@Override
+	public ServiceOutcome<List<GenericMenuDTO>> findAllMenuListByAppCode(String appCode) {
+		ServiceOutcome<List<GenericMenuDTO>> svc = new ServiceOutcome<>();
+		try {
+			UserVO user = SecurityHelper.getCurrentUser();
+			String token = user.getJwtForCore();
+			RestTemplate restTemplate = new RestTemplate();
+			HttpEntity<Void> entity = new HttpEntity<>(createHeaders(token));
+
+			String url = coreUrl + ApplicationConstants.ALL_MENU_URI + "/" + appCode;
+			ResponseEntity<ServiceOutcome<List<GenericMenuDTO>>> response = restTemplate.exchange(url, HttpMethod.POST,
+					entity, new ParameterizedTypeReference<ServiceOutcome<List<GenericMenuDTO>>>() {
+					});
+
+			if (response.getStatusCode().is2xxSuccessful()) {
+				svc = response.getBody();
+			} else {
+				svc.setOutcome(false);
+				svc.setMessage("Failed to fetch program levels");
+			}
+		} catch (Exception e) {
+			log.error("Exception occurred while fetching appCode levels", e);
+			svc.setOutcome(false);
+			svc.setMessage("Exception occurred while fetching appCode levels");
+		}
+		return svc;
+	}
+
+	private HttpHeaders createHeaders(String token) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.setBearerAuth(token);
+		return headers;
+	}
+	@Override
+	public ServiceOutcome<List<MasterType>> findAllGenderByIsActiveTrue() {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="GENDER";
+			List<MasterType> genderList = masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(genderList!=null){
+				svc.setOutcome(true);
+				svc.setData(genderList);
+			}
+
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+	
+	@Override
+	public ServiceOutcome<List<GenericDTO>> getUniversityList() {
+		
+		String url = customProperty +"/api/core/allow/getAllUniversityList";
+		ResponseEntity<ServiceOutcome<List<GenericDTO>>> response = restTemplate.exchange(url,
+				org.springframework.http.HttpMethod.GET,
+				null,
+				new ParameterizedTypeReference<ServiceOutcome<List<GenericDTO>>>() {}
+		);
+
+		ServiceOutcome<List<GenericDTO>> serviceOutcome = response.getBody();
+		if (serviceOutcome != null && serviceOutcome.getData() != null) {
+			serviceOutcome.getData().sort(Comparator.comparing(GenericDTO::getName));
+		}
+
+		return serviceOutcome;
+	}
+
+	@Override
+	public ServiceOutcome<?> findIdentityTypeListByIsActiveTrue() {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="IDENTITY";
+			List<MasterType> genderList = masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(genderList!=null){
+				svc.setOutcome(true);
+				svc.setData(genderList);
+			}
+
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> findAllReservationCategoryListByIsActiveTrue() {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="CASTE";
+			List<MasterType> genderList = masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(genderList!=null){
+				svc.setOutcome(true);
+				svc.setData(genderList);
+			}
+
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> findAllReligionByIsActiveTrue() {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="RELIGION";
+			List<MasterType> genderList = masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(genderList!=null){
+				svc.setOutcome(true);
+				svc.setData(genderList);
+			}
+
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> findAllNationalityByIsActiveTrue() {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="NATIONALITY";
+			List<MasterType> genderList = masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(genderList!=null){
+				svc.setOutcome(true);
+				svc.setData(genderList);
+			}
+
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> findAllMaritalStatusByIsActiveTrue() {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="MARITAL";
+			List<MasterType> genderList = masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(genderList!=null){
+				svc.setOutcome(true);
+				svc.setData(genderList);
+			}
+
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> findAllActiveTongueList() {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="MOTHERTONGUE";
+			List<MasterType> genderList = masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(genderList!=null){
+				svc.setOutcome(true);
+				svc.setData(genderList);
+			}
+
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> getAttemptsList(boolean b) {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="ATTEMPT";
+			List<MasterType> attemptList = masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(attemptList!=null){
+				svc.setOutcome(true);
+				svc.setData(attemptList);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> getGradingMasterList(boolean b) {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="GRADING";
+			List<MasterType> attemptList = masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(attemptList!=null){
+				svc.setOutcome(true);
+				svc.setData(attemptList);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> getLevelMasterList(boolean b) {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="LEVEL";
+			List<MasterType> attemptList = masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(attemptList!=null){
+				svc.setOutcome(true);
+				svc.setData(attemptList);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> getDivisionMasterList(boolean b) {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="PASSING";
+			List<MasterType> attemptList = masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(attemptList!=null){
+				svc.setOutcome(true);
+				svc.setData(attemptList);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> getFieldsSpecialisationList(boolean b) {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="SPECIALISATION";
+			List<MasterType> yearList =  masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(yearList!=null){
+				svc.setOutcome(true);
+				svc.setData(yearList);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> getResearchTypeList(boolean b) {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="RESEARCHTYPE";
+			List<MasterType> yearList =  masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(yearList!=null){
+				svc.setOutcome(true);
+				svc.setData(yearList);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<?> getResearchStatusList(boolean b) {
+		ServiceOutcome<List<MasterType>> svc = new ServiceOutcome<>();
+		try{
+			String status="RESEARCHSTATUS";
+			List<MasterType> yearList =  masterTypeRepository.findAllTypeNameByTypeCategory(status);
+			if(yearList!=null){
+				svc.setOutcome(true);
+				svc.setData(yearList);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			svc.setOutcome(false);
+			throw new RuntimeException(e);
+		}
+		return svc;
+	}
+
+	@Override
+	public ServiceOutcome<List<GenericDTO>> getRoleList( ) {
+		ResponseEntity<ServiceOutcome<List<GenericDTO>>> response = restTemplate.exchange(customProperty +
+				"/api/core/allow/getAllDesignationList",
+				org.springframework.http.HttpMethod.GET,
+				null,
+				new ParameterizedTypeReference<ServiceOutcome<List<GenericDTO>>>() {}
+				);
+		
+		return response.getBody();
+	}
+
+	@Override
+	public ServiceOutcome<List<GenericDTO>> getSubjectList() {
+		try {
+			ResponseEntity<ServiceOutcome<List<GenericDTO>>> response = restTemplate.exchange(customProperty +
+							"/api/core/allow/getAllSubjectList",
+					org.springframework.http.HttpMethod.GET,
+					null,
+					new ParameterizedTypeReference<ServiceOutcome<List<GenericDTO>>>() {}
+			);
+			ServiceOutcome<List<GenericDTO>> serviceOutcome = response.getBody();
+
+			if (serviceOutcome != null && serviceOutcome.getData() != null) {
+				serviceOutcome.getData().sort(Comparator.comparing(GenericDTO::getName));
+			}
+			return serviceOutcome;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+
+
+}

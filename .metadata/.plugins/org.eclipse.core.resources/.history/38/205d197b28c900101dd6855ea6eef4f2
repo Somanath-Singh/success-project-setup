@@ -1,0 +1,44 @@
+package com.aashdit.common.model;
+
+import com.aashdit.framework.core.annotation.Sortable;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+
+@DynamicInsert
+@DynamicUpdate
+@Entity
+@Table(name = "t_mst_gender", schema = "public")
+public class Gender implements Serializable {
+
+	private static final long serialVersionUID = 832436664155432699L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "gender_id")
+	private Long genderId;
+
+	@Column(name = "gender_code")
+	private String genderCode;
+
+	@Column(name = "gender_name_en")
+	@Sortable(lang = "en")
+	private String genderNameEN;
+
+	@Column(name = "gender_name_hi")
+	@Sortable(lang = "hi")
+	private String genderNameHI;
+
+	@Column(name = "is_active")
+	private Boolean isActive;
+
+
+}

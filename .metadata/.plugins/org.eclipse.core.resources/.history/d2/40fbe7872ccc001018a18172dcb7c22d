@@ -1,0 +1,91 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<section class="footer-section">
+        <div class="footer">
+      <%--   <div class="footer-shape">
+            <img src="${contextPath}/assets/img/footer-shape.png" alt="">
+        </div> --%>
+            <div class="container">     
+                <div class="row">
+                    <div class=" col-sm-4 col-xs-12">
+                        <div class="single_footer footer-logo-section">
+                            <div class="logo-style">
+                                 <a href="${contextPath}/dashboard"> <img src="${contextPath}/assets/img/logo-bg.png" alt=""></a>
+                            </div>
+                            <!-- <h3 class="website-name">University Recruitment Module</h3> -->
+                            <p class="mb-3 " style="text-align: justify; font-size: 15px;">
+                                We are many variations of passages available but the majority have suffered alteration
+                                in some form by injected humour words believable.
+                            </p>
+                        </div>
+                    </div>                       
+                    <div class=" col-sm-4 col-xs-12 ps-5">
+                        <div class="single_footer">
+                            <h4>Important Links</h4>
+                            <ul>
+                            	<li><a href="https://hims.odisha.gov.in" target="_blank"><i class="fa-solid fa-caret-right"></i>HIMS</a></li>
+                                <li><a href="javascript:void(0)"><i class="fa-solid fa-caret-right"></i>Privacy Policy</a></li>
+                                <li><a href="javascript:void(0)"><i class="fa-solid fa-caret-right"></i>Terms & Conditions</a></li>
+                                <li><a href="javascript:void(0)"><i class="fa-solid fa-caret-right"></i>About Us</a></li>
+                                <li><a href="javascript:void(0)"><i class="fa-solid fa-caret-right"></i>Notice</a></li>
+                                <li><a href="javascript:void(0)"><i class="fa-solid fa-caret-right"></i>Advertisement</a></li>
+                            </ul>
+                        </div>
+                    </div><!--- END COL --> 
+    <!--                 <div class="col-md-3 col-sm-4 col-xs-12">
+                        <div class="single_footer single_footer_address">
+                            <h4>Contact Us</h4>
+                            <ul>
+                                <li><h5>For Administrative Assistance call on</h5></li>
+                                <li><a href="#">0671 - 2305611</a></li>
+                                <li><a href="#">abc@example.com </a></li>
+                                <li><h5>For Technical Assistance call on</h5></li>
+                                <li><a href="#">0671 - 2304707, 2304141</a></li>
+                                <li><a href="#">abc2@example.com</a></li>
+                            </ul>
+                        </div>
+                    </div> -->
+                    <!--- END COL -->
+                    <div class="col-md-4  col-xs-12">
+                        <div class="single_footer single_footer_address">
+                            <h4>Subscribe today</h4>
+                            <div class="signup_form">                           
+                                <form action="#" class="subscribe">
+                                    <input type="text" class="subscribe__input" placeholder="Enter Email Address">
+                                    <button type="button" class="subscribe__btn"><i class="fas fa-paper-plane"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="social_profile">
+                            <ul>
+                                <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                                <li><a href="#"><i class="fab fa-google-plus-g"></i></a></li>
+                                <li><a href="#"><i class="fab fa-instagram"></i></a></li>
+                            </ul>
+                        </div>                          
+                    </div><!--- END COL -->         
+                </div><!--- END ROW --> 
+                <div class="row">
+                    <div class="col-lg-12 col-sm-12 col-xs-12">
+                        <p class="copyright">Copyright @ <span id="currentYear"></span> <a href="javascript:void(0)">Govt. of Odisha</a>.</p>
+                    </div><!--- END COL -->                 
+                </div><!--- END ROW -->                 
+            </div><!--- END CONTAINER -->
+        </div>
+    </section>
+    <script>
+    	document.addEventListener("DOMContentLoaded", function() {
+        const yearSpan = document.getElementById("currentYear");
+        const currentYear = new Date().getFullYear();
+        yearSpan.textContent = currentYear;
+    });
+    </script>
+    

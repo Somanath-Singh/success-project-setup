@@ -1,0 +1,87 @@
+{
+  "groups": [
+    {
+      "name": "mail",
+      "type": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "mail.app-password",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.auth",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.deleted-file-path",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.enable",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.file-source-path-r-h",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.file-upload-path",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.geo-tag-file-path",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.host",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.msg-sender",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.password",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.path",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.port",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.protocol",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.trust",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    },
+    {
+      "name": "mail.username",
+      "type": "java.lang.String",
+      "sourceType": "com.aashdit.prod.heads.framework.core.util.HeadsAppProperties"
+    }
+  ],
+  "hints": []
+}

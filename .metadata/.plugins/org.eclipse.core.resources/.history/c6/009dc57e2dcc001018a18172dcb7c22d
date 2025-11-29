@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="get_project_wise_running_bill" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d82a5475-e405-4329-a2ed-7907850ee0f5">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ERP_FAMS"/>
+	<queryString language="SQL">
+		<![CDATA[select * from fams.get_project_wise_running_bill();]]>
+	</queryString>
+	<field name="project_id" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="project_id"/>
+		<property name="com.jaspersoft.studio.field.label" value="project_id"/>
+	</field>
+	<field name="project_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="project_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="project_name"/>
+	</field>
+	<field name="project_code" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="project_code"/>
+		<property name="com.jaspersoft.studio.field.label" value="project_code"/>
+	</field>
+	<field name="estimation_no" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="estimation_no"/>
+		<property name="com.jaspersoft.studio.field.label" value="estimation_no"/>
+	</field>
+	<field name="workestimationid" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="workestimationid"/>
+		<property name="com.jaspersoft.studio.field.label" value="workestimationid"/>
+	</field>
+	<field name="est_code" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="est_code"/>
+		<property name="com.jaspersoft.studio.field.label" value="est_code"/>
+	</field>
+	<field name="totalestimatedamount" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="totalestimatedamount"/>
+		<property name="com.jaspersoft.studio.field.label" value="totalestimatedamount"/>
+	</field>
+	<field name="totalinvoiceamount" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="totalinvoiceamount"/>
+		<property name="com.jaspersoft.studio.field.label" value="totalinvoiceamount"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="50" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="3" y="0" width="550" height="50" backcolor="#578EAD" uuid="10305150-4f5a-4770-bc31-2d596bd04271"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Project Wise Running Bill]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="3" y="0" width="100" height="30" uuid="3127aba0-9f15-4023-8613-2c4d792ebec2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6bc62ed5-9830-43d6-a2c1-4dc9aa5f8e9e"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Project Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="103" y="0" width="100" height="30" uuid="be4bb48c-bd4b-41b5-b88a-fa4e22bec99c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0d07beb7-3b96-4d7b-991b-456f74fb23aa"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Project Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="203" y="0" width="100" height="30" uuid="bdce9568-049b-4170-83cb-a1434ed55312">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0d485c1f-f889-425d-860a-320956222943"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Estimation No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="303" y="0" width="110" height="30" uuid="17b8208b-fa93-4b63-8158-1123888c812e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bb0d901d-5f06-4d4c-9893-e8802827b99d"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Estimated Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="413" y="0" width="140" height="30" uuid="7a705c7a-0371-43c3-a7a8-f9a0f326a107">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="92cab01d-c48c-4f13-b835-5ae6f0d8463e"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Invoice Amount]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="3" y="0" width="100" height="30" uuid="72ec7d07-aafc-4ded-878e-b2f283ec8f9d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6bc62ed5-9830-43d6-a2c1-4dc9aa5f8e9e"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{project_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="0" width="100" height="30" uuid="e334ec95-9cb1-4100-8180-a9bf8f32be91">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0d07beb7-3b96-4d7b-991b-456f74fb23aa"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{project_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="203" y="0" width="100" height="30" uuid="1580d891-45f3-44cb-994e-ce78b5c4a0ee">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0d485c1f-f889-425d-860a-320956222943"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{estimation_no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="0" width="110" height="30" uuid="e5b2f46c-0500-4aaa-8439-9167c115aa63">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bb0d901d-5f06-4d4c-9893-e8802827b99d"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{totalestimatedamount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="413" y="0" width="140" height="30" uuid="3cf733a0-3e52-4440-b134-2e0042e0312c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="92cab01d-c48c-4f13-b835-5ae6f0d8463e"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{totalinvoiceamount}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

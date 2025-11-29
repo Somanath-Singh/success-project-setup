@@ -1,0 +1,201 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<script src="${contextPath}/resources/javascripts/accountMaster.js"></script>
+<script src="${contextPath}/resources/javascripts/common.js"></script>
+<script src="resources/javascripts/createAccountMaster.js"></script>
+<style>
+.table-striped>tbody>tr:nth-of-type(odd) {
+    --bs-table-accent-bg: rgb(247 249 244) !important;
+    /* color: var(--bs-table-striped-color); */
+}
+.accordion-body {
+    padding: 0.5rem;
+    background: #091a16 !important;
+}
+</style>
+<div class="breadcrumb_conatiner">
+      	<div class="col-md-6">
+     		<h4 class="change-color">Sub-Group Entity Map</h4>
+     	</div>
+     	<div class="col-md-6">
+     		<nav aria-label="breadcrumb">
+     			<ol class="breadcrumb">
+     				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+     				<li class="breadcrumb-item active" aria-current="page">Sub-Group Entity Map</li>
+     			</ol>
+     		</nav>
+     	</div>
+     </div>
+     <div class="row">
+     	<div class="col-md-12">
+     		<div class="card">
+     			<div class="card-header">
+                     <h5 class="card-title">Sub-Group Entity</h5>
+                 </div>
+     			<div class="card-body">
+     			<div class="row">
+		        <p class="mandatory" align="right" style="color: #0043ff;font-weight: 500;font-size: 11px;">
+		            <spring:message code="LAND.ALLOTMENT.MANDATORY" />
+		        </p>
+		        <div class="col-md-12">
+		            <form class="form-horizontal form-bordered" action="${contextPath}/budget/sub-group-entity-save" id="formId" method="post">
+		                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+		               <input type="hidden" value="true" id="labelmsg" name="labelmsg">
+		                <div class="row">
+		                    
+		
+		                     <div class="col-md-3 col-sm-3">
+		                        <div class="form-group">
+		                            <label class="col-md-12 required" for="activeFlag">Entity Type:</label>
+		                            <div class="col-md-12">
+		                                <select name="entityType" class="form-control require form-select" id="entityType" onchange="getEntityListByEntityType();">
+		                                <option value="">--select--</option>
+		                                
+		                                 <c:forEach items="${loadData.entityTypes}" var="type">
+                                         <option value="${type}" ${type eq data.selectedEntityType ?'selected':''}>${type.displayName}</option>
+                                         </c:forEach>
+		                                </select>
+		                            </div>
+		                        </div>
+		                    </div>
+		                
+		                 <div class="col-md-3 col-sm-3">
+		                        <div class="form-group">
+		                            <label class="col-md-12 required" for="activeFlag">Sub Group:</label>
+		                            <div class="col-md-12">
+		                                <select name="subGroupId" class="form-control require form-select" id="subGroupId" onchange="getEntityListByEntityType();">
+		                                <option value="">--select--</option>
+		                                 <c:forEach items="${loadData.subGroupList}" var="subgrp">
+                                         <option value="${subgrp.subGroupId}" ${subgrp.subGroupId eq data.selectedSubGroupId ?'selected':''}>${subgrp.subGroupName}</option>
+                                         </c:forEach>
+		                                </select>
+		                            </div>
+		                        </div>
+		                    </div>
+		                
+		                    
+		
+		               
+		<div class="row">
+       <div class="col-lg-12">
+            <div class="" id="accordionExample1">
+              <div class="">
+                <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingtwo" data-bs-parent="#accordionExample1">
+                  <div class="">
+                    <div class="col-md-12">
+                    <c:if test="${not empty data.entityList}">
+								<table class="table table-bordered mb-none"
+									id="datatable-default">
+									<thead>
+										<tr>
+											<th>${data.selectedEntityType eq 'ACCOUNT' ? 'Account Ledger Name' : data.selectedEntityType eq 'PROJECT' ? 'Project Name' : ''}
+											</th>
+											<th>${data.selectedEntityType eq 'ACCOUNT' ? 'Account Code' : data.selectedEntityType eq 'PROJECT' ? 'Project Code' : ''}
+											</th>
+											<th>Action</th>
+										</tr>
+									</thead>
+									<tbody id="tBodyId">
+										<c:forEach items="${data.entityList}" var="entity" varStatus="index">
+											<tr class="gradeX">
+												<td>${entity.entityName}</td>
+												<td>${entity.entityCode}</td>
+												<td>
+												    <input type="hidden"  name="budgetEntityMap[${index.index}].isChecked" id="isChecked${index.index}" value="${entity.isActiveBudgetEntityGrp eq true? true:false}">
+													<input type="checkbox" id="checkbox${index.index}" onclick="toggleCheck(${index.index})" class="" ${entity.isActiveBudgetEntityGrp eq true?'checked':''}>
+													<input type="hidden"  name="budgetEntityMap[${index.index}].budgetGrpEntityMapId" id="budgetGrpEntityMapId${index.index}" value="${entity.budgetGrpEntityMapId}">
+													<input type="hidden"  name="budgetEntityMap[${index.index}].entityId" id="entityId${index.index}" value="${entity.entityId}">
+													<input type="hidden"  name="budgetEntityMap[${index.index}].entityType" id="entityType${index.index}" value="${entity.entityType}">
+													<input type="hidden"  name="budgetEntityMap[${index.index}].subGroupId" id="subGroupId${index.index}" value="${entity.subGroupId}">
+												</td>
+											</tr>
+										</c:forEach>
+									</tbody>
+								</table>
+						</c:if>
+							</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    
+		     <div class="row mt-3">
+		     <div class="col-sm-12">
+				                        <div class="form-group text-center">
+				                            <button type="button" class="btn btn-success" onclick="submitFormData();">
+				                                <spring:message code="COMMON.BUTTON.SAVE" />
+				                            </button>
+				                            <a href="${contextPath}/home">
+				                                <input type="button" class="btn btn-warning" value=<spring:message code="COMMON.BUTTON.BACK"></spring:message>>
+				                            </a>
+				                        </div>
+				                    </div>
+				                </div>
+		
+		               
+		            </form>
+		        </div>
+		    </div>
+		</div>
+		
+
+        
+        
+    
+    
+    
+<form action="${contextPath}/budget/entity-by-type" method="get" id="entyForm">   
+    <input type="hidden" id="entityTypeHd" class="" name="entityType"/>
+    <input type="hidden" id="subGroupIdHd" class="" name="subGroupId"/>
+</form>
+
+	<script>
+	function submitFormData(){
+		if(validateForm()){ 
+			tableOrTbodyIDS=['tBodyId'];
+			tableOrTbodyKeys=['budgetEntityMap'];
+		 if(encryptFormData('formId', tableOrTbodyIDS, tableOrTbodyKeys)){
+				 confirmation('formId');
+			 }
+		}
+		
+	}
+	function getEntityListByEntityType(){
+		//document.cookie = "username=John Doe";
+		//console.log(document.cookie);
+		debugger
+		if($('#entityType').val()!=''&& $('#subGroupId').val()!=''){
+		$('#entityTypeHd').val($('#entityType').val());
+		$('#subGroupIdHd').val($('#subGroupId').val());
+		
+		 if(encryptFormData('entyForm', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('entyForm');
+		 }
+		 }
+	}
+	
+	function toggleCheck(index) {
+	    const checkbox = document.getElementById('checkbox' + index);
+	    const isCheckInput = document.getElementById('isChecked' + index);
+
+	    if (checkbox.checked) {
+	        checkbox.checked = true;  
+	        isCheckInput.value = true; 
+	    } else {
+	        checkbox.checked = false;  
+	        isCheckInput.value = false;
+	    }
+	}
+
+
+    </script>
+								
+		

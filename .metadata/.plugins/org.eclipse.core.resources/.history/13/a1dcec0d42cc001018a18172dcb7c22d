@@ -1,0 +1,147 @@
+/*
+ function loadTopSubject(){
+  $(".loader-chart").addClass('loading');
+ $.ajax({
+    type: "GET",
+    url: window.contextPath+'/dashboard/getTopSubject',
+    cache : false,
+	async : true,
+	dataType : "json",
+    success: function(response) {
+    	var mcqData = [];
+        var longData = [];
+        var shortData = [];
+        var categories = [];
+        var data = response;
+        
+        
+        $.each(data,function(index,value){
+        	mcqData.push(value.mcq_subject);        // MCQ data
+            longData.push(value.long_subject);      // LONG data
+            shortData.push(value.short_subject);
+            categories.push(value.top_subject);  
+        })
+        
+         var options = {
+          series: [{
+          name: 'MCQ',
+          data: mcqData
+        }, {
+          name: 'LONG',
+          data: longData
+        }, {
+          name: 'SHORT',
+          data: shortData
+        }],
+          chart: {
+          type: 'bar',
+          height: 180
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            endingShape: 'rounded'
+          },
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          show: true,
+          width: 3,
+          colors: ['transparent']
+        },
+        xaxis: {
+          categories:categories,
+        },
+        colors: ['#FCC100', '#EE7D2F', '#EF5350'],
+        yaxis: {
+          title: {
+            text: '( thousands )'
+          }
+        },
+        fill: {
+          opacity: 1
+        },
+        tooltip: {
+          y: {
+            formatter: function (val) {
+              return  val + " thousands"
+            }
+          }
+        }
+       
+        };
+
+        var chart = new ApexCharts(document.querySelector("#topsubwithqus"), options);
+        chart.render();
+        $(".loader-chart").removeClass('loading');
+        
+        
+        
+    },
+    error: function(error) {
+        console.log("Error fetching top subject data:", error);
+    }
+});
+}
+
+
+
+*/
+
+
+var options = {
+    series: [{
+        name: 'MCQ',
+        data: [44, 55, 57, 56]
+    }, {
+        name: 'LONG',
+        data: [76, 85, 101, 98]
+    }, {
+        name: 'SHORT',
+        data: [35, 41, 36, 26]
+    }],
+    chart: {
+        type: 'bar',
+        height: 180
+    },
+    plotOptions: {
+        bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            endingShape: 'rounded'
+        },
+    },
+    dataLabels: {
+        enabled: false
+    },
+    stroke: {
+        show: true,
+        width: 3,
+        colors: ['transparent']
+    },
+    xaxis: {
+        categories: ['Physics', 'Chemistry', 'Biology', 'Math'],
+    },
+    colors: ['#FCC100', '#EE7D2F', '#EF5350'],
+    yaxis: {
+        title: {
+            text: '( thousands )'
+        }
+    },
+    fill: {
+        opacity: 1
+    },
+    tooltip: {
+        y: {
+            formatter: function (val) {
+                return  val + " thousands"
+            }
+        }
+    }
+};
+
+var chart = new ApexCharts(document.querySelector("#topsubwithqus"), options);
+chart.render();

@@ -1,0 +1,799 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="<c:url value='/assets/utilsJs/dataEncryption.js'/>"></script>
+<%-- 
+<html lang="en">
+<head>
+    <title>BMAS Legacy Data Entry</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="<c:url value='/assets/css/vendors/bootstrap.css'/>">
+    <link rel="stylesheet" href="<c:url value='/assets/css/style.css'/>">
+
+    <!-- JS dependencies -->
+    <script src="<c:url value='/assets/js/jquery.min.js'/>"></script>
+    <script src="<c:url value='/assets/js/bootstrap.bundle.min.js'/>"></script>
+    <script src="<c:url value='/assets/utilsJs/dataEncryption.js'/>"></script> --%>
+    
+    <style>
+
+      .field-one {
+        position: absolute;
+        left: 18px;
+        top: -12px;
+        padding: 5px 15px;
+        background: #36a2eb;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: auto;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 16px;
+        margin-top: 10px;
+      }
+
+      .note input,
+      .note select {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+
+      .note input:focus,
+      .note select:focus {
+        outline: none;
+        border-color: #f6c73b;
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.4);
+      }
+
+      .text-danger {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      /* Additional improvements */
+      .note input[type="date"] {
+        cursor: pointer;
+      }
+
+      .note select {
+        cursor: pointer;
+        background-color: white;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+      
+      .info_con {
+        color: #b56f51;
+        font-weight: 600;
+        margin-bottom: 20px;
+        font-size: 22px;
+      }
+      
+      .btnnew {
+        border: none;
+        border-radius: 5px;
+        background: #d97706;
+        color: white;
+        padding: 6px 10px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      
+      .btnnew:hover {
+        background: #b45309;
+      }
+      
+      .table th {
+        background-color: #a86b28;
+        color: white;
+        border: 1px solid #dee2e6;
+        padding: 10px;
+      }
+      
+      .table td {
+        border: 1px solid #dee2e6;
+        padding: 10px;
+      }
+      
+      .table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      
+      .custom-edit {
+        background: #b45309;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+      
+      .custom-edit:hover {
+        background: #d97706;
+      }
+      
+      .note {
+		border: 1px solid #d0e8f9 !important;
+	    background-color: #e7f5ff !important;
+	    padding: 15px;
+	    border-radius: 8px;
+	    margin-top: 20px;
+      }
+      
+      .note h4 {
+        color: #856404;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .btns {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 5px;
+      }
+      
+      .btn-successs {background: #36a2eb !important;color: white;}
+      a:hover{color:white !important;}
+      .btn-successs:hover 	{transform:translateY(-2px);background:#bf7d44 !important;}
+      
+      input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        border: 2px dashed #ced4da;
+        border-radius: 8px;
+        background: white;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+      }
+      
+      input[type="file"]:hover {border-color: #bf7d44;}
+      .center {text-align:center;}
+      
+      /* .legacy-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 20px;
+        max-width: 900px;
+        margin: 0 auto;
+      } */
+      
+      .header {
+        background: linear-gradient(90deg, #3eb0ff -20%, #29a8ff 40%, #0a7dcb 100%);
+	    color: white;
+	    padding: 30px;
+	    text-align: center;
+	    border-radius: 12px 12px 0 0;
+      }
+      
+      .header h2 {
+        font-size: 28px;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+      
+      .header p {
+        font-size: 16px;
+        opacity: 0.9;
+      }
+      
+      /* .content {
+        background: white;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        padding: 30px;
+      } */
+    </style>
+</head>
+
+<body>
+<div class="container-fluid">
+	<div class="row mt-3">
+		<div class="card">
+           	<div class="card-header">
+            	<h5 class="card-title">Legacy Data Entry</h5>
+            </div>
+          	<div class="card-body">
+           		<form id="bmasLegancyForm" method="post" action="${contextPath}/bamsLegacy/save">
+                	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                    <input type="hidden" id="cipherText1" name="cipherText1" />
+                   	<div class="row">
+                        	<!-- Financial Year -->
+                        	<div class="col-md-2">
+                          		<div class="form-group">
+                            		<label>Financial Year :<span class="text-danger">*</span></label>
+		                            <select name="financialYearId" id="financialYearId" class="form-control">
+		                              <option value="">-- Select--</option>
+		                              <c:forEach var="fy" items="${financialYearList}">
+		                                <option value="${fy.finyearId}">${fy.finYear}</option>
+		                              </c:forEach>
+		                            </select>
+                          		</div>
+                        	</div>
+
+                        		<!-- District -->
+                        	<div class="col-md-2">
+                          		<div class="form-group">
+                            		<label>District :<span class="text-danger">*</span></label>
+                            		<select id="districtId" name="districtId" class="form-select" onchange="LoadBlockByDistrict(this.value,'blockId'); generateLegacyCode();">
+                              			<option value="">--Select--</option>
+		                              	<c:forEach var="d" items="${districtList}">
+		                                	<option value="${d.districtId}">${d.districtName}</option>
+		                              	</c:forEach>
+                            		</select>
+                          		</div>
+                        	</div>
+                        		<!-- Block -->
+                        	<div class="col-md-2">
+                          		<div class="form-group">
+                            		<label>Block :<span class="text-danger">*</span></label>
+		                            <select id="blockId" name="blockId" class="form-select"
+		                              onchange="LoadGrampanchayatByBlock(this.value,'gpId'); generateLegacyCode();">
+		                              <option value="">--Select--</option>
+		                            </select>
+                          		</div>
+                        	</div>
+
+                        <!-- GP -->
+                        <div class="col-md-2">
+                          <div class="form-group">
+                            <label>Gram Panchayat <span class="text-danger">*</span></label>
+                            <select id="gpId" name="gpId" class="form-select"
+                              onchange="LoadVillageByGrampanchayat(this.value); generateLegacyCode();">
+                              <option value="">--Select--</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <!-- Village -->
+                        <div class="col-md-2">
+                          <div class="form-group">
+                            <label>Village :<span class="text-danger">*</span></label>
+                            <select id="villageId" name="villageId" class="form-select"
+                              onchange="fetchRuralLocationCodeBamsLegacyManage(); generateLegacyCode();">
+                              <option value="">--Select--</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <!-- Building Type -->
+                        <div class="col-md-2">
+                          <div class="form-group">
+                            <label>Building Type :<span class="text-danger">*</span></label>
+                            <select id="buildingType" name="buildingType" class="form-select">
+                              <option value="">--Select--</option>
+                              <c:forEach var="bt" items="${buildingTypeList}">
+                                <option value="${bt.valueCode}">${bt.valueEn}</option>
+                              </c:forEach>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="col-md-2 conditional-field" id="subCategoryDiv" style="display: none;">
+                          <div class="form-group">
+                            <label>Sub Category :<span class="text-danger">*</span></label>
+                            <select id="subCategory" name="subCategory" class="form-select">
+                              <option value="">--Select--</option>
+                              <c:forEach var="sc" items="${residentialSubCategoryList}">
+                                <option value="${sc.valueCode}">${sc.valueEn}</option>
+                              </c:forEach>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="col-md-2 conditional-field" id="schoolCategoryDiv" style="display: none;">
+                          <div class="form-group">
+                            <label>School Category :<span class="text-danger">*</span></label>
+                            <select id="schoolCategory" name="schoolCategory" class="form-select">
+                              <option value="">--Select--</option>
+                              <c:forEach var="sch" items="${schoolCategoryList}">
+                                <option value="${sch.valueCode}">${sch.valueEn}</option>
+                              </c:forEach>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="col-md-2 conditional-field" id="hostelTypeDiv" style="display: none;">
+                          <div class="form-group">
+                            <label>Hostel Type :<span class="text-danger">*</span></label>
+                            <select id="hostelType" name="hostelType" class="form-select">
+                              <option value="">--Select--</option>
+                              <c:forEach var="ht" items="${hostelTypeList}">
+                                <option value="${ht.valueCode}">${ht.valueEn}</option>
+                              </c:forEach>
+                            </select>
+                          </div>
+                        </div>
+
+                        <!-- Hostel Category -->
+                        <div class="col-md-2 conditional-field" id="hostelCategoryDiv" style="display: none;">
+                          <div class="form-group">
+                            <label>Hostel Category :<span class="text-danger">*</span></label>
+                            <select id="hostelCategory" name="hostelCategory" class="form-select">
+                              <option value="">--Select--</option>
+                              <c:forEach var="hc" items="${hostelCategoryList}">
+                                <option value="${hc.valueCode}">${hc.valueEn}</option>
+                              </c:forEach>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="col-md-2 conditional-field" id="hostelCapacityDiv" style="display: none;">
+                          	<div class="form-group">
+                            	<label>Hostel Capacity :<span class="text-danger">*</span></label>
+                            	<select id="hostelCapacity" name="hostelCapacity" class="form-select">
+                              		<option value="">--Select--</option>
+                              		<c:forEach var="cap" items="${hostelCapacityList}">
+                                		<option value="${cap.valueCode}">${cap.valueEn}</option>
+                              		</c:forEach>
+                            	</select>
+                          	</div>
+                        </div>
+
+                        <div class="col-md-3">
+                          	<div class="form-group">
+                            	<label>Building Name :<span class="text-danger">*</span></label>
+                            	<input type="text" id="buildingName" name="buildingName" class="form-control">
+                          	</div>
+                        </div>
+
+                        <div class="col-md-3">
+                          	<div class="form-group">
+                            	<label>UDISE Code :<span class="text-danger">*</span></label>
+                            	<input type="text" id="uDiseCode" name="uDiseCode" class="form-control">
+                          	</div>
+                        </div>
+
+                        <div class="col-md-3">
+                          	<div class="form-group">
+                            	<label>Location Code :</label>
+                            	<input type="text" id="locationCode" name="locationCode" class="form-control" readonly>
+                          	</div>
+                        </div>
+
+                        <div class="col-md-3">
+                          	<div class="form-group">
+                            	<label>Legacy Code :</label>
+                            	<input type="text" id="legancyCode" class="form-control" readonly>
+                          	</div>
+                        </div>
+
+                        <div class="col-md-3">
+                          	<div class="form-group">
+                            	<label>Building Code :</label>
+                            	<input type="text" id="buildingCode" name="buildingCode" class="form-control" readonly>
+                          	</div>
+                        </div>
+
+                        <!-- Student Fields -->
+                        <div class="col-md-2">
+                          	<div class="form-group">
+                            	<label>ST Student :</label>
+                            	<input type="number" id="stStudent" class="form-control" maxlength="500">
+                          	</div>
+                        </div>
+                        
+                        <div class="col-md-2">
+                          	<div class="form-group">
+                            	<label>SC Student :</label>
+                            	<input type="number" id="scStudent" class="form-control" maxlength="500">
+                          	</div>
+                        </div>
+                        
+                        <div class="col-md-2">
+                          	<div class="form-group">
+                            	<label>OBC Student :</label>
+                            	<input type="number" id="obcStudent" class="form-control" maxlength="500">
+                          	</div>
+                        </div>
+                        
+                       	<div class="col-md-2">
+                          	<div class="form-group">
+                            	<label>Minority Student :</label>
+                            	<input type="number" id="minorityStudent" class="form-control" maxlength="500">
+                         	</div>
+                        </div>
+
+                       	<div class="col-md-12 text-end">
+                          	<div class="form-group mt-3">
+                            	<button type="button" class="btn btn-primary" onclick="submitBmasLegancyData()"><i class="fa fa-save"></i> Submit</button>
+                        	</div>
+                    	</div>
+                   	</div>
+               	</form>
+                  
+                  <!-- Excel Template and Upload Section -->
+                  <div class="mt-3">
+                    <div class="header">
+                      <h2>BAMS Legacy Projects</h2>
+                      <p>Excel Template Download & Data Upload System</p>
+                    </div>
+
+                    <div class="content">
+                      <div class="note">
+                        <div class="d-flex gap-3 align-item-center">
+                          <img src="${contextPath}/assets/images/check.png" style="width:30px;height:30px;">
+                          <h4>Step 1: Download Template</h4>
+                        </div>
+                        <div style="margin-left:48px;">
+                          <p>Download the Excel template file in the required BAMS legacy format.</p>
+                        </div>
+                        <div class="center">
+                          <a href="<c:url value='/bamsLegacy/download-template' />" class="btn btn-success">
+                            <i class="fa-solid fa-download"></i> Download Excel Template
+                          </a>
+                        </div>
+                      </div>
+
+                      <div class="note">
+                        <div class="d-flex gap-3 align-item-center">
+                          <img src="${contextPath}/assets/images/check.png" style="width:30px;height:30px;">
+                          <h4>Step 2: Upload Data</h4>
+                        </div>
+                        <div style="margin-left:44px;">
+                          <p>Upload your filled BAMS legacy Excel file to store the data into the system.</p>
+                          <form action="<c:url value='/bamsLegacy/upload' />" method="post" enctype="multipart/form-data" id="uploadForm">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                            <div class="form-group">
+                              <label for="file">Select Excel File:</label>
+                              <input type="file" name="file" id="file" accept=".xlsx,.xls" required onchange="validateFile(this)">
+                            </div>
+                            <div class="center">
+                              <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fa fa-save"></i> Upload & Save 
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+
+                      <!-- Instructions -->
+                      <div class="note">
+                        <div class="d-flex gap-3 align-item-center">
+                          <img src="${contextPath}/assets/images/check.png" style="width:30px;height:30px;">
+                          <h4>How to Use:</h4>
+                        </div>
+                        <ul style="margin-left:13px;">
+                          <li><p><strong>• Download</strong> the Excel template using the button above.</p></li>
+                          <li><p><strong>• Fill</strong> all required details in the correct format.</p></li>
+                          <li><p><strong>• Save</strong> the completed Excel file.</p></li>
+                          <li><p><strong>• Upload</strong> it using the section above.</p></li>
+                        </ul>
+                      </div>
+
+                      <div class="note">
+                        <div class="d-flex gap-3 align-item-center">
+                          <img src="${contextPath}/assets/images/check.png" style="width:30px;height:30px;">
+                          <h4>Important Information:</h4>
+                        </div>
+                        <div style="margin-left:44px;">
+                          <p>• Only Excel files (.xlsx, .xls) are accepted</p>
+                          <p>• File size must not exceed 10MB</p>
+                          <p>• UDISE code must correspond to an existing school code</p>
+                          <p>• Follow the template format exactly to avoid upload failure</p>
+                           <p>• Ensure the file follows the template format exactly</p>
+                           <P>• All required fields (marked with *) must be filled</P>
+                           <p>• Building Name must be unique duplicates will be rejected instantly</p>
+                        </div>
+                      </div>
+                    </div>
+            	</div>
+         	</div>
+         </div>
+         <div class="card mt-3">
+	         <div class="card-header">
+	         	<h5 class="card-title">BAMS Legacy Building List</h5>
+	         </div>
+             <div class="card-body">
+                    <div class="col-lg-12">
+                      <div class="table-responsive">
+                        <table id="bmasLegacyTable" class="table table-bordered table-hover exportbtn">
+                          <thead>
+                            <tr>
+                              <th style="text-align:center; width:60px;">Sl.No</th>
+                              <th>District</th>
+                              <th>Building Type</th>
+                              <th>Building Name</th>
+                              <th>UDISE Code</th>
+                              <th>SC Student</th>
+                              <th>ST Student</th>
+                              <th>OBC Student</th>
+                              <th>Minority Student</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <c:forEach var="bams" items="${bamsLegacyList}" varStatus="count">
+                              <tr>
+                                <td style="text-align: center">${count.count}</td>
+                                <td>${bams.districtName}</td>
+                                <td>${bams.buildingType}</td>
+                                <td>${bams.buildingName}</td>
+                                <td>${bams.udiseCode}</td>
+                                <td>${bams.stStudent}</td>
+                                <td>${bams.scStudent}</td>
+                                <td>${bams.obcStudent}</td>
+                                <td>${bams.minorityStudent}</td>
+                                <td>
+                                  <button class="btn btn-danger" onclick="removeBmasLegacy(${bams.legancyId})" title="Remove">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                  </button>
+                                </td>
+                              </tr>
+                            </c:forEach>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form action="${contextPath}/bamsLegacy/remove" method="post" id="removeForm">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" id="removeCipherText" name="cipherText">
+    <input type="hidden" name="legancyId" id="legancyIdRemove" />
+  </form>
+  
+  <script>
+    function submitBmasLegancyData() {
+      debugger;
+
+      const dto = {
+        financialYearId: $('#financialYearId').val(),
+        districtId: $('#districtId').val(),
+        blockId: $('#blockId').val(),
+        gpId: $('#gpId').val(),
+        villageId: $('#villageId').val(),
+        buildingType: $('#buildingType').val(),
+        subCategory: $('#subCategory').val(),
+        schoolCategory: $('#schoolCategory').val(),
+        hostelType: $('#hostelType').val(),
+        hostelCategory: $('#hostelCategory').val(),
+        hostelCapacity: $('#hostelCapacity').val(),
+        buildingName: $('#buildingName').val().trim(),
+        udiseCode: $('#uDiseCode').val().trim(),
+        stStudent: $('#stStudent').val(),
+        scStudent: $('#scStudent').val(),
+        obcStudent: $('#obcStudent').val(),
+        minorityStudent: $('#minorityStudent').val()
+      };
+
+      if (!dto.financialYearId) {
+        bootbox.alert("Please select Financial Year.");
+        $('#financialYearId').focus();
+        return;
+      }
+      if (!dto.districtId) {
+        bootbox.alert("Please select District.");
+        $('#districtId').focus();
+        return;
+      }
+      if (!dto.blockId) {
+        bootbox.alert("Please select Block.");
+        $('#blockId').focus();
+        return;
+      }
+      if (!dto.gpId) {
+        bootbox.alert("Please select Gram Panchayat.");
+        $('#gpId').focus();
+        return;
+      }
+      if (!dto.villageId) {
+        bootbox.alert("Please select Village.");
+        $('#villageId').focus();
+        return;
+      }
+      if (!dto.buildingType) {
+        bootbox.alert("Please select Building Type.");
+        $('#buildingType').focus();
+        return;
+      }
+      if (!dto.buildingName) {
+        bootbox.alert("Please enter Building Name.");
+        $('#buildingName').focus();
+        return;
+      }
+      if (!dto.udiseCode) {
+        bootbox.alert("Please enter UDISE Code.");
+        $('#uDiseCode').focus();
+        return;
+      }
+
+      const selectedType = $('#buildingType option:selected').text().trim().toLowerCase();
+
+      if (selectedType.includes('residential') && !dto.subCategory) {
+        bootbox.alert("Please select Sub Category for Residential building.");
+        $('#subCategory').focus();
+        return;
+      }
+      if (selectedType.includes('school') && !dto.schoolCategory) {
+        bootbox.alert("Please select School Category.");
+        $('#schoolCategory').focus();
+        return;
+      }
+      if (selectedType.includes('hostel')) {
+        if (!dto.hostelType) {
+          bootbox.alert("Please select Hostel Type.");
+          $('#hostelType').focus();
+          return;
+        }
+        if (!dto.hostelCategory) {
+          bootbox.alert("Please select Hostel Category.");
+          $('#hostelCategory').focus();
+          return;
+        }
+        if (!dto.hostelCapacity) {
+          bootbox.alert("Please select Hostel Capacity.");
+          $('#hostelCapacity').focus();
+          return;
+        }
+      }
+
+      console.log("DTO before encryption:", dto);
+
+      try {
+        const cipherText = enc_password(JSON.stringify(dto));
+        console.log("CipherText generated:", cipherText);
+
+        if (!cipherText || cipherText.trim() === "") {
+          bootbox.alert("Encryption failed. Please refresh and try again.");
+          return;
+        }
+
+        $('#cipherText1').val(cipherText);
+
+        bootbox.confirm({
+          title: "Confirm Submission",
+          message: "Are you sure you want to save this record?",
+          buttons: {
+            confirm: { label: 'Yes', className: 'btn-success' },
+            cancel: { label: 'No', className: 'btn-danger' }
+          },
+          callback: function (result) {
+            if (result) {
+              showLoader?.();
+              $("#bmasLegancyForm").submit();
+            }
+          }
+        });
+
+      } catch (error) {
+        console.error("Encryption error:", error);
+        bootbox.alert("Something went wrong while encrypting data.");
+      }
+    }
+
+    $(document).ready(function() {
+      $('#buildingType').on('change', function() {
+        const selectedType = $(this).find('option:selected').text().trim().toLowerCase();
+        $('.conditional-field').hide();
+
+        if (selectedType.includes('residential')) {
+          $('#subCategoryDiv').show();
+        } else if (selectedType.includes('school')) {
+          $('#schoolCategoryDiv').show();
+        } else if (selectedType.includes('hostel')) {
+          $('#hostelTypeDiv, #hostelCategoryDiv, #hostelCapacityDiv').show();
+        }
+      });
+    });
+
+    function validateFile(input) {
+debugger;
+      const file = input.files[0];
+      if (!file) return false;
+      const fileName = file.name.toLowerCase();
+      const fileSize = file.size;
+      const maxSize = 10 * 1024 * 1024; 
+      if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+        alert('Error: Only Excel files (.xlsx, .xls) are allowed.');
+        input.value = '';
+        return false;
+      }
+      if (fileSize > maxSize) {
+        alert('Error: File size must not exceed 10MB.');
+        input.value = '';
+        return false;
+      }
+      return true;
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+      const fileInput = document.getElementById('file');
+      const submitBtn = document.getElementById('submitBtn');
+      if (!validateFile(fileInput)) {
+        e.preventDefault();
+        return;
+      }
+      submitBtn.innerHTML = '⏳ Uploading...';
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.7';
+    });
+
+    function removeBmasLegacy(id) {
+      $("#legancyIdRemove").val(id);
+
+      var bizContent = $("#removeForm").serializeArray();
+
+      $("#removeCipherText").val(
+        enc_password(JSON.stringify(convertFormToJSONArray(bizContent)))
+      );
+
+      bootbox.confirm("Do you want to continue?", function(result) {
+        if (result) {
+          showLoader?.();
+          $("#removeForm").submit();
+        }
+      });
+    }
+
+    function generateLegacyCode() {
+debugger;
+      const districtName = $('#districtId option:selected').text().trim();
+      const blockName = $('#blockId option:selected').text().trim();
+      const villageName = $('#villageId option:selected').text().trim();
+
+      if (districtName !== "--Select--" && blockName !== "--Select--" && villageName !== "--Select--") {
+        const locationCode = districtName + "-" + blockName + "-" + villageName+ "-" + Date.now();
+        $('#locationCode').val(locationCode);
+
+        const buildingCode = districtName + "-" + blockName + "-" + Date.now();
+        $('#buildingCode').val(buildingCode);
+      }
+    }
+
+    function fetchRuralLocationCodeBamsLegacyManage(){
+      const districtId = $("#districtId").val();
+      const blockId = $("#blockId").val();
+      const gpId = $("#gpId").val();
+      const villageId = $("#villageId").val();
+      
+      $.ajax({
+        type : "GET",
+        url : contextPath + "/building/get-rural-location-code",
+        data : {
+          districtId,blockId,gpId,villageId
+        },
+        success : function(response) {
+          $('#locationCode').val(response);
+          $('#legancyCode').val("LEG-"+response);
+          $('#buildingCode').val(Number(response.split('-').pop()));
+        },
+        error : function(error) {
+        }
+      });
+    }
+  </script>
+<!-- </body>
+</html> -->

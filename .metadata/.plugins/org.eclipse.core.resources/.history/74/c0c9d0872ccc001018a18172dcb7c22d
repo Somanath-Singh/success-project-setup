@@ -1,0 +1,162 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<style>
+    .btns { border-radius: 0.2rem; padding: 6px 7px; font-size: 13px; }
+    table th, table td { vertical-align: middle; }
+    .mt-3 { margin-top: 1rem; }
+</style>
+
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6"><h4 class="change-color">Building Strength Report</h4></div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">School Details</h5></div>
+            <div class="card-body">
+                <p><strong>Principal Name:</strong> ${principalName}</p>
+                <p><strong>School Name:</strong> ${schoolName}</p>
+
+                <form class="form-horizontal" id="reportForm">
+                    <div class="row">
+                        <div class="form-group col-md-3">
+                            <label class="required">Select Month:</label>
+                            <select id="month" name="month" class="form-control form-control-sm" required>
+                                <option value="">-- Select Month --</option>
+                                <option value="January">January</option>
+                                <option value="February">February</option>
+                                <option value="March">March</option>
+                                <option value="April">April</option>
+                                <option value="May">May</option>
+                                <option value="June">June</option>
+                                <option value="July">July</option>
+                                <option value="August">August</option>
+                                <option value="September">September</option>
+                                <option value="October">October</option>
+                                <option value="November">November</option>
+                                <option value="December">December</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <h5 class="card-title">Building Strength Details</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Sl No</th>
+                                            <th>Building Type</th>
+                                            <th>Strength</th>
+                                            <th>Vacant</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>
+                                                <select name="buildingType1" class="form-control form-control-sm" disabled>
+                                                    <option value="Main School Building" selected>School Building</option>
+                                                    <option value="Hostel">Hostel-1</option>
+                                                    <option value="Staff Quarters">Hostel-2</option>
+                                                    <option value="Administrative Block">Administrative Block</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="number" name="strength1" class="form-control form-control-sm" value="500" ></td>
+                                            <td><input type="number" name="vacant1" class="form-control form-control-sm" value="50" ></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>
+                                                <select name="buildingType2" class="form-control form-control-sm" disabled>
+                                                    <option value="Hostel" selected>Hostel-1</option>
+                                                    <option value="Main School Building">School Building</option>
+                                                    <option value="Staff Quarters">Hostel-2</option>
+                                                    <option value="Administrative Block">Administrative Block</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="number" name="strength2" class="form-control form-control-sm" value="200" ></td>
+                                            <td><input type="number" name="vacant2" class="form-control form-control-sm" value="20" ></td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>
+                                                <select name="buildingType3" class="form-control form-control-sm" disabled>
+                                                    <option value="Administrative Block" selected>Hostel-2</option>
+                                                    <option value="Main School Building">Main School Building</option>
+                                                    <option value="Hostel">Hostel</option>
+                                                    <option value="Staff Quarters">Staff Quarters</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="number" name="strength3" class="form-control form-control-sm" value="100" ></td>
+                                            <td><input type="number" name="vacant3" class="form-control form-control-sm" value="10" ></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4 text-center">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-success btns" onclick="submitReport()">Submit</button>
+                        </div>
+                    </div>
+                </form>
+
+<!--                 <div class="row mt-3" id="resultDiv"> -->
+<!--                     <div class="col-md-12"> -->
+<!--                         <h5>Submitted Building Strength</h5> -->
+<!--                         <div class="table-responsive"> -->
+<!--                             <table class="table table-bordered table-striped table-sm" id="resultTable"> -->
+<!--                                 <thead class="thead-dark"> -->
+<!--                                     <tr> -->
+<!--                                         <th>Sl No</th> -->
+<!--                                         <th>Building Type</th> -->
+<!--                                         <th>Strength</th> -->
+<!--                                         <th>Vacant</th> -->
+<!--                                     </tr> -->
+<!--                                 </thead> -->
+<!--                                 <tbody id="resultBody"> -->
+<!--                                     <tr> -->
+<!--                                         <td>1</td> -->
+<!--                                         <td>Main School Building</td> -->
+<!--                                         <td>500</td> -->
+<!--                                         <td>50</td> -->
+<!--                                     </tr> -->
+<!--                                     <tr> -->
+<!--                                         <td>2</td> -->
+<!--                                         <td>Hostel</td> -->
+<!--                                         <td>200</td> -->
+<!--                                         <td>20</td> -->
+<!--                                     </tr> -->
+<!--                                     <tr> -->
+<!--                                         <td>3</td> -->
+<!--                                         <td>Staff Quarter</td> -->
+<!--                                         <td>100</td> -->
+<!--                                         <td>10</td> -->
+<!--                                     </tr> -->
+<!--                                 </tbody> -->
+<!--                             </table> -->
+<!--                         </div> -->
+<!--                     </div> -->
+<!--                 </div> -->
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set default month
+    document.getElementById('month').value = 'October';
+
+    function submitReport() {
+        alert('Data already pre-filled and displayed below.');
+    }
+</script>

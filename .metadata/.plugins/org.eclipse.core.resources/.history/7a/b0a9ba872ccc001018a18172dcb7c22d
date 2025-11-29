@@ -1,0 +1,282 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<div class="content">
+	<div class="breadcrumb_conatiner">
+		<div class="col-md-6">
+			<h4 class="change-color">Add & Manage Sub Head</h4>
+		</div>
+		<div class="col-md-6">
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+					<li class="breadcrumb-item active" aria-current="page">Manage Sub Head</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+	<div class="page-inner">
+		<div class="row mt-2">
+
+			<div class="col-md-12">
+				<div class="card full-height">
+					<div class="card-header">
+						<c:choose>
+							<c:when test="${not empty subhead.subHeadId}">
+								<h4 class="card-title">Update Sub Head</h4>
+							</c:when>
+							<c:otherwise>
+								<h4 class="card-title">Add Sub Head</h4>
+							</c:otherwise>
+						</c:choose>
+					</div>
+					<div class="card-body">
+						
+							<form action="${contextPath}/admin/master/subhead/save" id="addsubheadFrm"
+								method="post">
+								<input type="hidden" name="${_csrf.parameterName}"
+									value="${_csrf.token}" /> <input type="hidden" name="subHeadId"
+									value="${subhead.subHeadId}" id="subHeadId" />
+								<div class="row">	
+								<div class="col-md-3">
+										<div class="form-group">
+											<label class="col-md-12 required" for="stateId">Head :</label>
+											<div class="col-md-12">
+												<select name="head.headId" id="headId"
+													class="form-control form-select" required="required">
+													<option value="">Select</option>
+													<c:forEach items="${headList}" var="head">
+														<option value="${head.headId}"
+															${head.headId eq subhead.head.headId?'selected':''}>${head.headName}</option>
+													</c:forEach>
+												</select>
+											</div>
+										</div>
+									</div>															
+									<div class="col-md-3">
+										<div class="form-group">
+											<label class="col-md-12 required" for="subHeadName">Sub Head Name :</label>
+											<div class="col-md-12">
+												<input type="text" class="form-control form-control-sm AlphaNumericOnly" id="subHeadName" name="subHeadName" value="${subhead.subHeadName}" required="required" maxlength="20">
+											</div>
+										</div>
+									</div>	
+									<div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="col-md-12 " for="subHeadName">Sub Head Code :</label>
+                                            <div class="col-md-12">
+                                                <input type="text" class="form-control form-control-sm AlphaNumericOnly" id="" name="" value="${subhead.subHeadCode}" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+									<!-- <div class="col-md-3">
+										<div class="form-group">
+											<label class="col-md-12 " for="Description">Description :</label>
+											<div class="col-md-12">
+												<input type="text"
+													class="form-control form-control-sm AlphaNumericOnly"
+													id="description" name="description"
+													value="${subhead.description}" 
+													maxlength="80">
+											</div>
+										</div>
+									</div>										 -->
+								
+									<div class="text-center" style="margin-top: 20px;">
+										<c:choose>
+											<c:when test="${not empty subhead}">
+												<input type="button" name="add&ManageApplicationScheme"
+													value="Update" id="add&ManageApplicationSchemes"
+													class="btn btn-success btn-sm" onclick="submitFormData()">
+														<a href="${contextPath}/admin/master/subhead/list" type="button"
+													class="btn btn-warning btn-sm">Back</a>
+											</c:when>
+											<c:otherwise>
+												<input type="button" name="add&ManageApplicationScheme"
+													value="Submit" id="add&ManageApplicationSchemes"
+													class="btn btn-success btn-sm" onclick="submitFormData()">
+														<a  type="button" class="btn btn-warning btn-sm" onclick="backToModule()">Back</a>
+											</c:otherwise>
+										</c:choose>
+
+									</div>
+								</div>
+							</form>
+						
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<div class="row mt-3">
+			<div class="col-md-12">
+				<div class="card full-height">
+					<div class="card-header">
+						<h4 class="card-title">Sub Head List</h4>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<table id="basic-datatables"
+								class="display table table-bordered table-hover exportbtn">
+								<thead>
+									<tr>
+										<th class="text-center">Sl.No.</th>
+										<th>Head Name</th>
+										<th>Sub Head Name</th>
+										<th>Sub Head Code</th>
+						                <th>Description</th>
+										<th>Status</th>
+										<th >Action</th>
+									</tr>
+								</thead>
+								<tbody id="tbd">
+									<c:forEach items="${subheadList}" var="subhead" varStatus="count">
+										<tr>
+											<td class="text-center">${count.count}</td>
+											<td>${subhead.head.headName}</td>
+											<td>${subhead.subHeadName}</td>
+											<td>${subhead.subHeadCode}</td>
+											<td>${not empty subhead.description ? subhead.description : 'N/A'}</td>	
+											<c:if test="${subhead.isActive eq true }">
+												<td>Active</td>
+											</c:if>
+											<c:if test="${subhead.isActive eq false }">
+												<td>InActive</td>
+											</c:if>
+											<td >
+											<c:if test="${subhead.isActive eq true}">
+											<button class="btn btn-warning btn-sm"
+													onclick="editFundTypeById('${subhead.subHeadId}')" title="Edit Sub Head ">
+													<i class="fas fa-edit"></i>
+												</button>
+												<button class="btn btn-danger btn-sm"
+														onclick="activeInactiveSubHead('INACTIVE', '${subhead.subHeadId}')"
+														title="Deactivate Sub Head ">
+														<i class="fa fa-lock" aria-hidden="true"></i>
+													</button>
+											</c:if> <c:if test="${subhead.isActive eq false}">
+													<button class="btn btn-success btn-sm"
+															onclick="activeInactiveSubHead('ACTIVE', '${subhead.subHeadId}')"
+															title="Activate Sub Head ">
+													<i class="fa fa-unlock-alt" aria-hidden="true"></i>
+													</button>
+											</c:if>
+												
+											</td>
+										</tr>
+									</c:forEach>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<form method="GET" id="formId"></form>
+
+<form action="${contextPath}/admin/master/subhead/changeSubHeadStatus.htm"
+	id="changeSubHeadStatus" method="post">
+	<input type="hidden" name="${_csrf.parameterName}"
+		value="${_csrf.token}" /> <input type="hidden" name="actionType"
+		id="actionType" /> <input type="hidden" name="subHeadId" id="subhedId" />
+</form>
+<script type="text/javascript">
+
+
+function editFundTypeById(id) {
+	$("#formId").attr('action',
+			'${contextPath}/admin/master/subhead/edit/' + id + '');
+	$("#formId").submit();
+}
+	
+	function submitFormData(){
+		if($("#headId").val()==""){
+			bootbox.alert("Please select Head");
+			return false;
+		}
+		if($("#subHeadName").val()==""){
+			bootbox.alert("Please enter Sub Head Name");
+			return false;
+		}else{
+
+			
+			var flag = window.confirm("Do you want to continue ?");
+	  		if (flag == true) {
+	              $("#addsubheadFrm").submit();
+
+	  		}else{
+	  			
+	  			//e.preventDefault();
+	  		} 
+	    	  
+		}
+	}
+	function activeInactiveSubHead(actionType, subHeadId) {
+		$("#actionType").val(actionType); 
+		$("#subhedId").val(subHeadId); 
+		if(actionType == 'INACTIVE') {
+			bootbox.confirm({
+			    message: "Do you want to deactivate the subHead?",
+			    buttons: {
+			        confirm: {
+			            label: 'Yes',
+			            className: 'btn-success'
+			        },
+			        cancel: {
+			            label: 'No',
+			            className: 'btn-danger'
+			        }
+			    },
+			    callback: function (result) {
+			    	if(result == true) {
+			    		$("#changeSubHeadStatus").submit();  
+			    	} 
+			    }
+			}); 
+		}
+		if(actionType == 'ACTIVE') {
+			bootbox.confirm({
+			    message: "Do you want to activate the subHead?",
+			    buttons: {
+			        confirm: {
+			            label: 'Yes',
+			            className: 'btn-success'
+			        },
+			        cancel: {
+			            label: 'No',
+			            className: 'btn-danger'
+			        }
+			    },
+			    callback: function (result) {
+			    	if(result == true) {
+			    		$("#changeSubHeadStatus").submit();  
+			    	} 
+			    }
+			}); 
+		}
+	}
+	
+	$('#subHeadName').keypress(function (e) {
+        var regex = new RegExp(/^[a-zA-Z0-9_\s]+$/);
+        var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+        if (regex.test(str)) {
+            return true;
+        }
+        else
+        {
+        e.preventDefault();
+       bootbox.alert('Special Chataters are not allowed');
+        return false;
+        }
+    });
+	
+	</script>

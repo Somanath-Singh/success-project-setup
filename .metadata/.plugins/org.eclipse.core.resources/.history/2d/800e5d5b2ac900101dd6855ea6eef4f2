@@ -1,0 +1,112 @@
+package com.aashdit.common.service;
+
+import java.util.Optional;
+
+import org.jboss.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.MessageSourceAware;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.stereotype.Service;
+
+import com.aashdit.common.dto.DuplicateCheckDto;
+import com.aashdit.common.model.District;
+import com.aashdit.common.repository.DistrictRepository;
+import com.aashdit.framework.core.ServiceOutcome;
+
+
+@Service
+public class CommonValidationServiceImpl implements CommonValidationService,MessageSourceAware{
+	
+	private final Logger log = Logger.getLogger(this.getClass());
+
+	private MessageSource messageSource;
+	
+	@Override
+	public void setMessageSource(MessageSource messageSource) {
+		this.messageSource = messageSource;
+	}
+	
+	@Autowired
+	private DistrictRepository districtRepository;
+	
+	@Override
+	public ServiceOutcome<DuplicateCheckDto> checkDuplicateByAnyCode(String code, Long id, String type) {
+
+		ServiceOutcome<DuplicateCheckDto> svcOutcome = new ServiceOutcome<DuplicateCheckDto>();
+		try
+		{
+			Optional<Long> idData = Optional.ofNullable(id);
+			Long idVal = 0L;
+			if(idData.isPresent()) {
+				idVal = id;
+			}
+			if(type.equalsIgnoreCase("District")){
+				District district = districtRepository.findByDistrictCode(code);
+				if(district != null && !idVal.equals(district.getDistrictId())) {
+					DuplicateCheckDto duplicateCheckDto = new DuplicateCheckDto();
+					duplicateCheckDto.setIsDuplicate("true");
+					svcOutcome.setData(duplicateCheckDto);
+				}
+				else {
+					DuplicateCheckDto duplicateCheckDto = new DuplicateCheckDto();
+					duplicateCheckDto.setIsDuplicate("false");
+					svcOutcome.setData(duplicateCheckDto);
+				}
+			}
+		}
+		catch(Exception ex)
+		{
+			log.error(ex);
+			
+			svcOutcome.setData(null);
+			svcOutcome.setOutcome(false);
+			svcOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+			
+		}
+		return svcOutcome;
+		
+	}
+
+	@Override
+	public ServiceOutcome<DuplicateCheckDto> checkDuplicateByAnyName(String name, Long id, String type) {
+
+		ServiceOutcome<DuplicateCheckDto> svcOutcome = new ServiceOutcome<DuplicateCheckDto>();
+		try
+		{
+			Optional<Long> idData = Optional.ofNullable(id);
+			Long idVal = 0L;
+			if(idData.isPresent()) {
+				idVal = id;
+			}
+			if(type.equalsIgnoreCase("District")){
+				
+				District district = districtRepository.checkUniqueDistrictNameEn(name.toUpperCase());
+				if(district != null && !idVal.equals(district.getDistrictId())) {
+					DuplicateCheckDto duplicateCheckDto = new DuplicateCheckDto();
+					duplicateCheckDto.setIsDuplicate("true");
+					svcOutcome.setData(duplicateCheckDto);
+				}
+				else {
+					DuplicateCheckDto duplicateCheckDto = new DuplicateCheckDto();
+					duplicateCheckDto.setIsDuplicate("false");
+					svcOutcome.setData(duplicateCheckDto);
+				}
+			}
+
+		}
+		catch(Exception ex)
+		{
+			log.error(ex);
+			
+			svcOutcome.setData(null);
+			svcOutcome.setOutcome(false);
+			svcOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+			
+		}
+		return svcOutcome;
+		
+	
+	}
+
+}

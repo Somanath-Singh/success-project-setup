@@ -1,0 +1,377 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<%-- <sec:authentication var="principal" property="principal" /> --%>
+<%-- <c:set var="roleCode" value="${principal.primaryRole.roleCode}" /> --%>
+<style>
+.view-overlay {
+	position: absolute;
+    bottom: 13px !important;
+    right: 15px !important;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #4b96ff;
+    border: 0;
+    font-size: 13px;
+}
+
+   .main-panel {
+    position: fixed;
+    top: 67px;
+    left: 0px; 
+    /* width: calc(100% - 265px); */
+    width: 100%;
+    height: 100vh;
+    transition: 0.5s all;
+    padding: 5px;
+}
+
+   .main-panel {
+    position: fixed;
+    top: 67px;
+    left: 0px; 
+    /* width: calc(100% - 265px); */
+    width: 100%;
+    height: 100vh;
+    transition: 0.5s all;
+    padding: 5px;
+}
+</style>
+		<div class="breadcrumb_conatiner">
+              <div class="col-md-6">
+                <h4 class="change-color">View Grievance Details</h4>
+              </div>
+              <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                      <a href="#">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">View Grievance Details</li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+		
+		<div class="row">
+                <div class="col-md-12">
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h5 class="card-title">Special title treatment</h5>
+                    </div>
+                    <div class="card-body">
+		
+		
+		<hr style="margin-top: 5px;" />
+		<h6 class="headingbg mb-4">View Grievance Details</h6>
+		<div class="card-body">
+					<form action="${contextPath}/saveGrievence" id="grievenceId" enctype="multipart/form-data" method="post">
+						<input type="hidden" name="${_csrf.parameterName}"value="${_csrf.token}" />
+<%-- 						 <input type="hidden" name="errorType.errorTypeId" value="${grv.grvGrievence.errorType}"/>  --%>
+						<input type="hidden" name="grvId" value="${grv.grvGrievence.grvId}" id="grvId" /> 
+						<input type="hidden" name="deletFile"  id="deletFile" /> 
+						<div class="row apnd-box">
+						 <!-- <div class="col-md-2">
+							<div class="form-group">
+								<label class="required">Data Type<span class="req">*</span>
+								</label>
+							<div class="">
+									<select name="dataType" id="dataTypeId" onchange="hideErrorType(this.value)" class="form-control" required="required">
+										<option value="">--Select--</option>
+											<option value="DATA-CORRECTION">Data Correction</option>
+												<option value="TECHNICAL-ERROR">Technical Error</option>
+												<option value="AADHAR">Aadhar</option>
+												<option value="LIVE-BIRTH">Live Birth</option>
+												<option value="OTHERS">Others</option>
+												<option value="ACCOUNTS">Accounts</option>
+												<option value="PVTG">Pvtg</option>
+												<option value="RCH-NO">Rch No</option>
+												<option value="MOBILE-NUMBER">Mobile Number</option>
+									</select>
+								</div>
+							</div>
+						</div>  -->
+						 <%-- <div class="col-md-4 " id="errorTypeDiv">
+						 	<div class="form-group" >
+								<label class="required">Grievance Category</label>
+								<div class="">
+										<select name="errorTypeId" id="errorType"
+											class="form-control  " required="required" onchange="checkSelectValue()" disabled>
+											<c:forEach items="${error}" var="err">
+												<option value="${err.errorCategoryId}"
+													<c:forEach items="${grv.grvGrievence.errorTypeId}" var="errror"> ${errror eq err.errorCategoryId ?'selected':''}</c:forEach>>${err.categoryType}</option>
+											</c:forEach>
+										</select>
+									</div>
+							</div>
+						 </div> --%>
+						 <div class="col-md-2">
+								<div class="form-group">
+									<label class="required">Category Description Type</label>
+								<div class="">
+								<select
+								class="form-control form-control-sm" name="errorMapGrievence.errorCategoryMapId" id="errorCategoryMapId"
+								disabled>
+								  <option selected>${grv.grvGrievence.errorMapGrievence.mstGrvErrorCategory.categoryType}</option>
+							</select>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="required">Category Description Type</label>
+								<div class="">
+								<select
+								class="form-control form-control-sm" name="errorMapGrievence.errorCategoryMapId" id="errorCategoryMapId"
+								disabled>
+								  <option selected>${grv.grvGrievence.errorMapGrievence.categoryDescType}</option>
+							</select>
+									</div>
+								</div>
+							</div>
+						<div class="col-md-2" >
+								<div class="form-group">
+									<label class="required">Email Id<span class="req">*</span>
+									</label>
+									<div class="">
+										<input type="text" name="emailId" id="emailId"  class="form-control NumbersOnly" maxlength="2" value="${grv.grvGrievence.emailId}" readonly/>
+									</div>
+								</div>
+							</div>
+						 <div class="col-md-2" >
+								<div class="form-group">
+									<label class="required">Contact No<span class="req">*</span>
+									</label>
+									<div class="">
+										<input type="text" name="contactNo" id="contactNo"  class="form-control NumbersOnly" onchange= "getMobNo()" maxlength="10" value="${grv.grvGrievence.contactNo}" readonly/>
+									</div>
+								</div>
+							</div>  
+						 <div class="col-md-2">
+							<div class="form-group">
+								<label class="required" for="applicantName">Token No</label>
+								<input name="tokenNo" id="tokenNo" class="form-control" value="${grv.grvGrievence.tokenNo}" required="required" readonly>
+							</div>
+						</div> 
+						<div class="col-md-2">
+							<div class="form-group ">
+								<label class="required" for="applicantName">Status</label>
+								<input type="text" name="status" id="status" class="form-control" maxlength="200" readonly required="required"value="${grv.grvGrievence.status}">
+							</div>
+						</div> 
+						 <div class="col-md-3" id="textareaContainer">
+							<div class="form-group">
+								<label class="required" for="applicantName">Remarks</label>
+								<textarea name="remarks" rows="2" cols="20" id="remarks" class="form-control" maxlength="200" readonly required="required">${grv.grvGrievence.remarks}</textarea>
+							</div>
+						</div> 
+						 
+
+						 <div class="form-group col-md-2">
+							<label for="inputCity">Raised Date </label>
+							<input class="form-control" type="text" name="createdOn1" id="createdOn" readonly value="<fmt:formatDate pattern="dd-MM-yyyy"  value='${grv.grvGrievence.createdOn}'/>"/>
+						</div> 
+						
+                          		<div class="form-group col-lg-2 position-relative">
+                                 <label for="">Identity Proof:<span class="req">*</span></label>
+                                  <input type="file" class="form-control" id="identityCard" name="identityCard" disabled>
+                                  <c:choose>
+                                  	<c:when test="${not empty grv.grvGrievence.identityCardPath}">
+                                  		<a href="${contextPath}/public/grv/identityProof/${grv.grvGrievence.grvId}" target="_blank" class="view-overlay btn btn-sm btn-dark doc_view_btn btn-sm"><i class="fa fa-eye"></i></a>
+                                  	</c:when>
+                                  	<c:otherwise>
+                                  		<a href="#" title="Not Available" class="btn btn-sm btn-light mt-2 doc_view_btn"><i class="fas fa-close"></i></a>
+                                  	</c:otherwise>
+                                  </c:choose>
+                                </div>
+                                  <c:choose>
+                                  	<c:when test="${grv.grievenceDocList.size() > 0}">
+                                  		<c:forEach items="${grv.grievenceDocList}" var="grvDocs" varStatus="count">
+                                  		 <div class="form-group col-lg-2 position-relative">
+                                  		 	 <label for="">Attachments:</label>
+                                     			<input type="file" class="form-control" id="filePath'${count.count-1}'" name="grievenceDocList['${count.count-1}'].grvDocWeb">
+                                     			<c:choose>
+                                     			  <c:when test="${not empty grvDocs.filePath}">
+                                     			  <a href="${contextPath}/public/grv/filePath/${grvDocs.multipartId}?doc='ADH'" target="_blank" class="btn btn-dark view-overlay doc_view_btn btn-sm"><i class="fa fa-eye"></i></a>
+                                     			  </c:when>
+                                     			  <c:otherwise>
+                                     			  <a href="#" title="Not Available" class="btn btn-light mt-2 doc_view_btn"><i class="fas fa-close"></i></a>
+                                     			  </c:otherwise>
+                                     			</c:choose>
+                                     			
+                                  		 </div>
+                                  		</c:forEach>
+                                  	</c:when>
+                                  	<c:otherwise>
+                                  		 <div class="form-group col-lg-2 position-relative">
+                                  		 	 <label for="">Attachment:</label>
+                                     			<input type="file" class="form-control" id="aadharCardDoc'${count.count-1}'" disabled name="beneficiaryDocumentList['${count.count-1}'].aadharDocWeb">
+                                     			<a href="#" title="Not Available" class="btn btn-light mt-2 doc_view_btn"><i class="fas fa-close"></i></a>
+                                  		 </div>
+                                  	</c:otherwise>
+                                  </c:choose>
+                                  
+						</div>
+						
+				</form>
+				<div class="row">
+                         <div class="col-md-12 mt-4">
+										   <table class="table table-hover table-bordered info-table  data-table "><!-- data-table-feature -->
+											<thead>
+												<tr style="background-color: #d3e2f7;">
+													<th>Date</th>
+													<th>Remark By</th>
+													<th>Remark</th>
+													<th>View Document</th>													
+												</tr>
+											</thead>
+											 <tbody id="tbd">
+												 <c:choose>
+													<c:when test="${not empty grvStageHistoryList}">
+													 	<c:forEach items="${grvStageHistoryList}" var="grvStageHistory"> 
+															<tr>
+																<td><fmt:formatDate pattern="dd-MM-yyyy" value="${grvStageHistory.createdOn}" /></td>
+																<td>${grvStageHistory.stageForwardedRule.routeType}</td>
+																<td>${empty grvStageHistory.remark ? 'N/A': grvStageHistory.remark}</td>
+																<td>
+																	<c:choose>
+																		<c:when test="${not empty grvStageHistory.document}">
+																			<a type="button" href="${contextPath}/bnf/firstInst/fstInstStageHistory/document/${grvStageHistory.grvStageHisId}" target="_blank"  draggable="false">View Document</a>
+																		</c:when>
+																		<c:otherwise>
+																			<a style="color:red;font-size: 13px;">Not Available</a>
+																		</c:otherwise>
+																	</c:choose>
+																</td>
+															</tr> 
+													     </c:forEach>
+													</c:when>
+													<c:otherwise>
+														<tr>
+															<td colspan="4">Data Not Available</td>
+														</tr>
+													</c:otherwise>
+												</c:choose>
+											</tbody>  
+										</table> 
+									</div> 
+									</div>
+				<%-- <div class="col-md-12 text-center mt-3">
+				<c:if test="${grv.grvGrievence.status ne 'CLOSE'}">
+					<c:forEach items="${stageForwardedRules}" var="stageForwardedRule">
+						<c:if test="${(stageForwardedRule.frmStageMaster.roleId eq grv.grvGrievence.stageForwardedRule.toStageMaster.roleId) and (stageForwardedRule.showInPage eq true)}">
+							<c:choose>
+							<c:when test="${stageForwardedRule.actionType.actionCode eq 'OPEN'}">
+								<a type="button"
+									class="${stageForwardedRule.actionType.color}"
+									href="javascript:updateDetails();">${stageForwardedRule.actionType.actionNameEn}</a>
+							</c:when>
+							<c:when test="${stageForwardedRule.actionType.actionCode eq 'OPEN'}">
+								<a type="button"
+									class="${stageForwardedRule.actionType.color}"
+									href="javascript:updateDetails();">${stageForwardedRule.actionType.actionNameEn}</a>
+							</c:when>
+							<c:otherwise>
+								<button type="button" class="${stageForwardedRule.actionType.color}"
+								onclick="actionByAuthority(${stageForwardedRule.forwardedId},${grv.grvGrievence.grvId})">${stageForwardedRule.actionType.actionNameEn}</button>
+							</c:otherwise>
+							</c:choose>
+						</c:if>
+					</c:forEach>
+				</c:if>
+
+
+				<c:if test="${grv.grvGrievence.status eq 'OPEN'}">
+				<button type="button" class="btn btn-sm btn-info" onclick="formSubmit('${grv.grvGrievence.grvId}','${grv.grvGrievence.createdOn}')">Resolved</button>
+				</c:if>
+				<c:if test="${grv.grvGrievence.status eq 'OPEN'}">
+				<button type="button" class="btn btn-sm btn-info" onclick="revertFormSubmit('${grv.grvGrievence.grvId}','${grv.grvGrievence.createdOn}')">Revert</button>
+				</c:if>
+				
+				</div> --%>
+				<div class="col-lg-12 text-center">
+					<a href="${contextPath}/getGrievanceList" class="btn btn-sm btn-dark">Back</a>
+				</div>
+			</div>
+	</div>
+</div>
+</div>
+</div>
+
+<form  method="POST" action="${contextPath}/actionByAuthority" enctype="multipart/form-data" id="authForm">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+<input type="hidden" value="${grv.grvGrievence.grvId}"name="grvId" id="grvId"/>
+<input type="hidden" name="forwardedId" id="forwardedId"/>
+<input type="hidden" name="viewType" id="viewType" value="${viewType}"/>
+
+<input type="hidden" name="tabCode" id="tabCode" value="${tabCode}"/>
+
+   <div id="grievanceHistModal" class="modal fade" role="dialog">
+         <div class="modal-dialog modal-lg">
+           <!-- Modal content-->
+           <div class="modal-content" >
+             <div class="modal-header" style="background-color:#9dfdd8; color:#fff;">
+             	<h4 class="modal-title">Authority Form</h4>
+<!--                <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+             </div>
+             <div class="modal-body" style="height:191px;">
+              <!-- <div class="col-md-12">
+              <div class="col-md-4">
+					<div class="form-group">
+						<label class="col-md-12 required1" for="applicantName">Attached Document</label>
+						<div class="col-md-12">
+						<input type="file" class="form-control" name="attachedDocument" id="attachedDocument" onchange="imageCheck(this);">
+						</div>
+					</div>
+				   </div>
+			  </div> -->
+				<div class="col-md-12">
+				 <div class="col-md-9">
+					<div class="form-group">
+						<label class="col-md-12 required" for="applicantName">Remarks</label>
+						  <textarea name="txtMsg" rows="2" cols="20" id="txtRemark" class="form-control" maxlength="200" required="required"></textarea>
+							<!-- <div class="chrtr_lmt">
+								<small>Maximum Characters <input size="3"
+									id="spnDescription" value="200" name="text_num"
+									readonly="readonly" class="remaining">
+								</small>
+							</div> -->
+					</div>
+				</div>
+		     </div>
+           </div>
+           <div class="modal-footer">
+           <button type="submit" class="btn btn-success">Send</button>
+           <button type="button" id="resetId"  class="btn btn-danger" class="close" data-dismiss="modal">Close</button>
+            </div>
+         </div>
+	</div>
+	</div>
+</form>
+
+<script>
+function actionByAuthority(forwardedId,applicationId){
+	 $("#grvId").val(applicationId);
+	 $("#forwardedId").val(forwardedId);
+	 $("#grievanceHistModal").modal('show');
+}
+$(function () {
+    $('#resetId').on('click', function () {
+        $('#grievanceHistModal').modal('hide');
+    })
+});
+
+</script>

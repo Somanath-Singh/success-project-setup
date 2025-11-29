@@ -1,0 +1,84 @@
+package com.aashdit.prod.heads.common.service;
+
+import java.util.List;
+
+import com.aashdit.prod.heads.common.dto.BankBranchMasterVo;
+import com.aashdit.prod.heads.common.dto.BankMasterVO;
+import com.aashdit.prod.heads.common.dto.VendorDocuments;
+import com.aashdit.prod.heads.common.model.AdditionalCost;
+import com.aashdit.prod.heads.common.model.AdditionalCostMaster;
+import com.aashdit.prod.heads.common.model.AssetVendor;
+import com.aashdit.prod.heads.common.model.BankBranchMaster;
+import com.aashdit.prod.heads.common.model.BankMaster;
+import com.aashdit.prod.heads.common.model.Block;
+import com.aashdit.prod.heads.common.model.Category;
+import com.aashdit.prod.heads.common.model.District;
+import com.aashdit.prod.heads.common.model.FinancialYear;
+import com.aashdit.prod.heads.common.model.Gender;
+import com.aashdit.prod.heads.common.model.VendorType;
+import com.aashdit.prod.heads.framework.core.ServiceOutcome;
+import com.aashdit.prod.heads.hims.umt.dto.EntityIdAndUserLevel;
+import com.aashdit.prod.heads.hims.umt.model.OrganizationStructureHierarchy;
+import com.aashdit.prod.heads.hims.umt.model.Role;
+
+public interface CommonService {
+
+	ServiceOutcome<List<District>> findDistrictListByStateId(Long stateId);
+
+
+	List<Block> getAllBlockList(Long distId);
+
+	List<District> getAllDistrictNameList();
+	
+	List<Gender> getAllGenderList();
+
+	ServiceOutcome<List<BankBranchMaster>> findByBankId(Long bankId);
+
+	ServiceOutcome<String> getIfscByBranchId(Long branchId);
+
+	ServiceOutcome<String> getConfigParameterValueFromParamCode(String paramCode);
+
+	List<FinancialYear> getAllFinancialYearList();
+
+	ServiceOutcome<List<BankMasterVO>> getAllBankList();
+
+	ServiceOutcome<List<BankBranchMasterVo>> getAllBranchByBankId(Long bankId);
+
+	BankBranchMaster getIfscCodeByBranchId(Long branchId);
+
+	ServiceOutcome<List<BankMaster>> getAllBankMasterList();
+
+
+	List<OrganizationStructureHierarchy> getLevelListByOrganization(String orgData);
+
+	List<EntityIdAndUserLevel> getActualLevelNameListByLevelCodeAndOrgId(String levelData);
+
+	List<Role> getRoleListByActualLevel(String actualLevelData);
+	
+	List<AdditionalCost> getAllActiveAdditionalCostList();
+	
+	List<VendorType> getAllActiveVendorType();
+
+	ServiceOutcome<AssetVendor> saveAndUpdateVendor(AssetVendor assetVendor, VendorDocuments vendorDoc);
+
+	AssetVendor getVendorById(Long vendorId);
+
+	List<AssetVendor> getAllActiveVendor();
+
+	AssetVendor deleteVendor(Long vendorId);
+	
+	ServiceOutcome<Category> saveAndUpdateCategory(Category category);
+
+	ServiceOutcome<List<Category>> getAllActiveCategory();
+
+	Category getCategoryById(Long categoryId);
+	
+	Category deleteCategory(Long categoryId);
+	
+	ServiceOutcome<List<Category>> getAllCategory();
+	
+	List<AssetVendor> getAllVendorNameAsc(Long id, String type);
+
+	List<AdditionalCostMaster> getAllActiveAdditionalCostMasterList();
+
+}

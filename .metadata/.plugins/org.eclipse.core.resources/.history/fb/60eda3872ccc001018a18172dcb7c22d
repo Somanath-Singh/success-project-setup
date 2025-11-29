@@ -1,0 +1,289 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+
+
+<style>
+.modaltabledata th {
+    line-height: 16px;
+    font-size: 13px !important;
+    font-weight: 400;
+}
+.tablemodal .modal-footer {
+    padding: 0;
+}
+.tablemodal .modal-footer .btn-submit {
+    margin-top: 7px;
+}
+.tablemodal .modal-footer .btn-exit {
+    margin-top: 7px;
+}
+.modaltop-data {
+    font-size: 14px;
+}
+.tablemodal .modal-body {
+    padding-bottom: 0;
+}
+.lftdata {
+    width: 50%;
+    float: left;
+    font-size: 14px;
+}
+.rgtdata {
+    width: 50%;
+    float: right;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+</style>
+
+<spring:message code="ACCOUNT.ACCOUNTSCHEDULE.HEADING" />
+
+
+<div class="col-md-12">
+    <form class="form-horizontal form-bordered" id="createScheduleSubSchedule">
+      
+        <input type="hidden" name="scheduleId" id="scheduleId" value="${data.scheduleId}" />
+        
+        <div class="row">
+            <div class="col-md-3 col-sm-3">
+                <div class="form-group">
+                    <label  for="scheduleName" class="required">
+                        <spring:message code="ACCOUNT.ACCOUNTSCHEDULE.NAME" />:
+                    </label>
+                    <div class="col-md-12">
+                        <input type="text" required name="scheduleName" class="form-control" id="scheduleName" value="${data.scheduleName}" maxlength="100" onchange="validateNameAndCode(this)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-3">
+                <div class="form-group">
+                    <label  for="scheduleCode" class="required">
+                        <spring:message code="ACCOUNT.ACCOUNTSCHEDULE.CODE" />:
+                    </label>
+                    <div class="col-md-12">
+                        <input type="text" required name="scheduleCode" class="form-control" id="scheduleCode" value="${data.scheduleCode}" maxlength="20" onblur="validateNameAndCode(this)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-3">
+                <div class="form-group">
+                    <label for="parentScheduleId" class="required">
+                        <spring:message code="ACCOUNT.ACCOUNTSCHEDULE.UNDER" />:
+                    </label>
+                    <div class="col-md-12">
+                        <select class="form-control" name="parentScheduleId" id="parentScheduleId" data-plugin-selectTwo>
+                            <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+                            <c:forEach items="${scheduleActiveSubScheduleList}" var="schedule">
+                                <option value="${schedule.scheduleId}" ${schedule.scheduleId eq data.parentScheduleId ? 'selected="selected"' : ''}>
+                                    ${schedule.scheduleName}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+          <div class="col-md-3 col-sm-3">
+    <div class="form-group">
+        <label for="accountGroupId" class="required">
+            <spring:message code="ACCOUNT.ACCOUNTMASTER.GROUP" />:
+        </label>
+        <div class="col-md-12">
+            <select class="form-control"  name="accountGroupId" data-plugin-selectTwo onchange="getAccountSubGroups(this.value);" id="accountGroupId">
+                <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+                <c:forEach items="${parentActiveaccountGrupList}" var="parentGroup">
+                    <option value="${parentGroup.accountGroupId}" ${data.accountGroupId.accountGroupId eq parentGroup.accountGroupId ? 'selected="selected"' : ''}>
+                        ${parentGroup.accountGroupName}
+                    </option>
+                </c:forEach>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 col-sm-3">
+        <div class="form-group">
+            <label  for="accountSubGroupId" class="required">
+                <spring:message code="ACCOUNT.ACCOUNTMASTER.SUBGROUP" />:
+            </label>
+            <div class="col-md-12">
+                <select class="form-control" name="accountSubGroupId" data-plugin-selectTwo id="accountSubGroupId">
+                    <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.NONE" /></option>
+                    <c:forEach items="${childActiveaccountGrupList}" var="subGroup">
+                        <option value="${subGroup.accountGroupId}" ${data.accountSubGroupId.accountGroupId eq subGroup.accountGroupId ? 'selected="selected"' : ''}>
+                            ${subGroup.accountGroupName}
+                        </option>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+						
+						
+
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group">
+                    <label class="col-md-12" for="description">
+                        <spring:message code="COMMON.LABEL.DESCRIPTION" />:
+                    </label>
+                    <div class="col-md-12">
+                        <textarea name="description" class="form-control" id="description" style="height: 28px;" maxlength="200">${data.description}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+  <div class="row">
+    <div class="col-sm-12" style="margin-top: 30px;">
+        <div class="form-group text-center">
+            <button type="button" class="btn btn-sm btn-success" onclick="save('createScheduleSubSchedule');">
+              		<c:choose>
+								    <c:when test="${empty data.scheduleId}">
+								        <spring:message code="COMMON.BUTTON.SUBMIT" />
+								    </c:when>
+								    <c:otherwise>
+								        <spring:message code="COMMON.BUTTON.UPDATE" />
+								    </c:otherwise>
+								</c:choose>
+            </button>
+            <a href="${contextPath}/home" class="btn btn-sm btn-danger">
+                <spring:message code="COMMON.BUTTON.BACK" />
+            </a>
+        </div>
+    </div>
+</div>
+
+    </form>
+</div>
+
+
+
+<spring:message code="ACCOUNT.ACCOUNTSCHEDULE.LIST" />
+
+<table class="table table-bordered table-striped mb-none" id="datatable-default">
+    <thead>
+        <tr>
+            <th><spring:message code="ACCOUNT.ACCOUNTSCHEDULE.NAME" /></th>
+            <th><spring:message code="ACCOUNT.ACCOUNTSCHEDULE.CODE" /></th>
+            <th><spring:message code="ACCOUNT.ACCOUNTSCHEDULE.UNDER" /></th>
+            <th><spring:message code="COMMON.LABEL.OPTION" /></th>
+        </tr>
+    </thead>
+    <tbody>
+        <c:forEach items="${scheduleSubScheduleList}" var="schedule">
+            <tr class="gradeX">
+                <td>${schedule.scheduleName}</td>
+                <td>${schedule.scheduleCode}</td>
+                <c:set var="parentScheduleName" value="NONE" />
+                <c:forEach items="${scheduleActiveSubScheduleList}" var="activeSchedule">
+                    <c:if test="${schedule.parentScheduleId eq activeSchedule.scheduleId}">
+                        <c:set var="parentScheduleName" value="${activeSchedule.scheduleName}" />
+                    </c:if>
+                </c:forEach>
+                <td>${parentScheduleName}</td>
+                <td>
+                    
+                    <a class="btn btn-sm btn-circle btn-warning text-white" title="<spring:message code="COMMON.BUTTON.ICONEDIT" />" onclick="edit(${schedule.scheduleId})">
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                    </a>
+                </td>
+            </tr>
+        </c:forEach>
+    </tbody>
+</table>
+
+<form action="${contextPath}/mst/saveScheduleSubSchedule" method="POST" id="finalSubmit">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    <input type="hidden" name="encData" id="hdnData"/>
+</form>
+
+<form id="editAccountGroup" action="${contextPath}/mst/updateScheduleSubSchedule" method="POST">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+    <input type="hidden" name="encDataa" id="hdnData1"/>
+    <!-- <input type="hidden" name="accountGroupId" id="accountGroupId" value="" /> -->
+</form>
+
+
+<script type="text/javascript">
+
+function edit(scheduleId){
+    debugger;
+    var scheduleIddata = scheduleId.toString();
+    $("#hdnData1").val(AES256.encrypt(scheduleIddata));
+    $("#editAccountGroup").submit();
+}
+
+
+const save=async(formId)=>
+{
+	  const requiredFields = document.querySelectorAll('.required');
+      let validationFailed = false;
+
+      for (const field of requiredFields) {
+          const inputId = field.getAttribute('for');
+          const inputField = document.getElementById(inputId);
+          if (!inputField.value) {
+              inputField.style.borderColor = 'red';
+              await showNotification(true, field.textContent.replace(/:/g, "") + " is required.");
+              setTimeout(() => {
+                  inputField.style.borderColor = '';
+              }, 3000);
+              validationFailed = true;
+              break;
+          }
+      }
+
+      if (!validationFailed) {
+    const encryptFormDataResult = await encryptHiddenFormData(formId);
+    	debugger
+    	if (encryptFormDataResult) {
+    	    $('#hdnData').val(encryptFormDataResult);
+    	    $('#finalSubmit').submit();
+    	} else {
+    	    showNotification(true, 'Unable to process your request. Please try after some time.');
+    	}
+      }
+}
+
+function getAccountSubGroups(groupId,selectedSubGrp){
+    debugger
+    $.ajax({
+        type: "GET",
+        url: '${contextPath}/mst/getAccountSubGroups',
+        data: {
+            "accountId": AES256.encrypt(groupId), 
+        },
+        success: function(response) {
+            var subScheduleDropdown = $('#subAccountGroup');
+            subScheduleDropdown.empty();
+            $.each(JSON.parse(response), function(index, value) { 
+                subScheduleDropdown.append($('<option>', {
+                    value: value.accountGroupId, 
+                    text: value.accountGroupCode + ' | ' + value.accountGroupName 
+                }));
+            });
+            
+            if(selectedSubGrp!=''){
+            	$("#subAccountGroup").val(selectedSubGrp);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error occurred: " + status + " " + error);
+        }
+    });
+}
+
+</script>

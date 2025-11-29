@@ -1,0 +1,17 @@
+package com.aashdit.common.repository;
+
+import com.aashdit.common.model.EntityLevel;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+
+@Repository
+public interface EntityLevelRepository extends JpaRepository<EntityLevel, Long> {
+
+	EntityLevel findByValueCode(String entityLvl);
+	List<EntityLevel> findByCode(String entityLvl);
+
+
+}

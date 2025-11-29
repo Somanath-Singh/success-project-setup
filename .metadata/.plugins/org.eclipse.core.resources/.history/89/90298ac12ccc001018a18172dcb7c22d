@@ -1,0 +1,279 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<style>
+.freeze {
+    pointer-events: none;
+    opacity: 0.6; 
+    cursor: not-allowed;
+}
+</style>
+
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Add Audit Details</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+           	 	<li class="breadcrumb-item active" aria-current="page">Audit Management</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+		<div class="card-header">
+          <h5 class="card-title">Audit Management</h5>
+		</div>
+		<div class="card-body">
+      		<form class="form-horizontal" action="${contextPath}/audit-management/saveAuditManagementDetails" method="POST" id="auditManagementData" enctype="multipart/form-data">
+				<input type="hidden" id="cipherText" name="cipherText" value="">
+				<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+				<input type="hidden" id="auditManagementId" name="auditManagementId" value="${auditManagement.auditManagementId}">
+				<input type="hidden" id="inspectedBy" name="inspectedBy" value="${auditManagement.inspectedBy}">
+				<input type="hidden" id="buttonCode" name="buttonCode">	
+				
+				<div class="row">
+				<div class="col-md-3">
+                      <div class="form-group">
+                          <label class="smallInput required" for="financialYear">Financial Year :</label>
+                          <select class="form-control form-control-sm form-select freeze" id="financialYearId" name="financialYearId" onchange="getDistrictByFinancialYear(this.value)">
+                              <option value="0" selected disabled>- Select -</option>
+                              <c:forEach items="${financialYearList}" var="fy" varStatus="index">
+                                 <option value="${fy.financialYearId}" ${ fy.financialYearId eq auditManagement.financialYearId ? 'selected' : ''}>${fy.financialYear}</option>
+                              </c:forEach>
+                         </select>
+                     </div>
+                 </div>
+                 <div class="col-md-3">
+                       <div class="form-group">
+                           <label class="smallInput required" for="districtId">District :</label>
+                          <select class="form-control form-control-sm select2 form-select freeze" id="districtId" name="districtId" onchange="getProjectByFinancialYearAndDistrict(this.value)">
+                              <option value="0" selected disabled>- Select -</option>
+                              <c:if  test="${not empty auditManagement}">
+                             	<c:forEach items="${districtList}" var="district">
+                                    <option value="${district.districtId}" ${ district.districtId eq auditManagement.districtId ? 'selected' : ''}>
+                                        ${district.districtName}
+                                    </option>
+                               	</c:forEach>
+                             </c:if>
+                          </select>
+                       </div>
+                   </div>
+             		<div class="col-md-3">
+						<div class="form-group">
+							<label class="col-md-12 required" for="projectId">Building :</label>
+							<div class="col-md-12">
+								<select id="projectId" name="projectId" class="form-control form-control-sm form-select select2 freeze" required="required">
+									<option value="0" selected disabled>- Select -</option>
+									<c:if  test="${not empty auditManagement}">
+	                                 	<c:forEach items="${projectList}" var="project">
+	                                        <option value="${project.projectId}" ${ project.projectId eq auditManagement.projectId ? 'selected' : ''}>
+	                                            ${project.projectName}
+	                                        </option>
+	                                   	</c:forEach>	
+                                 	</c:if>
+								</select>
+							</div>
+						</div>
+					</div>	
+					<div class="col-md-3">
+						<div class="form-group">
+							<label class="col-md-12 required" for="inspectionTypeId">Select Inspection Type :</label>
+							<div class="col-md-12">
+								<select id="inspectionTypeId" name="inspectionTypeId" class="form-control form-control-sm form-select freeze" required>
+									<option value="0">- Select -</option>
+									<c:forEach items="${inspectionTypeList}" var="inspectionType">
+										<option value="${inspectionType.inspectionTypeId}" ${inspectionType.inspectionTypeId eq auditManagement.inspectionTypeId ? 'selected' : '' }>${inspectionType.inspectionType}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+					</div>	
+				</div>
+			
+				<div class="row">
+					<div class="col-md-3">
+						<div class="form-group">
+							<label class="required">Latitude : </label>
+							<div class="col-md-12">
+								<input type="text" id="latitude" name="latitude" class="form-control form-control-sm freeze" required maxlength="100" value="${auditManagement.latitude}">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="form-group">
+							<label class="required">Longitude : </label>
+							<div class="col-md-12">
+								<input type="text" id="longitude" name="longitude" class="form-control form-control-sm freeze" required maxlength="100" value="${auditManagement.longitude}">
+							</div>
+						</div>
+					</div>
+					<%-- <c:if test="${not empty auditManagement.auditFileName}">
+						<div class="form-group col-md-3">
+						    <label class="required">Upload Document :</label>
+						    <div class="col-md-12 position-relative">
+						            <img 
+									  src="${pageContext.request.contextPath}/document/viewDocuments?moduleName=AUDIT_MANAGEMENT_FILE&filePath=${auditManagement.auditFileName}" 
+									  class="img-fluid rounded mb-2" 
+									  alt="Site Image" 
+									  style="max-height: 400px; object-fit: contain;" />
+						          	<span style="font-size: 12px;color: #7b3f00;font-weight: 600;">${auditManagement.auditFileName}</span>
+						    </div>
+						</div>
+					</c:if> --%>
+					<div class="col-md-3">
+					    <label class="required">Upload Document :</label>
+					    <div class="col-md-12 position-relative">
+					 	    <input type="file" id="auditFilePath" name="auditFilePath" class="form-control form-control-sm freeze" required maxlength="100" value="${auditManagement.auditFileName}" >
+					 	    <c:if test="${not empty auditManagement.auditFileName}">
+					            <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top: 1px;" onclick="viewDocument('${auditManagement.auditFileName}','AUDIT_MANAGEMENT_FILE')" title="Download Document">
+					                <i class="fa fa-download"></i>
+					            </button> <span style="font-size: 12px;color: #7b3f00;font-weight: 600;">${auditManagement.auditFileName}</span>
+					        </c:if>
+					    </div>
+					</div>
+					
+					<div class="col-md-3">
+					    <label for="remarks" class="required">Remarks:</label>
+					    <div class="col-md-12">
+								<textarea  
+								    class="form-control freeze"  
+								    id="remarks"  
+								    name="remarks"  
+								    rows="3"  
+								    placeholder="Enter your remarks">${auditManagement.remarks}</textarea>
+						</div>
+				  </div>
+				</div>
+				
+				<c:set var="dynamicFromId" value="auditManagementData" scope="request" />
+		        <c:set var="wonFunction" value="submitAuditForm()" />
+		        <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp" %>
+			
+		  </form>     
+		</div>
+	</div>
+  </div>
+</div>
+
+<form action = "${contextPath}/document/viewDocuments" method="get" id="documentFormView" enctype="multipart/form-data" target="_blank">
+	<input type="hidden" name="moduleName" id="moduleName"/>
+	<input type="hidden" name="filePath" id="filePath"/>
+</form>
+
+<script>
+
+function viewDocument(filePath,moduleName){
+	debugger
+	 $('#moduleName').val(moduleName);
+	 $('#filePath').val(filePath);
+	 $('#documentFormView').submit();
+	}
+
+
+function submitAuditForm() {
+	
+    const financialYearId = $("#financialYearId").val();
+    const districtId = $("#districtId").val();
+    const projectId = $("#projectId").val();
+    const inspectionTypeId = $("#inspectionTypeId").val();
+    const latitude = $("#latitude").val();
+    const longitude = $("#longitude").val();
+    const auditFilePath = $("#auditFilePath").val();
+    const remarks = $("#remarks").val();
+    const buttonCode = $("#hdnButtonCode").val();
+
+    if (!financialYearId || financialYearId === "0") {
+        bootbox.alert("Please select a Financial Year.");
+        return false;
+    } else if (!districtId || districtId === "0") {
+        bootbox.alert("Please select a District.");
+        return false;
+    } else if (!projectId || projectId === "0") {
+        bootbox.alert("Please select a Project.");
+        return false;
+    } else if (!inspectionTypeId || inspectionTypeId === "0") {
+        bootbox.alert("Please select an Inspection Type.");
+        return false;
+    } else if (!latitude) {
+        bootbox.alert("Latitude is required.");
+        return false;
+    } else if (!longitude) {
+        bootbox.alert("Longitude is required.");
+        return false;
+    } else if (!remarks) {
+        bootbox.alert("Remarks are required.");
+        return false;
+    }
+
+    $("#buttonCode").val(buttonCode);
+
+    const bizContent = $("#auditManagementData").serializeArray();
+    $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    // Confirm before submit
+    bootbox.confirm("Do you want to continue?", function (result) {
+        if (result) {
+            showLoader();
+            $("#auditManagementData").submit();
+        }
+    });
+}
+
+function getDistrictByFinancialYear(finYearId){
+    $.ajax({
+        url: "${contextPath}/audit-management/get-district-by-financialYear",
+        type: "GET",
+        data: {
+        	financialYearId: finYearId
+        },
+        success: function (districts) {
+   
+            var districtSelect = $("#districtId");
+            districtSelect.empty(); 
+            districtSelect.append('<option value="0" selected disabled>- Select -</option>');
+            
+            $.each(districts, function(index, district) {
+            	districtSelect.append('<option value="' + district.districtId + '">' + district.districtName + '</option>');
+            });
+        },
+        error: function (error) {
+            bootbox.alert("Error fetching districts :",error);
+        }
+    });
+}
+
+function getProjectByFinancialYearAndDistrict(districtId){
+	const financialYear = $("#financialYearId").val();
+    $.ajax({
+        url: "${contextPath}/audit-management/get-projects-by-financialyear-and-district",
+        type: "GET",
+        data: {
+        	financialYearId: financialYear,
+        	districtId: districtId
+        },
+        success: function (projects) {
+   
+            var projectSelect = $("#projectId");
+            projectSelect.empty(); 
+            projectSelect.append('<option value="0" selected disabled>- Select -</option>');
+            
+            $.each(projects, function(index, project) {
+            	projectSelect.append('<option value="' + project.projectId + '">' + project.projectName + '</option>');
+            });
+        },
+        error: function (error) {
+            bootbox.alert("Error fetching projects :",error);
+        }
+    });
+}
+
+
+</script>

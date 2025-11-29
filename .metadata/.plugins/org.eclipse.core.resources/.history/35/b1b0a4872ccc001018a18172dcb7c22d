@@ -1,0 +1,225 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<script src="${contextPath}/resources/javascripts/accountMaster.js"></script>
+<script src="${contextPath}/resources/javascripts/common.js"></script>
+<script src="resources/javascripts/createAccountMaster.js"></script>
+<style>
+.modaltabledata th {
+    line-height: 16px;
+    font-size: 13px !important;
+    font-weight: 400;
+}
+.tablemodal .modal-footer{
+padding:0
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-exit{
+margin-top:7px;
+}
+.modaltop-data {
+    font-size: 14px;
+}
+.tablemodal .modal-body {
+    padding-bottom: 0;
+}
+.lftdata {
+    width: 50%;
+    float: left;
+    font-size: 14px;
+}
+.rgtdata {
+    width: 50%;
+    float: right;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+</style>
+<div class="container-fluid">
+          <!-- Start::row-1 -->
+          <div class="row">
+              <div class="col-xl-12">
+                  <div class="card custom-card">
+                      <div class="top-left"></div>
+                      <div class="top-right"></div>
+                      <div class="bottom-left"></div>
+                      <div class="bottom-right"></div>
+                      <div class="card-body">
+                     <h5><b>Close Financial Year</b></h5>
+								<div class="col-md-12">
+									<form action="${contextPath}/updateOpnClsBlnc" id="updateOpnClsBlnc" method="post" lass="form-horizontal form-bordered" >
+				            <input type="hidden" name="${_csrf.parameterName}"value="${_csrf.token}" />
+				            <div class="row">
+				                <div class="form-group col-md-3">
+				                  <label for="finYear" class="form-label required">fin Year:<span style="color:red">*</span> </label>
+					                  <select class="form-select"   aria-label="Default select example" id="finYear" name="finYear" onchange="getSelectedAllField(this.value);">
+					                        <option value="">---select---</option>
+						                    <c:forEach items="${finList}" var="fin">
+												<option value="${fin.finYearId}" ${finMaster.finYearId eq fin.finYearId ?'selected':'' }>${fin.finYear}</option>
+											</c:forEach>
+					                  </select>
+				                </div>
+				                
+				                
+				                <div class="form-group col-md-3">
+				                  <label for="rcvVoucher" class="form-label required">Receive Voucher:</label>
+					                  <select class="form-select"  aria-label="Default select example" id="rcvVoucher" name="rcvVoucher" onchange="showDiv();">
+					                       <option value="">---select---</option>
+						                   <option value="CLOSED" ${finMaster.statusForRcptVchr eq 'false'?'selected':'' }>CLOSED</option>
+						                   <option value="OPEN" ${finMaster.statusForRcptVchr eq 'true'?'selected':'' }>OPEN</option>
+				                 	   </select>
+				                </div>
+				                
+				                
+				                <div class="form-group col-md-3">
+				                  <label for="paymentVoucher" class="form-label required">Payment Voucher:</label>
+					                  <select class="form-select"  aria-label="Default select example" id="paymentVoucher" name="paymentVoucher" onchange="showDiv();">
+					                      <option value="" >---select---</option>
+						                   <option value="CLOSED" ${finMaster.statusForCpf eq 'false'?'selected':'' }>CLOSED</option>
+						                   <option value="OPEN" ${finMaster.statusForCpf eq 'true'?'selected':'' }>OPEN</option>
+					                  </select>
+				                </div>
+				               
+				                
+				                <div class="form-group col-md-3">
+				                  <label for="journalVoucher" class="form-label required">Journal Voucher:</label>
+					                  <select class="form-select"  aria-label="Default select example" id="journalVoucher" name="journalVoucher" onchange="showDiv();">
+						                   <option value="">---select---</option>
+						                  <option value="CLOSED" ${finMaster.statusForJV eq 'false'?'selected':'' }>CLOSED</option>
+						                   <option value="OPEN" ${finMaster.statusForJV eq 'true'?'selected':'' }>OPEN</option>
+					                  </select>
+				                </div>
+				             
+				                  <div class="form-group col-md-3">
+				                  <label for="contraVoucher" class="form-label required">Contra Voucher:</label>
+					                  <select class="form-select"  aria-label="Default select example" id="contraVoucher" name="contraVoucher" onchange="showDiv();">
+						                   <option value="">---select---</option>
+						                  <option value="CLOSED" ${finMaster.statusForJV eq 'false'?'selected':'' }>CLOSED</option>
+						                   <option value="OPEN" ${finMaster.statusForJV eq 'true'?'selected':'' }>OPEN</option>
+					                  </select>
+				                </div>
+				               
+				                
+				                <div class="form-group col-md-3">
+                                  <label for="compilationSec" class="form-label required">Compilation Section:</label>
+                                  <select class="form-select"  aria-label="Default select example" id="compilationSec" name="compilationSec" onchange="showDiv();">
+                                       <option value="">---select---</option>
+                                      <option value="CLOSED" ${finMaster.statusForComp eq 'false'?'selected':'' }>CLOSED</option>
+                                       <option value="OPEN" ${finMaster.statusForComp eq 'true'?'selected':'' }>OPEN</option>
+                                  </select>
+				                </div>
+				                
+				
+								<div class="form-group col-md-3"> 
+                                   <label for="updatedDate" class="form-label required">Updated Date:</label>
+                                   <div class="datepicker-box">
+                                       <input type="text" class="form-control datepicker" id="updatedDate" name="updatedDate"
+                                       autocomplete="off" maxlength="25" value="${finMaster.lastUpdatedDate}">
+                                   </div>
+                               </div>
+				
+				                <div class="row">
+					                 <div class="form-group col d-flex justify-content-center">
+					               		 <button type="button" class="btn btn-secondary btn-submit"onclick="checkFormData_onSubmit('updateOpnClsBlnc')">Proceed</button>
+					                </div>
+				                </div>
+				                </div>
+				            </form>
+					</div>
+				</div>
+          </div>
+     </div>
+  </div>
+</div>
+        
+
+
+<script>
+const checkFormData_onSubmit = async (formId) => {
+	    debugger
+	    const requiredFields = document.querySelectorAll('.required');
+	    let validationFailed = false;
+
+	    for (const field of requiredFields) {
+	        const inputId = field.getAttribute('for');
+	        const inputField = document.getElementById(inputId);
+	        if (!inputField.value) {
+	            inputField.style.borderColor = 'red';
+	            await showNotification(true, field.textContent.replace(/:/g, "") + " is required.");
+	            setTimeout(() => {
+	                inputField.style.borderColor = '';
+	            }, 3000);
+	            validationFailed = true;
+	            break;
+	        }
+	    }
+
+	    if (!validationFailed) {
+	        bootbox.confirm({
+	            message: "Are you sure you want to proceed?",
+	            buttons: {
+	                confirm: {
+	                    label: 'Yes',
+	                    className: 'btn-success'
+	                },
+	                cancel: {
+	                    label: 'No',
+	                    className: 'btn-danger'
+	                }
+	            },
+	            callback: function (result) {
+	                if (result === true) {
+	                	showLoader();
+	                    $('#updateOpnClsBlnc').submit();
+	                }
+	            }
+	        });
+	    }
+
+	    return false;
+	}
+
+
+function getSelectedAllField(yearId){
+	$.ajax({
+ 		type : "GET",
+		url  : '${contextPath}/getSelectedAllField',
+		data : {
+			"yearId":yearId,
+		},
+		success : function(response) {
+			debugger
+		   var data=response;
+		   if(data!=null){
+			   $("#finYear").val(data.finYear);
+			   $("#rcvVoucher").val(data.rcvVoucher);
+			   $("#paymentVoucher").val(data.paymentVoucher);
+			   $("#journalVoucher").val(data.journalVoucher);
+			   $("#contraVoucher").val(data.contraVoucher);
+			   $("#compilationSec").val(data.compilationSec);
+			   $("#updatedDate").val(data.selUpdatedDate);
+		   }
+			
+		},
+		error : function(error) {
+			bootbox.alert("ajax error");
+		}
+	});
+}
+
+
+
+</script>
+
+
+    

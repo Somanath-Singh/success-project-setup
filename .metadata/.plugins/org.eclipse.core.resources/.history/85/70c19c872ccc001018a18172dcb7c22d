@@ -1,0 +1,715 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<!-- NOTE: CSS & JS should be in <head> or Tiles <put-attribute name="js"> -->
+<!-- Remove <link> and <script> from here — move to Tiles layout or header -->
+
+<!-- Breadcrumb -->
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Add Fund Distribution </h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="${contextPath}/home"><i class="fa fa-home"></i> Home</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Add Fund Distribution</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<%@ include file="/WEB-INF/views/BAMS/filter-building-page/building-common-filter.jsp"%>
+
+
+<div class="card mt-4">
+  <div class="card-header">
+    <h5 class="card-title">Fund Distribution Report Details</h5>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped exportbtn" id="reportTable">
+        <thead class="table-light">
+         <tr >
+            <th>Sl No.</th>
+            <th>Work Order Value </th>
+            <th>Last Released Date</th>
+            <th>Cumulative Amount So Far </th>
+            <th>Cumulative Percentage</th>
+            <th>Current Stage</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <c:choose>
+            <c:when test="${not empty buildingFilterData.reportDataList}">
+              <c:forEach items="${buildingFilterData.reportDataList}" var="item" varStatus="loop">
+              	<!-- Only render row if fundDTO exists -->
+            	<c:if test="${not empty item.fundDTO}">
+            		<tr>
+	                  <td class="text-center">${loop.index + 1}</td>
+	                  <td>${item.fundDTO.workOrderValue}</td>
+	                  <td>
+	                    <c:choose>
+	                        <c:when test="${not empty item.fundDTO.lastReleasedDates}">
+	                           <fmt:parseDate value="${item.fundDTO.lastReleasedDates}" 
+						               pattern="yyyy-MM-dd HH:mm:ss.SSS" 
+						               var="parsedDate" />
+	
+							<fmt:formatDate value="${parsedDate}" pattern="yyyy-MM-dd" />
+	
+	                        </c:when>
+	                        <c:otherwise>N/A</c:otherwise>
+	                    </c:choose>
+	                 </td>
+		              <td>${item.fundDTO.cummulativeAmount}</td>
+		              <td>${item.fundDTO.cummulativePercentage}</td>
+		              <td>${item.fundDTO.fundReleaseType}</td>
+		              <td class="tdbuttons-small">
+	                    <div class="d-flex gap-2">
+	                      <button type="button" class="viewbtn" data-bs-toggle="modal" onclick="sendBuildingId(${item.buildingDTO.buildingId},${23})" data-bs-target="#viewModal" data-bs-toggle="tooltip" title="View"><i class="ti ti-eye"></i></button>
+	                      <button class="btn viewbtn" onclick="editRecord(${item.buildingDTO.buildingId})"><i class="ti ti-pencil"></i></button>
+	                    </div>
+	                  </td>
+	                </tr>
+            	</c:if>
+              </c:forEach>
+            </c:when>
+            <c:otherwise>
+              <tr><td colspan="7" class="text-center text-muted">No records found for the selected criteria.</td></tr>
+            </c:otherwise>
+          </c:choose>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+ <form action="${contextPath}/fund/get-by-id" method="Post" id="fundForm">
+	 <input type="hidden" id="fundCipherText" name="cipherText">
+	 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	 <input type="hidden" name="buildingIdd" id="buildingId" />
+	</form>
+
+<!-- View Modal -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Building Fund Distribution Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Building Details -->
+        <h6 class="hnew"><b>Building Details</b></h6>
+
+        <div class="row mt-3">
+
+          <div class="col-md-4"><p><b>District:</b> <span id="dist"></span></p></div>
+          <div class="col-md-4"><p><b>Block:</b> <span id="block"></span></p></div>
+          <div class="col-md-4"><p><b>Gram Panchayat:</b> <span id="gp"></span></p></div>
+
+          <div class="col-md-4"><p><b>Village:</b> <span id="village"></span></p></div>
+          <div class="col-md-4"><p><b>Building Type:</b> <span id="buildingTypee"></span></p></div>
+          <div class="col-md-4"><p><b>Building Name:</b> <span id="buildingNamee"></span></p></div>
+
+          <div class="col-md-4"><p><b>UDISE Code:</b> <span id="udiseCode"></span></p></div>
+          <div class="col-md-4"><p><b>Class Range:</b> <span id="classRange"></span></p></div>
+          <div class="col-md-4"><p><b>Category of School:</b> <span id="category"></span></p></div>
+
+          <div class="col-md-4"><p><b>Building Code:</b> <span id="buildingCode"></span></p></div>
+          <div class="col-md-4"><p><b>Location Code:</b> <span id="locationCode"></span></p></div>
+
+        </div>
+
+        <hr>
+
+        <!-- Fund Distribution Details -->
+        <h6 class="hnew"><b>Fund Distribution Details</b></h6>
+
+        <div class="row mt-3">
+
+          <div class="col-md-4"><p><b>Work Order Value:</b> <span id="woValue"></span></p></div>
+          <div class="col-md-4"><p><b>Last Released Date:</b> <span id="lastRelease"></span></p></div>
+          <div class="col-md-4"><p><b>Cumulative Amount So Far:</b> <span id="cumAmt"></span></p></div>
+
+          <div class="col-md-4"><p><b>Cumulative Percentage (%):</b> <span id="cumPercent"></span></p></div>
+
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  $( document ).ready(function() {
+    $('.datepicker_con>input').datepick({
+      dateFormat: 'dd/mm/yyyy', 
+          showOnFocus: true,
+      showTrigger: '<button type="button" class="trigger">' +
+      '<i class="fa fa-calendar"></i></button>',
+  });
+    
+});
+  
+  function LoadBuildingName(buildingType) {
+	  debugger;
+	    $.ajax({
+	        type: "GET",
+	        url:"${contextPath}/fund/getBuildingName",
+	        data: { buildingType: buildingType },
+	        success: function (response) {
+	            let dropdown = $('#buildingName');
+	            dropdown.empty();
+	            dropdown.append('<option value="" selected disabled>--Select--</option>');
+
+	            $.each(response, function (index, name) {
+	                dropdown.append('<option value="' + name + '">' + name + '</option>');
+	            });
+	        },
+	        error: function (error) {
+	            console.error("Error fetching building names:", error);
+	        }
+	    });
+	}
+  
+  
+  function sendBuildingId(buildingId, fundId) {
+
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/fund/distribution-list-ajax",
+	        data: { buildingId, fundId },
+	        success: function (res) {
+	            let dto = res;
+	            console.log(dto);
+	        	debugger;
+	            $("#dist").text(dto.planningDTO.districtName);
+	            $("#block").text(dto.planningDTO.blockName);
+	            $("#gp").text(dto.planningDTO.gpName);
+	            $("#village").text(dto.planningDTO.villageName);
+	            $("#buildingTypee").text(dto.planningDTO.buildingType);
+	            $("#buildingNamee").text(dto.planningDTO.buildingName);
+	            $("#udiseCode").text(dto.planningDTO.udiseCode);
+	            $("#classRange").text(dto.planningDTO.subCategory);
+	            $("#category").text(dto.planningDTO.schoolCategory);
+	            $("#buildingCode").text(dto.planningDTO.buildingCode);
+	            $("#locationCode").text(dto.planningDTO.locationCode);
+
+	            $("#woValue").text(dto.workOrderValue);
+	            $("#lastRelease").text(dto.lastReleasedDate);
+	            $("#cumAmt").text(dto.cummulativeAmount);
+	            $("#cumPercent").text(dto.cummulativePercentage + "%");
+
+	            $("#viewModal").modal("show");
+	        },
+	        error: function (error) {
+	            console.error("Error fetching record:", error);
+	        }
+	    });
+	}
+  
+
+  
+  function editRecord(buildingId) {
+	  debugger;
+	  $("#buildingId").val(buildingId);
+	  var bizContent = $("#fundForm").serializeArray();
+	  $("#fundCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+	  bootbox.confirm("Do you want to continue ?",function(result){
+		  if(result){
+			  showLoader();
+			  $("#fundForm").submit();
+		  }
+	  })
+}
+
+
+  </script>
+  
+  
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+<%--  
+ <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+	<style>
+	#viewModal .modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#viewModal .modal-header {
+  background: #996c0c;
+  color: white;
+  padding: 12px 20px;
+}
+
+#viewModal .modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color:#fff;
+}
+
+#viewModal .modal-body {
+  font-size: 14px;
+  padding-top: 30px;
+}
+#viewModal label {
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+
+/* ===== Inputs & Selects ===== */
+#viewModall .form-control,
+#viewModal .form-select {
+  border-radius: 4px;
+  font-size: 13px;
+  padding: 6px 8px;
+}
+
+#viewModal .form-control:focus,
+#viewModal .form-select:focus {
+  border-color: #0c9990;
+  box-shadow: 0 0 4px rgba(12, 153, 144, 0.4);
+}
+
+/* ===== Button Styling ===== */
+#editModal .btn-success {
+  background: #995c0c;
+  border: none;
+  font-weight: 600;
+}
+
+#editModal .btn-success:hover {
+  background: #0a7c74;
+}
+
+#viewModal .btn-secondary {
+  font-weight: 600;
+}
+
+/* ===== Row Spacing ===== */
+#viewModal .row > div {
+  margin-bottom: 10px;
+}
+	fieldset {
+    position: relative;
+    border: 1px solid #ffd0bc;
+    background-color: #fff0e9;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+	}
+/* ===== Fieldset Title Styling ===== */
+#viewModal .field-one {
+  position: absolute;
+        left: 18px;
+        top: -20px;
+        padding: 1px 1px;
+        background: #b56f51;
+        color: white;
+        font-size: 14px !important;
+        font-weight: 600;
+        border-radius: 4px;
+        padding: 2px 5px;
+}
+.hnew
+{
+border-bottom: 1px solid #d07d3470
+; padding-bottom: 7px;
+background:#e7ac63;
+color:#fff;
+padding-left:5px;
+padding-top:7px;
+border-radius:10px;
+}
+	</style> 
+  </head>
+
+<body>
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Edit Fund Distribution </h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="${contextPath}/home"><i class="fa fa-home"></i> Home</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Edit Fund Distribution</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+  
+    <div class="card-header bg-light fw-bold">Edit Fund Distribution</div>
+    <div class="card-body">
+      <div class="page_body_wrapper">
+        <div class="page-body">
+          
+          <div class="container-fluid">
+               <div class="row">
+              <div class="card">
+                <div class="card-body">
+                    <div class="innerpage-content">
+            <div class="row">
+  <!-- Date Filter From -->
+  <div class="col-md-3">
+    <div class="form-group mb-3">
+      <label>Date From</label>
+      <input type="date" class="form-control" id="dateFrom" />
+    </div>
+  </div>
+
+  <!-- Date Filter To -->
+  <div class="col-md-3">
+    <div class="form-group mb-3">
+      <label>Date To</label>
+      <input type="date" class="form-control" id="dateTo" />
+    </div>
+  </div>
+
+  <!-- District Filter -->
+  <div class="col-md-3">
+                        <div class="form-group">
+                          <label>District </label>
+                          <select
+                            class="form-select"
+                            id="district"
+                            aria-label="District"
+                            onchange="LoadBlockByDistrict(this.value, 'block')" >
+                            <option selected disabled>--Select--</option>
+                            <c:forEach var="dist" items="${districts}">
+                            <option value="${dist.districtId}">${dist.districtName}</option>
+                            </c:forEach>
+                          </select>
+                        </div>
+                      </div>
+
+							Block
+                            <div class="col-md-3">
+                            	<div class="form-group">
+                                <label class="required" for="blockId">Block Name :</label>
+                                 <select id="blockId" name="blockId" class="form-control form-control-sm form-select" required="required" onchange="LoadGrampanchayatByBlock(this.value, 'gpId');">
+                                     <option value="0" disabled selected>- Select -</option>
+                                 </select>
+                                 </div>
+                            </div>
+
+  <!-- Building Name Filter -->
+              <div class="col-md-3">
+                <label>Building Type</label>
+                <select id="buildingType" name="buildingType" class="form-select" onchange="LoadBuildingName(this.value);">
+                    <option value="">--Select--</option>
+                    <c:forEach var="bt" items="${buildingTypeList}">
+                        <option value="${bt.valueCode}">${bt.valueEn}</option>
+                    </c:forEach>
+                </select>
+            </div>
+
+                      <div class="col-md-3">
+                        <div class="form-group mb-3">
+                          <label>Building Name</label>
+                          <select id="buildingName" class="form-control">
+                            <option value="Select">--Select--</option>
+                            
+                          </select>
+                        </div>
+                      </div>
+  <!-- DWO Name Filter -->
+  
+
+  <!-- DEO Name Filter -->
+   
+</div>
+            <div class="row">
+			 <div class="table-responsive mt-3">
+
+                  <table class="table table-bordered mt-2" >
+                    <thead >
+                      <tr >
+                        <th class="text-center thnow" >Sl No.</th>
+                        <th class="text-center thnow">Work Order Value </th>
+                        <th class="text-center thnow">Last Released Date (yyyy-mm-dd)</th>
+                        <th class="text-center thnow">Cumulative Amount So Far </th>
+                        <th class="text-center thnow">Cumulative Percentage (%) </th>
+                        <th class="text-center thnow">Last Updated Date</th>
+                        <th class="text-center thnow">Current Stage(yyyy-mm-dd)</th>
+                        <th class="text-center thnow">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    <c:forEach items="${listRecords}" var="record" varStatus="loop">
+                      <tr>
+                        <td class="text-center">${loop.index + 1}</td>
+                        <td class="text-center">${record.workOrderValue }</td>
+                        <td class="text-center"><fmt:formatDate value="${record.lastReleasedDate }" pattern="yyyy-MM-dd"></fmt:formatDate></td>
+                        <td class="text-center">${record.cummulativeAmount }</td>
+                        <td class="text-center">
+						    <c:choose>
+						        <c:when test="${record.workOrderValue > 0}">
+						            <fmt:formatNumber 
+						                value="${(record.cummulativeAmount * 100) / record.workOrderValue}" 
+						                type="number" 
+						                maxFractionDigits="2" 
+						                minFractionDigits="2" 
+						            /> %
+						        </c:when>
+						        <c:otherwise>
+						            0.00 %
+						        </c:otherwise>
+						    </c:choose>
+						</td>
+
+                        <td class="text-center"><fmt:formatDate value="${record.lastUpdatedOn }" pattern="yyyy-MM-dd"></fmt:formatDate></td>
+                        <td class="text-center">${record.fundReleaseType }</td>
+                        
+						<td class="tdbuttons-small">
+                          <div class="d-flex gap-2">
+                            <button type="button" class="viewbtn" data-bs-toggle="modal" onclick="sendBuildingId(${record.buildingMaster.buildingId},${record.fundId })" data-bs-target="#viewModal" data-bs-toggle="tooltip" title="View"><i class="ti ti-eye"></i></button>
+                            <button class="btn viewbtn" onclick="editRecord(${record.buildingMaster.buildingId})"><i class="ti ti-pencil"></i></a></button>
+                          </div>
+                        </td>
+                      </tr>
+                     </c:forEach>
+                 </tbody>
+            </table>  
+                </div>
+          </div>
+        </div>
+                </div>
+              </div>
+            </div>
+      </div>
+
+    </div>
+    </div>
+      
+    </div>
+    
+	
+	<!-- View Modal -->
+<!-- View Modal -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Building & Fund Distribution Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Building Details -->
+        <h6 class="hnew"><b>Building Details</b></h6>
+
+        <div class="row mt-3">
+
+          <div class="col-md-4"><p><b>District:</b> <span id="dist"></span></p></div>
+          <div class="col-md-4"><p><b>Block:</b> <span id="block"></span></p></div>
+          <div class="col-md-4"><p><b>Gram Panchayat:</b> <span id="gp"></span></p></div>
+
+          <div class="col-md-4"><p><b>Village:</b> <span id="village"></span></p></div>
+          <div class="col-md-4"><p><b>Building Type:</b> <span id="buildingTypee"></span></p></div>
+          <div class="col-md-4"><p><b>Building Name:</b> <span id="buildingNamee"></span></p></div>
+
+          <div class="col-md-4"><p><b>UDISE Code:</b> <span id="udiseCode"></span></p></div>
+          <div class="col-md-4"><p><b>Class Range:</b> <span id="classRange"></span></p></div>
+          <div class="col-md-4"><p><b>Category of School:</b> <span id="category"></span></p></div>
+
+          <div class="col-md-4"><p><b>Building Code:</b> <span id="buildingCode"></span></p></div>
+          <div class="col-md-4"><p><b>Location Code:</b> <span id="locationCode"></span></p></div>
+
+        </div>
+
+        <hr>
+
+        <!-- Fund Distribution Details -->
+        <h6 class="hnew"><b>Fund Distribution Details</b></h6>
+
+        <div class="row mt-3">
+
+          <div class="col-md-4"><p><b>Work Order Value:</b> <span id="woValue"></span></p></div>
+          <div class="col-md-4"><p><b>Last Released Date:</b> <span id="lastRelease"></span></p></div>
+          <div class="col-md-4"><p><b>Cumulative Amount So Far:</b> <span id="cumAmt"></span></p></div>
+
+          <div class="col-md-4"><p><b>Cumulative Percentage (%):</b> <span id="cumPercent"></span></p></div>
+
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+    <form action="${contextPath}/fund/get-by-id" method="Post" id="fundForm">
+	 <input type="hidden" id="fundCipherText" name="cipherText">
+	 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	 <input type="hidden" name="buildingIdd" id="buildingId" />
+	</form>
+
+	<style>
+	.table > thead .thnow{
+	background: #a86b28;
+	color:#000;
+	}
+	</style>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $('.exportbtn').DataTable({
+        dom: 'lBfrtip',
+        responsive: true,
+        pageLength: 10,
+        // lengthMenu: [0, 5, 10, 20, 50, 100, 200, 500],
+      });
+
+    });
+
+  $( document ).ready(function() {
+    $('.datepicker_con>input').datepick({
+      dateFormat: 'dd/mm/yyyy', 
+          showOnFocus: true,
+      showTrigger: '<button type="button" class="trigger">' +
+      '<i class="fa fa-calendar"></i></button>',
+  });
+    
+});
+  
+  function LoadBuildingName(buildingType) {
+	  debugger;
+	    $.ajax({
+	        type: "GET",
+	        url:"${contextPath}/fund/getBuildingName",
+	        data: { buildingType: buildingType },
+	        success: function (response) {
+	            let dropdown = $('#buildingName');
+	            dropdown.empty();
+	            dropdown.append('<option value="" selected disabled>--Select--</option>');
+
+	            $.each(response, function (index, name) {
+	                dropdown.append('<option value="' + name + '">' + name + '</option>');
+	            });
+	        },
+	        error: function (error) {
+	            console.error("Error fetching building names:", error);
+	        }
+	    });
+	}
+  
+  
+  function sendBuildingId(buildingId, fundId) {
+
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/fund/distribution-list-ajax",
+	        data: { buildingId, fundId },
+	        success: function (res) {
+	            let dto = res;
+	            console.log(dto);
+	        	debugger;
+	            $("#dist").text(dto.planningDTO.districtName);
+	            $("#block").text(dto.planningDTO.blockName);
+	            $("#gp").text(dto.planningDTO.gpName);
+	            $("#village").text(dto.planningDTO.villageName);
+	            $("#buildingTypee").text(dto.planningDTO.buildingType);
+	            $("#buildingNamee").text(dto.planningDTO.buildingName);
+	            $("#udiseCode").text(dto.planningDTO.udiseCode);
+	            $("#classRange").text(dto.planningDTO.subCategory);
+	            $("#category").text(dto.planningDTO.schoolCategory);
+	            $("#buildingCode").text(dto.planningDTO.buildingCode);
+	            $("#locationCode").text(dto.planningDTO.locationCode);
+
+	            $("#woValue").text(dto.workOrderValue);
+	            $("#lastRelease").text(dto.lastReleasedDate);
+	            $("#cumAmt").text(dto.cummulativeAmount);
+	            $("#cumPercent").text(dto.cummulativePercentage + "%");
+
+	            $("#viewModal").modal("show");
+	        },
+	        error: function (error) {
+	            console.error("Error fetching record:", error);
+	        }
+	    });
+	}
+  
+
+  
+  function editRecord(buildingId) {
+	  debugger;
+	  $("#buildingId").val(buildingId);
+	  var bizContent = $("#fundForm").serializeArray();
+	  $("#fundCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+	  bootbox.confirm("Do you want to continue ?",function(result){
+		  if(result){
+			  showLoader();
+			  $("#fundForm").submit();
+		  }
+	  })
+}
+
+
+  </script>
+</body>
+
+</html> 
+  
+  
+  
+  
+  
+ --%>

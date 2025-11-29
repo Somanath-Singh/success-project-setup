@@ -1,0 +1,270 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<style>
+    .sorting_1 a{
+        color: #0d6efdb3 !important;
+    }
+    .sorting_1 a:visited {
+      color: pink !important;
+    }
+    .sorting_1 a.visited-link {
+        color: purple !important;
+    }
+</style>
+
+<div class="breadcrumb_conatiner">
+              <div class="col-md-6">
+                <h4 class="change-color">Good Receive Note</h4>
+              </div>
+              <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Good Receive Note</li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+            
+             <div class="row">
+                <div class="col-md-12">
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h5 class="card-title">Good Receive Note</h5>
+                    </div>
+                    <div class="card-body">
+			<div class="row">
+				<form action="${contextPath}/procurement/purchaseOrder/createMrnOrGrn" method="get" id="form" enctype="multipart/form-data">
+				    <input type="hidden" class="" id="encodedDataform" name="poIdEncoded" value="" />
+					<div class="col-md-12">
+				
+						<div class="row align-items-center">
+							<div class="col-md-3">
+								<div class="form-group">
+									<label class="col-md-12 required" for="text"><spring:message code="PROC.REQ.PONO" /> :</label>
+									<div class="col-md-12">
+										<select class="form-control form-select noPass" id="poNo" name="poId" onchange="getMrnDetails()">
+											<option value="0"><spring:message code="COMMON.SELECT" /></option>
+											<c:forEach items="${lstPo}" var="po">
+												<option value="${po.poId}" ${po.poId eq poId ? 'selected' : ''}>${po.poNo}</option>
+											</c:forEach>
+										</select>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-3 " style="margin-top:5px;">
+								<input type="button" class="btn btn-submit" value="Submit" onclick="validateForms()">
+								<a class="btn-danger btn" onclick="backToModule()">Cancel</a>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<c:if test="${not empty canEdit && canEdit}">
+							<c:choose>
+								<c:when test="${hasMrn eq true}">
+									<div class="row" style="float: right; font-size: 13px; color: #fff; height: 27px; line-height: 27px; margin-bottom: 10px; margin-right: 0">
+										<button type="button" style="float: right; background: #007468; color: #fff; border: none; border-radius: 5px;" class="btnadd-right" onclick="createMrn(${poId},0,false)"> Add MRN<i class='fa-solid fa-plus'></i></button>
+									</div>
+								</c:when>
+								<c:otherwise>
+								    <div class="row" style="float: right; font-size: 13px; color: #fff; height: 27px; line-height: 27px; margin-bottom: 10px; margin-right: 0">
+                                        <button type="button" style="float: right; background: #007468; color: #fff; border: none; border-radius: 5px;" class="btnadd-right" onclick="createGrn(${poId},0)"> Add GRN<i class='fa-solid fa-plus'></i></button>
+                                    </div>
+								</c:otherwise>
+							</c:choose>
+						</c:if>
+					</div>
+				</form>
+			</div>
+			<div class="row mt-5">
+				<c:choose>
+					<c:when test="${hasMrn eq true}">
+						<table class="datatable table table-striped table-bordered exportbtn mt-2 ">
+							<thead>
+								<tr>
+									<th>MRN No</th>
+									<th>PO Number</th>
+									<th>MRN Date</th>
+									<th>MRN Remarks</th>
+									<th>MRN Doc</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach items="${lstMrn}" var="mrn">
+									<tr>
+										<td>
+											<a href="javascript:void(0)" onclick="createMrn(${poId},${mrn.mrnId},true)" class="">${mrn.mrnNo}</a></td>
+										<td>${mrn.purchaseOrder.poNo}</td>
+										<td><fmt:formatDate value='${mrn.mrnDate}' pattern='dd/MM/yyyy' /></td>
+										<td>${mrn.remarks}</td>
+										<td>
+											<c:choose>
+												<c:when test="${not empty mrn.mrnDoc}">
+													<i class='fa-solid fa-file-export' style="font-size: 24px;" onclick="downloadDoc('${mrn.mrnDoc}','Purchase/Mrn')"></i>
+												</c:when>
+												<c:otherwise>
+						            				No Doc Uploaded
+						            			</c:otherwise>
+											</c:choose>
+										</td>
+										<td>
+											<c:choose>
+												<c:when test="${mrn.isGrnSubmit eq false}">
+													<a href="#" onclick="createGrn(0,${mrn.mrnId})"><i class='fa-solid fa-share' style="font-size: 25px;"></i></a>
+												</c:when>
+												<c:otherwise>
+													<a href="#" onclick="viewGrn(${mrn.grn.grnId})"><i class='fa-solid fa-share' style="font-size: 25px;"></i></a>
+												</c:otherwise>
+											</c:choose>
+										</td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</c:when>
+					<c:otherwise>
+						<table class="datatable table table-striped table-bordered exportbtn mt-2">
+							<thead>
+								<tr>
+									<th>GRN No</th>
+									<th>PO Number</th>
+									<th>GRN Date</th>
+									<th>GRN Remarks</th>
+									<th>GRN Doc</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach items="${lstGrn}" var="grn">
+									<tr>
+										<td>
+											<c:choose>
+												<c:when test="${grn.stageForwardedRule.actionType.actionCode eq 'APPROVE'}">
+													<a href="#" onclick="viewGrn(${grn.grnId})" target="_blank">${grn.grnNo}</a>
+												</c:when>
+												<c:otherwise>
+													${grn.grnNo}
+												</c:otherwise>
+											</c:choose>
+										</td>
+										<td>${grn.purchaseOrder.poNo}</td>
+										<td><fmt:formatDate value='${grn.grnDate}' pattern='dd/MM/yyyy' /></td>
+										<td>${grn.remarks}</td>
+										<td>
+											<c:choose>
+												<c:when test="${not empty grn.grnDoc}">
+													<i class='fa-solid fa-file-export' style="font-size: 25px;" onclick="downloadDoc('${grn.grnDoc}','Purchase/Grn')"></i>
+												</c:when>
+												<c:otherwise>
+					            					No Doc Uploaded
+					            				</c:otherwise>
+											</c:choose>
+										</td>
+										<td>
+											<a href="#" onclick="viewGrn(${grn.grnId})"><i class='fa-solid fa-share' style="font-size: 25px;"></i></a>
+										</td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<form action="${contextPath}/procurement/purchaseOrder/viewGrn" method="get" id="viewGrn">
+	<input type="hidden" class="" id="encodedDataviewGrn" name="grnIdEncoded" value="" />
+</form>
+
+<form action="${contextPath}/procurement/purchaseOrder/createMrn" method="get" id="mrnForm">
+	<input class="" type="hidden" id="poId" name="poId">
+	<input class="" type="hidden" id="mrnIdd" name="mrnId">
+	<input type="hidden" class="" id="encodedDatamrnForm" name="mrnFormEncoded" value="" />
+</form>
+<form action="${contextPath}/procurement/purchaseOrder/createGrn" method="get" id="grnForm">
+	<input class="" type="hidden" id="poIdd" name="poId">
+	<input class="" type="hidden" id="mrnIid" name="mrnId">
+    	<input type="hidden" class="" id="encodedDatagrnForm" name="grnFormEncoded" value="" />
+</form>
+<form method="post" action="${contextPath}/document/download" id="download" target="empty">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	<input type="hidden" id="docPath" name="docPath" value="">
+	<input type="hidden" id="module" name="module" value="">
+</form>
+
+<script>
+function backToModule(){
+       let currentModuleCode =  localStorage.getItem('currentModuleCode');
+       $('#moduleId').val(enc_password(currentModuleCode));
+       $('#moduleForm').submit();
+    }
+    function viewGrn(grnId) {
+        var encodeGrn= btoa(grnId);
+        $("#encodedDataviewGrn").val(encodeGrn);
+        $("#viewGrn").submit();
+    }
+	function downloadDoc(path,module){
+		$("#docPath").val(path);
+		$("#module").val(module);
+		var a=$("#docPath").val();
+		$("#download").submit();
+	}
+	function validateForms() {
+		var val=$("#poNo").val();
+		
+		if(val==0){
+			bootbox.alert("please select Po number.");
+		}else{
+            encryptFormData("form", tableOrTbodyIDS, tableOrTbodyKeys);
+			//removeFieldsFromFormBYClass("form","noPass");
+		    $("#form").submit();
+		}
+	}
+	
+	function createMrn(poId,mrnId,byLink) {
+	    $("#mrnForm").removeAttr("target", "_blank");
+	    $("#encodedDatamrnForm").val("");
+		$("#poId").val(poId);
+		if(mrnId !=0 ) {
+		    $("#mrnIdd").val(mrnId);
+		}
+		 encryptFormData("mrnForm", tableOrTbodyIDS, tableOrTbodyKeys);
+         removeFieldsFromFormBYClass("mrnForm","noPass");
+         if(byLink){
+            $("#mrnForm").attr("target", "_blank");
+         }
+		$("#mrnForm").submit();
+
+	}
+	function createGrn(poId,mrnId) {
+	    if(mrnId !=0 ) {
+	        $("#mrnIid").val(mrnId);
+	    }
+	    if(poId !=0){
+	        $("#poIdd").val(poId);
+	    }
+        encryptFormData("grnForm", tableOrTbodyIDS, tableOrTbodyKeys);
+        removeFieldsFromFormBYClass("grnForm","noPass");
+		$("#grnForm").submit();
+	}
+
+</script>
+<script>
+document.addEventListener("click", function (event) {
+    if (event.target.closest(".sorting_1 a")) {
+        event.target.classList.add("visited-link");
+    }
+});
+
+</script>

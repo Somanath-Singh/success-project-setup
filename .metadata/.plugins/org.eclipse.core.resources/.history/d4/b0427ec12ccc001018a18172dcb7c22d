@@ -1,0 +1,140 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<link rel="stylesheet" href="${contextPath}/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.css" />
+
+<style>
+	.vwol li a.active {
+		background: #ff9800;
+		color: #fff;
+	}
+</style>
+<section class="main_container">
+	<header class="page-header">
+		<h2><spring:message code="INV.STOCK.HEADER"/></h2>
+		<div class="right-wrapper pull-right">
+			<ol class="breadcrumbs">
+				<li><a href="${contextPath}"> <i class="fa fa-home"></i></a></li>
+				<li><span><spring:message code="INV.STOCK.HEADER"/></span></li>
+				<li><span><spring:message code="INV.STOCK.SUBHEADER"/></span></li>
+			</ol>
+		</div>
+	</header>
+
+	<div class="row">
+		<div class="col-md-12">
+			<section class="panel">
+				<header class="panel-heading">
+					<h2 class="panel-title"><spring:message code="INV.STOCK.SUBHEADER"/></h2>
+				</header>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="col-md-3">
+								<label><spring:message code="INV.STOCK.TABLE.SPAREPARTCODE"/></label>
+								<input type="text" value="${stock.eqptSpItems.itemCode}" readonly>
+							</div>
+							<div class="col-md-3">
+								<label><spring:message code="INV.STOCK.TABLE.SPAREPARTNAME"/></label>
+								<input type="text" value="${stock.eqptSpItems.itemName}" readonly>
+							</div>
+							<div class="col-md-3">
+								<label><spring:message code="INV.STOCK.TABLE.CATEGORY"/></label>
+								<input type="text" value="${stock.eqptSpItems.subCategory.category.categoryName}" readonly>
+							</div>
+							<div class="col-md-3">
+								<label><spring:message code="INV.STOCK.TABLE.QUANTITY"/></label>
+								<input type="text" value="${stock.availQty}" readonly>
+							</div>
+						</div>
+					</div>
+					<hr>
+
+					<ul class="nav nav-tabs vwol">
+						<li class="nav-item"><a class="nav-link ${code eq 'maintain' ? 'active':''}" id="ongoing" href="#" onclick="handleTabClick('maintain')">Maintain</a></li>
+						<li class="nav-item"><a class="nav-link ${code eq 'purchase' ? 'active':''}" id="upcoming" href="#"  onclick="handleTabClick('purchase')" >Purchase</a></li>
+
+						 
+						<!-- Add other tabs as needed -->
+					</ul>
+
+
+					<!-- start table -->
+					<div class="row">
+						<div class="col-md-12 table-responsive" style="padding-top: 5px;">
+							<c:if test="${code eq 'maintain'}">
+								<table class="DataTable table table-bordered table-hovered" style="width: 100%">
+									<thead>
+										<tr>
+											<th><spring:message code="SL_NO"/></th>
+											<th>Workorder no</th>
+											<th>Start date</th>
+											<th>End Date</th>
+											<th>Used Quantity</th>
+
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach items="${woList}" var="wo" varStatus="status">
+											<tr>
+												<td>${status.count}</td>
+												<td>${wo.workorder.workOrderNumber}</td>
+												<td>${wo.workorder.actualStartDate}</td>
+												<td>${wo.workorder.actualEndDate}</td>
+												<td>${wo.utilizedQuantity}</td>
+
+											</tr>
+										</c:forEach>
+									</tbody>
+								</table>
+							</c:if>
+							<c:if test="${code eq 'purchase'}">
+								<table class="DataTable table table-bordered table-hovered" style="width: 100%">
+									<thead>
+										<tr>
+											<th><spring:message code="SL_NO"/></th>
+											<th>Description</th>
+											<th>Adjustment Date</th>
+											<th>Adjust Quantity</th>
+											<th>Remarks</th>
+
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach items="${adjustmentHistoryList}" var="wo" varStatus="status">
+											<tr>
+												<td>${status.count}</td>
+												<td>${wo.description}</td>
+												<td>${wo.createdOn}</td>
+												<td>${wo.adjustQty}</td>
+												<td>${wo.remarks}</td>
+
+											</tr>
+										</c:forEach>
+									</tbody>
+								</table>
+							</c:if>
+						</div>
+					</div>
+					<!-- End Of Table -->
+				</div>
+			</section>
+		</div>
+	</div>
+</section>
+<form action="${contextPath}/maintenance/getWorkOrderDetailsByItemId" method="get" id="itemQtyDtls">
+	<input type="hidden" id="stockId" name="stockId" value="${stock.stockId}">
+	<input type="hidden" id="code" name="code">
+</form>
+
+<script>
+	function handleTabClick(code){
+		$("#code").val(code);
+		$("#itemQtyDtls").submit();
+	}
+</script>
+
+

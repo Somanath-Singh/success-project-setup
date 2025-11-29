@@ -1,0 +1,771 @@
+package com.aashdit.prod.heads.common.service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.stereotype.Service;
+
+import com.aashdit.prod.heads.common.controller.DownloadUploadController;
+import com.aashdit.prod.heads.common.dto.BankBranchMasterVo;
+import com.aashdit.prod.heads.common.dto.BankMasterVO;
+import com.aashdit.prod.heads.common.dto.VendorDocuments;
+import com.aashdit.prod.heads.common.model.AdditionalCost;
+import com.aashdit.prod.heads.common.model.AdditionalCostMaster;
+import com.aashdit.prod.heads.common.model.AppConfigParameters;
+import com.aashdit.prod.heads.common.model.AssetVendor;
+import com.aashdit.prod.heads.common.model.BankBranchMaster;
+import com.aashdit.prod.heads.common.model.BankMaster;
+import com.aashdit.prod.heads.common.model.Block;
+import com.aashdit.prod.heads.common.model.Category;
+import com.aashdit.prod.heads.common.model.District;
+import com.aashdit.prod.heads.common.model.FinancialYear;
+import com.aashdit.prod.heads.common.model.Gender;
+import com.aashdit.prod.heads.common.model.VendorBankDetails;
+import com.aashdit.prod.heads.common.model.VendorType;
+import com.aashdit.prod.heads.common.repository.AdditionalCostMasterRepository;
+import com.aashdit.prod.heads.common.repository.AdditionalCostRepository;
+import com.aashdit.prod.heads.common.repository.AppConfigParametersRepository;
+import com.aashdit.prod.heads.common.repository.AssetVendorRepository;
+import com.aashdit.prod.heads.common.repository.BankBranchMasterRepository;
+import com.aashdit.prod.heads.common.repository.BankMasterRepository;
+import com.aashdit.prod.heads.common.repository.BlockRepository;
+import com.aashdit.prod.heads.common.repository.CategoryRepository;
+import com.aashdit.prod.heads.common.repository.DistrictRepository;
+import com.aashdit.prod.heads.common.repository.FinancialYearRepository;
+import com.aashdit.prod.heads.common.repository.GenderRepository;
+import com.aashdit.prod.heads.common.repository.VendorBankDetailsRepository;
+import com.aashdit.prod.heads.common.repository.VendorTypeRepository;
+import com.aashdit.prod.heads.common.utils.ApplicationStringUtils;
+import com.aashdit.prod.heads.common.utils.CommonConstants;
+import com.aashdit.prod.heads.framework.core.ServiceOutcome;
+import com.aashdit.prod.heads.hims.umt.dto.EntityIdAndUserLevel;
+import com.aashdit.prod.heads.hims.umt.model.HierarchyEntityMap;
+import com.aashdit.prod.heads.hims.umt.model.OrganizationStructureHierarchy;
+import com.aashdit.prod.heads.hims.umt.model.Role;
+import com.aashdit.prod.heads.hims.umt.model.RoleEntityMap;
+import com.aashdit.prod.heads.hims.umt.model.UmtNativeQuery;
+import com.aashdit.prod.heads.hims.umt.model.User;
+import com.aashdit.prod.heads.hims.umt.repository.HierarchyEntityMapRepository;
+import com.aashdit.prod.heads.hims.umt.repository.OrganizationStructureHierarchyRepository;
+import com.aashdit.prod.heads.hims.umt.repository.RoleEntityMapRepository;
+import com.aashdit.prod.heads.hims.umt.repository.RoleRepository;
+import com.aashdit.prod.heads.hims.umt.repository.UmtNativeQueryRepository;
+import com.aashdit.prod.heads.hims.umt.utils.SecurityHelper;
+
+import lombok.extern.slf4j.Slf4j;
+
+
+@Service
+@Slf4j
+public class CommonServiceImpl<T> implements CommonService {
+
+	@Autowired
+	private RoleRepository roleRepository;
+
+	@Autowired
+	private AppConfigParametersRepository appConfigParamRepo;
+
+	@Autowired
+	private RoleEntityMapRepository roleEntityMapRepository;
+
+	@Autowired
+	private UmtNativeQueryRepository umtNativeQueryRepository;
+
+	@Autowired
+	private HierarchyEntityMapRepository hierarchyEntityMapRepository;
+
+	@Autowired
+	private EntityManager entityManager;
+
+
+	@Autowired
+	private MessageSource messageSource;
+
+	@Autowired
+	private AdditionalCostRepository additionalCostRepository;
+
+
+	@Autowired
+	private DistrictRepository districtRepository;
+
+	@Autowired
+	private BlockRepository blockRepository;
+
+	@Autowired
+	private BankBranchMasterRepository bankBranchMstRepo;
+
+	@Autowired
+	private FinancialYearRepository financialYearRepository;
+
+	@Autowired
+	private BankMasterRepository bankMasterRepository;
+
+	@Autowired
+	private GenderRepository genderRepository;
+
+	@Autowired
+	private OrganizationStructureHierarchyRepository organizationStructureHierarchyRepository;
+
+	@Autowired
+	private CategoryRepository categoryRepository;
+
+	@Autowired
+	private AssetVendorRepository assetVendorRepository;
+
+	@Autowired
+	private VendorBankDetailsRepository vendorBankDetailsRepository;
+
+	@Autowired
+	private VendorTypeRepository vendorTypeRepository;
+
+	@Autowired
+	private BankBranchMasterRepository bankBranchMasterRepository;
+
+	@Autowired
+	private DownloadUploadController downloadUploadController;
+
+	@Autowired
+	private AdditionalCostMasterRepository additionalCostMasterRepository;
+
+
+	@Override
+	public ServiceOutcome<List<District>> findDistrictListByStateId(Long stateId) {
+		ServiceOutcome<List<District>> svcOutcome = new ServiceOutcome<>();
+		List<District> districts = null;
+		try {
+			districts = districtRepository.findAllByStateId(stateId, true);
+			svcOutcome.setData(districts);
+			svcOutcome.setOutcome(true);
+		} catch (Exception e) {
+			log.error("Exception Occured in findDistrictListByStateId()", e);
+			svcOutcome.setData(new ArrayList<District>());
+			svcOutcome.setOutcome(false);
+		}
+		return svcOutcome;
+	}
+
+
+
+
+//	@Override
+//	public List<Role> getRoleListByActualEntityLevel(List<String> asList) {
+//		Set<Role> rolesSet = new HashSet<>();
+//		List<Role> rolesList = new ArrayList<>();
+//		try {
+//			for (String data : asList) {
+//				if (data.contains("##")) {
+//					String[] splitData = data.split("##");
+//					Long entityId = Long.valueOf(splitData[0]);
+//					String entityLevel = splitData[1];
+//
+//					List<RoleEntityMap> roleEntityMaps = roleEntityMapRepository.findAllByEntityIdAndEntityLevelAndIsActiveTrue(entityId, entityLevel);
+//					//boolean isPublicRoleNeeded = roleEntityMaps.stream().anyMatch(RoleEntityMap::getIsPublicRoleNeeded);
+//
+//					List<String> roleCodes = roleEntityMaps.stream().map(RoleEntityMap::getRoleCode).collect(Collectors.toList());
+//					List<Role> roles = roleRepository.findAllByIsActiveTrueAndRoleCodeIn(roleCodes);
+//
+//					rolesSet.addAll(roles);
+//
+////					if (isPublicRoleNeeded) {
+////						List<Role> publicRoles = roleRepository.findByRoleAccessType(ApplicationConstants.ROLE_ACCESS_TYPE_PUBLIC);
+////						rolesSet.addAll(publicRoles);
+////					}
+//				}
+//			}
+//
+//			rolesList = rolesSet.stream().sorted(Comparator.comparing(Role::getDisplayName)).collect(Collectors.toList());
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return rolesList;
+//	}
+
+
+	
+	
+	
+	@Override
+	public List<Block> getAllBlockList(Long distId) {
+		return blockRepository.findAllByDistrictDistrictIdAndIsActiveTrue(distId);
+	}
+
+	@Override
+	public List<District> getAllDistrictNameList() {
+		return districtRepository.findAllByIsActiveTrue();
+	}
+
+	@Override
+	public List<Gender> getAllGenderList() {
+		return genderRepository.findAllByIsActiveTrue();
+	}
+
+	@Override
+	public ServiceOutcome<List<BankBranchMaster>> findByBankId(Long bankId) {
+		ServiceOutcome<List<BankBranchMaster>> srvc = new ServiceOutcome<>();
+		try {
+			List<BankBranchMaster> branchList = bankBranchMstRepo.findByBankIdBankIdAndIsActiveTrue(bankId);
+			srvc.setData(branchList);
+
+		} catch (Exception e) {
+			srvc.setData(null);
+			srvc.setOutcome(false);
+			srvc.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+			e.printStackTrace();
+			log.error("Error occured in findByBankId in CommonServiceImpl => ", e);
+		}
+		return srvc;
+	}
+
+
+	@Override
+	public ServiceOutcome<String> getIfscByBranchId(Long branchId) {
+		ServiceOutcome<String> srvc = new ServiceOutcome<>();
+		try {
+			BankBranchMaster bankMaster = bankBranchMstRepo.findByBankBranchId(branchId);
+			srvc.setData(bankMaster.getIfscCode());
+
+		} catch (Exception e) {
+			srvc.setData(null);
+			srvc.setOutcome(false);
+			srvc.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+			e.printStackTrace();
+			log.error("Error occured in getIfscByBranchId in CommonServiceImpl => ", e);
+		}
+		return srvc;
+	}
+
+
+	@Override
+	public ServiceOutcome<String> getConfigParameterValueFromParamCode(String paramCode) {
+		ServiceOutcome<String> srvc = new ServiceOutcome<>();
+		try {
+			AppConfigParameters appConfig = appConfigParamRepo.findByParamCode(paramCode);
+			srvc.setData(appConfig.getParamValue());
+			srvc.setOutcome(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Exception occured in getConfigParameterValueFromParamCode() in CommonServiceImpl => ", e);
+		}
+		return srvc;
+	}
+
+
+
+	@Override
+	public List<FinancialYear> getAllFinancialYearList() {
+		List<FinancialYear> years = null;
+		try {
+			years = financialYearRepository.findByIsActiveTrueOrderByFinYearDesc();
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Exception occurred in getAllFinancialYearList() of CommonServiceImpl => " + e);
+		}
+		return years;
+	}
+
+
+
+	@Override
+	public ServiceOutcome<List<BankMasterVO>> getAllBankList() {
+		List<BankMasterVO> bankDataList = new ArrayList<>();
+		ServiceOutcome<List<BankMasterVO>> srvc = new ServiceOutcome<>();
+		srvc.setOutcome(false);
+		try {
+			List<BankMaster> bankList = Optional.ofNullable(bankMasterRepository.findAllByIsActiveTrueOrderByBankName())
+					.orElse(Collections.emptyList());
+
+			if (!bankList.isEmpty()) {
+				for (BankMaster bank : bankList) {
+					BankMasterVO brankVo = new BankMasterVO();
+					brankVo.setBankId(bank.getBankId());
+					brankVo.setBankName(bank.getBankName());
+					brankVo.setShortName(bank.getShortName());
+					bankDataList.add(brankVo);
+				}
+				srvc.setOutcome(true);
+				srvc.setMessage("Bank list fetched successfully.");
+			} else {
+				srvc.setMessage("No bank found.");
+			}
+			return srvc;
+		} catch (Exception e) {
+			log.error("Exception occurred in getAllBankList ==> in CommonService ", e);
+			srvc.setMessage("Something went wrong while retrieving bank list.");
+			return srvc;
+		}
+	}
+
+	@Override
+	public ServiceOutcome<List<BankMaster>> getAllBankMasterList() {
+		ServiceOutcome<List<BankMaster>> srvc = new ServiceOutcome<>();
+		srvc.setOutcome(false);
+		try {
+			List<BankMaster> bankList = Optional.ofNullable(bankMasterRepository.findAllByIsActiveTrueOrderByBankName())
+					.orElse(Collections.emptyList());
+
+				srvc.setData(bankList);
+				srvc.setOutcome(true);
+				srvc.setMessage("Bank list fetched successfully.");
+
+			return srvc;
+		} catch (Exception e) {
+			log.error("Exception occurred in getAllBankMasterList ==> in CommonService ", e);
+			srvc.setMessage("Something went wrong while retrieving bank list.");
+			return srvc;
+		}
+	}
+
+
+	@Override
+	public ServiceOutcome<List<BankBranchMasterVo>> getAllBranchByBankId(Long bankId) {
+		ServiceOutcome<List<BankBranchMasterVo>> outcome = new ServiceOutcome<>();
+		outcome.setOutcome(false);
+		try {
+			List<BankBranchMasterVo> branchList = Optional.ofNullable(bankBranchMstRepo.findByBankIdBankIdAndIsActiveTrue(bankId))
+					.map(bankBranchList -> bankBranchList.stream()
+							.map(data -> new BankBranchMasterVo(data))
+							.collect(Collectors.toList()))
+					.orElse(Collections.emptyList());
+
+			outcome.setData(branchList);
+			outcome.setOutcome(true);
+			outcome.setMessage("Bank branches retrieved successfully");
+			return outcome;
+		} catch (Exception e) {
+			log.error("Exception occurred in getAllBranchByBankId() ==> in CommonService ", e);
+			outcome.setMessage("Something went wrong while retrieving bank branches.");
+			return outcome;
+		}
+	}
+
+
+	private boolean matches(Long value1, Long value2) {
+		return Optional.ofNullable(value1).map(v1 -> v1.equals(value2)).orElse(true);
+	}
+
+
+	@Override
+	public BankBranchMaster getIfscCodeByBranchId(Long branchId) {
+		BankBranchMaster bankMaster  = null;
+        try {
+             bankMaster = bankBranchMstRepo.findByBankBranchId(branchId);
+           // srvc.setData(bankMaster.getIfscCode());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Error occured in getIfscByBranchId in CommonServiceImpl => ", e);
+        }
+        return bankMaster;
+	}
+
+	@Override
+	public List<OrganizationStructureHierarchy> getLevelListByOrganization(String orgData) {
+		List<OrganizationStructureHierarchy> levelList = null;
+		try {
+			if (orgData.contains("##"))
+				levelList = organizationStructureHierarchyRepository.findAllUniqueByOrganizationStructureId(Long.valueOf(orgData.split("##")[0]), String.valueOf(orgData.split("##")[1]));
+			levelList = levelList.stream()
+					.collect(Collectors.toCollection(() ->
+							new TreeSet<>(Comparator.comparing(OrganizationStructureHierarchy::getLevelCode))
+					))
+					.stream()
+					.collect(Collectors.toList());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return levelList;
+	}
+
+	@Override
+	public List<EntityIdAndUserLevel> getActualLevelNameListByLevelCodeAndOrgId(String levelData) {
+		List<EntityIdAndUserLevel> entityIdAndUserLevels = null;
+		try {
+			if (levelData.contains("##")) {
+				List<HierarchyEntityMap> hierarchyEntityMaps = hierarchyEntityMapRepository.findAllByOrganizationStructureHierarchyOrganizationStructureObjectIdAndOrganizationStructureHierarchyOrganizationStructureObjectTypeAndObjectTypeAndIsActiveTrue(Long.valueOf(levelData.split("##")[0]), levelData.split("##")[2], levelData.split("##")[1]);
+				List<Long> entityIds = hierarchyEntityMaps.stream().map(HierarchyEntityMap::getObjectId).collect(Collectors.toList());
+				entityIdAndUserLevels = getDynamicEntityList(levelData.split("##")[1], entityIds);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return entityIdAndUserLevels;
+	}
+
+	private List<EntityIdAndUserLevel> getDynamicEntityList(String entityCode, List<Long> entityIds) {
+		List<EntityIdAndUserLevel> entityIdAndUserLevelList = new ArrayList<>();
+		Optional<UmtNativeQuery> nativeQuery = umtNativeQueryRepository.findByQueryCode(entityCode.trim());
+		if (nativeQuery.isPresent()) {
+			UmtNativeQuery query = nativeQuery.get();
+			String sql = query.getQuery();
+			Query qr = entityManager.createNativeQuery(sql);
+			qr.setParameter("objectId", entityIds);
+			List<Object[]> resultList = qr.getResultList();
+			for (Object[] obj : resultList) {
+				EntityIdAndUserLevel map = new EntityIdAndUserLevel();
+				long entityId = obj[0] != null ? Long.parseLong(obj[0].toString()) : 0;
+				String name = obj[1] != null ? obj[1].toString() : "";
+				String userLevel = obj[2] != null ? obj[2].toString() : "";
+				map.setEntityId(entityId);
+				map.setOrganizationName(name);
+				map.setUserLevel(userLevel);
+				map.setCombineTwo(entityId + "##" + userLevel);
+				entityIdAndUserLevelList.add(map);
+			}
+		}
+		return entityIdAndUserLevelList;
+	}
+
+	@Override
+	public List<Role> getRoleListByActualLevel(String actualLevelData) {
+		Set<Role> rolesSet = new HashSet<>();
+		List<Role> rolesList = new ArrayList<>();
+		try {
+			if (actualLevelData.contains("##")) {
+				List<RoleEntityMap> roleEntityMaps = roleEntityMapRepository.findAllByEntityIdAndEntityLevelAndIsActiveTrue(Long.valueOf(actualLevelData.split("##")[0]), actualLevelData.split("##")[1]);
+//				boolean isPublicRoleNeeded = roleEntityMaps.stream().anyMatch(RoleEntityMap::getIsPublicRoleNeeded);
+				List<String> roleCodes = roleEntityMaps.stream().map(RoleEntityMap::getRoleCode).collect(Collectors.toList());
+				List<Role> roles = roleRepository.findAllByIsActiveTrueAndRoleCodeIn(roleCodes);
+				rolesSet.addAll(roles);
+//				if (isPublicRoleNeeded) {
+//					List<Role> roleList = roleRepository.findByRoleAccessType(CommonUMTConstants.ROLE_ACCESS_TYPE_PUBLIC);
+//					rolesSet.addAll(roleList);
+//				}
+				// sort in name ascending order
+				rolesList = rolesSet.stream().sorted(Comparator.comparing(Role::getDisplayName)).collect(Collectors.toList());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return rolesList;
+	}
+
+    @Override
+    public List<AdditionalCost> getAllActiveAdditionalCostList() {
+        try{
+            return additionalCostRepository.findAllByIsActiveIsTrue();
+        }catch (Exception e) {
+            e.printStackTrace();
+            log.error("Error in VehicleServiceImpl ,Method --> getAllActiveAdditionalCostList"+e);
+        }
+        return new ArrayList<>();
+    }
+
+//	Sourava Pattanayak 16-11-2023
+	//	function of save and update category
+	@Override
+	public ServiceOutcome<Category> saveAndUpdateCategory(Category category) {
+		ServiceOutcome<Category> result=new ServiceOutcome<>();
+		Category cat;
+		try {
+			String catName=category.getCategoryName().replaceAll("\\s+", " ");
+			if(category.getCategoryId()!=null) {
+				cat=categoryRepository.findById(category.getCategoryId()).orElseThrow(() -> new RuntimeException("No Category Found"));
+				cat.setCategoryName(catName);
+				cat.setDescription(category.getDescription());
+				cat.setIsActive(category.getIsActive());
+
+				result.setMessage("Category Successfully Updated.... ");
+			}else {
+				cat=new Category();
+
+				cat.setCategoryName(catName);
+				cat.setIsActive(true);
+				cat.setDescription(category.getDescription());
+				String categoryCode= ApplicationStringUtils.camelCaseToUpperCaseWithUnderscore(category.getCategoryName());
+				cat.setCategoryCode(categoryCode);
+				result.setMessage("Category Successfully Saved....");
+			}
+			Category duplicateWithName=categoryRepository.findByCategoryName(catName);
+			if(duplicateWithName!=null  && (cat.getCategoryId()== null || (cat.getCategoryId()!=null && !cat.getCategoryId().equals(duplicateWithName.getCategoryId())))) {
+				result.setOutcome(false);
+				result.setMessage("Category with same name already exists");
+				return result;
+			}
+			Category duplicateWithCode=categoryRepository.findByCategoryCode(cat.getCategoryCode());
+			if(duplicateWithCode!=null  && (cat.getCategoryId()== null || (cat.getCategoryId()!=null && !cat.getCategoryId().equals(duplicateWithCode.getCategoryId())))) {
+				result.setOutcome(false);
+				result.setMessage("Category with same code already exists");
+				return result;
+			}
+			cat=categoryRepository.save(cat);
+			result.setData(cat);
+			result.setOutcome(true);
+
+		} catch (Exception e) {
+			result.setOutcome(false);
+			result.setMessage("Error occured while saving category....");
+			e.printStackTrace();
+			log.error("Error in MasterServiceImpl ,Method -->saveAndUpdateCategory"+e);
+		}
+		return result;
+	}
+
+//	Sourava Pattanayak 16-11-2023
+//	function of get all active category
+	@Override
+	public ServiceOutcome<List<Category>> getAllActiveCategory() {
+		ServiceOutcome<List<Category>> outcome=new ServiceOutcome<>();
+		try {
+			List<Category> catList=categoryRepository.findAllByIsActiveIsTrue();
+			outcome.setData(catList);
+			outcome.setOutcome(true);
+		} catch (Exception e) {
+			outcome.setData(null);
+			outcome.setOutcome(false);
+			e.printStackTrace();
+			log.error("Error in MasterServiceImpl ,Method -->getAllActiveCategory"+e);
+		}
+
+		return outcome;
+	}
+
+//	Sourava Pattanayak 16-11-2023
+//	function of get all active category
+	@Override
+	public ServiceOutcome<List<Category>> getAllCategory() {
+		ServiceOutcome<List<Category>> outcome=new ServiceOutcome<>();
+		try {
+			List<Category> catList=categoryRepository.findAllByOrderByCategoryNameAsc();
+			outcome.setData(catList);
+			outcome.setOutcome(true);
+		} catch (Exception e) {
+			outcome.setData(null);
+			outcome.setOutcome(false);
+			e.printStackTrace();
+			log.error("Error in MasterServiceImpl ,Method -->getAllActiveCategory"+e);
+		}
+
+		return outcome;
+	}
+
+
+	//	Sourava Pattanayak 16-11-2023
+//	function of get category by categoryId
+	@Override
+	public Category getCategoryById(Long categoryId) {
+		Optional<Category> cat=null;
+		try {
+			cat=categoryRepository.findById(categoryId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Error in MasterServiceImpl ,Method -->getCategoryById"+e);
+		}
+		return cat.isPresent()? cat.get() : null;
+	}
+
+//	Sourava Pattanayak 21-11-2023
+//	function of get all active Vendor Type
+	@Override
+	public List<VendorType> getAllActiveVendorType() {
+		List<VendorType> lstVndTyp=vendorTypeRepository.findAllByIsActiveIsTrue();
+		return lstVndTyp;
+	}
+
+
+
+//	Sourava Pattanayak 21-11-2023
+//	function of save and update Vendor
+	@Override
+	public ServiceOutcome<AssetVendor> saveAndUpdateVendor(AssetVendor assetVendor, VendorDocuments vendorDoc) {
+		ServiceOutcome<AssetVendor> result=new ServiceOutcome<>();
+		AssetVendor vendorr;
+		try {
+			String vendorName= assetVendor.getVendorName().replaceAll("\\s+", " ");
+			Category cat=null;
+			if(assetVendor.getCategoryId()!=null) {
+				cat=this.getCategoryById(assetVendor.getCategoryId());
+			}
+
+			VendorType vendorType = vendorTypeRepository.findById(assetVendor.getVendorTypeId()).orElseThrow(() -> new RuntimeException("No Vendor Type Found"));
+
+			String action="";
+			if(assetVendor.getVendorId()!=null) {
+				vendorr=this.getVendorById(assetVendor.getVendorId());
+				vendorr.setIsActive(assetVendor.getIsActive());
+				action="Updated";
+			}else {
+				vendorr=new AssetVendor();
+				vendorr.setVendorCode(ApplicationStringUtils.camelCaseToUpperCaseWithUnderscore(vendorName));
+				vendorr.setIsActive(true);
+				User currentUser = SecurityHelper.getCurrentUser();
+				if(currentUser==null){
+					throw new RuntimeException("User not found");
+				}
+				String idAndType = assetVendor.getObjectIdAndType();
+				if(idAndType==null){
+					throw new RuntimeException("Entity Id and Type not found");
+				}
+				String[] idAndTypeArr = idAndType.split("##");
+				vendorr.setEntityLevel(idAndTypeArr[1]);
+				vendorr.setEntityId(Long.parseLong(idAndTypeArr[0]));
+				action="added";
+			}
+			vendorr.setMobileNo(assetVendor.getMobileNo());
+			vendorr.setEmail(assetVendor.getEmail());
+			vendorr.setVendorAddress(assetVendor.getVendorAddress());
+			vendorr.setPointOfContact(assetVendor.getPointOfContact());
+			vendorr.setContactNumber(assetVendor.getContactNumber());
+			vendorr.setGstNo(assetVendor.getGstNo());
+			vendorr.setVendorName(vendorName);
+			vendorr.setCategory(cat);
+			vendorr.setAadharNo(assetVendor.getAadharNo());
+			vendorr.setPanNo(assetVendor.getPanNo());
+			vendorr.setPocEmail(assetVendor.getPocEmail());
+			vendorr.setVendorType(vendorType);
+
+			if(vendorDoc.getGstDocc() != null && vendorDoc.getGstDocc().getSize() > 0) {
+				int lastDotIndex = vendorDoc.getGstDocc().getOriginalFilename() == null ? -1 : vendorDoc.getGstDocc().getOriginalFilename().lastIndexOf('.');
+				String fileExtension = lastDotIndex == -1 ? "" : vendorDoc.getGstDocc().getOriginalFilename().substring(lastDotIndex + 1);
+				String fileName = lastDotIndex == -1 ? vendorDoc.getGstDocc().getOriginalFilename() : vendorDoc.getGstDocc().getOriginalFilename().substring(0, lastDotIndex);
+				String filePath = downloadUploadController.uploadFile(vendorDoc.getGstDocc(), CommonConstants.MASTER_VENDOR_MODULE_GST, fileName, fileExtension);
+				vendorr.setGstDoc(filePath);
+			}
+
+			if(vendorDoc.getLiorDocc() != null && vendorDoc.getLiorDocc().getSize() > 0) {
+				int lastDotIndex = vendorDoc.getLiorDocc().getOriginalFilename() == null ? -1 : vendorDoc.getLiorDocc().getOriginalFilename().lastIndexOf('.');
+				String fileExtension = lastDotIndex == -1 ? "" : vendorDoc.getLiorDocc().getOriginalFilename().substring(lastDotIndex + 1);
+				String fileName = lastDotIndex == -1 ? vendorDoc.getLiorDocc().getOriginalFilename() : vendorDoc.getLiorDocc().getOriginalFilename().substring(0, lastDotIndex);
+				String filePath = downloadUploadController.uploadFile(vendorDoc.getLiorDocc(), CommonConstants.MASTER_VENDOR_MODULE_LIOR, fileName, fileExtension);
+				vendorr.setLiorDoc(filePath);
+			}
+
+			if(vendorDoc.getPanDocc() != null && vendorDoc.getPanDocc().getSize() > 0) {
+				int lastDotIndex = vendorDoc.getPanDocc().getOriginalFilename() == null ? -1 : vendorDoc.getPanDocc().getOriginalFilename().lastIndexOf('.');
+				String fileExtension = lastDotIndex == -1 ? "" : vendorDoc.getPanDocc().getOriginalFilename().substring(lastDotIndex + 1);
+				String fileName = lastDotIndex == -1 ? vendorDoc.getPanDocc().getOriginalFilename() : vendorDoc.getPanDocc().getOriginalFilename().substring(0, lastDotIndex);
+				String filePath = downloadUploadController.uploadFile(vendorDoc.getPanDocc(), CommonConstants.MASTER_VENDOR_MODULE_PAN, fileName, fileExtension);
+				vendorr.setPanDoc(filePath);
+			}
+
+			if(vendorDoc.getTanDocc() != null && vendorDoc.getTanDocc().getSize() > 0) {
+				int lastDotIndex = vendorDoc.getTanDocc().getOriginalFilename() == null ? -1 : vendorDoc.getTanDocc().getOriginalFilename().lastIndexOf('.');
+				String fileExtension = lastDotIndex == -1 ? "" : vendorDoc.getTanDocc().getOriginalFilename().substring(lastDotIndex + 1);
+				String fileName = lastDotIndex == -1 ? vendorDoc.getTanDocc().getOriginalFilename() : vendorDoc.getTanDocc().getOriginalFilename().substring(0, lastDotIndex);
+				String filePath = downloadUploadController.uploadFile(vendorDoc.getTanDocc(), CommonConstants.MASTER_VENDOR_MODULE_TAN, fileName, fileExtension);
+				vendorr.setTanDoc(filePath);
+			}
+			final AssetVendor vndor= assetVendorRepository.save(vendorr);
+			List<VendorBankDetails> bankDetails = vendorBankDetailsRepository.findAllByVendorIdVendorId(vendorr.getVendorId());
+			assetVendor.getVendorBankDetails().forEach(vndBnk->{
+				VendorBankDetails vendorBankDetails=null;
+				if(vndBnk.getVendorBankMapId()!= null){
+					try {
+						vendorBankDetails=vendorBankDetailsRepository.findById(vndBnk.getVendorBankMapId()).orElseThrow(()->new Exception("Could not find vendor Bank details"));
+					} catch (Exception e) {
+						throw new RuntimeException("Could not find vendor Bank details"+e);
+					}
+					bankDetails.remove(vendorBankDetails);
+					vendorBankDetails.setUpdateBy(SecurityHelper.getCurrentUser().getUserId());
+					vendorBankDetails.setUpdatedAt(new Date());
+				}else{
+					vendorBankDetails=new VendorBankDetails();
+					vendorBankDetails.setCreatedBy(SecurityHelper.getCurrentUser().getUserId());
+					vendorBankDetails.setCreatedAt(new Date());
+				}
+				BankBranchMaster branch=bankBranchMasterRepository.findByBankBranchId(vndBnk.getBankBranchId());
+				vendorBankDetails.setBankBranchMaster(branch);
+				vendorBankDetails.setVendorId(vndor);
+				vendorBankDetails.setIsPrimary(vndBnk.getIsPrimary());
+				vendorBankDetails.setAccountNo(vndBnk.getAccountNo());
+				vendorBankDetails.setAccountHolderName(vndBnk.getAccountHolderName());
+				vendorBankDetailsRepository.save(vendorBankDetails);
+			});
+			bankDetails.forEach(x->{
+				x.setActive(false);
+			});
+			vendorBankDetailsRepository.saveAll(bankDetails);
+
+
+			result.setMessage("Vendor Successfully "+action+"....");
+			result.setData(vendorr);
+			result.setOutcome(true);
+
+		} catch (Exception e) {
+			result.setOutcome(false);
+			log.error("Error in MasterServiceImpl ,Method -->saveAndUpdateVendor"+e);
+		}
+		return result;
+	}
+
+//	Sourava Pattanayak 21-11-2023
+//	function of get Vendor by vendorId
+	@Override
+	public AssetVendor getVendorById(Long vendorId) {
+		Optional<AssetVendor> vendor= assetVendorRepository.findById(vendorId);
+		return vendor.isPresent()? vendor.get() : null;
+	}
+
+//	Sourava Pattanayak 21-11-2023
+//	function of get all active Vendor
+	@Override
+	public List<AssetVendor> getAllActiveVendor() {
+		List<AssetVendor> lstVnd= assetVendorRepository.findAllByIsActiveIsTrue();
+		return lstVnd;
+	}
+
+//	Sourava Pattanayak 21-11-2023
+//	function of remove Uom
+	@Override
+	public AssetVendor deleteVendor(Long vendorId) {
+		AssetVendor assetVendor = null;
+		try {
+			assetVendor =this.getVendorById(vendorId);
+			assetVendor.setActive(false);
+			assetVendor = assetVendorRepository.save(assetVendor);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Error in MasterServiceImpl ,Method -->deleteVendor"+e);
+		}
+		return assetVendor;
+	}
+
+//	Sourava Pattanayak 17-11-2023
+//	function of remove category
+	@Override
+	public Category deleteCategory(Long categoryId) {
+		Category cat = null;
+		try {
+			cat=this.getCategoryById(categoryId);
+			cat.setIsActive(false);
+			cat=categoryRepository.save(cat);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Error in MasterServiceImpl ,Method -->deleteCategory"+e);
+		}
+		return cat;
+	}
+
+
+	@Override
+	public List<AssetVendor> getAllVendorNameAsc(Long id, String type) {
+		return assetVendorRepository.findByEntityIdAndEntityLevelNameAsc(id, type);
+	}
+
+	@Override
+	public List<AdditionalCostMaster> getAllActiveAdditionalCostMasterList() {
+		try{
+			return additionalCostMasterRepository.findAllByIsActiveIsTrue();
+		}catch (Exception e) {
+			e.printStackTrace();
+			log.error("Error in VehicleServiceImpl ,Method --> getAllActiveAdditionalCostMasterList"+e);
+		}
+		return new ArrayList<>();
+	}
+
+
+}
+

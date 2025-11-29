@@ -1,0 +1,14 @@
+package com.aashdit.common.repository;
+
+import com.aashdit.common.model.Month;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface MonthRepository extends JpaRepository<Month, Long> {
+    Month findByMonthCode(String upperCase);
+
+    List<Month> findAllByOrderByDisplayOrderAsc();
+    
+    List<Month> findAllByOrderByMonthId() ;
+}

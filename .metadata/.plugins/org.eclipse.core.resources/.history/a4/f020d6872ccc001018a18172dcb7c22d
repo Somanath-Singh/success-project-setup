@@ -1,0 +1,213 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+ 
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Agency Performance Report</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+           	 	<li class="breadcrumb-item active" aria-current="page">Agency Performance Report</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+
+<div class="card">
+	<div class="card-header">
+        <h5 class="card-title">Agency Performance Report</h5>
+	</div>
+	<div class="card-body">
+		<form id="filterForm" action="${contextPath}/report/agencyPerformance" method="get">
+			<div class="row">
+				<div class="col-md-3">
+					<label class="required">Start Date : </label>
+					<div class="datepicker-box">
+						<input type="text" id="startDate" name="startDate" value="${startDateStr}" class="form-control form-control-sm datepicker" required readonly>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<label class="required"> End Date : </label>
+					<div class="datepicker-box">
+						<input type="text" id="endDate" name="endDate" value="${endDateStr}" class="form-control form-control-sm datepicker" required readonly>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="agencyId">Select Agency :</label>
+						<select id="agencyId" name="agencyId" class="form-control form-control-sm form-select" required>
+							<option value="0">- Select -</option>
+							<c:forEach items="${agencyList}" var="agency">
+								<option value="${agency.agencyId}" ${selectedAgencyId == agency.agencyId ? 'selected' : ''}>${agency.agencyName}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</div>	
+		    </div>
+		    <div class="row mt-4">
+				<div class="col-md-12 text-center">
+					<button type="button" class="btn btn-success" onclick="filterData()">Filter</button>
+					<a href="${contextPath}/home" type="button" class="btn btn-warning btn-sm">Back</a>
+				</div>
+			</div>
+		</form>
+   	</div>
+</div>
+ 
+<div class="card mt-4" id="agency-performance-report">
+    <div class="card-header">
+        <h5 class="card-title">Agency Performance Details</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped exportbtn" id="performanceTable">
+			    <thead class="table-light">
+			        <tr>
+			        	<th class="text-center">Sl.No.</th>
+			            <th>Work Order Code</th>
+			            <th>Start Date</th>
+			            <th>End Date</th>
+			            <th>Last Inspection Date</th>
+			            <th>Time Difference(Days)</th>
+			        </tr>
+			    </thead>
+			    <tbody id="agencyTableBody">
+			       
+			    </tbody>
+			</table>
+        </div>
+    </div>
+</div>
+ 
+<script>
+function filterData() {
+    const startDate = $("#startDate").val();
+    const endDate = $("#endDate").val();
+    const agencyId = $("#agencyId").val();
+
+    if (!startDate) {
+        bootbox.alert("Start Date is required.");
+        return false;
+    } else if (!endDate) {
+        bootbox.alert("End Date is required.");
+        return false;
+    } else if (agencyId == 0) {
+        bootbox.alert("Please select an agency.");
+        return false;
+    } else {
+        getAgencyPerformanceReport(startDate, endDate, agencyId);
+    }
+}
+
+function showLoader() {
+    $(".loader-div").css("display", "flex");
+}
+
+function hideLoader() {
+    $(".loader-div").css("display", "none");
+}
+
+function getAgencyPerformanceReport(startDate, endDate, agencyId) {
+    showLoader();
+
+    $.ajax({
+        url: contextPath + "/report/getAgencyPerformanceReport",
+        type: "GET",
+        data: {
+            startDate: startDate,
+            endDate: endDate,
+            agencyId: agencyId
+        },
+        success: function (data) {
+            hideLoader();
+
+            if ($.fn.DataTable.isDataTable('#performanceTable')) {
+                $('#performanceTable').DataTable().destroy();
+            }
+
+            var html = "";
+
+            if (!data || data.length === 0) {
+                html = "<tr><td colspan='6' class='text-center text-muted'>No performance records found for the selected criteria.</td></tr>";
+                $("#agencyTableBody").html(html);
+                return;
+            }
+
+            for (var i = 0; i < data.length; i++) {
+                var record = data[i];
+
+                html += "<tr>";
+                html += "<td  class='text-center align-middle'>" + (i + 1) + "</td>";
+                html += "<td>" + (record.workOrderCode || "N/A") + " (" + (record.projectName || "N/A") + ")" + "</td>";
+                html += "<td>" + (record.startDate || "N/A") + "</td>";
+                html += "<td>" + (record.endDate || "N/A") + "</td>";
+                html += "<td>" + (record.lastInspectionDate || "N/A") + "</td>";
+
+                if (record.delayDays == null || record.delayDays === "Invalid Date") {
+                    html += "<td class='text-left text-muted'>N/A</td>";
+                } else {
+                    let days = parseInt(record.delayDays, 10);
+                    if (days > 0) {
+                        html += "<td class='text-left text-danger'>" + days + " days late</td>";
+                    } else if (days < 0) {
+                        html += "<td class='text-left text-success'>" + Math.abs(days) + " days early</td>";
+                    } else {
+                        html += "<td class='text-left text-primary'>On time</td>";
+                    }
+                }
+
+                html += "</tr>";
+            }
+
+            $("#agencyTableBody").html(html);
+
+            $('#performanceTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: ['copy', 'excel', 'csv', 'pdf', 'print'],
+                searching: true,
+                paging: true,
+                ordering: true,
+                pageLength: 10
+            });
+        },
+        error: function (error) {
+            hideLoader();
+            console.error("Error fetching agency performance data:", error);
+            bootbox.alert("Error fetching agency performance records.");
+        }
+    });
+}
+
+$(document).ready(function () {
+    var today = new Date();
+    var oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+
+    $(".datepicker").datepick({
+        dateFormat: "dd-mm-yyyy",
+        onShow: $.datepick.monthOnly,
+        yearRange: "c-20:c+10",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+    });
+
+    if (!$("#startDate").val()) {
+        $('#startDate').datepick('setDate', oneMonthAgo);
+    }
+    if (!$("#endDate").val()) {
+        $('#endDate').datepick('setDate', today);
+    }
+
+    getAgencyPerformanceReport(
+        $("#startDate").val(),
+        $("#endDate").val(),
+        $("#agencyId").val()
+    );
+});
+</script>

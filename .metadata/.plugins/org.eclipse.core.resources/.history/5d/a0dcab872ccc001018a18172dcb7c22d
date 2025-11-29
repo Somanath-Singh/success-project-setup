@@ -1,0 +1,493 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<link href="${contextPath}/assets/css/dashboard.css" rel="stylesheet" type="text/css" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Agency Registration</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                <li class="breadcrumb-item active">Agency Registration</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <c:choose>
+            <c:when test="${not empty agencyRegistration}">
+                <h5 class="card-title">Update Agency Registration</h5>
+            </c:when>
+            <c:otherwise>
+                <h5 class="card-title">Add Agency Registration</h5>
+            </c:otherwise>
+        </c:choose>
+    </div>
+    <div class="card-body">
+        <form action="${contextPath}/agencyRegistration/save" id="agencyRegistrationForm" method="post">
+            <input type="hidden" id="cipherText" name="cipherText">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+            <input type="hidden" id="agnRegId" name="agnRegId" value="${agencyRegistration.agnRegId}" />
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput required" for="agencyId">Agency :</label>
+                        <select class="form-control form-control-sm form-select select2" id="agencyId" name="agencyId" onchange="loadAgencyType(this.value)">
+                            <option value="" selected disabled>- Select -</option>
+                            <c:forEach items="${agencyMasterList}" var="agency">
+                                <option value="${agency.agencyId}"
+                                    ${agency.agencyId eq agencyRegistration.agencyId ? 'selected' : ''}>
+                                    ${agency.agencyNameEn}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput">Agency Type :</label>
+                        <input type="text" id="agencyType" name="agencyType" value="${agencyRegistration.agencyType}"
+                            class="form-control form-control-sm" readonly />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput required" for="agnRegNameEn">Agency Name :</label>
+                        <input type="text" id="agnRegNameEn" name="agnRegNameEn" value="${agencyRegistration.agnRegNameEn}" maxlength="100"
+                            class="form-control form-control-sm" required />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput required" for="agnRegCode">Agency Registration Code :</label>
+                        <input type="text" id="agnRegCode" name="agnRegCode" value="${agencyRegistration.agnRegCode}" maxlength="50"
+                            class="form-control form-control-sm disablecopypaste" required />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput" for="agencyRegMail">Email :</label>
+                        <input type="email" id="agencyRegMail" name="agencyRegMail" value="${agencyRegistration.agencyRegMail}" maxlength="100"
+                            class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput" for="agencyRegCellNo">Cell Number :</label>
+                        <input type="text" id="agencyRegCellNo" name="agencyRegCellNo"
+                            value="${agencyRegistration.agencyRegCellNo}" maxlength="10"
+                            class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput" for="agencyRegAcntNumber">Account Number :</label>
+                        <input type="text" id="agencyRegAcntNumber" name="agencyRegAcntNumber"
+                            value="${agencyRegistration.agencyRegAcntNumber}" maxlength="48"
+                            class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput" for="bankBranchId">Bank Branch :</label>
+                        <select class="form-control form-control-sm form-select select2" id="bankBranchId" name="bankBranchId">
+                            <option value="" selected disabled>- Select -</option>
+                            <c:forEach items="${bankBranchList}" var="bank">
+                                <option value="${bank.bankBranchId}"
+                                    ${bank.bankBranchId eq agencyRegistration.bankBranchId ? 'selected' : ''}>
+                                    ${bank.branchName}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput" for="address">Address :</label>
+                        <input type="text" id="address" name="address"
+                            value="${agencyRegistration.address}"
+                            class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput" for="description">Description :</label>
+                        <input type="text" id="description" name="description"
+                            value="${agencyRegistration.description}"
+                            class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput required" for="accessLevel">Access Level :</label>
+                        <select class="form-control form-control-sm form-select" id="accessLevel" name="accessLevel" required>
+                            <option value="" selected disabled>- Select -</option>
+                            <option value="CREATOR" ${agencyRegistration.accessLevel eq 'CREATOR' ? 'selected' : ''}>CREATOR</option>
+                            <option value="VIEWER" ${agencyRegistration.accessLevel eq 'VIEWER' ? 'selected' : ''}>VIEWER</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput" for="stateId">State :</label>
+                        <select class="form-control form-control-sm form-select select2" id="stateId" name="stateId"
+                            onchange="loadDistrictsByState(this.value)">
+                            <option value="" selected disabled>- Select -</option>
+                            <c:forEach items="${stateList}" var="state">
+                                <option value="${state.stateId}"
+                                    ${state.stateId eq agencyRegistration.stateId ? 'selected' : ''}>
+                                    ${state.stateName}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput" for="districtId">District :</label>
+                        <select class="form-control form-control-sm form-select select2" id="districtId" name="districtId"
+                            onchange="loadBlocksByDistrict(this.value)">
+                            <option value="" selected disabled>- Select -</option>
+                            <c:if test="${not empty agencyRegistration}">
+                                <c:forEach items="${districtList}" var="district">
+                                    <option value="${district.districtId}"
+                                        ${district.districtId eq agencyRegistration.districtId ? 'selected' : ''}>
+                                        ${district.districtName}</option>
+                                </c:forEach>
+                            </c:if>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput" for="blockId">Block :</label>
+                        <select class="form-control form-control-sm form-select select2" id="blockId" name="blockId">
+                            <option value="" selected disabled>- Select -</option>
+                            <c:if test="${not empty agencyRegistration}">
+                                <c:forEach items="${blockList}" var="block">
+                                    <option value="${block.blockId}"
+                                        ${block.blockId eq agencyRegistration.blockId ? 'selected' : ''}>
+                                        ${block.blockName}</option>
+                                </c:forEach>
+                            </c:if>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <c:choose>
+                    <c:when test="${not empty agencyRegistration}">
+                        <input type="button" value="Update" class="btn btn-success btn-sm"
+                            onclick="submitAgencyRegistrationData()">
+                        <a href="${contextPath}/agencyRegistration/add" class="btn btn-warning btn-sm">Back</a>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="button" value="Submit" class="btn btn-success btn-sm"
+                            onclick="submitAgencyRegistrationData()">
+                        <a href="${contextPath}/home" class="btn btn-warning btn-sm">Back</a>
+                        <button type="reset" class="btn btn-danger btn-sm">Reset</button>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="col-md-12 mt-3">
+    <c:if test="${empty agencyRegistration}">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Agency Registration List</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+            <table id="basic-datatables" class="table table-bordered table-hover exportbtn">
+			    <thead>
+			        <tr>
+			            <th class="text-center" style="width: 60px">Sl.No</th>
+			            <th>Agency Name</th>
+			            <th>Agency Code</th>
+			            <th>Registration Code</th>
+			            <th>Email</th>
+			            <th>Mobile No</th>
+			            <th>State</th>
+			            <th>District</th>
+			            <th>Block</th>
+			            <th class="text-center">Action</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			        <c:forEach items="${agencyRegistrationList}" var="agency" varStatus="count">
+			            <tr>
+			                <td class="text-center">${count.count}</td>
+			                <td>${agency.agnRegNameEn}</td>    
+			                <td>${agency.agencyCode}</td>     
+			                <td>${agency.agnRegCode}</td>     
+			                <td>${agency.agencyRegMail}</td> 
+			                <td>${agency.agencyRegCellNo}</td> 
+			                <td>${agency.stateName}</td>  
+			                <td>${agency.districtName}</td>  
+			                <td>${agency.blockName}</td>     
+			                <td class="text-center">
+			                    <button class="btn btn-warning btn-sm"
+			                        onclick="editAgencyRegistration(${agency.agnRegId})" title="Edit">
+			                        <i class="fas fa-edit"></i>
+			                    </button>
+			                </td>
+			            </tr>
+			        </c:forEach>
+			    </tbody>
+			</table>
+
+                </div>
+            </div>
+        </div>
+    </c:if>
+</div>
+
+<script>
+function submitAgencyRegistrationData() {
+    var agnRegId = $("#agnRegId").val();
+    var agencyId = $("#agencyId").val();
+    var agnRegNameEn = $("#agnRegNameEn").val().trim();
+    var agnRegCode = $("#agnRegCode").val().trim();
+    var agencyType = $("#agencyType").val().trim();
+    var agnEmail = $("#agencyRegMail").val().trim();
+    var agnCellNo = $("#agencyRegCellNo").val().trim();
+    var agnAccountNumber = $("#agencyRegAcntNumber").val().trim();
+    var bankBranchId = $("#bankBranchId").val();
+    var address = $("#address").val().trim();
+    var description = $("#description").val().trim();
+    var accessLevel = $("#accessLevel").val();
+    var stateId = $("#stateId").val();
+    var districtId = $("#districtId").val();
+    var blockId = $("#blockId").val();
+
+    // Required Fields
+    if (!agencyId) {
+        bootbox.alert("Please select an Agency");
+        $("#agencyId").focus();
+        return false;
+    }
+    if (!agnRegNameEn) {
+        bootbox.alert("Please enter Agency Name");
+        $("#agnRegNameEn").focus();
+        return false;
+    }
+    if (!agnRegCode) {
+        bootbox.alert("Please enter Agency Registration Code");
+        $("#agnRegCode").focus();
+        return false;
+    }
+    if (!accessLevel) {
+        bootbox.alert("Please select Access Level");
+        $("#accessLevel").focus();
+        return false;
+    }
+
+    // Optional validations
+    if (agnEmail && !validateEmail(agnEmail)) {
+        bootbox.alert("Please enter a valid Email address");
+        $("#agencyRegMail").focus();
+        return false;
+    }
+    
+   /*  if (agnCellNo && !validatePhoneNumber(agnCellNo)) {
+        bootbox.alert("Please enter a valid Cell Number (digits only, 10-15 digits)");
+        $("#agencyRegCellNo").focus();
+        return false;
+    } */
+
+    if (agnAccountNumber && !validateAccountNumber(agnAccountNumber)) {
+        bootbox.alert("Please enter a valid Account Number (digits only)");
+        $("#agencyRegAcntNumber").focus();
+        return false;
+    }
+
+    if (!stateId) {
+        bootbox.alert("Please select a State");
+        $("#stateId").focus();
+        return false;
+    }
+    if (!districtId) {
+        bootbox.alert("Please select a District");
+        $("#districtId").focus();
+        return false;
+    }
+    if (!blockId) {
+        bootbox.alert("Please select a Block");
+        $("#blockId").focus();
+        return false;
+    }
+
+    // Validate uniqueness of agnRegCode via AJAX
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/agencyRegistration/validate-agnRegCode",
+        data: { agnRegCode: agnRegCode, agnRegId: agnRegId },
+        success: function(isDuplicate) {
+            if (isDuplicate === true) {
+                bootbox.alert("Agency Registration Code already exists. Please provide another.");
+                $("#agnRegCode").val("").focus();
+                return false;
+            } else {
+                submitAgencyRegistrationForm();
+            }
+        },
+        error: function(err) {
+            console.error("Error validating agnRegCode:", err);
+            submitAgencyRegistrationForm();
+        }
+    });
+}
+
+// Serialize and submit
+function submitAgencyRegistrationForm() {
+    var bizContent = $("#agencyRegistrationForm").serializeArray();
+    $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    bootbox.confirm("Do you want to continue?", function(result) {
+        if (result) {
+            showLoader();
+            $("#agencyRegistrationForm").submit();
+        }
+    });
+}
+
+
+function editAgencyRegistration(id) {
+    $("#agencyRegistrationEditId").val(id);
+    var bizContent = $("#editForm").serializeArray();
+    $("#editCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    bootbox.confirm("Do you want to continue?", function(result) {
+        if (result) {
+            showLoader();
+            $("#editForm").submit();
+        }
+    });
+}
+
+function loadAgencyType(agencyId) {
+    if (agencyId) {
+        $.ajax({
+            url: "${contextPath}/agencyRegistration/getAgencyType",
+            type: "GET",
+            data: { agencyId: agencyId },
+            success: function(agencyType) {
+                $("#agencyType").val(agencyType);
+            },
+            error: function(error) {
+                bootbox.alert("Error fetching agency type: " + error);
+            }
+        });
+    } else {
+        $("#agencyType").val("");
+    }
+}
+
+function loadDistrictsByState(stateId) {
+    if (stateId) {
+        $.ajax({
+            url: "${contextPath}/common/fetchDistrictsByState",
+            type: "GET",
+            data: { stateId: stateId },
+            success: function(districts) {
+                var districtSelect = $("#districtId");
+                
+                districtSelect.empty();
+                districtSelect.append('<option value="" selected disabled>- Select -</option>');
+                
+                $.each(districts, function(index, district) {
+                    districtSelect.append('<option value="' + district.districtId + '">' + district.districtName + '</option>');
+                });
+                $("#blockId").empty().append('<option value="" selected disabled>- Select -</option>');
+            },
+            error: function(error) {
+                bootbox.alert("Error fetching districts: " + error);
+            }
+        });
+    } else {
+        $("#districtId").empty().append('<option value="" selected disabled>- Select -</option>');
+        $("#blockId").empty().append('<option value="" selected disabled>- Select -</option>');
+    }
+}
+
+function loadBlocksByDistrict(districtId) {
+    if (districtId) {
+        $.ajax({
+            url: "${contextPath}/common/fetchBlockByDistrict",
+            type: "GET",
+            data: { districtId: districtId },
+            success: function(blocks) {
+                var blockSelect = $("#blockId");
+                
+                blockSelect.empty();
+                blockSelect.append('<option value="" selected disabled>- Select -</option>');
+                
+                $.each(blocks, function(index, block) {
+                    blockSelect.append('<option value="' + block.blockId + '">' + block.blockName + '</option>');
+                });
+            },
+            error: function(error) {
+                bootbox.alert("Error fetching blocks: " + error);
+            }
+        });
+    } else {
+        $("#blockId").empty().append('<option value="" selected disabled>- Select -</option>');
+    }
+}
+
+//Utility Functions
+function validateEmail(email) {
+    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function validateAccountNumber(account) {
+    var re = /^[0-9]{6,20}$/; // typical bank account length
+    return re.test(account);
+}
+
+/* function validatePhoneNumber(phone) {
+    var re = /^[0-9]{10,15}$/; // 10 to 15 digits
+    return re.test(phone);
+}
+ */
+/* function validatePhoneNumber(input) {
+    let value = input.value;
+    value = value.replace(/[^0-9]/g, "");
+    if (value.length > 15) {
+        value = value.slice(0, 15);
+    }
+    input.value = value;
+}  */
+
+$(document).ready(function() {
+    $(".select2").select2();
+});
+
+</script>
+
+<form action="${contextPath}/agencyRegistration/edit" method="post" id="editForm">
+    <input type="hidden" id="editCipherText" name="cipherText">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" id="agencyRegistrationEditId" name="agnRegId" />
+</form>

@@ -1,0 +1,93 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<style>
+   .nav_item a:before{
+    position: absolute;
+    content: '';
+    background-color: #f36414;
+    width: 0%;
+    height: 2px;
+    left: 0px;
+    bottom: -7px;
+    transition: all 500ms ease;
+    }
+    .nav_item a:hover{
+    color: #f36414;
+    }
+   li.nav-items {
+    padding: 0;
+}
+.nav_item{
+position: relative;
+}
+
+.nav_item a:hover:before{
+  width: 100%;
+}
+.nav_item a{
+color:#fff;
+}
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+          
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMobileToggle" aria-controls="navbarMobileToggle" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse d-flex" id="navbarMobileToggle">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center gap-4">
+                  <li class="nav_item">
+                      <a class="nav-links active" aria-current="page" href="${contextPath}/dashboard" >Home</a>
+                  </li>
+                  <li class="nav_item">
+                    <a href="${contextPath}/apply/apply-section/view" id="Submenu-Dropdowno" >
+                     Apply Section
+                    </a> </li>
+                        <li class="nav_item"><a href="${contextPath}/apply/my-application-list">My Applications</a></li>
+                    
+                     <li class="nav_item"><a href="${contextPath}/apply/my-appointment-details">My Appointment</a></li>
+                 <%--    <ul class="dropdown-menu rounded-3" aria-labelledby="Submenu-Dropdowno">
+                        <li><a class="dropdown-item" href="${contextPath}/apply-section">Apply Section</a></li>/dashboard
+                        <li><a class="dropdown-item" href="${contextPath}/my-application-list">My Applications</a></li>
+                    </ul> --%>
+               
+              </ul>
+              
+              <ul class="navbar-nav  mb-2 mb-lg-0 d-flex">
+                
+                  <li class="nav-items dropdown d-flex justify-content-end" style="align-items: center; gap: 7px;">
+
+                      <%-- <a class="nav-links" href="${contextPath}/my-profile" id="Submenu-Dropdown" role="button"  style="color: #fff" class="me-2">
+                      <img src="${contextPath}/loginPage/images/profile_view.png" style="width: 28%; object-fit: cover;">
+                      My Profile
+                      </a> --%>
+                    <!--   <ul class="dropdown-menu rounded-3" aria-labelledby="Submenu-Dropdown">
+                          <li><a class="dropdown-item" href="/my-profile">My Profile</a></li>
+                          <li><a class="dropdown-item" href="/generate-profile-pdf">View Profile</a></li>
+                          <li><a class="dropdown-item" href="my-request.html">My Request</a></li>
+                          <li><a class="dropdown-item" href="/apply-section">View Profile</a></li>
+                          <li><a class="dropdown-item" href="my-request.html">My Request</a></li>
+                      </ul> -->
+                  </li>
+                  <%-- <li class="nav-items dropdown d-flex justify-content-end" style="align-items: center; gap: 7px;">
+
+                      <a  href="#" id="btnLogout" role="button" style=" color: #fff;" class="ms-2">
+                        <img src="${contextPath}/loginPage/images/logout.png" style="width: 28%; object-fit: cover;">
+                      Logout
+                      </a>
+                  </li> --%>
+                  
+<!--                  <button class="main-button-login btn-sm" title="Logout" id="btnLogout" class="main-button-login btn-sm log-out">
+                  <img src="/loginPage/images/logout.png" style="width: 28%; object-fit: cover;">
+                 Logout</button> -->
+                
+              </ul>
+          </div>
+      </div>
+  </nav> 

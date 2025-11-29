@@ -1,0 +1,72 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/otp.js"></script>
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<meta name="_csrf" content="${_csrf.token}"/>
+<meta name="_csrf_header" content="${_csrf.parameterName}"/>
+
+
+      <section class="inner_banner_sec">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg 12 col-md-12">
+              <div class="mainbredcum">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                      <a href="${contextPath}/landing">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                      FAQ
+                    </li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- faq  -->
+      <section id="faq">
+        <div class="container my-5">
+          <h2 class="mb-4 text-left" style="color: #f58320;">FAQ Questions</h2>
+
+          <div class="accordion" id="faqAccordion">
+  			<c:forEach items="${faqList}" var="faq">
+    			<div class="accordion-item">
+      				<h2 class="accordion-header" id="faqHeading${faq.faqId}">
+        				<button class="accordion-button collapsed" type="button"  data-bs-toggle="collapse" data-bs-target="#faqCollapse${faq.faqId}"  aria-expanded="false"  aria-controls="faqCollapse${faq.faqId}">
+        					<c:choose>
+		                        <c:when test="${locale eq 'or_IN'}">
+		                            ${faq.questionOd}
+		                        </c:when>
+		                        <c:otherwise>
+		                            ${faq.questionEn}
+		                        </c:otherwise>
+                    		</c:choose>
+        				</button>
+      				</h2>
+	      			<div id="faqCollapse${faq.faqId}" class="accordion-collapse collapse"  aria-labelledby="faqHeading${faq.faqId}" data-bs-parent="#faqAccordion">
+	        			<div class="accordion-body">
+	        				 <c:choose>
+		                        <c:when test="${locale eq 'or_IN'}">
+		                            ${faq.answerOd}
+		                        </c:when>
+		                        <c:otherwise>
+		                            ${faq.answerEn}
+		                        </c:otherwise>
+                    		</c:choose>
+	        			</div>
+	      			</div>
+    			</div>
+  			</c:forEach>
+		 </div>
+        </div>
+      </section>
+      

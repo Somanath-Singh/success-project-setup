@@ -1,0 +1,25 @@
+package com.aashdit.common.service;
+
+
+import com.aashdit.common.model.District;
+import com.aashdit.framework.core.ServiceOutcome;
+
+import java.util.List;
+
+public interface DistrictService {
+
+    ServiceOutcome<List<District>> getAllDistrict(Boolean includeDeleted);
+
+    ServiceOutcome<District> getById(Long districtId);
+
+    ServiceOutcome<List<District>> search(District searchParams);
+
+    ServiceOutcome<District> saveDistrict(District district);
+
+    ServiceOutcome<District> updateDistrict(District district);
+
+    ServiceOutcome<District> deleteDistrict(Long districtId);
+    
+    ServiceOutcome<List<District>> listByStateId(Long stateId);
+
+}

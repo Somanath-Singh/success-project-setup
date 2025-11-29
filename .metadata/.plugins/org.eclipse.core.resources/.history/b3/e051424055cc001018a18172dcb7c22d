@@ -1,0 +1,42 @@
+#---- DEVELOPMENT PROFILE ----#
+# =================================  LOCALHOST  =================================
+spring.datasource.url=jdbc:postgresql://localhost:5432/crop_erp
+spring.datasource.username=postgres
+spring.datasource.password=root
+
+
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# ------ Spring Data JPA Update------------
+#spring.jpa.hibernate.ddl-auto=update
+
+#------------- SMTP Configuration----------------------
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+mail.smtp.host=smtp.gmail.com
+mail.smtp.ssl.trust=smtp.gmail.com
+mail.smtp.port=587
+mail.smtp.ssl.protocols=TLSv1.2
+mail.username=atmosphere.oppro@gmail.com
+mail.password=etnpkzqipiqbfqfb
+
+# 1 minute
+mail.priority.immediate=60000
+# 3 minutes
+mail.priority.high=180000
+# 5 minutes
+mail.priority.medium=300000
+# 10 minutes
+mail.priority.low=600000
+
+server.port=5858
+server.servlet.context-path=/erp
+UPLOAD.FILE.PATH=D://CMC-SWP-UPLOAD//UPLOADED_FILES//
+UPLOAD.JASPER.FILE.PATH=D:\\ERP_JASPER_REPORT
+
+
+
+
+
+

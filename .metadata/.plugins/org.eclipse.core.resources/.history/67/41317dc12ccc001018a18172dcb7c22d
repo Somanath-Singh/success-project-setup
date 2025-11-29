@@ -1,0 +1,484 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<style>
+    .frezz {
+        pointer-events: none;
+        background-color: #e9ecef !important;
+        color: #495057 !important;
+    }
+    .card-title-add {
+        font-size: 14px;
+        margin: 0;
+        color: #000 !important;
+        font-weight: 500;
+    }
+    .btns {
+        border-radius: 0.2rem;
+        line-height: 14px;
+        padding: 6px 7px 6px 6px;
+        font-size: 13px;
+    }
+    /* Ensure dropdown fits within sector */
+    select.form-control-sm {
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Legacy Maintenance Report</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#"><i class="fa fa-home"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Filter Legacy Maintenance Report</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Filter Legacy Maintenance Report</h5>
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal" id="projectMstForm">
+                    <div class="row">
+                        <!-- From Date -->
+                        <div class="form-group col-md-3">
+                            <label class="required">From Date :</label>
+                            <input type="date" class="form-control form-control-sm" id="fromDate" name="fromDate">
+                        </div>
+                        <!-- To Date -->
+                        <div class="form-group col-md-3">
+                            <label class="required">To Date :</label>
+                            <input type="date" class="form-control form-control-sm" id="toDate" name="toDate">
+                        </div>
+                        <!-- Executing Agency -->
+                        <div class="form-group col-md-3">
+                            <label class="required">Executing Agency :</label>
+                            <select class="form-control form-control-sm" id="executingAgency" name="executingAgency">
+                                <option selected disabled>- Select -</option>
+                                <option selected>NPCC</option>
+                            </select>
+                        </div>
+                        <!-- Project Name -->
+                        <div class="form-group col-md-3">
+                            <label class="required">Name of the Buildings :</label>
+                            <select class="form-control form-control-sm" id="projectName" name="projectName">
+                                <option selected disabled>- Select -</option>
+                                <option>Sundergarh Hostel</option>
+                                <option>Baliguda Adivasi College Hostel (Boys)</option>
+                                <option>Baliguda NAC Hostel (Boys)</option>
+                                <option>Jeypore Hostel</option>
+                                <option>Nilagiri Hostel</option>
+                                <option>Kaptipada Hostel (Boys)</option>
+                                <option>Indira Gandhi Womens College Hostel</option>
+                                <option>Th. Rampur Hostel (Boys)</option>
+                                <option>Koraput Hostel (Girls)</option>
+                                <option>Kuchinda Hostel</option>
+                                <option>Karanjia NAC Hostel</option>
+                                <option>Nabarangpur Hostel (Girls)</option>
+                                <option>L.N College Hostel (Boys)</option>
+                                <option>L.N College Hostel (Girls)</option>
+                                <option>Bhubaneswar 200-Seated Hostel</option>
+                                <option>Cuttack School Building</option>
+                                <option>Berhampur Hospital Renovation</option>
+                                <option>Angul Water Supply</option>
+                                <option>Bargarh Community Hall</option>
+                                <option>Keonjhar Bridge</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row mt-4 mb-4">
+                <div class="col-md-12 text-center">
+                    <button type="button" class="btn btn-success" onclick="filterData()">Filter</button>
+                    <a href="${contextPath}/home" type="button" class="btn btn-warning btn-sm">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Legacy Maintenance Report List</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm exportbtn">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Agency</th>
+                                <th>Scheme</th>
+                                <th>Year</th>
+                                <th>District</th>
+                                <th>Building Name</th>
+                                <th>Sanction Amount</th>
+                                <th>Letter No & Date</th>
+                                <th>Agreement Amount</th>
+                                <th>1st Release</th>
+                                <th>2nd Release</th>
+                                <th>3rd Release</th>
+                                <th>Start Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Sundargarh</td>
+                                <td>100 seated Composite Urban Model Hostel at Sundergarh, Sundergarh</td>
+                                <td>33,296,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>10,987,680</td>
+                                <td>12,718,541</td>
+                                <td>2752 dt.05.02.2025</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Tiles work in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Kandhamal</td>
+                                <td>100 seated Composite Urban Model Hostel Inside Adivasi college, Baliguda, Kandhamal (Boys)</td>
+                                <td>33,180,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>10,945,400</td>
+                                <td>12,687,288</td>
+                                <td>11836 dt.20.05.2025</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Brickwork in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Kandhamal</td>
+                                <td>100 seated Composite Urban Model Hostel Inside Adivasi college, Baliguda NAC, Kandhamal (Boys)</td>
+                                <td>33,139,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>10,935,870</td>
+                                <td>12,649,875</td>
+                                <td>11836 dt.20.05.2025</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Plastering in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Koraput</td>
+                                <td>100 seated Composite Urban Model Hostel at Jeypore, Koraput</td>
+                                <td>33,410,500</td>
+                                <td>6290/14.03.2024</td>
+                                <td>11,025,465</td>
+                                <td>12,771,032</td>
+                                <td>2752 dt.05.02.2025</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Plastering work in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Balasore</td>
+                                <td>100 seated Composite Urban Model Hostel at Nilagiri, Balasore</td>
+                                <td>33,189,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>10,952,370</td>
+                                <td>12,910,443</td>
+                                <td>22775 dtd.16.09.2025</td>
+                                <td>10,485,176</td>
+                                <td>14.03.2024</td>
+                                <td>Plastering work in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Mayurbhanj</td>
+                                <td>100 seated Hostel at Kaptipada, Mayurbhanj (Boys)</td>
+                                <td>33,369,500</td>
+                                <td>6290/14.03.2024</td>
+                                <td>11,011,935</td>
+                                <td>12,103,491</td>
+                                <td>22775 dtd.16.09.2025</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>GF Slab to be casted</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Mayurbhanj</td>
+                                <td>Hostel at Indira Gandhi Womens College, Udala</td>
+                                <td>33,369,500</td>
+                                <td>6290/14.03.2024</td>
+                                <td>11,011,935</td>
+                                <td>12,783,798</td>
+                                <td>11836 dt.20.05.2025</td>
+                                <td>10,455,701</td>
+                                <td>14.03.2024</td>
+                                <td>Brickwork + plastering in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Kalahandi</td>
+                                <td>Hostel at Th. Rampur, Kalahandi (Boys)</td>
+                                <td>33,310,500</td>
+                                <td>6290/14.03.2024</td>
+                                <td>10,992,465</td>
+                                <td>12,734,996</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Plastering work in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Koraput</td>
+                                <td>Hostel at Koraput (Girls)</td>
+                                <td>33,396,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>11,020,680</td>
+                                <td>12,772,057</td>
+                                <td>11836 dt.20.05.2025</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Plastering in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Sambalpur</td>
+                                <td>Hostel at Kuchinda, Sambalpur</td>
+                                <td>33,292,500</td>
+                                <td>6290/14.03.2024</td>
+                                <td>10,986,525</td>
+                                <td>12,715,020</td>
+                                <td>11836 dt.20.05.2025</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Plastering in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Mayurbhanj</td>
+                                <td>Hostel at Karanjia NAC</td>
+                                <td>33,279,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>10,982,070</td>
+                                <td>12,725,137</td>
+                                <td>22775 dtd.16.09.2025</td>
+                                <td>9,751,679</td>
+                                <td>14.03.2024</td>
+                                <td>Finishing work in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Nawarangpur</td>
+                                <td>Hostel at Nabarangpur (Girls)</td>
+                                <td>33,262,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>10,976,460</td>
+                                <td>12,720,684</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Finishing work in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Jharsuguda</td>
+                                <td>Hostel Inside L.N College (Boys)</td>
+                                <td>33,389,500</td>
+                                <td>6290/14.03.2024</td>
+                                <td>11,018,535</td>
+                                <td>12,732,363</td>
+                                <td>2752 dt.05.02.2025</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Plastering in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Jharsuguda</td>
+                                <td>Hostel Inside L.N College (Girls)</td>
+                                <td>33,389,500</td>
+                                <td>6290/14.03.2024</td>
+                                <td>11,018,535</td>
+                                <td>12,727,986</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Plumbing + electrical work in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Khordha</td>
+                                <td>200 seated Hostel at Bhubaneswar</td>
+                                <td>64,140,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>21,166,200</td>
+                                <td>21,166,200</td>
+                                <td>11836 dt.20.05.2025</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Tiles + PH work in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Cuttack</td>
+                                <td>School Building Construction at Cuttack</td>
+                                <td>30,000,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>9,800,000</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Foundation work started</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Ganjam</td>
+                                <td>Hospital Renovation at Berhampur</td>
+                                <td>28,500,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>9,200,000</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Approval pending</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Angul</td>
+                                <td>Water Supply Project at Angul</td>
+                                <td>32,000,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>10,600,000</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Pipelines laying in progress</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Bargarh</td>
+                                <td>Community Hall at Bargarh</td>
+                                <td>15,000,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>5,000,000</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Work awarded</td>
+                            </tr>
+                            <tr>
+                                <td>NPCC</td>
+                                <td>CUMH</td>
+                                <td>2023-24</td>
+                                <td>Keonjhar</td>
+                                <td>Bridge Construction at Keonjhar</td>
+                                <td>45,000,000</td>
+                                <td>6290/14.03.2024</td>
+                                <td>15,000,000</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>14.03.2024</td>
+                                <td>Survey in progress</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default date range to last month
+    const today = new Date();
+    const lastMonth = new Date();
+    lastMonth.setMonth(today.getMonth() - 1);
+
+    // Format dates to YYYY-MM-DD
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    document.getElementById('fromDate').value = formatDate(lastMonth);
+    document.getElementById('toDate').value = formatDate(today);
+
+    // Update filterData function to use new field IDs
+    window.filterData = function() {
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = document.getElementById('toDate').value;
+        const executingAgency = document.getElementById('executingAgency').value;
+        const projectName = document.getElementById('projectName').value;
+
+        // Create hidden inputs for form submission
+        const form = document.getElementById('projectMstForm');
+        form.innerHTML += `<input type="hidden" name="hiddenFromDate" value="${fromDate}">`;
+        form.innerHTML += `<input type="hidden" name="hiddenToDate" value="${toDate}">`;
+        form.innerHTML += `<input type="hidden" name="hiddenExecutingAgency" value="${executingAgency}">`;
+        form.innerHTML += `<input type="hidden" name="hiddenProjectName" value="${projectName}">`;
+
+        // Simulate form submission (replace with actual backend logic)
+        console.log('Filtering with:', { fromDate, toDate, executingAgency, projectName });
+        form.submit();
+    };
+});
+</script>

@@ -1,0 +1,272 @@
+package com.aashdit.prod.heads.hims.ipms.controller;
+
+
+import java.security.Principal;
+import java.time.LocalDate;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.HttpSessionRequiredException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.aashdit.prod.heads.common.model.District;
+import com.aashdit.prod.heads.common.model.FinancialYear;
+import com.aashdit.prod.heads.common.service.CommonService;
+import com.aashdit.prod.heads.common.service.EntityModuleMapService;
+import com.aashdit.prod.heads.framework.core.ServiceOutcome;
+import com.aashdit.prod.heads.hims.ipms.model.EntityAppModuleMap;
+import com.aashdit.prod.heads.hims.umt.model.LoggedInUser;
+import com.aashdit.prod.heads.hims.umt.model.User;
+import com.aashdit.prod.heads.hims.umt.model.UserLoginHistory;
+import com.aashdit.prod.heads.hims.umt.repository.UserLoginHistoryRepository;
+import com.aashdit.prod.heads.hims.umt.service.UserService;
+import com.aashdit.prod.heads.hims.umt.utils.AesUtil;
+import com.aashdit.prod.heads.hims.umt.utils.CommonHelperFunctions;
+import com.aashdit.prod.heads.hims.umt.utils.SecurityHelper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@Slf4j
+public class HomeController {
+
+	@Value("${UPLOAD.FILE.PATH}")
+	private String uploadFilePath;
+
+	@Autowired
+	private UserLoginHistoryRepository userLoginHistoryRepository;
+
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private CustomLoginController customLoginController;
+
+	@Autowired
+	private EntityModuleMapService entityModuleMapService;
+
+	@Autowired
+	private CommonService commonService;
+
+	@GetMapping("/login")
+	public String beforLogin(Principal principal, Model model) {
+		try {
+			if (principal != null) {
+				return "redirect:/home";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "layout.login";
+	}
+
+	@GetMapping(path = {"/","/home"})
+	public String home(Model model){
+		User user = SecurityHelper.getCurrentUser();
+		if (user == null) {
+			return "redirect:/login";
+		}
+
+		return "site.module.directory";
+	}
+
+	@PostMapping("/moduleDirectory")
+	public String home(Model model, HttpServletRequest request, @RequestParam(value = "moduleCode", required = false) String moduleCode) {
+		User user = SecurityHelper.getCurrentUser();
+		if (user == null) {
+			return "redirect:/login";
+		}
+
+		LoggedInUser userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoggedInUser
+				? (LoggedInUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+				: null;
+
+		if (userDetails == null) {
+			return "redirect:/login";
+		}
+
+		if (moduleCode != null) {
+			moduleCode = customLoginController.decryptPassword(moduleCode, request.getParameter("_csrf"));
+		}
+
+		customLoginController.loadMenus(request, userDetails, moduleCode);
+
+		List<FinancialYear> finYearList = commonService.getAllFinancialYearList();
+		FinancialYear finYear = finYearList.stream().filter(FinancialYear::getCurrFinYear).findFirst().orElse(null);
+		model.addAttribute("finYearList", finYearList);
+		model.addAttribute("currFinYear", finYear != null ? finYear.getFinYear() : "");
+		model.addAttribute("finYear", finYear != null ? finYear.getFinYear() : null);
+		model.addAttribute("monthId", LocalDate.now().getMonthValue());
+
+		try {
+			
+		} catch (Exception e) {
+			log.error("Exception in /moduleDirectory while loading dashboard: " + e.getMessage(), e);
+		}
+		return "app.home";
+	}
+
+	@ExceptionHandler(HttpSessionRequiredException.class)
+	public String handleSessionTimeOut() {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+		return "site.session.timeout";
+	}
+
+	@GetMapping(value = "/admin/user/login/history")
+	public String userLoginHistory(Model model) {
+		try {
+			List<UserLoginHistory> userHistories = userLoginHistoryRepository.findAll();
+			if (userHistories != null && userHistories.size() > 0) {
+				userHistories = userHistories.stream().sorted(Comparator.comparing(UserLoginHistory::getLoggedInDate))
+						.collect(Collectors.toList());
+				Collections.reverse(userHistories);
+				model.addAttribute("userHistoryList", userHistories);
+			}
+		} catch (Exception e) {
+			log.error("Exception occured in getting login history in HomeController-->" + e);
+		}
+		return "site.admin.loginHistory";
+	}
+
+	@PostMapping(path = "/umt/user/change/password/submit", name = "Change Password")
+	public String changePassword(RedirectAttributes attr, HttpSession session, String userId, String txtPass,
+			String txtRePass, String currPass, HttpServletRequest request) {
+		try {
+			Boolean isOK = Boolean.valueOf(true);
+			String realCurrentPass = "";
+			String realPass = "";
+			String realRePass = "";
+			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			User user = null;
+			if (userId != null) {
+				user = userService.findByUsername(userId).getData();
+			} else {
+				session.invalidate();
+				return "redirect:/login";
+			}
+			String decryptedCurrentPassword = new String(Base64.getDecoder().decode(currPass));
+			String psk = request.getParameter("_csrf");
+			psk = psk.substring(0, 16);
+			AesUtil aesUtil = new AesUtil(128, 1000);
+			if (decryptedCurrentPassword != null && decryptedCurrentPassword.split("::").length == 3) {
+				realCurrentPass = aesUtil.decrypt(decryptedCurrentPassword.split("::")[1],
+						decryptedCurrentPassword.split("::")[0], psk, decryptedCurrentPassword.split("::")[2]);
+			}
+			isOK = Boolean.valueOf(passwordEncoder.matches(realCurrentPass, user.getPassword()));
+			if (!isOK.booleanValue()) {
+				attr.addFlashAttribute("error_msg", "Sorry, Curent Password not matched please try again !");
+				log.error("Error Msg : Sorry, Curent Password not matched please try again during change password !");
+				return "redirect:/umt/user/change/password";
+			} else {
+				boolean chk = false;
+				if (txtRePass != null && !txtRePass.trim().isEmpty() && txtPass != null && !txtPass.trim().isEmpty()) {
+					String decryptedPassword = new String(Base64.getDecoder().decode(txtPass));
+					if (decryptedPassword != null && decryptedPassword.split("::").length == 3) {
+						realPass = aesUtil.decrypt(decryptedPassword.split("::")[1], decryptedPassword.split("::")[0],psk, decryptedPassword.split("::")[2]);
+					}
+					String decryptedRePassword = new String(Base64.getDecoder().decode(txtRePass));
+					if (decryptedRePassword != null && decryptedRePassword.split("::").length == 3) {
+						realRePass = aesUtil.decrypt(decryptedRePassword.split("::")[1],decryptedRePassword.split("::")[0], psk, decryptedRePassword.split("::")[2]);
+					}
+					//chk = PasswordValidator.checkString(realPass);
+					if (chk) {
+						if (realPass.equals(realRePass)) {
+							Boolean isSuccess = userService.saveResetPassword(user.getUserId(), realRePass);
+							if (isSuccess) {
+								log.info("Password changed successfully.");
+								attr.addFlashAttribute("success_msg", "Password changed successfully.");
+								session.invalidate();
+								return "redirect:/login";
+							} else {
+								return "redirect:/umt/user/change/password";
+							}
+						} else {
+							attr.addFlashAttribute("error_msg", "Password not match with password!");
+							log.error("Error Msg : Password not match with password!");
+							return "redirect:/umt/user/change/password";
+						}
+					} else {
+						attr.addFlashAttribute("error_msg", "Password not match with password policy !");
+						log.error("Error Msg : Password not match with password policy !");
+						return "redirect:/umt/user/change/password";
+					}
+				} else {
+					attr.addFlashAttribute("error_msg", "Password not match with password policy !");
+					log.error("Error Msg : Password not match with password policy !");
+					return "redirect:/umt/user/change/password";
+				}
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			attr.addFlashAttribute("error_msg", "Unable to update profile");
+			return "redirect:/umt/user/change/password";
+		}
+	}
+
+	@GetMapping("/getPublicAndEntity/specificEntityLevelCodeListList")
+	@ResponseBody
+	public ResponseEntity<?> getPublicAndEntitySpecificEntityLevelCodeListList(@RequestParam("entityIdAndType") String entityIdAndType, @RequestParam(value = "selectedEntityIdAndType", required = false) String selectedEntityIdAndType){
+		try {
+			Base64.Decoder decoder = Base64.getDecoder();
+			String entityIdDecode = new String(decoder.decode(entityIdAndType));
+			JsonObject jsonObject = new JsonObject();
+
+			String[] split = entityIdDecode.split("##");
+			Long entityId = Long.parseLong(split[0]);
+			String entityLevel = split[1];
+			List<EntityAppModuleMap> entityLevelCodeList = entityModuleMapService.getPublicAndEntitySpecificEntityLevelCodeListList(entityId, entityLevel);
+			JsonArray allApps = new JsonArray();
+			for (EntityAppModuleMap app: entityLevelCodeList){
+				JsonObject appObj = new JsonObject();
+				appObj.addProperty("id", app.getAppModuleId().getId());
+				appObj.addProperty("name", app.getAppModuleId().getModuleName());
+				appObj.addProperty("code", app.getAppModuleId().getModuleCode());
+
+				allApps.add(appObj);
+			}
+			jsonObject.add("allApps", allApps);
+			JsonArray selectedApps = new JsonArray();
+			if (selectedEntityIdAndType != null && !selectedEntityIdAndType.isEmpty()) {
+				String selectedEntityIdDecode = new String(decoder.decode(selectedEntityIdAndType));
+				String[] splitSelected = selectedEntityIdDecode.split("##");
+				Long selectedEntityId = Long.parseLong(splitSelected[0]);
+				String selectedEntityLevel = splitSelected[1];
+				List<EntityAppModuleMap> selectedEntityLevelCodeList = entityModuleMapService.getPublicAndEntitySpecificEntityLevelCodeListList(selectedEntityId, selectedEntityLevel);
+				for (EntityAppModuleMap app: selectedEntityLevelCodeList){
+					JsonObject appObj = new JsonObject();
+					appObj.addProperty("id", app.getAppModuleId().getId());
+					appObj.addProperty("name", app.getAppModuleId().getModuleName());
+					appObj.addProperty("code", app.getAppModuleId().getModuleCode());
+
+					selectedApps.add(appObj);
+				}
+			}
+			jsonObject.add("selectedApps", selectedApps);
+			return new ResponseEntity<>(CommonHelperFunctions.onGsonObjectSuccess(jsonObject), HttpStatus.OK);
+		}catch (Exception e){
+			return new ResponseEntity<>(CommonHelperFunctions.onError(e), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+}

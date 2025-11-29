@@ -1,0 +1,781 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+	<c:set var="userDetails" value="${serviceOutcome.data}"/> 
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}" />
+
+<style>
+.mandotory::before {
+  content: '* '; /* Display an asterisk followed by a space before the header text */
+  color: red;    /* Optionally, set the color to red or any other desired color */
+}
+
+.required::before {
+  content: '* '; /* Display an asterisk followed by a space before the header text */
+  color: red;    /* Optionally, set the color to red or any other desired color */
+}
+.disabled-dropdown {
+    pointer-events: none;
+    background-color: #eee; /* Optional: Change the background color to visually indicate it's disabled */
+}
+
+.mandatory-field {
+    border: 1px solid #b3432f;
+/*     background-color: #ffb2a8; /* Adjust the background color as needed */ */
+}
+
+	.hidden {
+    display: none;
+}
+#workplanrow th{
+	min-width:150px;
+}
+#workplanrow th:last-child{
+	min-width: 80px;
+}
+#workplanrow td select{
+	min-width: 200px;
+}
+
+</style>	
+		<div class="breadcrumb_conatiner">
+               <div class="col-md-6">
+                 <h4 class="change-color">Interview Schedule</h4>
+               </div>
+              <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Interview Schedule</li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-header">
+									<h5 class="card-title">Interview Schedule</h5>
+								</div>
+								<div class="card-body">
+										<div class="col-lg-12 mt-3">
+										<!-- New Select Field -->
+									        <div class="row mb-3">
+									            <div class="col-md-4">
+									                <label for="statusFilter">Designation :</label>
+									                <select class="form-control form-select validId3 require" name="roleId" id="roleSelect" data-plugin-selectTwo onchange="getRoundList(this.value)">
+													    <option value=""><spring:message code="label.common.select" /></option>
+													    <c:forEach var="role" items="${roleList}">
+													        <option value="${role[3]}" ${vacancyIdHdn eq role[3]?'selected':'' }>${role[1]} | ${role[2]}</option>
+													    </c:forEach>
+													</select>
+									            </div>
+									            <div class="col-md-2" id="publicationDateContainer">
+												    <div class="form-group">
+												        <label for="publicationDate">Publication Date :</label>
+												        <div class="form-group ">
+												            <input type="text" name="publicationDate" id="publicationDate" value="${publishDate}" class="form-control" required readonly>
+												        </div>
+												    </div>
+												</div>
+									            <div class="col-md-2" id="publicationDateContainer">
+											        <div class="form-group">
+											            <label for="applicationDeadline">Application Deadline :</label>
+											            <div class="form-group ">
+											            	<input type="text" name="applicationDeadline" id="applicationDeadline" class="form-control" value="${applDeadlineDate}" readonly>
+											            </div>
+											        </div>
+											    </div>
+									        </div>
+										    <input type="hidden" id="tabStatus" name="tabStatus" value=""/>
+										     <!-- Tabs -->
+											<ul class="nav nav-tabs" id="interviewRoundsTabs" role="tablist">
+											    <c:forEach var="roundMap" items="${intrvRound}">
+											        <li class="nav-item" role="presentation">
+											            <button class="nav-link ${roundMap.round.roundCode == tabStatusId && roundMap.orderId == selectedOrderId ? 'active' : ''}" 
+															    id="tab-${roundMap.round.roundId}-${roundMap.orderId}" 
+															    data-bs-toggle="tab" 
+															    data-bs-target="#content-${roundMap.round.roundId}-${roundMap.orderId}" 
+															    type="button" 
+															    role="tab" 
+															    aria-controls="content-${roundMap.round.roundId}-${roundMap.orderId}" 
+															    aria-selected="${roundMap.round.roundCode == tabStatusId && roundMap.orderId == selectedOrderId}"
+															    onclick="setTabStatus('${roundMap.round.roundId}'), 
+															             filterData('${roundMap.round.roundCode}', '${roundMap.orderId}')">
+															    ${roundMap.round.roundType}(${roundMap.orderId})
+															</button>
+											        </li>
+											    </c:forEach>
+											</ul>
+
+
+								</div>
+								<div class="row">
+								    <div class="col-md-12 mb-5">
+								        <div class="table-responsive">
+								            <table class="table table-bordered" id="workplanrow">
+											    <thead>
+											        <tr>
+											            <th>Applicant Name</th>
+											            <th>Registration code</th>
+											            <th>Mobile No</th>
+											            <th>Email</th>
+											            <th>Aadhaar No</th>
+<!-- 											            <th>DOB</th> -->
+											            <th>Age</th>
+											            <th>View Details</th>
+										                <th>Interviewer</th>
+										                <th style="width: 180px;">Date</th>
+										                <th>Time</th>
+										                <th>Interview Type</th>
+										                <th>Status</th>
+											            <th>Action
+											                <input type="checkbox" id="selectAll" />
+											            </th>
+											        </tr>
+											    </thead>
+											    <tbody>
+											        <c:forEach items="${details}" var="regd" varStatus="count">
+											            <tr>
+											                <td>
+											                 <input type="hidden" id="interviewId${count.count}" name="interviewId${count.count}" value="${regd.interviewId}"/>
+										                     <input type="hidden" class="form-control" name="totalMarks${count.count}" id="totalMarks${count.count}"  value="${regd.totalMarks}"   onblur="validateMarks('${count.count}')">
+											                 <input type="hidden" class="form-control" name="securedMarks${count.count}" id="securedMarks${count.count}"  value="${regd.securedMarks}" onblur="validateMarks('${count.count}')" >
+											                 <input type="hidden" class="form-control" name="remarks${count.count}" id="remarks${count.count}" value="${regd.remarks}" >
+											                ${regd.name}</td>
+											                <td>${regd.code}</td>
+											                <td>${regd.mobileNo}</td>
+											                <td>${regd.mailId}</td>
+											                <td>${regd.aadhaarNo}</td>
+<!-- 											                <td> -->
+<%-- 											                    <c:choose> --%>
+<%-- 											                        <c:when test="${not empty vac.dob}"> --%>
+<%-- 											                            <fmt:formatDate value="${vac.dob}" pattern="dd/MM/yyyy" /> --%>
+<%-- 											                        </c:when> --%>
+<%-- 											                        <c:otherwise> --%>
+<!-- 											                            NA -->
+<%-- 											                        </c:otherwise> --%>
+<%-- 											                    </c:choose> --%>
+<!-- 											                </td> -->
+											                <td>${regd.age}</td>
+											                <td>
+											                    <button title="Edit" type="button" onclick="getApplicantAllDetails('${regd.regdId}','${vacancyIdHdn}')" class="btn btn-xs btn-primary">
+											                        <i class="fas fa-eye"></i>
+											                    </button>
+											                </td>
+											                <td>
+											                    <!-- Interviewer Dropdown -->
+											                    <select class="form-control" name="interviewerId${count.count}" id="interviewerId${count.count}">
+											                        <option value="">---select---</option>
+											                        <c:forEach var="staff" items="${staffMasters}">
+											                            <option value="${staff.staffId}" ${regd.staffId eq staff.staffId?'selected':'' }>${staff.staffName}</option>
+											                        </c:forEach>
+											                    </select>
+											                </td>
+											                <td>
+											                    <input type="hidden" name="interviewEligibleDate" id="interviewEligibleDate${count.count}" value="${regd.interviewDate}" />
+											                    <!-- Interview Date -->
+<%-- 											                    <input type="date" class="form-control" name="interviewDate${count.count}" id="interviewDate${count.count}" placeholder="Select Date"> --%>
+															<div class="form-group recdatepicker_con"> 
+ 				            									<input type="text" name="interviewDate${count.count}" id="interviewDate${count.count}" class="form-control" value="${regd.interviewDate }">
+ 				            					            </div> 
+											                </td>
+											                <td>
+											                <input type="hidden" name="interviewEligibleTime" id="interviewEligibleTime${count.count}" value="${regd.interviewTime}" />
+											                    <!-- Interview Time -->
+											                    <input type="time" class="form-control" name="interviewTime${count.count}" id="interviewTime${count.count}" placeholder="Select Time" value="${regd.interviewTime}">
+											                </td>
+											                <td>
+											                    <!-- Interview Type Dropdown -->
+											                    <select class="form-control" name="interviewType${count.count}" id="interviewType${count.count}">
+											                        <option value="">---select---</option>
+											                        <c:forEach var="intType" items="${intrvType}">
+											                            <option value="${intType.typeId}" ${intType.typeId eq regd.interviewType?'selected':'' }>${intType.typeName}</option>
+											                        </c:forEach>
+											                    </select>
+											                </td>
+											               <td class="x-status"> 
+												                <c:if test="${regd.statusCode eq 'SELECTED'}"> 
+												                 ${regd.statusCode} IN PREVIOUS ROUND
+												                </c:if>
+												                <c:if test="${regd.statusCode eq 'SHORTLISTED'}"> 
+												                  SHORTLISTING FOR INTERVIEW
+												                </c:if>
+												                 <c:if test="${regd.statusCode ne 'SELECTED' && regd.statusCode ne 'SHORTLISTED'}"> 
+												                 ${regd.statusCode}
+												                </c:if>
+											                </td>
+											                <td>
+											                  <c:if test="${regd.statusCode ne 'REJECTED' }">
+											                    <!-- Checkbox for Selection -->
+											                    <input type="checkbox" class="x-check" id="empCheckBox${count.count}" value="${regd.regdId}" data-row-index="${count.count}">
+											                  </c:if>
+											                </td>
+											            </tr>
+											        </c:forEach>
+											    </tbody>
+											</table>
+
+
+								        </div>
+								    </div>
+								</div>
+
+									 <div class="col-md-12 text-center">
+										<div class="form-group">
+											<div class="col-md-12">
+											    <c:if test="${not empty details }">
+											        <button type="button" class="btn btn-sm btn-primary" onclick="takeAction('SCHEDULED','SHORTSELECT')" style="width: 158px;">Interview Schedule</button>
+											        <button type="button" class="btn btn-sm btn-danger" onclick="takeAction('CANCELLED','CANCELLED')" style="width: 158px;">Interview Cancel</button>
+											        <button type="button" class="btn btn-sm btn-revert" onclick="takeAction('RESCHEDULED','SCHEDULED')" style="width: 190px;">Interview Reschedule</button>
+<!-- 											        <button type="button" class="btn btn-sm btn-info" onclick="takeAction('SELECTED','MOVETONEXT')">Move to Next Round</button> -->
+											        <button type="button" class="btn btn-sm btn-danger" onclick="takeAction('REJECTED','REJECTED')">Reject</button>
+											    </c:if>
+											    <a href="${contextPath}/home" class="btn btn-sm btn-warning" style="margin-top: 0px;">Back</a>
+											</div>
+									</div>
+							</div>
+						</div>
+					</div>
+				</div>	
+					<!-- Modal -->
+<div class="modal"  id="publishModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="publishModalLabel">Publish Vacancy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="publishForm">
+                    <div class="form-group datepicker_con">
+                        <label for="publishDate" class="form-label">Publish Date</label>
+                        <input type="text" class="form-control" id="publicationDate" name="publicationDate" required>
+                    </div>
+                    <div class="form-group datepicker_con">
+                        <label for="applicationDeadline" class="form-label">Application Deadline</label>
+                        <input type="text" class="form-control" id="applicationDeadline" name="applicationDeadline" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" form="publishForm" class="btn btn-primary" onclick="publishVac()">Publish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>
+<form action="${contextPath}/getApplicantListForIntrvSchedule" method="POST" id="getApplicantListForIntrvSchedule">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	<input type="hidden" id="tabStatusId" name="tabStatusId">
+	<input type="hidden" id="orderIdHdn" name="orderId">
+	<input type="hidden" id="vacancyIdHdn" name="vacancyIdHdn">
+	<input type="hidden" id="publicationDateHdn" name="publicationDateHdn">
+	<input type="hidden" id="applicationDeadlineHdn" name="applicationDeadlineHdn">
+	<input type="hidden" id="interviewSchedule" name="interviewSchedule" value="intervRound">
+</form>
+
+
+<form action="${contextPath}/setWflowStageId" method="POST" id="setWflowStageId">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+    <input type="hidden" id="hdnRegdIds" name="hdnRegdIds">
+    <input type="hidden" id="vacancyIdHdn2" name="vacancyIdHdn2">
+    <input type="hidden" id="hdnStageStatus" name="hdnStageStatus">
+    <input type="hidden" id="hdnTabStatus" name="hdnTabStatus">
+<!--     <input type="hidden" id="hdnOrderId" name="hdnOrderId"> -->
+    <input type="hidden" id="hdnInterviewDetails" name="hdnInterviewDetails"> 
+    <input type="hidden" name="pageStatus"  id="pageStatus" value="CREATOR">
+</form>
+
+
+<form action="${contextPath}/vaccancy/editVacancyDetails" method="post" id="editVacancyDetails">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" name="hiddenVacId"  id="hiddenVacId" value="">
+</form>
+
+<form action="${contextPath}/vaccancy/publishVacancy" method="post" id="publishVacancy">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" name="hiddenVacIdP"  id="hiddenVacIdP" value="">
+	<input type="hidden" name="publishDate"  id="publishDate" value="">
+	<input type="hidden" name="deadLineDate"  id="deadLineDate" value="">
+</form>
+
+<form action="${contextPath}/getApplicantAllDetails" method="get" id="getApplicantAllDetails">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" name="regiId"  id="regiId" value="">
+	<input type="hidden" name="vacId"  id="vacId" value="">
+</form>
+
+
+<form action="${contextPath}/getRoundList" method="post" id="getRoundList">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" name="hdnVacId"  id="hdnVacId" value="">
+	<input type="hidden" name="hdnRoleSelect"  id="hdnRoleSelect" value="">
+	<input type="hidden" name="pageStatus"  id="pageStatus" value="CREATOR">
+</form>
+
+<script>
+
+function setTabStatus(tabId) {
+
+    document.getElementById('tabStatus').value = tabId; // Example: Set a hidden input value
+}
+
+function filterData(tabStatus, orderId){
+    debugger;
+    if ($("#roleSelect").val() == '') {
+        bootbox.alert("Please select vacancy.");
+        return false;
+    } else {
+        if (tabStatus != null && tabStatus != '') {
+            $("#tabStatusId").val(tabStatus);  // Set tab status
+            $("#vacancyIdHdn").val($("#roleSelect").val()); // Set vacancy
+            $("#publicationDateHdn").val($("#publicationDate").val()); // Set publication date
+            $("#applicationDeadlineHdn").val($("#applicationDeadline").val()); // Set application deadline
+            $("#orderIdHdn").val(orderId); // Set Order ID
+            $("#getApplicantListForIntrvSchedule").submit();
+//             $("#hdnOrderId").val(orderId); 
+        }
+    }
+}
+
+
+function checkData(checkStatus) {
+    debugger;
+
+    // If the action is 'REJECTED', no validation is required
+    if (checkStatus === 'REJECTED') {
+        return true;
+    }
+
+    // Get all checked checkboxes
+    var checkedElements = document.querySelectorAll('.x-check:checked');
+
+    // If no rows are selected
+    if (checkedElements.length === 0) {
+        console.log("No rows selected.");
+        bootbox.alert("Please select at least one candidate.");
+        return false;
+    }
+	debugger;
+    var statuses = []; // Array to store the statuses of checked rows
+
+    // Collect the status of each checked row
+    checkedElements.forEach(function (checkbox) {
+        var row = checkbox.closest('tr');
+        var statusText = row.querySelector('.x-status').textContent.trim();
+        statuses.push(statusText);
+    });
+
+    let validStatuses = []; // Valid statuses based on the action
+    let errorMessage = "";  // Error message to guide the user
+
+    // Define rules for each action
+    if (checkStatus === 'MOVETONEXT') {
+        validStatuses = ['SCHEDULED', 'RESCHEDULED'];
+        errorMessage = "Only candidates with the status 'SCHEDULED' or 'RESCHEDULED' can be moved to the next round.";
+    }  else if (checkStatus === 'SHORTSELECT') {
+        validStatuses = ['SHORTLISTING FOR INTERVIEW', 'SELECTED IN PREVIOUS ROUND'];
+        errorMessage = "Only candidates with the status 'SHORTLISTED' or 'SELECTED' can be scheduled.";
+    }  else if (checkStatus === 'CANCELLED') {
+        validStatuses = ['SCHEDULED', 'RESCHEDULED'];
+        errorMessage = "Only candidates with the status 'SCHEDULED' or 'RESCHEDULED' can be cancelled.";
+    } else if (checkStatus === 'RESCHEDULED') {
+        validStatuses = ['SCHEDULED','RESCHEDULED'];
+        errorMessage = "Only candidatess with the status 'SCHEDULED' can be rescheduled.";
+    }else if (checkStatus === 'SCHEDULED') {
+        validStatuses = ['SCHEDULED','RESCHEDULED','CANCELLED'];
+        errorMessage = "Only candidates with the status 'SCHEDULED' can be rescheduled.";
+    }
+
+    
+    
+    // Check if all selected rows meet the criteria
+    const allMatch = statuses.every(function (status) {
+        return validStatuses.includes(status);
+    });
+
+    if (!allMatch) {
+        console.log("Status mismatch detected."); // Log for debugging
+        alert(errorMessage); // Show relevant error message
+        return false;
+    }
+
+    return true; // All validations passed
+}
+
+function validateInterviewerSchedule() {
+    debugger;
+
+    // Collect all interview details
+    var interviewSchedules = []; // Array to store schedule details for validation
+    var rows = document.querySelectorAll('#workplanrow tbody tr'); // Get all table rows
+
+    // Iterate through rows to gather interview details
+    rows.forEach(function (row) {
+        var interviewer = row.querySelector('select[name^="interviewerId"]')?.value; // Get interviewer
+        var interviewDate = row.querySelector('input[name^="interviewDate"]')?.value; // Get interview date
+        var interviewTime = row.querySelector('input[name^="interviewTime"]')?.value; // Get interview time
+
+        // Push details only if all fields are filled
+        if (interviewer && interviewDate && interviewTime) {
+            interviewSchedules.push({
+                interviewer: interviewer,
+                date: interviewDate,
+                time: interviewTime,
+            });
+        }
+    });
+
+    // Helper function to convert time to minutes since midnight
+    function timeToMinutes(time) {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
+    }
+
+    // Check for conflicts in schedules
+    for (let i = 0; i < interviewSchedules.length; i++) {
+        for (let j = i + 1; j < interviewSchedules.length; j++) {
+            const schedule1 = interviewSchedules[i];
+            const schedule2 = interviewSchedules[j];
+
+            if (schedule1.interviewer === schedule2.interviewer && schedule1.date === schedule2.date) {
+                const time1 = timeToMinutes(schedule1.time);
+                const time2 = timeToMinutes(schedule2.time);
+
+                // Check if the time difference is less than 1 hour (60 minutes)
+                if (Math.abs(time1 - time2) < 60) {
+                    bootbox.alert("Interviews for the same interviewer must be scheduled at least 1 hour apart on the same date.");
+                    return false; // Stop validation on detecting a conflict
+                }
+            }
+        }
+    }
+
+    return true; // Validation passed
+}
+
+
+
+
+
+function takeAction(stageStatus, checkStatus) {
+    var myElements = document.getElementsByClassName("x-check");
+    debugger;
+
+    if ($('input:checkbox:checked').length === 0) {
+        bootbox.alert("Please select at least one candidate.");
+        return false;
+    }
+
+    if (checkData(checkStatus)) {
+        var checked = [];
+        var interviewDetails = [];
+
+        // Collect all checked rows
+        for (var i = 0; i < myElements.length; i++) {
+            if (myElements[i].checked) {
+                var regdId = myElements[i].value;
+                var rowIndex = $(myElements[i]).data('row-index');
+                checked.push({ regdId, rowIndex });
+            }
+        }
+
+        if (checked.length === 0) {
+            bootbox.alert("Please select at least one record.");
+            return false;
+        }
+
+        var orderId = '${selectedOrderId}'; // Retrieve Order ID
+
+        // Validate fields for all selected rows
+        for (var i = 0; i < checked.length; i++) {
+            var rowIndex = checked[i].rowIndex;
+            var regdId = checked[i].regdId;
+
+            var interviewer = $("#interviewerId" + rowIndex).val();
+            var interviewDate = $("#interviewDate" + rowIndex).val();
+            var interviewTime = $("#interviewTime" + rowIndex).val();
+            var interviewType = $("#interviewType" + rowIndex).val();
+            var interviewId = $("#interviewId" + rowIndex).val();
+            
+            var totalMarks = $("#totalMarks" + rowIndex).val();
+	        var securedMarks = $("#securedMarks" + rowIndex).val();
+	        var remarks = $("#remarks" + rowIndex).val();
+
+            if (stageStatus != 'REJECTED') {
+                if (!interviewer || !interviewDate || !interviewTime || !interviewType) {
+                    bootbox.alert("All fields are mandatory for the selected records.");
+                    return false;
+                } else {
+                    if (!validateInterviewerSchedule()) {
+                        return false;
+                    }
+                }
+            }
+
+            interviewDetails.push({
+                regdId: regdId,
+                interviewerId: interviewer,
+                interviewDate: interviewDate,
+                interviewTime: interviewTime,
+                interviewType: interviewType,
+                interviewId: interviewId,
+                orderId: orderId, // Include Order ID
+                totalMarks: totalMarks,
+	            securedMarks: securedMarks,
+	            remarks: remarks,
+            });
+        }
+
+        $("#hdnRegdIds").val(checked.map(item => item.regdId).toString());
+        $("#hdnStageStatus").val(stageStatus.toString());
+        $("#vacancyIdHdn2").val($("#roleSelect").val());
+        $("#hdnInterviewDetails").val(JSON.stringify(interviewDetails));
+        $("#hdnTabStatus").val('${tabStatusId}');
+
+        bootbox.confirm({
+            message: "Are you sure you want to perform this action on this record?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (result) {
+                if (result === true) {
+                    $("#setWflowStageId").submit();
+                }
+            }
+        });
+    }
+}
+
+
+  
+
+$('.x-check').change(function() {
+    handleCheckboxChange();
+});
+
+$('#selectAll').click(function(e) {
+    var table = $(e.target).closest('table');
+    $('td input:checkbox', table).prop('checked', this.checked);
+    $('td input.isFreezed', table).prop('checked', false);
+});
+
+function handleCheckboxChange() {
+    var allCheckboxes = $('.x-check');
+    var selectAllCheckbox = $('#selectAll');
+    selectAllCheckbox.prop('checked', allCheckboxes.length === allCheckboxes.filter(':checked').length);
+}  
+
+function getVacancyById(vacId){
+	debugger
+	 $("#hiddenVacId").val(vacId);
+	 $("#editVacancyDetails").submit();
+}
+
+function publishModal(idforPub){
+	debugger
+	$("#publishModal").show();
+	$("#hiddenVacIdP").val(idforPub);
+}
+
+function publishVac(){
+	
+	 if ($("#publicationDate").val().trim()=='') {
+		 bootbox.alert("Publication Date is required when the job is published.");
+ 	     return false;
+     }
+	
+	if ($("#publicationDate").val().trim()!='' && $("#applicationDeadline").val().trim()=='') {
+		bootbox.alert("Application Deadline is required when Publication Date is set.");
+	     return false;
+	 }
+	 
+	//// Validate that publication date is less than or equal to application deadline
+	const publicationDateValue = $("#publicationDate").val().trim();
+	const applicationDeadlineValue = $("#applicationDeadline").val().trim();
+
+		   if (publicationDateValue !== '' && applicationDeadlineValue !== '') {
+		    const publicationDate = parseDate(publicationDateValue);
+		    const applicationDeadline = parseDate(applicationDeadlineValue);
+		
+		    if (publicationDate > applicationDeadline) {
+		    	bootbox.alert("Publication Date cannot be greater than the Application Deadline.");
+		        $("#publicationDate").focus();
+		        return false;
+		    }else{
+		    	$("#publishDate").val($("#publicationDate").val());
+		    	$("#deadLineDate").val($("#applicationDeadline").val());
+		    	$("#publishVacancy").submit();
+		    }
+		}
+}
+
+function parseDate(input) {
+    const parts = input.split('/'); // Split by "/"
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Months are 0-based in JavaScript
+    const year = parseInt(parts[2], 10);
+
+    return new Date(year, month, day);
+}
+
+
+
+
+
+function formatDateToDDMMYYYY(dateInput) {
+    if (!dateInput) return ''; // Handle null or undefined date
+
+    // Check if the input is a timestamp (number)
+    if (typeof dateInput === 'number') {
+        const date = new Date(dateInput); // Convert timestamp to Date object
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const year = date.getFullYear();
+        return day + '/' + month + '/' + year; ;
+    }
+
+    // If input is already a string, handle string-based dates (e.g., "YYYY-MM-DD")
+    if (typeof dateInput === 'string') {
+        const dateParts = dateInput.split(' ')[0].split('-'); // Split date and remove time
+        const year = dateParts[0];
+        const month = dateParts[1];
+        const day = dateParts[2];
+        return day + '/' + month + '/' + year;
+    }
+
+    // Fallback in case of unexpected input
+    return '';
+}
+
+function getApplicantAllDetails(regdId,vacId){
+	$("#regiId").val(regdId);
+	$("#vacId").val(vacId);
+	$("#getApplicantAllDetails").submit();
+}
+
+
+
+function getRoundList(hdvVacId){
+	$("#hdnVacId").val(hdvVacId);
+	$("#hdnRoleSelect").val($("#roleSelect").val());
+	$("#getRoundList").submit();
+}
+
+$(document).ready(function () {
+    debugger;
+    // Clear fields if statusCode is "SELECTED"
+    $("tbody tr").each(function () {
+        var statusCode = $(this).find(".x-status").text().trim();
+
+        if (statusCode === "SELECTED" || statusCode === 'SELECTED IN PREVIOUS ROUND') {
+            $(this).find("select[name^='interviewerId']").val(""); 
+            $(this).find("input[name^='interviewDate']").val("");
+            $(this).find("input[name^='interviewTime']").val("");
+            $(this).find("select[name^='interviewType']").val("");
+        }
+    });
+
+    // Apply datepicker with validation
+    $(".recdatepicker_con input").datepick({
+        dateFormat: 'dd/mm/yyyy', 
+        showOnFocus: true,
+        minDate: '0',
+        showTrigger: '<button type="button" class="trigger">' +
+                     '<i class="fa fa-calendar"></i></button>',
+        onSelect: function (selectedDate) {
+            validateDateTime($(this)); // Call validation function
+        }
+    });
+
+    // Time field validation when user selects a time
+    $("input[name^='interviewTime']").on("change", function () {
+        validateDateTime($(this)); // Call validation function
+    });
+
+    function validateDateTime($inputField) {
+        debugger;
+        var row = $inputField.closest("tr");
+        var dateField = row.find("input[name^='interviewDate']");
+        var selectedDateStr = dateField.val();
+        var eligibleDateStr = row.find("input[name^='interviewEligibleDate']").val();
+        var eligibleTimeStr = row.find("input[name^='interviewEligibleTime']").val();
+        var selectedTimeStr = row.find("input[name^='interviewTime']").val();
+
+        if (!selectedDateStr || !eligibleDateStr) {
+            console.warn("⚠️ No reference date found for validation.");
+            return;
+        }
+
+        // Convert selected and eligible date strings to Date objects
+        var selectedDateParts = selectedDateStr.split("/");
+        var selectedDate = new Date(selectedDateParts[2], selectedDateParts[1] - 1, selectedDateParts[0]);
+
+        var eligibleDateParts = eligibleDateStr.split("/");
+        var eligibleDate = new Date(eligibleDateParts[2], eligibleDateParts[1] - 1, eligibleDateParts[0]);
+
+        if (selectedDate < eligibleDate) {
+            bootbox.alert("Interview date cannot be earlier than the previous interview scheduled date.");
+            dateField.val(""); // Clear invalid date
+            return;
+        }
+
+        // Time validation if the selected date is the same as the eligible date
+        if (selectedDate.getTime() === eligibleDate.getTime() && eligibleTimeStr) {
+            if (!selectedTimeStr) {
+                return; // Skip validation if no time is selected
+            }
+
+            var selectedTime = selectedTimeStr.split(":");
+            var eligibleTime = eligibleTimeStr.split(":");
+
+            var selectedHours = parseInt(selectedTime[0], 10);
+            var selectedMinutes = parseInt(selectedTime[1], 10);
+            var eligibleHours = parseInt(eligibleTime[0], 10);
+            var eligibleMinutes = parseInt(eligibleTime[1], 10);
+
+            var selectedTotalMinutes = selectedHours * 60 + selectedMinutes;
+            var eligibleTotalMinutes = eligibleHours * 60 + eligibleMinutes + 30; // Add 30 minute
+
+            if (selectedTotalMinutes <= eligibleTotalMinutes) {
+                bootbox.alert("Interview time must be at least 30 mins after the previous interview scheduled time.");
+                row.find("input[name^='interviewTime']").val(""); // Clear invalid time
+            }
+        }
+    }
+
+    debugger;
+    var rounds = '${intrvRound.size()}';
+    var tabStatusId = '${tabStatusId}';
+    if (rounds !== '' && rounds !== '0' && tabStatusId === '') {
+        $(".nav-link:first").trigger("click");
+    }
+});
+
+
+
+
+
+</script>

@@ -1,0 +1,16 @@
+package com.aashdit.construction.service;
+
+import com.aashdit.construction.model.EntityAppModuleMap;
+
+import java.util.List;
+
+public interface EntityModuleMapService {
+
+	void entityModuleMap(List<Long> moduleIds, Long entityId, Class<?> entityClass);
+
+	void entityModuleMap(String[] moduleCodes, Long entityId, Class<?> entityClass);
+
+	List<Long> getAppModuleIdByEntityIdAndCode(Long governingBodyId, Class<?> entityClass);
+
+	List<EntityAppModuleMap> getPublicAndEntitySpecificEntityLevelCodeListList(Long entityId, String entityLevel);
+}

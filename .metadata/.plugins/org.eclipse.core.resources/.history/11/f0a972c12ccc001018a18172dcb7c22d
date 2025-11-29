@@ -1,0 +1,210 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<script src="${contextPath}/resources/javascripts/accountMaster.js"></script>
+<script src="${contextPath}/resources/javascripts/common.js"></script>
+<script src="resources/javascripts/createAccountMaster.js"></script>
+<style>
+.table-striped>tbody>tr:nth-of-type(odd) {
+    --bs-table-accent-bg: rgb(247 249 244) !important;
+    /* color: var(--bs-table-striped-color); */
+}
+.accordion-body {
+    padding: 0.5rem;
+    background: #091a16 !important;
+}
+</style>
+
+     <div class="breadcrumb_conatiner">
+      	<div class="col-md-6">
+     		<h4 class="change-color">Add Budget Group</h4>
+     	</div>
+     	<div class="col-md-6">
+     		<nav aria-label="breadcrumb">
+     			<ol class="breadcrumb">
+     				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+     				<li class="breadcrumb-item active" aria-current="page">Add Budget Group</li>
+     			</ol>
+     		</nav>
+     	</div>
+     </div>
+     <div class="row">
+     	<div class="col-md-12">
+     		<div class="card">
+     			<div class="card-header">
+                     <h5 class="card-title">Budget Group</h5>
+                 </div>
+     			<div class="card-body">
+     			<div class="row">
+		        <p class="mandatory" align="right" style="color: #0043ff;font-weight: 500;font-size: 11px;">
+		            <spring:message code="LAND.ALLOTMENT.MANDATORY" />
+		        </p>
+		        <div class="col-md-12">
+		            <form class="form-horizontal form-bordered" action="${contextPath}/budget/group-save" id="groupSaveForm" method="post">
+		                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+		           <input type="hidden" name="budgetGrpId" class="form-control" id="budgetGrpId" value="${budgetGroupMaster.budgetGrpId}">
+		               <input type="hidden" value="true" id="labelmsg" name="labelmsg">
+		                <div class="row">
+		                    <div class="col-md-3 col-sm-3">
+		                        <div class="form-group">
+		                            <label class="col-md-12 required" for="budgetGroup">Budget Group Name:</label>
+		                            <div class="col-md-12">
+		                                <input type="text" name="budgetGroup" class="form-control require" id="budgetGroup" maxlength="30" value="${budgetGroupMaster.budgetGroup}">
+		                            </div>
+		                        </div>
+		                    </div>
+		
+		                    <div class="col-md-3 col-sm-3">
+		                        <div class="form-group">
+		                            <label class="col-md-12 required" for="budgetGroupCode">Budget Group Code:</label>
+		                            <div class="col-md-12">
+		                                <input type="text" name="budgetGroupCode" class="form-control require" id="budgetGroupCode" value="${budgetGroupMaster.budgetGroupCode}" maxlength="10">
+		                            </div>
+		                        </div>
+		                    </div>
+		                    
+		                    <div class="col-md-3 col-sm-3">
+		                        <div class="form-group">
+		                            <label class="col-md-12 required" for="activeFlag">Active Flag:</label>
+		                            <div class="col-md-12">
+		                                <select name="activeFlag" class="form-control require form-select" id="activeFlag">
+		                                    <option value="true" ${budgetGroupMaster.activeFlag eq true?'selected':''}>Yes</option>
+		                                    <option value="false" ${budgetGroupMaster.activeFlag eq false?'selected':''}>No</option>
+		                                </select>
+		                            </div>
+		                        </div>
+		                    </div>
+
+		
+		                    <div class="col-md-3 col-sm-3">
+		                        <div class="form-group">
+		                            <label class="col-md-12 required" for="displayChar">Display Character:</label>
+		                            <div class="col-md-12">
+		                                <input type="text" name="displayChar" class="form-control require" id="displayChar" value="${budgetGroupMaster.displayChar}" maxlength="1">
+		                            </div>
+		                        </div>
+		                    </div>
+		
+		                    <div class="col-md-3 col-sm-3">
+		                        <div class="form-group">
+		                            <label class="col-md-12 required" for="displayOrder">Display Order:</label>
+		                            <div class="col-md-12">
+		                                <input type="text" name="displayOrderin" class="form-control require" id="displayOrderin" value="${budgetGroupMaster.displayOrderin}" maxlength="1">
+		                            </div>
+		                        </div>
+		                    </div>
+		                  </div>
+
+		
+		                <div class="row">
+		                    <div class="col-sm-12" style="margin-top:10px;">
+		                        <div class="form-group text-center">
+		                            <button type="button" class="btn btn-submit" onclick="submitFormData(); ">
+		                                <spring:message code="COMMON.BUTTON.SAVE" />
+		                            </button>
+		                            <a href="${contextPath}/home">
+		                                <input type="button" class="btn btn-warning" value=<spring:message code="COMMON.BUTTON.BACK"></spring:message>>
+		                            </a>
+		                        </div>
+		                    </div>
+		                </div>
+		            </form>
+		        </div>
+		    </div>
+
+
+        
+        
+    <div class="main-content mt-3">
+    <div class="row">
+       <div class="col-lg-12">
+            <div class="" id="accordionExample1">
+              <div class="">
+                <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingtwo" data-bs-parent="#accordionExample1">
+                  <div class="">
+                    <div class="col-md-12">
+                        <table class="table table-bordered mb-none" id="datatable-default">
+                            <thead>
+                                <tr>
+                                    <th>Budget Group Name</th>
+                                    <th>Budget Group Code</th>
+                                    <th>Display Character</th>
+                                    <th>Display Order</th>
+                                    <th>Active Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach items="${data.budgetGroupList}" var="budget">
+                                    <tr class="gradeX">
+                                        <td>${budget.budgetGroup}</td>
+                                        <td>${budget.budgetGroupCode}</td>
+                                        <td>${budget.displayChar}</td>
+                                        <td>${budget.displayOrderin}</td>
+                                        
+                                        <c:if test="${budget.activeFlag eq true}">
+                                            <td>ACTIVE</td>
+                                        </c:if>
+                                        <c:if test="${budget.activeFlag eq false}">
+                                            <td>INACTIVE</td>
+                                        </c:if>
+                                        
+                                        <td>
+                                            <input type="hidden" name="budgetId" id="budget_ids">
+                                            <a class="btn btn-primary" title="<spring:message code='COMMON.BUTTON.ICONEDIT' />"
+                                               onclick="editGroup('${budget.budgetGrpId}')">
+                                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!--End::row-1 -->
+      </div>
+
+
+               
+		 
+<form action="${contextPath}/budget/group-edit" method="get" id="editgroupForm">   
+    <input type="hidden" id="budgetGrpIdHd" class="" name="budgetGrpId"/>
+</form>
+
+	<script>
+	function submitFormData(){
+		if(validateForm()){
+		 if(encryptFormData('groupSaveForm', tableOrTbodyIDS, tableOrTbodyKeys)){
+				 confirmation('groupSaveForm');
+			 }
+		}
+		
+	}
+	function editGroup(budgetGroupId){
+		//document.cookie = "username=John Doe";
+		//console.log(document.cookie);
+		$('#budgetGrpIdHd').val(budgetGroupId);
+		 if(encryptFormData('editgroupForm', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('editgroupForm');
+		 }
+		
+	}
+    </script>
+								
+		

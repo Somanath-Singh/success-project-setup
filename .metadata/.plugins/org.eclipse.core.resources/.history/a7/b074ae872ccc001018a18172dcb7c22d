@@ -1,0 +1,265 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/js/commonFunctions.js"></script>
+
+
+<c:set var="rowcount" value="0" />
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Item Stock Adjustment</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Item	Stock Adjustment</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Item Stock Adjustment</h5>
+			</div>
+			<div class="card-body">
+				<form method="POST"
+					action="${contextPath}/inventory/store/saveStockAdjustment"
+					id="stkAdjFrm" enctype="multipart/form-data">
+					<input type="hidden" name="${_csrf.parameterName}"
+						value="${_csrf.token}" /> <input type="hidden" id="itemId"
+						value="${item.itemId }"> <input type="hidden" id="stockId"
+						name="stockId" value=""> <input type="hidden"
+						id="storesize" value="${lstStore.size()}"> <input
+						type="hidden" class="" id="encodedDatastkAdjFrm"
+						name="encodedDatastkAdjFrm" value="" />
+					<div class="row">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="form-group col-md-3">
+									<!-- <label class="ft-sz"><strong>Item Name :</strong>
+										${item.itemName }</label> -->
+										<label class="">Item Name :</label>
+                                        <input type="text" class="form-control" value="${item.itemName }" readonly/>
+
+								</div>
+
+								<div class="form-group col-md-3">
+									<!--<label class="ft-sz"><strong>Item Code :</strong>
+										${item.itemCode }</label>-->
+										<label class="">Item Code :</label>
+                                        <input type="text" class="form-control" value="${item.itemCode }" readonly/>
+								</div>
+
+								<div class="form-group col-md-3">
+									<!--<label class="ft-sz"><strong>Sub Category :</strong>
+										${item.subCategory.subCategoryName }</label>-->
+										<label class="">Sub Category :</label>
+                                        <input type="text" class="form-control" value="${item.subCategory.subCategoryName }" readonly/>
+								</div>
+
+								<div class="form-group col-md-3">
+									<!--<label class="ft-sz"><strong>Unit :</strong>
+										${item.uom.uom }</label>-->
+										<label class="">Unit :</label>
+                                        <input type="text" class="form-control" value="${item.uom.uom }" readonly/>
+								</div>
+
+							</div>
+							<div class="row">
+								<div class="form-group col-md-2">
+									<label for="inputEmail4">Store:<span style="color: red">*</span>
+									</label>
+									<c:choose>
+										<c:when test="${lstStore.size() > 1}">
+											<select class="form-select requiredField"
+												aria-label="Default select example" id="storeId"
+												onchange="getStockDetails()">
+												<option value="">-Select-</option>
+												<c:forEach items="${lstStore}" var="store">
+													<option value="${store.storeId}"
+														${store.storeId eq stock.store.storeId ? 'selected' : ''}>${store.storeName}</option>
+												</c:forEach>
+											</select>
+										</c:when>
+										<c:otherwise>
+											<input type="hidden" id="storeId"
+												value="${lstStore[0].storeId}" />
+											<input type="text"
+												class="form-control form-control-sm requiredField"
+												value="${lstStore[0].storeName}" readonly="readonly" />
+										</c:otherwise>
+									</c:choose>
+								</div>
+								<div class="form-group col-md-2">
+									<label for="inputEmail4">Last Purchase Price :<span
+										style="color: red">*</span>
+									</label> <input type="text" id="lpPrice" name="lastPurchasePrice"
+										class="form-control form-control-sm requiredField"
+										readonly="readonly" />
+								</div>
+								<div class="form-group col-md-2">
+									<label for="inputEmail4">Available Quantity :<span
+										style="color: red">*</span>
+									</label> <input type="text" id="avlQty" name="avlQuantity"
+										class="form-control form-control-sm requiredField"
+										readonly="readonly" />
+								</div>
+								<div class="form-group col-md-2">
+									<label for="inputEmail4">Prepared Quantity :<span
+										style="color: red">*</span>
+									</label> <input type="text" id="preQty" name="preQty"
+										class="form-control form-control-sm requiredField"
+										readonly="readonly" />
+								</div>
+								<div class="form-group col-md-2">
+									<label for="inputEmail4">Quantity :<span
+										style="color: red">*</span>
+									</label> <input type="number" id="qty" name="quantity"
+										class="form-control form-control-sm ${item.uom.isFractional ? 'numberWithTwoDesimal' : 'numberWithTwoDesimalButOnlyAllowZero'} maximunLengthIs10WithDot greaterThanZero onClickInput"
+										value="0" onkeyup="checkQuantity()" />
+								</div>
+								<div class="form-group col-md-2">
+									<label for="inputEmail4">Operation :<span
+										style="color: red">*</span>
+									</label> <select class="form-select requiredField"
+										aria-label="Default select example" id="operation"
+										name="operation" onchange="checkQuantity()">
+										<option value="">-Select-</option>
+										<option value="plus">Plus</option>
+										<option value="minus">Minus</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<c:set var="dynamicFromId" value="stkAdjFrm" scope="request" />
+					<%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+				</form>
+
+
+				<div class="col-md-12">
+					<div class="table-responsive">
+						<table
+							class="datatable table table-striped table-bordered exportbtn mt-3">
+							<thead>
+								<tr>
+									<th>Sl No</th>
+									<th>Item Name</th>
+									<th>Item Code</th>
+									<th>Store Name</th>
+									<th>Store Code</th>
+									<th>Operation Quantity</th>
+									<th>Operation Type</th>
+									<th>Operation Date</th>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach items="${stkAdj}" var="item" varStatus="status">
+									<tr>
+										<td>${status.count}</td>
+										<td>${item.stock.item.itemName}</td>
+										<td>${item.stock.item.itemCode}</td>
+										<td>${item.stock.store.storeName}</td>
+										<td>${item.stock.store.storeCodeStr}</td>
+										<td>${item.quantity}</td>
+										<td>${item.operation}</td>
+										<td><fmt:formatDate value='${item.createdAt}'
+												pattern='dd/MM/yyyy' /></td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	tableIds = [];
+	jsonKeys = [];
+	$(document).ready(function() {
+		if ($("#storesize").val() == 1) {
+			getStockDetails();
+		}
+	});
+	function getStockDetails() {
+		var itemId = $("#itemId").val();
+		var storeId = $("#storeId").val();
+
+		$.ajax({
+			url : "${contextPath}/ajax/getStockDetails",
+			type : 'GET',
+			data : {
+				itemId : itemId,
+				storeId : storeId
+			},
+			success : function(response) {
+				var data = JSON.parse(response);
+				$("#lpPrice").val(data.lastPurchasePrice.toFixed(2));
+				$("#preQty").val(data.preQty);
+				$("#avlQty").val(data.avlQty);
+				$("#stockId").val(data.stockId);
+			},
+			error : function(e) {
+			}
+		});
+	}
+
+	function submitForm() {
+		var storeId = $("#storeId").val();
+		var qty = parseFloat($("#qty").val());
+		var operation = $("#operation").val();
+
+		if (storeId == undefined || storeId == "") {
+			bootbox.alert("please select store.");
+			return false;
+		} else if (qty == undefined || qty == "" || qty == 0) {
+			bootbox.alert("please enter quantity.");
+			return false;
+		} else if (operation == undefined || operation == "") {
+			bootbox.alert("please select operation.");
+			return false;
+		} else {
+			$("#stkAdjFrm").submit();
+		}
+
+	}
+
+	function checkQuantity() {
+		var operation = $("#operation").val();
+		var avlQty = parseFloat($("#avlQty").val());
+		var preQty = parseFloat($("#preQty").val());
+		var qty = $("#qty").val();
+		avlQty = parseFloat(avlQty);
+		qty = parseFloat(qty);
+		if (operation == 'minus') {
+			if (avlQty < qty) {
+				$("#qty").val(0);
+				bootbox
+						.alert("can't enter greater than available quantity while minus operation.");
+				return false;
+			}
+			if (preQty < qty) {
+				$("#qty").val(0);
+				bootbox
+						.alert("can't enter greater than prepared quantity while minus operation.");
+				return false;
+			}
+		}
+	}
+</script>

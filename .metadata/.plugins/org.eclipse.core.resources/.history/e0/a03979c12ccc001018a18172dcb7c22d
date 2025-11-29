@@ -1,0 +1,388 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+ <jsp:useBean id="utils" class="com.aashdit.fams.utils.ApplicationStringUtilsFams"/>  
+<%@ taglib prefix="fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<link rel="stylesheet" href="resources/stylesheets/financialaccounting/fa-common-report-style.css" />
+<link rel="stylesheet" href="resources/stylesheets/financialaccounting/fa-common-styles.css" />
+
+<link rel="stylesheet" href="resources/stylesheets/financialaccounting/fa-common-report-style.css" />
+
+<script src="../assets/javascripts/common.js"></script>
+<script src="../assets/javascripts/incomeAndExpenditure.js"></script>
+<script src="resources/javascripts/document/jquery.autocomplete.min.js"></script>
+
+<style>
+.printtable > thead > tr > th {
+	background: #d9dab6;
+	padding: 3px 4px 4px 4px;
+}
+.printtable > tbody > tr > td {
+	padding: 3px 4px 4px 4px;
+}
+</style>
+<section class="home-section">
+    <div class="main-content">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="accordion" id="accordionExample">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                   <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+  				  GST R-2 Summary (B2B)
+					</button>
+                </h2>
+                
+                <div id="collapseOne" class="accordion-collapse collapse show"  aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+				<form class="form-horizontal form-bordered" id="rptInvoice" action="taxInvoice.htm" method="post">
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+					<div class="row">
+
+						<div class="col-md-2 col-sm-2">
+							<div class="form-group">
+								<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.CONTRA.VOUCHER.COMPANY"/></label>
+								<div class="col-md-12">
+									<select class="form-control" name="company" id="companyId1" data-plugin-selectTwo>
+										<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.CORPORATE"/></option>
+										<c:forEach items="${officeList}" var="officeList">
+											<option value="${officeList.officeMasterId}" ${officeList.officeMasterId eq selOffice}selected >${officeList.officeCode} | ${officeList.officeName}</option>
+										</c:forEach>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-4 col-sm-4">
+							<div class="form-group">
+								<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.ACCOUNTS.INVOICE.PARTY.CODENAME"/></label>
+								<div class="col-md-12">
+											<input type="text" class="form-control" name="partyName" id="partyName" value="${party}" placeholder="Type to search for Matching Parties">
+											<input type="hidden" name="partyId" id="partyId" value="${client}">
+											
+											
+								</div>
+							</div>
+					 	</div>
+
+						<div class="col-md-1 col-sm-1">
+							<div class="form-group">
+							<label class="col-md-12 required" for="cboMonth"><spring:message code="LAND.ALT.LANDRENEWAL.YEAR" /></label>
+								<div class="col-md-12">
+									<select class="form-control" name="reportYear" id="reportYear" onchange="getStartAndEndDateOfMonth();" data-plugin-selectTwo>
+										<c:set var="startYear" value="2017"/>
+										<c:set var="sumOfYears" value="${startYear + currYear}"/>
+							            <c:forEach var="i" begin="${startYear}" end="${currYear}" step="1">
+											<c:set var="yearsDescending" value="${sumOfYears-i}"/>
+							                <option value="${yearsDescending}" ${yearsDescending eq selYear ? "selected" :''}>${yearsDescending}</option>
+							            </c:forEach>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2 col-sm-2">
+							<div class="form-group">
+								<label class="col-md-12" for="fromDate"><spring:message code="HR.REIMBURSE.FORM.FROMDATE" /></label>
+								 <div class="datepicker-box">
+									<input type="text" class="form-control datepicker_con" value="${startDate}" id="startDate" name="startDate" placeholder="dd/MM/yyyy">
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2 col-sm-2">
+							<div class="form-group">
+								<label class="col-md-12 " for="fromDate"><spring:message code="HR.REIMBURSE.FORM.TODATE" /></label>
+								 <div class="datepicker-box">
+									<input type="text" class="form-control datepicker_con" id="endDate" value="${endDate}" name="endDate" placeholder="dd/MM/yyyy">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12 col-sm-12" style="text-align: center; margin-top: 20px;">
+							<input type="button" class="btn-submit" value="<spring:message code="COMMON.BUTTON.SEARCH"/>" onclick="showAllInvoices();" />
+<!-- 							<a href="../rpt/financeReportList.htm" class="btn btn-danger ">Back</a> -->
+						</div>
+					</div>
+					<div class="row"></div>
+				</form>
+			</div>
+
+			<c:if test="${empty invoiceList}">
+				<c:set var="report" value="none"></c:set>
+				<c:if test="${type eq 'Post'}">
+					<c:set var="list" value="block"></c:set>
+				</c:if>
+				<c:if test="${type eq 'Get'}">
+					<c:set var="list" value="none"></c:set>
+				</c:if>
+
+				<div class="row" style="display:${list};">
+					<div class="col-md-12 col-sm-12">
+						<div class="form-group">
+							<label class="acct-req-th noDataRow"><spring:message code="COMMON.REPORT.NODATA"/></label>
+						</div>
+					</div>
+				</div>
+			</c:if>
+			<c:if test="${not empty invoiceList}">
+				<c:set var="report" value="block"></c:set>
+			</c:if>
+	
+			<div id="GSTR1Report" style="float:left; width: 100%; display:${report};">
+			<hr>
+				<div id="report" class="printDiv">
+					<div class="row">
+						<div class="col-md-12 col-sm-12" style="text-align:center">
+						       <h5>${organisationName}</h5>
+								<%-- <img class="reportLogo" src="../assets/images/Idco-bw-image.jpg" />
+									<h3><spring:message code="COMMON.LABEL.IDCO.TITLE"></spring:message></h3>
+									<h5><spring:message code="COMMON.LABEL.IDCO.ADDRESS.TITLE"></spring:message></h5> --%>
+									<h5>Invoice List</h5>
+								</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12 col-sm-12">
+							<div class="table-responsive">
+								<table class=" table headerTable">
+									<tr style="height: 20px;">
+										<td width="30%" class="textLeftFontSixhundred"><b>For the Month : &nbsp; ${monthAsMMMinStartDate}, ${yearInStartDate}</b></td>
+										<td width="30%" class=""></td>
+									</tr>
+								</table>
+							</div>
+							
+							<div class="table-responsive">
+								<table class="table printtable" style="font-size: 14px;">
+									<thead>
+										<tr>
+											<th width="04%" class="leftSolidBorder bottomSolidBorder topSolidBorder rightDottedBorder">Sl.#</th>
+											<th width="13%" class="topSolidBorder bottomSolidBorder rightDottedBorder">Invoice No.</th>
+											<th width="10%" class="topSolidBorder bottomSolidBorder rightDottedBorder">Invoice Date</th>
+											<th width="13%" class="topSolidBorder bottomSolidBorder rightDottedBorder rightAlignedText">Invoice Amount (Rs.)</th>
+											<th width="48%" class="topSolidBorder bottomSolidBorder rightDottedBorder">Party Name & Code</th>
+											<th width="12%" class="topSolidBorder bottomSolidBorder rightSolidBorder">Division</th>
+										</tr>
+									</thead>
+									<c:set scope="page" var="row" value="1" />
+									<c:forEach items="${invoiceList}" var="invoiceList">
+										<tr>
+											<td class="leftSolidBorder bottomDottedBorder rightDottedBorder">
+												<input type="hidden" name="invoiceIdTemp" id="invoiceIdTemp" value="${gstr1List.invoiceId}"/>
+												${row}
+											</td>
+											<td class="bottomDottedBorder rightDottedBorder">
+												<a href="#" id="invoiceIdpdf" style="font-weight: 600;" onclick="generateInvoicePDF('${invoiceList.invoiceId}');" data-toggle="tooltip" data-placement="top" title="Click to View Invoice">
+													<c:choose>
+														<c:when test="${fn:indexOf(invoiceList.invoiceNo, '/') > -1}">
+															${invoiceList.invoiceNo}
+														</c:when>
+														<c:otherwise>
+															<%-- ${invoiceList.officeMaster.officeCode}/${selFinYear}/<fmt:formatNumber pattern="000000" value="${invoiceList.finalInvoiceNo}" /> --%>
+															${invoiceList.officeMaster.officeCode}/${selFinYear}/${invoiceList.finalInvoiceNo}
+														</c:otherwise>
+													</c:choose>
+												</a>
+											</td>
+											<td class="bottomDottedBorder rightDottedBorder">
+												<c:choose>
+													<c:when test="${not empty invoiceList.invoiceDate}">
+														<fmt:formatDate value="${invoiceList.invoiceDate}" pattern="dd/MM/yyyy" />
+													</c:when>
+													<c:otherwise>${invoiceList.invoiceDate}</c:otherwise>
+												</c:choose>
+											</td>
+											<td style="text-align: right; padding-right: 5px;" class="bottomDottedBorder rightDottedBorder">${utils.convertAmountToINRFormat(invoiceList.totalInvoiceAmount)}</td>
+											<td class="bottomDottedBorder rightDottedBorder">${invoiceList.partyDetails.partyCode} | ${invoiceList.partyDetails.partyName}</td>
+											<td class="bottomDottedBorder rightSolidBorder">${invoiceList.officeMaster.officeCode} | ${invoiceList.officeMaster.officeName}</td>
+										</tr>
+				 						<c:set value="${row+1}" var="row" />
+			 						</c:forEach> 
+								</table>
+							</div>
+						</div>
+					</div>	
+				</div>
+			</div>
+		  </div>
+		</div>
+	  </div>	
+	</div>
+	</div>
+	</div>
+</section>
+			<form action="generateTaxInvoicePDF.htm" method="post" id="frmInvoicePDF" target="_blank">
+				<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+				<input type="hidden" name="invoiceId" id="invoiceId"/>
+				<input type="hidden" id="hdnInvoiceType" name="invoiceType" value="FINAL"/>
+			</form>
+		
+	
+
+
+<script type="text/javascript">
+/* $(document).ready(function()
+{
+	getStartAndEndDateOfMonth();
+}); */
+
+function showAllInvoices()
+{
+	$("#rptInvoice").submit();
+}
+
+function generateInvoicePDF(invoiceId)
+{
+	$("#invoiceId").val(invoiceId);
+	$("#frmInvoicePDF").submit();
+}
+
+/* function getStartAndEndDateOfMonth()
+{
+	var month = $("#reportMonth").val();
+	var year = $("#reportYear").val();
+	if($('#reportMonth').val() !="" && $('#reportYear').val())
+	{
+		$.ajax({
+			url : './getStartAndEndDateOfMonth.htm',
+	 	    type:'GET',
+	 	    data : ({
+	 	    	month : month,
+	 	    	year : year,
+	 	    }),
+			cache:false,
+			asynch:false,
+			success : function(response) 
+			{
+				if(response!=null)
+				{
+					var value = [];
+					var value = response.split("#");
+					document.getElementById("startDate").value = value[0];
+					document.getElementById("endDate").value = value[1];
+				} 
+			}
+		});
+	}
+	else
+	{
+		document.getElementById("startDate").value = "";
+		document.getElementById("endDate").value = "";
+	}
+} */
+
+$(document).ready(function() 
+{
+	$('body').on('mouseenter', '.tbl_input_tooltip', function () {
+
+		if ($(this).attr('data-toggle') == 'tooltip')
+		{
+		    $(this).tooltip({
+		        container: 'body',
+		        placement: 'top',
+		        trigger: 'hover'
+		    }).tooltip('show');
+		}
+		});
+
+/* 	$("input[name^='partyName']").autocomplete({
+		serviceUrl: 'findPartyDetailByAutocomplete.htm',
+		paramName: "clientcode",
+		delimiter: ",",
+		width: '150px',
+		transformResult: function(response) {
+			return {
+				//must convert json to javascript object before process
+				suggestions: $.map($.parseJSON(response), function(item) {
+					return {                      
+						value: item.clientcode, data: item.clientid
+					};
+				})
+			};
+		},
+		onSelect: function (suggestion) 
+		{
+			var selectedRow=0;
+			selectedRow=parseInt(this.parentNode.parentNode.rowIndex)-1;
+			document.getElementById("partyId").value=suggestion.data;
+			getPartyDetails();
+		}
+	}); */
+	
+/* 	$("input[name^='hsnCodeName']").autocomplete({	
+		serviceUrl: 'findGSTDetailByAutocomplete.htm',
+		paramName: "gstcode",
+		delimiter: ",",
+		width: '285px',
+		transformResult: function(response) {
+			return {
+				suggestions: $.map($.parseJSON(response), function(item) {
+					return {                      
+						value: item.gstcode, data: item.gstid
+					};
+				})
+			};
+		},
+		onSelect: function (suggestion) 
+		{
+			var selectedRow=0;
+			selectedRow=parseInt(this.parentNode.parentNode.rowIndex)-1;
+			document.getElementById("hsnCode0").value=suggestion.data;
+			$("#hsnCodeName0").attr("data-original-title",suggestion.value);
+			getHsnsacCodeDetails(0);
+		}
+	}); */
+	
+	//total_amount(0);
+	var updateInvoiceId = '${paymentInvoiceMaster.invoiceId}';
+	if(updateInvoiceId != ""){
+		getPartyDetails();
+	}
+})
+
+function checkEmptyValue()
+{
+	var partyName = document.getElementById("partyName1").value;
+	if(partyName != null || partyName != "")
+	{
+		document.getElementById("partyId1").value="";
+	}
+}
+
+
+$(document).ready(function() 
+		{
+	
+	
+	$(".jqueryNDatePicker").datepick({
+		constrainInput:false,
+		dateFormat: 'dd/mm/yyyy',
+		showOnFocus: true,
+	});	
+			$("input[name^='partyName']").autocomplete({	
+				serviceUrl: '../creditRefund/findPartyDetailByAutocomplete.htm',
+				paramName: "clientcode",
+				delimiter: ",",
+				width: '295px',
+				transformResult: function(response) {
+					return {
+						//must convert json to javascript object before process
+						suggestions: $.map($.parseJSON(response), function(item) {
+							return {                      
+								value: item.clientcode, data: item.clientid
+							};
+						})
+					};
+				},
+				onSelect: function (suggestion) {
+					var selectedRow=0;
+					selectedRow=parseInt(this.parentNode.parentNode.rowIndex)-1;
+					document.getElementById("partyId").value=suggestion.data;
+					if(document.getElementById("accountHead").value != null){
+						getCreditRefundList();
+					} 
+				}
+			});
+		}) 
+</script>
+

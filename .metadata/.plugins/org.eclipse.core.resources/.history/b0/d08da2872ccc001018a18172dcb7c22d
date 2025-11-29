@@ -1,0 +1,382 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/resources/javascripts/accountMaster.js"></script>
+<script src="${contextPath}/resources/javascripts/common.js"></script>
+<script src="resources/javascripts/createAccountMaster.js"></script>
+<style>
+.table-striped>tbody>tr:nth-of-type(odd) { -
+	-bs-table-accent-bg: rgb(247, 249, 244) !important;
+	/* color: var(--bs-table-striped-color); */
+}
+
+.accordion-body {
+	padding: 0.5rem;
+	background: #091a16 !important;
+}
+</style>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">HSN/SAC Master</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">HSN/SAC Master</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title" id="headingOne">HSN/SAC Master</h5>
+            </div>
+            <div class="card-body">
+		<form class="form-horizontal form-bordered" action="${contextPath}/mst/saveGSTCodesMaster" id="createGstMaster" method="POST">
+		
+		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+			<input type="hidden" name="gstId" id="gstId"	value="${gSTCodesMaster.gstId}" />
+			
+
+
+			<div class="row">
+
+				<div class="col-md-3 col-sm-3">
+					<div class="form-group">
+						<label for="hsnSacCode" class="required">HSN/SAC Code:</label>
+						<div class="col-md-12">
+							<input type="text" name="hsnSacCode" class="form-control"
+								id="hsnSacCode" value="${gSTCodesMaster.hsnSacCode}"
+								maxlength="100">
+						</div>
+					</div>
+				</div>
+
+
+				<div class="col-md-3 col-sm-2">
+					<div class="form-group">
+						<label for="goodsServiceType" class="required">Type:</label>
+						<div class="col-md-12">
+							<select class="form-control form-select" name="goodsServiceType"
+								id="goodsServiceType" data-plugin-selectTwo>
+								<option value="">
+									<spring:message code="COMMON.LABEL.DROPDOWN.SELECT" />
+								</option>
+								<option value="G"
+									${gSTCodesMaster.goodsServiceType eq 'G' ? 'selected="selected"' : 'true'}>Goods</option>
+								<option value="S"
+									${gSTCodesMaster.goodsServiceType eq 'S' ? 'selected="selected"' : 'false'}>Services</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="col-md-6 col-sm-6">
+					<div class="form-group">
+
+						<label for="description" class="required">Description:</label>
+						<div class="col-md-12">
+							<%-- 									<c:if test="${not empty GSTCodeMasterDetails.description}"> --%>
+							<%-- 										<input type="text" name="description" class="form-control" id="description" tabindex="-1" value="${GSTCodeMasterDetails.description}" readonly> --%>
+							<%-- 									</c:if> --%>
+							<%-- 									<c:if test="${empty GSTCodeMasterDetails.description}"> --%>
+							<input type="text" name="description" class="form-control"
+								id="description" tabindex="-1"
+								value="${gSTCodesMaster.description}">
+							<%-- 									</c:if> --%>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-2 col-sm-2">
+					<div class="form-group">
+						<label for="gstRatePercent" class="required">Total GST %:</label>
+
+						<div class="col-md-12">
+							<input type="text" class="form-control rightAlignedText text-end"
+								name="gstRatePercent" id="gstRatePercent"
+								onblur="validateDecimalField('gstRatePercent','2','5','GST Percentage'),calculateGSTBreakup();"
+								value="${gSTCodesMaster.gstRatePercent}">
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-1 col-sm-1">
+					<div class="form-group">
+						<label for="sgstRatePercent" class="required">SGST %:</label>
+
+						<div class="col-md-12">
+							<input type="text" class="form-control rightAlignedText text-end"
+								name="sgstRatePercent" id="sgstRatePercent" readonly="readonly"
+								tabindex="-1" value="${gSTCodesMaster.sgstRatePercent}">
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-1 col-sm-1">
+					<div class="form-group">
+						<label for="cgstRatePercent" class="required">CGST %:</label>
+
+						<div class="col-md-12">
+							<input type="text" class="form-control rightAlignedText text-end"
+								name="cgstRatePercent" id="cgstRatePercent" readonly="readonly"
+								tabindex="-1" value="${gSTCodesMaster.cgstRatePercent}">
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-1 col-sm-1">
+					<div class="form-group">
+						<label for="igstRatePercent" class="required">IGST %:</label>
+						<div class="col-md-12">
+							<input type="text" class="form-control rightAlignedText text-end"
+								name="igstRatePercent" id="igstRatePercent" readonly="readonly"
+								tabindex="-1" value="${gSTCodesMaster.igstRatePercent}">
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-1 col-sm-1">
+					<div class="form-group">
+						<label for="cessPercent" class="required">CESS %:</label>
+
+						<div class="col-md-12">
+							<input type="text" class="form-control rightAlignedText text-end"
+								name="cessPercent" id="cessPercent"
+								onblur="validateDecimalField('cessPercent','2','5','CESS Percentage'),cessApplicable();"
+								value="${gSTCodesMaster.cessPercent}">
+						</div>
+					</div>
+				</div>
+				
+		 	      <div class="col-md-2 col-sm-2">
+    <div class="form-group">
+        <label for="effectiveFrom" class="required">From Date</label>
+        <div class="datepicker_con" style="">
+            <input type="text"
+                class="form-control form-control-sm"
+                name="effectiveFrom"
+                id="effectiveFrom"
+
+                value="${formattedDate}"
+                placeholder="dd/mm/yyyy"
+                required />
+        </div>
+    </div>
+</div>
+</div>
+
+				
+
+
+
+
+
+				<div class="row">
+					<div class="col-sm-12" style="margin-top: 10px;">
+						<div class="form-group text-center">
+							<button type="button" class="btn btn-sm btn-success"
+								onclick="checkFormDataOnSubmit('createGstMaster');">
+								<c:choose>
+									<c:when test="${empty gSTCodesMaster.gstId}">
+										<spring:message code="COMMON.BUTTON.SUBMIT" />
+									</c:when>
+									<c:otherwise>
+										<spring:message code="COMMON.BUTTON.UPDATE" />
+									</c:otherwise>
+								</c:choose>
+
+							</button>
+							<%-- <a href="${contextPath}/home"><input type="button"
+								class="btn btn-sm btn-danger"
+								value="<spring:message code="COMMON.BUTTON.BACK"></spring:message>"></a> --%>
+											<button type="button" class="btn btn-warning no-print unfreezeField back" onclick="backToModule()">Back</button>
+								
+						</div>
+					</div>
+				</div>
+		</form>
+
+		<div class="col-lg-12">
+			<div class="col-md-12">
+				<table class="table table-bordered" id="datatable">
+					<thead>
+						<tr>
+							<th style="width: 07%;"  class="text-center"><label class="acct-req-th">Sl.
+									No.</label></th>
+							<th style="width: 23%;"><label class="acct-req-th">HSN/SAC
+									Code</label></th>
+							<th style="width: 11%;"><label class="acct-req-th">CGST
+									%</label></th>
+							<th style="width: 11%;"><label class="acct-req-th">SGST
+									%</label></th>
+							<th style="width: 11%;"><label class="acct-req-th">IGST
+									%</label></th>
+							<th style="width: 11%;"><label class="acct-req-th">CESS
+									%</label></th>
+							<th class="width10Percent"style="width: 60px;"><spring:message
+									code="COMMON.LABEL.OPTION" /></th>
+							<!--                     <th style="width: 13%;"><label class="acct-req-th">Effective From</label></th> -->
+							<!--                     <th style="width: 13%;"><label class="acct-req-th">Effective Till</label></th> -->
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach items="${gSTCodesMasterList}" var="gst"
+							varStatus="recCount">
+							<tr class="gradeX">
+								<td class="text-center">${recCount.index + 1}</td>
+								<td>${gst.hsnSacCode}</td>
+								<td>${gst.cgstRatePercent}</td>
+								<td>${gst.sgstRatePercent}</td>
+								<td>${gst.igstRatePercent}</td>
+								<td>${gst.cessPercent}</td>
+								<td>  <a class="btn btn-primary" title="<spring:message code="COMMON.BUTTON.ICONEDIT" />" onclick="edit(${gst.gstId})">
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                    </a></td>
+								<%--                         <td><fmt:formatDate value='${gst.effectiveFrom}' pattern='dd/MM/yyyy' /></td> --%>
+								<%--                         <td><fmt:formatDate value='${gst.effectiveTill}' pattern='dd/MM/yyyy' /></td> --%>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+   
+                   
+
+
+		<form action="${contextPath}/mst/saveGSTCodesMaster" method="POST"
+			id="finalSubmit">
+			<input type="hidden" name="${_csrf.parameterName}"
+				value="${_csrf.token}" /> <input type="hidden" name="encData"
+				id="hdnData" />
+
+		</form>
+		<form action="${contextPath}/mst/updatedGSTCodesMaster" method="POST"id="editForm">
+			<input type="hidden" name="${_csrf.parameterName}"value="${_csrf.token}" /> 
+			<input type="hidden" name="gstId"id="gstIdHd" />
+		</form>
+	</div>
+   </div>
+                 </div>
+              </div>
+          </div>
+         
+      </div> 
+      </div>
+
+	<script>
+ 
+    
+    const checkFormDataOnSubmit=async(formId)=>
+    {
+    	  const requiredFields = document.querySelectorAll('.required');
+          let validationFailed = false;
+
+          for (const field of requiredFields) {
+              const inputId = field.getAttribute('for');
+              const inputField = document.getElementById(inputId);
+              if (!inputField.value) {
+                  inputField.style.borderColor = 'red';
+                  await showNotification(true, field.textContent.replace(/:/g, "") + " is required.");
+                  setTimeout(() => {
+                      inputField.style.borderColor = '';
+                  }, 3000);
+                  validationFailed = true;
+                  break;
+              }
+          }
+
+          if (!validationFailed) {
+        	  if(encryptFormData('createGstMaster', tableOrTbodyIDS, tableOrTbodyKeys)){
+    				 confirmation('createGstMaster');
+    			 }
+        	  
+        /* const encryptFormDataResult = await encryptHiddenFormData(formId);
+        	debugger
+        	if (encryptFormDataResult) {
+        	    $('#hdnData').val(encryptFormDataResult);
+        	    $('#finalSubmit').submit();
+        	} else {
+        	    showNotification(true, 'Unable to process your request. Please try after some time.');
+        	} */
+          }
+          
+    }
+    
+   
+    
+    function calculateGSTBreakup()
+    {
+    	var totalGST = 0;
+    	if ($("#gstRatePercent").val() == "") 
+    	{
+    		bootbox.alert("Please enter GST rate.");
+    		return false;
+    	}
+    	totalGST = document.getElementById("gstRatePercent").value;
+    	document.getElementById("cgstRatePercent").value = (parseFloat(totalGST)/2).toFixed(2);
+    	document.getElementById("sgstRatePercent").value = (parseFloat(totalGST)/2).toFixed(2);
+    	document.getElementById("igstRatePercent").value = parseFloat(totalGST).toFixed(2);
+    	document.getElementById("cessPercent").value = "0.00";
+    /* 
+    	if(totalGST > 0)
+    	{
+    		document.getElementById("cessPercent").readOnly = "readOnly";
+    		document.getElementById("cessPercent").value = "0.00";
+    	}
+    	else
+    	{
+    		document.getElementById("cessPercent").readOnly = "";
+    	}
+     */
+    }
+
+    function cessApplicable()
+    {
+    	if(parseFloat(document.getElementById("cessPercent").value) > 0)
+    	{
+    		document.getElementById("gstRatePercent").readOnly = "readOnly";
+    		document.getElementById("cgstRatePercent").value = "0.00";
+    		document.getElementById("sgstRatePercent").value = "0.00";
+    		document.getElementById("igstRatePercent").value = "0.00";
+    		document.getElementById("gstRatePercent").value = "0.00";
+    	}
+    	else
+    	{
+    		//document.getElementById("gstRatePercent").value = "0.00";
+    		document.getElementById("gstRatePercent").readOnly = "";
+    	}
+    }
+
+
+
+
+
+    
+    
+     function edit(gstId){
+    	$("#gstIdHd").val(gstId);
+   		 if(encryptFormData('editForm', tableOrTbodyIDS, tableOrTbodyKeys)){
+   				 confirmation('editForm');
+   			 }
+    }
+    
+
+     
+</script>

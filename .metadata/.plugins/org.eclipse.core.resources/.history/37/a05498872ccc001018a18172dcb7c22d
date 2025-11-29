@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rtiRequestStatusReport" pageWidth="800" pageHeight="842" columnWidth="480" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2ce76f1c-dcf2-4bce-89f8-0b170edf2c60">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="rtiFileDate" class="java.lang.String"/>
+	<parameter name="rtiFileTentdate" class="java.lang.String"/>
+	<parameter name="rtiFileId" class="java.lang.Long"/>
+	<queryString>
+		<![CDATA[SELECT * FROM public.get_rti_file_status( $P{rtiFileDate}, $P{rtiFileTentdate},$P{rtiFileId})]]>
+	</queryString>
+	<field name="rti_allct_qns_id" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="rti_allct_qns_id"/>
+		<property name="com.jaspersoft.studio.field.label" value="rti_allct_qns_id"/>
+	</field>
+	<field name="rti_file_no" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="rti_file_no"/>
+		<property name="com.jaspersoft.studio.field.label" value="rti_file_no"/>
+	</field>
+	<field name="rti_question" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="rti_question"/>
+		<property name="com.jaspersoft.studio.field.label" value="rti_question"/>
+	</field>
+	<field name="question_asked_by" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="question_asked_by"/>
+		<property name="com.jaspersoft.studio.field.label" value="question_asked_by"/>
+	</field>
+	<field name="object_id" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="object_id"/>
+		<property name="com.jaspersoft.studio.field.label" value="object_id"/>
+	</field>
+	<field name="object_type" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="object_type"/>
+		<property name="com.jaspersoft.studio.field.label" value="object_type"/>
+	</field>
+	<field name="from_org" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="from_org"/>
+		<property name="com.jaspersoft.studio.field.label" value="from_org"/>
+	</field>
+	<field name="to_org" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="to_org"/>
+		<property name="com.jaspersoft.studio.field.label" value="to_org"/>
+	</field>
+	<field name="is_forwarded" class="java.lang.Boolean">
+		<property name="com.jaspersoft.studio.field.name" value="is_forwarded"/>
+		<property name="com.jaspersoft.studio.field.label" value="is_forwarded"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="760" height="30" backcolor="#B0C4CF" uuid="b35d7cdc-1905-4e09-b3be-ce246c1294f6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RTI Request Status Report]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="30" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="120" height="30" uuid="e99e1757-b93e-48cf-9078-ecd3ba21e9f2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1a7de5dd-9764-4462-ad93-58e4efedd45e"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[File No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="0" width="280" height="30" uuid="14d74b28-c4d4-4bfc-acd5-eed095d4f877">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b5f078b4-e67f-424f-a74f-9230c54b6a47"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Question]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="0" width="160" height="30" uuid="33c2c53b-3ac3-488b-9f2c-b2764baf1f45">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3981e46c-4ed0-4044-b1a3-94655bdd0403"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Question Asked By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="560" y="0" width="100" height="30" uuid="f300e20d-0824-4651-a598-2d52d4d80889">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="48b9f6b8-f2e1-4750-a298-3681d6b22285"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[From Entity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="660" y="0" width="100" height="30" uuid="79bda91b-f3e5-4921-9902-44d130f107c4">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e8449007-a664-4bde-8286-78881ae18a13"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[To Entity]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="120" height="30" uuid="788c668f-f804-48a5-be4b-c45890087320">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1a7de5dd-9764-4462-ad93-58e4efedd45e"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rti_file_no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="0" width="280" height="30" uuid="58237f9a-fbd0-4d65-9348-5fa7dfe52ab2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b5f078b4-e67f-424f-a74f-9230c54b6a47"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rti_question}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="0" width="160" height="30" uuid="a24d0761-637f-4398-94b2-6c97b298e3fd">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3981e46c-4ed0-4044-b1a3-94655bdd0403"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{question_asked_by}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="560" y="0" width="100" height="30" uuid="04f0c476-785d-4295-9e90-19bf7f2754f5">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ccb20e10-6777-42a8-b0c6-ca21d7aeb2ff"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{from_org}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="660" y="0" width="100" height="30" uuid="eece1c93-6177-435a-abb4-5e0f74e70aa4">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="62400969-a872-4a96-9f28-a23a4f57a3d3"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{to_org}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="90" splitType="Stretch">
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="110" y="60" width="90" height="30" uuid="f878454b-b33b-4c92-b6c7-98bfc969947c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="60" width="110" height="30" uuid="3cc76670-1ac1-49dd-b8b7-8a8decc636cc"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Report Generated On:-]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="600" y="60" width="100" height="30" uuid="6eb013f2-dc3f-4abf-af20-dd00b5e70216"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Time:]]></text>
+			</staticText>
+			<textField pattern="HH:mm">
+				<reportElement x="700" y="60" width="80" height="30" uuid="b4070de7-fc66-417a-8119-9e5b3c6a7229"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,494 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<link href="${contextPath}/assets/css/dashboard.css" rel="stylesheet" type="text/css" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Add PSU Project</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active">Add PSU Project</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+
+<div class="card">
+	<div class="card-header">
+		<c:choose>
+			<c:when test="${not empty project}">
+				<h5 class="card-title">Update PSU Project</h5>
+			</c:when>
+			<c:otherwise>
+				<h5 class="card-title">Add PSU Project</h5>
+			</c:otherwise>
+		</c:choose>
+	</div>
+	<div class="card-body">
+		<form action="${contextPath}/psuProject/save" id="psuProjectForm" method="post">
+			<input type="hidden" id="cipherText" name="cipherText">
+			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+			<input type="hidden" id="projectId" name="projectId" value="${project.projectId}" />
+			<input type="hidden" id="isActive" name="isActive" value="${project.isActive}" />
+
+			<div class="row">
+				<!-- Basic Project Details -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput required" for="slNo">Sl. No. :</label>
+						<div class="">
+							<input type="number" id="slNo" name="slNo" value="${project.slNo}" 
+								class="form-control form-control-sm" required />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput required" for="executiveAgency">Executive Agency :</label>
+						<div class="">
+							<select class="form-control form-control-sm form-select" id="executiveAgency" name="executiveAgency" required>
+								<option value="" selected disabled>- Select -</option>
+								<option value="B&R" ${project.executiveAgency eq 'B&R' ? 'selected' : ''}>B&R</option>
+								<option value="CEL" ${project.executiveAgency eq 'CEL' ? 'selected' : ''}>CEL</option>
+								<option value="EPIL" ${project.executiveAgency eq 'EPIL' ? 'selected' : ''}>EPIL</option>
+								<option value="HSCL" ${project.executiveAgency eq 'HSCL' ? 'selected' : ''}>HSCL</option>
+								<option value="NBCC" ${project.executiveAgency eq 'NBCC' ? 'selected' : ''}>NBCC</option>
+								<option value="NPCC" ${project.executiveAgency eq 'NPCC' ? 'selected' : ''}>NPCC</option>
+								<option value="OSIC" ${project.executiveAgency eq 'OSIC' ? 'selected' : ''}>OSIC</option>
+								<option value="OSPHWC" ${project.executiveAgency eq 'OSPHWC' ? 'selected' : ''}>OSPHWC</option>
+								<option value="WAPCOS" ${project.executiveAgency eq 'WAPCOS' ? 'selected' : ''}>WAPCOS</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput required" for="scheme">Scheme :</label>
+						<div class="">
+							<select class="form-control form-control-sm form-select" id="scheme" name="scheme" required>
+								<option value="" selected disabled>- Select -</option>
+								<option value="ANWESHA" ${project.scheme eq 'ANWESHA' ? 'selected' : ''}>ANWESHA</option>
+								<option value="SC Hostel (100 seated)" ${project.scheme eq 'SC Hostel (100 seated)' ? 'selected' : ''}>SC Hostel (100 seated)</option>
+								<option value="ST Hostel (120 seated)" ${project.scheme eq 'ST Hostel (120 seated)' ? 'selected' : ''}>ST Hostel (120 seated)</option>
+								<option value="Ashram School to High School" ${project.scheme eq 'Ashram School to High School' ? 'selected' : ''}>Ashram School to High School</option>
+								<option value="UP-Graded Higher Secondary School" ${project.scheme eq 'UP-Graded Higher Secondary School' ? 'selected' : ''}>UP-Graded Higher Secondary School</option>
+								<option value="MPC" ${project.scheme eq 'MPC' ? 'selected' : ''}>MPC</option>
+								<option value="PM-JANMAN" ${project.scheme eq 'PM-JANMAN' ? 'selected' : ''}>PM-JANMAN</option>
+								<option value="BPAV" ${project.scheme eq 'BPAV' ? 'selected' : ''}>BPAV</option>
+								<option value="TRDC" ${project.scheme eq 'TRDC' ? 'selected' : ''}>TRDC</option>
+								<option value="PSH" ${project.scheme eq 'PSH' ? 'selected' : ''}>PSH</option>
+								<option value="Special ST Hostel" ${project.scheme eq 'Special ST Hostel' ? 'selected' : ''}>Special ST Hostel</option>
+								<option value="(New) OBC Hostel" ${project.scheme eq '(New) OBC Hostel' ? 'selected' : ''}>(New) OBC Hostel</option>
+								<option value="Janajati (New)" ${project.scheme eq 'Janajati (New)' ? 'selected' : ''}>Janajati (New)</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput required" for="sanctionedYear">Sanctioned Year :</label>
+						<div class="">
+							<select class="form-control form-control-sm form-select" id="sanctionedYear" name="sanctionedYear" required>
+								<option value="" selected disabled>- Select -</option>
+								<c:forEach begin="2016" end="2025" var="year">
+									<option value="${year}" ${project.sanctionedYear eq year ? 'selected' : ''}>${year}-${year+1}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="smallInput required" for="district">District :</label>
+						<div class="">
+							<select class="form-control form-control-sm form-select" id="district" name="district" required>
+								<option value="" selected disabled>- Select -</option>
+								<option value="Angul" ${project.district eq 'Angul' ? 'selected' : ''}>Angul</option>
+								<option value="Balangir" ${project.district eq 'Balangir' ? 'selected' : ''}>Balangir</option>
+								<option value="Balasore" ${project.district eq 'Balasore' ? 'selected' : ''}>Balasore</option>
+								<option value="Bargarh" ${project.district eq 'Bargarh' ? 'selected' : ''}>Bargarh</option>
+								<option value="Boudh" ${project.district eq 'Boudh' ? 'selected' : ''}>Boudh</option>
+								<option value="Bhadrak" ${project.district eq 'Bhadrak' ? 'selected' : ''}>Bhadrak</option>
+								<option value="Cuttack" ${project.district eq 'Cuttack' ? 'selected' : ''}>Cuttack</option>
+								<option value="Deogarh" ${project.district eq 'Deogarh' ? 'selected' : ''}>Deogarh</option>
+								<option value="Dhenkanal" ${project.district eq 'Dhenkanal' ? 'selected' : ''}>Dhenkanal</option>
+								<option value="Gajapati" ${project.district eq 'Gajapati' ? 'selected' : ''}>Gajapati</option>
+								<option value="Ganjam" ${project.district eq 'Ganjam' ? 'selected' : ''}>Ganjam</option>
+								<option value="Jagatsinghpur" ${project.district eq 'Jagatsinghpur' ? 'selected' : ''}>Jagatsinghpur</option>
+								<option value="Jajpur" ${project.district eq 'Jajpur' ? 'selected' : ''}>Jajpur</option>
+								<option value="Jharsuguda" ${project.district eq 'Jharsuguda' ? 'selected' : ''}>Jharsuguda</option>
+								<option value="Kalahandi" ${project.district eq 'Kalahandi' ? 'selected' : ''}>Kalahandi</option>
+								<option value="Kandhamal" ${project.district eq 'Kandhamal' ? 'selected' : ''}>Kandhamal</option>
+								<option value="Kandhamal" ${project.district eq 'Kandhamal' ? 'selected' : ''}>Kandhamal</option>
+								<option value="Keonjhar" ${project.district eq 'Keonjhar' ? 'selected' : ''}>Keonjhar</option>
+								<option value="Khordha" ${project.district eq 'Khordha' ? 'selected' : ''}>Khordha</option>
+								<option value="Koraput" ${project.district eq 'Koraput' ? 'selected' : ''}>Koraput</option>
+								<option value="Malkangiri" ${project.district eq 'Malkangiri' ? 'selected' : ''}>Malkangiri</option>
+								<option value="Mayurbhanj" ${project.district eq 'Mayurbhanj' ? 'selected' : ''}>Mayurbhanj</option>
+								<option value="Nabarangpur" ${project.district eq 'Nabarangpur' ? 'selected' : ''}>Nabarangpur</option>
+								<option value="Nayagarh" ${project.district eq 'Nayagarh' ? 'selected' : ''}>Nayagarh</option>
+								<option value="Nuapada" ${project.district eq 'Nuapada' ? 'selected' : ''}>Nuapada</option>
+								<option value="Puri" ${project.district eq 'Puri' ? 'selected' : ''}>Puri</option>
+								<option value="Rayagada" ${project.district eq 'Rayagada' ? 'selected' : ''}>Rayagada</option>
+								<option value="Sambalpur" ${project.district eq 'Sambalpur' ? 'selected' : ''}>Sambalpur</option>
+								<option value="Subarnapur" ${project.district eq 'Subarnapur' ? 'selected' : ''}>Subarnapur</option>
+								<option value="Sundergarh" ${project.district eq 'Sundergarh' ? 'selected' : ''}>Sundergarh</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="smallInput required" for="projectName">Name of the Project :</label>
+						<div class="">
+							<input type="text" id="projectName" name="projectName" value="${project.projectName}" 
+								class="form-control form-control-sm" maxlength="500" required />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput required" for="administrativeApprovalAmount">Administrative Approval Amount (Rs.) :</label>
+						<div class="">
+							<input type="number" step="0.01" id="administrativeApprovalAmount" name="administrativeApprovalAmount" 
+								value="${project.administrativeApprovalAmount}" class="form-control form-control-sm" required />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput" for="letterNoDate">Letter No & Date :</label>
+						<div class="">
+							<input type="text" id="letterNoDate" name="letterNoDate" value="${project.letterNoDate}" 
+								class="form-control form-control-sm" />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput" for="agreementAmount">Agreement Amount (Rs.) :</label>
+						<div class="">
+							<input type="number" step="0.01" id="agreementAmount" name="agreementAmount" 
+								value="${project.agreementAmount}" class="form-control form-control-sm" />
+						</div>
+					</div>
+				</div>
+
+				<!-- Phase 1 Funds -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput" for="phase1Amount">Funds Released (1st Phase) (Rs.) :</label>
+						<div class="">
+							<input type="number" step="0.01" id="phase1Amount" name="phase1Amount" 
+								value="${project.phase1Amount}" class="form-control form-control-sm" />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput" for="phase1SanctionOrder">Sanction Order / Date (1st Phase) :</label>
+						<div class="">
+							<input type="text" id="phase1SanctionOrder" name="phase1SanctionOrder" 
+								value="${project.phase1SanctionOrder}" class="form-control form-control-sm" />
+						</div>
+					</div>
+				</div>
+
+				<!-- Phase 2 Funds -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput" for="phase2Amount">Funds Released (2nd Phase) (Rs.) :</label>
+						<div class="">
+							<input type="number" step="0.01" id="phase2Amount" name="phase2Amount" 
+								value="${project.phase2Amount}" class="form-control form-control-sm" />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput" for="phase2SanctionOrder">Sanction Order / Date (2nd Phase) :</label>
+						<div class="">
+							<input type="text" id="phase2SanctionOrder" name="phase2SanctionOrder" 
+								value="${project.phase2SanctionOrder}" class="form-control form-control-sm" />
+						</div>
+					</div>
+				</div>
+
+				<!-- Phase 3 Funds -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput" for="phase3Amount">Funds Released (3rd Phase) (Rs.) :</label>
+						<div class="">
+							<input type="number" step="0.01" id="phase3Amount" name="phase3Amount" 
+								value="${project.phase3Amount}" class="form-control form-control-sm" />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput" for="phase3SanctionOrder">Sanction Order / Date (3rd Phase) :</label>
+						<div class="">
+							<input type="text" id="phase3SanctionOrder" name="phase3SanctionOrder" 
+								value="${project.phase3SanctionOrder}" class="form-control form-control-sm" />
+						</div>
+					</div>
+				</div>
+
+				<!-- Dates -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput" for="commencementDate">Date of Commencement :</label>
+						<div class="datepicker-box">
+							<input type="text" id="commencementDate" name="commencementDate" 
+								value="${project.commencementDate}" class="form-control form-control-sm datepicker" />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput" for="completionDueDate">Due Date of Completion :</label>
+						<div class="datepicker-box">
+							<input type="text" id="completionDueDate" name="completionDueDate" 
+								value="${project.completionDueDate}" class="form-control form-control-sm datepicker" />
+						</div>
+					</div>
+				</div>
+
+				<!-- Status -->
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="smallInput required" for="presentStatus">Present Status :</label>
+						<div class="">
+							<textarea id="presentStatus" name="presentStatus" class="form-control form-control-sm" rows="2" maxlength="500" required>${project.presentStatus}</textarea>
+						</div>
+					</div>
+				</div>
+
+				<!-- Total Funds Released -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-12">Total Funds Released (Rs.) :</label>
+						<div class="col-md-12">
+							<input type="number" step="0.01" id="totalFundsReleased" name="totalFundsReleased" 
+								value="${project.totalFundsReleased}" class="form-control form-control-sm" readonly />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-12">Funds Balance (Rs.) :</label>
+						<div class="col-md-12">
+							<input type="number" step="0.01" id="fundsBalance" name="fundsBalance" 
+								value="${project.fundsBalance}" class="form-control form-control-sm" readonly />
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="text-center mt-4">
+				<c:choose>
+					<c:when test="${not empty project}">
+						<input type="button" value="Update" class="btn btn-success btn-sm" onclick="submitProjectData()">
+						<a href="${contextPath}/psuProject/add" class="btn btn-warning btn-sm">Back</a>
+					</c:when>
+					<c:otherwise>
+						<input type="button" value="Submit" class="btn btn-success btn-sm" onclick="submitProjectData()">
+						<a href="${contextPath}/home" class="btn btn-warning btn-sm">Back</a>
+						<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Project List -->
+<div class="col-md-12 mt-3">
+	<c:if test="${empty project}">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">PSU Projects List</h5>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table id="psu-projects-table" class="table table-bordered table-hover exportbtn">
+						<thead>
+							<tr>
+								<th class="text-center" style="width: 60px">Sl.No</th>
+								<th>Executive Agency</th>
+								<th>Scheme</th>
+								<th>Sanctioned Year</th>
+								<th>District</th>
+								<th>Project Name</th>
+								<th>Admin Approval (Rs.)</th>
+								<th>Agreement (Rs.)</th>
+								<th>Phase 1 (Rs.)</th>
+								<th>Phase 2 (Rs.)</th>
+								<th>Phase 3 (Rs.)</th>
+								<th>Total Released (Rs.)</th>
+								<th>Status</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach items="${projectList}" var="p" varStatus="count">
+								<tr>
+									<td class="text-center">${count.count}</td>
+									<td>${p.executiveAgency}</td>
+									<td>${p.scheme}</td>
+									<td>${p.sanctionedYear}</td>
+									<td>${p.district}</td>
+									<td>${p.projectName}</td>
+									<td>${p.administrativeApprovalAmount}</td>
+									<td>${p.agreementAmount}</td>
+									<td>${p.phase1Amount}</td>
+									<td>${p.phase2Amount}</td>
+									<td>${p.phase3Amount}</td>
+									<td>${p.totalFundsReleased}</td>
+									<td>${p.presentStatus}</td>
+									<td class="text-center">
+										<button class="btn btn-warning btn-sm" onclick="editProjectForm(${p.projectId})" title="Edit">
+											<i class="fas fa-edit"></i>
+										</button>
+									</td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</c:if>
+</div>
+
+<script>
+function submitProjectData() {
+    // Validation
+    var slNo = $("#slNo").val();
+    var executiveAgency = $("#executiveAgency").val();
+    var scheme = $("#scheme").val();
+    var sanctionedYear = $("#sanctionedYear").val();
+    var district = $("#district").val();
+    var projectName = $("#projectName").val();
+    var administrativeApprovalAmount = $("#administrativeApprovalAmount").val();
+    var presentStatus = $("#presentStatus").val();
+
+    if (!slNo || parseInt(slNo) <= 0) {
+        bootbox.alert("Please enter valid Sl. No.");
+        $("#slNo").focus();
+        return false;
+    } else if (!executiveAgency) {
+        bootbox.alert("Please select Executive Agency");
+        $("#executiveAgency").focus();
+        return false;
+    } else if (!scheme) {
+        bootbox.alert("Please select Scheme");
+        $("#scheme").focus();
+        return false;
+    } else if (!sanctionedYear) {
+        bootbox.alert("Please select Sanctioned Year");
+        $("#sanctionedYear").focus();
+        return false;
+    } else if (!district) {
+        bootbox.alert("Please select District");
+        $("#district").focus();
+        return false;
+    } else if (!projectName || projectName.trim() === "") {
+        bootbox.alert("Please enter Project Name");
+        $("#projectName").focus();
+        return false;
+    } else if (!administrativeApprovalAmount || parseFloat(administrativeApprovalAmount) <= 0) {
+        bootbox.alert("Please enter valid Administrative Approval Amount");
+        $("#administrativeApprovalAmount").focus();
+        return false;
+    } else if (!presentStatus || presentStatus.trim() === "") {
+        bootbox.alert("Please enter Present Status");
+        $("#presentStatus").focus();
+        return false;
+    } else {
+        submitProjectForm();
+    }
+}
+
+function submitProjectForm() {
+    var bizContent = $("#psuProjectForm").serializeArray();
+    $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    bootbox.confirm("Do You Want To Continue?", function(result) {
+        if (result) {
+            showLoader();
+            $("#psuProjectForm").submit();
+        }
+    });
+}
+
+function editProjectForm(id) {
+    window.location.href = "${contextPath}/psuProject/edit/" + id;
+}
+
+$(document).ready(function () {
+    // Datepicker initialization
+    $(".datepicker").datepick({
+        onShow: $.datepick.monthOnly,
+        dateFormat: "dd-mm-yyyy",
+        yearRange: "c-10:c+5",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>'
+    });
+
+    // Calculate total funds released and balance
+    function calculateFunds() {
+        let phase1 = parseFloat($("#phase1Amount").val()) || 0;
+        let phase2 = parseFloat($("#phase2Amount").val()) || 0;
+        let phase3 = parseFloat($("#phase3Amount").val()) || 0;
+        let adminApproval = parseFloat($("#administrativeApprovalAmount").val()) || 0;
+        
+        let totalReleased = phase1 + phase2 + phase3;
+        let balance = adminApproval - totalReleased;
+        
+        $("#totalFundsReleased").val(totalReleased.toFixed(2));
+        $("#fundsBalance").val(balance.toFixed(2));
+    }
+
+    // Event listeners for fund calculations
+    $("#phase1Amount, #phase2Amount, #phase3Amount, #administrativeApprovalAmount").on("input", function() {
+        calculateFunds();
+    });
+
+    // Initialize calculation
+    calculateFunds();
+
+    // DataTable initialization
+    $('#psu-projects-table').DataTable({
+        "pageLength": 25,
+        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+        "order": [[0, "asc"]],
+        "responsive": true
+    });
+});
+</script>
+
+<form action="${contextPath}/psuProject/edit" method="post" id="editForm">
+	<input type="hidden" id="editCipherText" name="cipherText">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" id="projectEditId" name="projectId" />
+</form>

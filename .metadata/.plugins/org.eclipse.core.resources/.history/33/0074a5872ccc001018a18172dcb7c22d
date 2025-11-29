@@ -1,0 +1,542 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="voucherTypee" value="${voucherDto.voucherTypeId}" />
+<c:set var="stageId" value="${voucherStageId}"/>
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+<sec:authentication var="principal" property="principal" />
+<style>
+.modaltabledata th {
+    line-height: 16px;
+    font-size: 13px !important;
+    font-weight: 400;
+}
+.tablemodal .modal-footer{
+padding:0
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-exit{
+margin-top:7px;
+}
+.modaltop-data {
+    font-size: 14px;
+}
+.tablemodal .modal-body {
+    padding-bottom: 0;
+}
+.lftdata {
+    width: 50%;
+    float: left;
+    font-size: 14px;
+}
+.rgtdata {
+    width: 50%;
+    float: right;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+.is-invalid {
+	border-color: red;
+}
+
+
+.tableizer-table td {
+	padding: 1px 2px 1px 3px;
+	border: 1px dotted #CCC;
+}
+
+.tableizer-table th {
+	padding: 1px;
+	margin: 1px;
+	border: 1px dotted #CCC;
+	font-weight: bold;
+}
+
+.tableizerTitleRow {
+	text-align: left;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+.table>tbody>tr>td {
+	word-break: break-all;
+}
+
+.datepicker_con>input {
+	width: 100%;
+	border-radius: 3px;
+	border: 1px solid #aaaaaa;
+}
+
+.datepicker_con>button {
+	display: none;
+}
+
+.dif-color td{
+    font-size: 14px ! IMPORTANT;
+    font-weight: 600;
+}
+
+ .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-left {
+            font-size: 16px;
+            font-weight: 500;
+            color: #0043ff;
+        }
+
+        .header-right {
+            font-size: 14px;
+            color: #0043ff;
+            font-weight: 500;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4444e957 !important;
+            color: #0f0e47;
+            font-weight: 500 !important;
+            letter-spacing: 0.5px;
+        }
+
+        .nested-table th, .nested-table td {
+            padding: 5px;
+            font-size: 12px;
+        }
+
+        .nested-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .nested-table th, .nested-table td {
+            border: 1px solid #ddd;
+        }
+
+        .transaction-table-wrapper {
+            padding: 10px 0;
+        }
+
+</style>
+
+<script>
+$(function()
+{
+	$('#datatable-default').dataTable({
+ 		"bSort": false,
+ 		"autoWidth": false
+	});
+})
+</script>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Bank & Cash Book report</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Bank & Cash Book report</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Bank & Cash Book report</h5>
+			</div>
+				<div class="card-body" id="partyDtlsInRequest">
+										<form class="form-horizontal form-bordered" action="${contextPath}/report/featchBankCashReport" method="get" id="filter" >
+                                             <input type="hidden" value="true" id="labelmsg" name="labelmsg">
+										     <div class="row"> 
+										<c:set var="ownFunctions" value="getSelectedLowerEntity" />
+									    <c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+										<c:set var="upperOrDown" value="down" />
+										<c:set var="functionList2" value=""/>
+										<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+												<div class="col-md-2 col-sm-3">
+												    <div class="form-group">
+												        <label for="FinancialYear" class="required">Financial Year :</label>
+												        <div class="col-md-12">
+												            <select class="form-control require remove form-select" name="finYearId" id="finYearId" onchange="getFinYearStartEndDates(this.value,'N');" data-plugin-selectTwo>
+												                <c:forEach items="${loadData.finYearList}" var="fin">
+												                    <option value="${fin.finyearId}" ${fin.finyearId eq reportData.finYearId ?'selected':''}>${fin.finYear}</option>
+												                </c:forEach>
+												            </select>
+												        </div>
+												    </div>
+												</div>
+
+												<%-- <div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="FinancialYear" class="required ">Division </label> 
+														  <div class="col-md-12">
+															<select class="form-control require remove" name="officeMasterId" id="officeMasterId" onchange="gettingDepartmentList(this.value,0);" data-plugin-selectTwo>
+										                        <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+										                        <c:forEach items="${loadData.officeMasterList}" var="off">
+																	  <option value="${off.id}">${off.name}</option> 
+																</c:forEach>
+										                 	</select>
+														</div>
+													</div>
+												</div> --%>
+												
+											<!-- 	<div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="Department" class="required">Department :</label>
+														<div class="">
+															<select class="form-control remove form-select" id="departmentId"
+																name="departmentId">
+																<option value="">- Select -</option>
+															</select>
+														</div>
+													</div>
+												</div> -->
+											 	<div class="col-md-2 col-sm-3">
+                                                    <div class="form-group">
+                                                        <label for="inputEmail4">
+                                                            <spring:message code="LABEL.PAYMENT.VOUCHER.TXNMODE" />:
+                                                            <span style="color:red">*</span>
+                                                        </label>
+                                                        <div class="col-md-12">
+                                                            <select class="form-control require remove form-select" aria-label="Default select example" name="txnMode" id="txnModeId" onchange="getAccountListByTxnMode(this.value, 0);">
+                                                                <option value="Bank">
+                                                                    <spring:message code="ACCOUNT.COMMON.MODE.BANK" />
+                                                                </option>
+                                                                <option value="Cash">
+                                                                    <spring:message code="ACCOUNT.COMMON.MODE.CASH" />
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div> 
+									
+									              <div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="section" class="required">Account Name :</label>
+														<div class="">
+															<select class="form-control require  remove form-select" id="accountId" name="accountId">
+																<option value="">- Select -</option>
+															</select>
+														</div>
+													</div>
+												</div>  
+												
+												<div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="VoucherDate">Start Date :</label>
+															 <input class="form-control form-control-sm require remove disabled"  type="text" id="startDate" name="startDate" value="${voucherMasterDto.finalVoucherDate}" readonly>
+													</div>
+												</div>
+												<div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="VoucherDate">End Date :</label>
+															 <input class="form-control form-control-sm require remove disabled"  type="text" id="endDate" name="endDate" value="${voucherMasterDto.finalVoucherDate}" readonly>
+													</div>
+												</div>
+											</div>
+											
+											
+											<div class="row mt-3">
+							                    <div class="col-sm-12" style="">
+							                    	
+							                    
+							                        <div class="form-group text-center">
+							                            <button type="button" class="btn btn-success" onclick="submitFormData();">
+							                                <spring:message code="COMMON.BUTTON.FILTER" />
+							                            </button>
+							                            <a href="${contextPath}/home">
+							                                <input type="button" class="btn btn-warning" value=<spring:message code="COMMON.BUTTON.BACK"></spring:message>>
+							                            </a>
+							                        </div>
+							                    </div>
+							                </div> 
+							                
+							   
+							    
+									     </form>
+									     <hr>
+									       <div class="col-md-12 col-sm-12" style="text-align:center">
+								<!-- <img src="/fams/assets/image/aashdit-A.png" style="width: 48px;">
+									<h3>AASHDIT TECHNOLOGIES LLP.</h3>
+									<h5>4th floor, Galaxy Mall,Raghunathpur, Bhubaneswar</h5> -->
+									<h5>${loadData.organisationName}</h5>
+								</div>
+							                
+							      <div class="header">
+							        <div class="header-left">
+							            ${reportData.header.leftHead}
+							        </div>
+							        <div class="header-right">
+							            ${reportData.header.rightHead}
+							        </div>
+							    </div> 
+						        <table class="table table-bordered">
+							        <thead>
+							            <tr>
+							                <th>Voucher Date</th>
+							                <th>GL Code & Name</th>
+							                <th>MR No & Date</th>
+							                <th>Instr. No & Date</th>
+							                <th>Party Code & Name</th>
+							                <th class="text-end">Debit (Rs.)	</th>
+							                <th class="text-end">Credit (Rs.)</th>
+							            </tr>
+							        </thead>
+							        <tbody>
+							          <c:set var="closingBalance" value="${reportData.openingBalance}"></c:set> <!-- Initial Closing Balance -->
+										<c:set var="openingBalance" value="${closingBalance}"></c:set> <!-- Initialize Opening Balance -->
+										
+										<c:forEach var="voucher" items="${reportData.voucherList}">
+										    <c:set var="dayTotalDebitAmount" value="0.00"></c:set>
+										    <c:set var="dayTotalCreditAmount" value="0.00"></c:set>
+										
+										    <tr class="dif-color" style="">
+										        <td colspan="6">${voucher.finalVoucherDate} </td>
+										        <td >Total Opening: ${openingBalance}<br> </td>
+										    </tr>
+										
+										    <tr>
+										        <td colspan="2">${voucher.drCrType != null ? voucher.drCrType.toUpperCase() : ''}V -${voucher.finalVoucherNo} (${voucher.finalVoucherDate})</td>
+										        <td>${voucher.mr_no != null ? voucher.mr_no : '-'} - ${voucher.mr_date != null ? voucher.mr_date : '-'}</td>
+										        <td>${voucher.instru_no != null ? voucher.instru_no : '-'} - ${voucher.instru_date != null ? voucher.instru_date : '-'}</td>
+										        <td colspan="2">Pro No - ${voucher.voucherNo} - (${voucher.voucherDate})</td>
+										        <td colspan="2"></td>
+										    </tr>
+										
+										    <c:forEach var="txn" items="${voucher.voucherTrnsxn}">
+										        <c:set var="dayTotalDebitAmount" value="${dayTotalDebitAmount + txn.debitAmount}"></c:set>
+										        <c:set var="dayTotalCreditAmount" value="${dayTotalCreditAmount + txn.creditAmount}"></c:set>
+										        
+										        <tr>
+										            <td colspan="4">${txn.accountCode} - ${txn.accountName}</td>
+										            <td>${txn.partyCode} - ${txn.partyName}</td>
+										            <td class="text-end">
+										                <c:if test="${txn.debitAmount ne '0.0'}">
+										                    ${utils.convertAmountToINRFormat(txn.debitAmount)}
+										                </c:if>
+										                ${txn.debitAmount}
+										            </td>
+										            <td class="text-end">
+										                <c:if test="${txn.creditAmount ne '0.0'}">
+										                    ${utils.convertAmountToINRFormat(txn.creditAmount)}
+										                </c:if>
+										                ${txn.creditAmount}
+										            </td>
+										    <c:set var="netCrAmount" value="${netCrAmount+txn.debitAmount}"></c:set>
+										    <c:set var="netDrAmount" value="${netDrAmount+txn.creditAmount}"></c:set>
+										        </tr>
+										    </c:forEach>
+										
+										    <tr class="narretion">
+										        <td colspan="7">Narration: ${voucher.narration}</td>
+										    </tr>
+										
+										    <tr class="dif-color">
+										        <td colspan="4"></td>
+										        <td class="text-end ">Transaction Total:</td>
+										        <td class="text-end">${voucher.totalDrAmount}</td>
+										        <td class="text-end">${voucher.totalCrAmount}</td>
+										    </tr>
+										
+										    <!-- Update Closing Balance for this voucher -->
+										    <c:set var="closingBalance" value="${closingBalance + (dayTotalDebitAmount - dayTotalCreditAmount)}"></c:set>
+										
+										    <tr class="dif-color" style="">
+										        <td class="text-end" colspan="7">
+										        Day Transaction Total : ${dayTotalCreditAmount + dayTotalDebitAmount} </br>
+										        Total Closing: ${closingBalance}</td>
+										    </tr>
+										
+										    <!-- Prepare opening balance for the next voucher iteration -->
+										    <c:set var="openingBalance" value="${closingBalance}"></c:set>
+										   
+										</c:forEach>
+                                        
+
+							                </tbody>
+							            </table>
+							            
+							            <table class="printtable mt-3 table table-bordered" style="">
+                                            <tr>
+                                                <th colspan="5" style="text-align: center; font-size: 15px;background: #00ffff5b !important;">SUMMARY &nbsp; (${reportData.startDateStr}  -  ${reportData.endDateStr})</th>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid;">
+                                                 <th width="40%"></th>
+                                                <th width="17%" class="text-end">Opening Balance (Rs.)</th>
+                                                <th width="14%" class="text-end">Total Dr (Rs.)</th>
+                                                <th width="14%" class="text-end">Total Cr (Rs.)</th>
+                                                <th width="15%" class="text-end">Closing Balance (Rs.)</th>
+                                            </tr>
+
+                                            <tr style="">
+                                                 <td> ${reportData.header.leftHead}</td>
+                                                <td class="text-end">${reportData.openingBalance}</td>
+                                                <td class="text-end">${netCrAmount}</td>
+                                                <td class="text-end">${netDrAmount}</td>
+                                                <td class="text-end">${closingBalance < 0 ? (-closingBalance):closingBalance} </td>
+                                            </tr>
+                                        </table>
+							            
+							            
+									  </div>
+								   </div>
+							</section>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+ 
+
+<script>
+
+$(document).ready(function() {
+
+    var finYear = $("#finYearId").val();
+    var txnMode = '${reportData.txnMode}';
+    var startDateStr = '${reportData.startDateStr}';
+    var endDateStr = '${reportData.endDateStr}';
+     var accountId = '${reportData.accountId}';
+//     var officeMasterId = '${reportData.officeMasterId}';
+//     var departmentId = '${reportData.departmentId}';
+
+    if (startDateStr === '' && endDateStr === '') {
+        getFinYearStartEndDates(finYear, 'N');
+    } else {
+        $("#startDate").val(startDateStr);
+        $("#endDate").val(endDateStr);
+    }
+    
+
+     if (txnMode != '') {
+        $("#txnModeId").val(txnMode);
+        if (accountId != '') {
+            getAccountListByTxnMode(txnMode, accountId);
+        }
+    }else{
+    	var txn = $("#txnModeId").val();
+    	 getAccountListByTxnMode(txn, '0');
+    } 
+    
+    
+   /*  if (officeMasterId != '') {
+        $("#officeMasterId").val(officeMasterId);
+        if (departmentId != '') {
+            gettingDepartmentList(officeMasterId, departmentId);
+        }
+
+    } */
+
+});
+
+function gettingDepartmentList(officeMasterId,departmentId) {
+	$.ajax({
+		type : "GET",
+		url : "${contextPath}/gettingDepartmentListByDivision",
+		data : {
+			"officeId" : officeMasterId,
+		},
+		success : function(response) {
+			var html = "";
+			html= html+"<option value=''>- Select -</option>";
+			var obj = JSON.parse(response);
+			$.each(obj, function(index, value) {
+				html = html + '<option value='+value.departmentId+'>'
+						+ value.departmentName + '</option>';
+			});
+			$("#departmentId").empty().append(html);
+			if(departmentId!=0){
+				$("#departmentId").val(departmentId);
+			}
+ 			
+		},
+		error : function(error) {
+			bootbox.alert("Error found at gettingDepartmentList");
+		}
+	});
+}
+
+function getAccountListByTxnMode(txnMode, glid) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/gettingBankOrCashByTaxMode",
+        data: {
+            "txnMode": txnMode
+        },
+        success: function(response) {
+            var html = "<option value=''>- Select -</option>";
+            try {
+                var obj = JSON.parse(response);
+                $.each(obj, function(index, value) {
+                    html += '<option value="' + value.accountId + '">' + value.accountCode + ' | ' + value.accountName + '</option>';
+                });
+                $("#accountId").empty().append(html);
+                if (glid != 0) {
+                    $("#accountId").val(glid);
+                }
+            } catch (e) {
+                console.error("Parsing error:", e);
+                bootbox.alert("Error parsing response data.");
+            }
+        },
+        error: function(error) {
+            bootbox.alert("Error found at getting account list.");
+            console.error("AJAX error:", error);
+        }
+    });
+}
+
+
+function submitFormData(){
+	if($("#upperEntityId").val()==''){
+		bootbox.alert("please select the entity..");
+		return false;
+	}
+	if(validateForm()){
+	 if(encryptFormData('filter', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('filter');
+		 }
+	}
+	
+}
+
+function getSelectedLowerEntity(){
+	var entityIdLevelCombo= '${entityIdLevelCombo}';
+	 $("#upperEntityId").val(entityIdLevelCombo);
+ }
+
+</script>

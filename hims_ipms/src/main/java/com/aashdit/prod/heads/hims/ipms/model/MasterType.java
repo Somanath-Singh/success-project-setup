@@ -1,0 +1,41 @@
+package com.aashdit.prod.heads.hims.ipms.model;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import lombok.Data;
+@Data
+@Entity
+@Table(name = "t_master_type_details")
+public class MasterType implements Serializable{
+
+	private static final long serialVersionUID = 832436664155432698L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "type_id")
+	private Long typeId;
+
+	@Column(name = "type_name")
+	private String typeName;
+
+	@Column(name = "type_code")
+	private String typeCode;
+
+	@Column(name = "type_category")
+	private String typeCategory;
+
+	@Column(name = "is_active")
+	private Boolean isActive;
+	
+	@Column(name = "order_by")
+	private Long orderBy;
+
+
+}

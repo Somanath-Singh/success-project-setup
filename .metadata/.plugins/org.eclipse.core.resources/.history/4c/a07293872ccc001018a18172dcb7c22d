@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="agency_report" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="dfddd755-6911-4fdd-8be4-5860bcd6973e">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter for scst"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.3" value="lastPageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.graphics" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.cell.border" value="true"/>
+	<import value="java.io.File"/>
+	<parameter name="LOGO_PATH" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\scst_assets\\fab.png"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 
+    tmia.agency_code,
+    tmia.agency_name,
+    tmia.address,
+    tmabd.account_no,
+    tmabd.ifsc_code
+FROM 
+    public.t_mst_implementing_agency tmia
+INNER JOIN 
+    public.t_mst_agency_bank_details tmabd 
+    ON tmia.agency_id = tmabd.agency_id
+WHERE 
+    tmia.is_active = true]]>
+	</queryString>
+	<field name="agency_code" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="agency_code"/>
+		<property name="com.jaspersoft.studio.field.label" value="agency_code"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="t_mst_implementing_agency"/>
+	</field>
+	<field name="agency_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="agency_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="agency_name"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="t_mst_implementing_agency"/>
+	</field>
+	<field name="address" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="address"/>
+		<property name="com.jaspersoft.studio.field.label" value="address"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="t_mst_implementing_agency"/>
+	</field>
+	<field name="account_no" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="account_no"/>
+		<property name="com.jaspersoft.studio.field.label" value="account_no"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="t_mst_agency_bank_details"/>
+	</field>
+	<field name="ifsc_code" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ifsc_code"/>
+		<property name="com.jaspersoft.studio.field.label" value="ifsc_code"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="t_mst_agency_bank_details"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="108" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="250" y="30" width="580" height="20" uuid="1acd2faa-d80e-402d-9736-4849c31ecec2"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Building & Assets Management System]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="54" width="670" height="27" uuid="900ab19b-33ae-47f3-b724-d6dccc754e68"/>
+				<textElement>
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[ST & SC Development, Minorities & Backward Classes Welfare Department Government of Odisha]]></text>
+			</staticText>
+			<image>
+				<reportElement x="70" y="27" width="50" height="54" uuid="6d6b9a1f-54dd-4259-9dbd-347764ac414c"/>
+				<imageExpression><![CDATA["D:/scst_assets/fab.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="50">
+			<staticText>
+				<reportElement x="260" y="9" width="273" height="33" uuid="ec451a53-105b-49c9-aed8-c05cd001304d"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[           Agency  Report]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="41" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="80" y="0" width="100" height="41" forecolor="#050505" uuid="d2b938f8-d907-43ae-8093-4efbbfa2f65f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="abfdb4e9-63c6-4a83-a84e-91f43f53d2da"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineColor="#050505"/>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Agency Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="0" width="107" height="41" forecolor="#050505" uuid="6be6d22c-8693-4bc1-8aab-bd081c8df969">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="218e57f4-4f93-4c9a-b56b-144a3bbd6482"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineColor="#050505"/>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[      Agency Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="0" width="100" height="41" forecolor="#050505" uuid="4d3af28a-f72e-4c7f-88b9-f3b7b2a50eab">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="951b2459-b4f9-4447-9735-476041e1f562"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineColor="#050505"/>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Address]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="521" y="0" width="156" height="41" forecolor="#050505" uuid="03b74a60-c6f8-4a6c-ac0f-9ab468f90c5b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b4e4f04f-515e-4d55-8c98-9188a78b5397"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineColor="#050505"/>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[  IFSC Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="387" y="0" width="134" height="41" forecolor="#050505" uuid="c36b165e-ce4d-4f72-a2b5-92aee4e94291">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="638deea4-d6ae-422d-9bdb-9550c528ff68"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineColor="#050505"/>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Account Number]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="80" y="0" width="100" height="30" forecolor="#050505" uuid="902292d3-5a47-45ba-9af3-0930338dc0c2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="abfdb4e9-63c6-4a83-a84e-91f43f53d2da"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{agency_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="287" y="0" width="100" height="30" forecolor="#050505" uuid="992838af-85d2-478c-ba0e-e4f9887e4448">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="951b2459-b4f9-4447-9735-476041e1f562"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="387" y="0" width="134" height="30" forecolor="#050505" uuid="bf868ee2-55d8-4714-928f-a0009a4702f5">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="638deea4-d6ae-422d-9bdb-9550c528ff68"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineColor="#050505"/>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{account_no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="521" y="0" width="155" height="30" forecolor="#050505" uuid="6a696002-b786-4d61-acb5-f8d30ffbfbd1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b4e4f04f-515e-4d55-8c98-9188a78b5397"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{ifsc_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="0" width="107" height="30" forecolor="#050505" uuid="018e21be-518a-4f31-bf71-3baac614e73a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="218e57f4-4f93-4c9a-b56b-144a3bbd6482"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{agency_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

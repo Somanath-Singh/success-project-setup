@@ -1,0 +1,75 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+
+<section>
+    <div class="mt-2">
+        <form action="${contextPath}/inventory/issueRequest/list" method="get">
+            <div class="panel-body">
+				<div class="row">
+					<div class="col-md-12">
+					<h5 class="mb-3"><spring:message code="INV.ISSUE.REQ.TRACK.TITLE" /></h5>
+						<div class="row align-items-end">
+							<div class="col-md-3">
+								<div class="form-group">
+									<label class="col-md-12 required" for="text"><spring:message code="PROC.REQ.STATUS" /></label>
+									<div class="col-md-12">
+										<select class="form-control" id="status" name="status" >
+											<option value="All" ${activeStatus eq 'All' ? 'selected' : ''}><spring:message code="COMMON.ALL" /></option>
+											<option value="DRAFT" ${activeStatus eq 'DRAFT' ? 'selected' : ''}><spring:message code="COMMON.DRAFT" /></option>
+											<option value="PENDING" ${activeStatus eq 'PENDING' ? 'selected' : ''}><spring:message code="COMMON.PRNDING" /></option>
+											<option value="APPROVE" ${activeStatus eq 'APPROVE' ? 'selected' : ''}><spring:message code="COMMON.APPROVE" /></option>
+											<option value="REVERT" ${activeStatus eq 'REVERT' ? 'selected' : ''}><spring:message code="COMMON.Revert" /></option>
+											<option value="REJECT" ${activeStatus eq 'REJECT' ? 'selected' : ''}><spring:message code="COMMON.REJECT" /></option>
+										</select>
+									</div>
+								</div>
+							</div>
+							
+							<div class="col-md-2 " style="margin-bottom: 8px;">
+								<input type="submit" class="btn-submit" value="Submit"> 
+								<a href="${contextPath}" class="btn-back">Cancel</a>
+							</div>
+							<div class="col-md-12">
+								<table class="datatable table table-striped table-bordered mt-3">
+									<thead>
+										<tr>
+											<th>Sl No.</th>
+											<th>Request No.</th>
+											<th>Request Type</th>
+											<th>Priority Level</th>
+											<th>Store Name</th>
+											<th>Status</th>
+											<th>Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach items="${issueRequestList}" var="list"  varStatus="count">
+											<tr>
+												<td>${count.count}</td>
+												<td>${list.requestNumber}</td>
+												<td>${list.stockType.stockTypeName}</td>
+												<td>${list.priorityLevel.priorityLevelName}</td>
+												<td>${list.store.storeName}</td>
+												<td>${list.stageForwardedRule.displayName}</td>
+												<td><a href="${contextPath}/inventory/issueRequest/edit?issueItemRequestId=${list.issueItemRequestId}"><i class="fa-regular fa-eye"></i></a>
+												</td>
+											</tr>
+										</c:forEach>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+        </form>
+	</div>
+</section>

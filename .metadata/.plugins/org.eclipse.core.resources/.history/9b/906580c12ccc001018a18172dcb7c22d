@@ -1,0 +1,697 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+
+<style>
+.add-button{
+    padding: 6px 10px;
+}
+.table-responsive th{
+    min-width: 200px;
+}
+.table-responsive tr{
+    vertical-align: middle;
+}
+.table-responsive th:last-child{
+    min-width:60px;
+}
+</style>
+	   <!-- #######################################################  STAFF : EMPLOYMENT DETAILS TAB ####################################################### -->
+					
+						<form action="${contextPath}/staff/saveStaffDetails" method="POST" id="employmentFrm" enctype="multipart/form-data">
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+							 <input type="hidden" id="staffId" name="staffId" value="${staffDetails.staffId}" />
+	                         <input type="hidden" name="pageCode" id="pageCode" value="employment"/>
+							<%-- <input type="hidden" name="currentEdit" id="currentEditemp" value="${userstatus}">  --%>
+							
+							<h6 class="headingbg mb-4" style="margin-top: 25px;">Employment Details :</h6>
+							<div class="row add-multi-row" id="emplRow0">
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="required" for="serviceStatusId">Service Status</label>
+									<div class="">
+										<select class="form-control require form-select" name="serviceStatusId" id="serviceStatusId"  readOnly><!-- data-plugin-selectTwo -->
+										    <option value=""><spring:message code="label.common.select"></spring:message></option>
+										    <c:forEach var="serviceStatus" items="${satffLoadData.serviceStatus}">
+									            <c:if test="${serviceStatus.serviceStatus eq 'In Service'}">
+									                <option value="${serviceStatus.serviceStatusId}" selected>${serviceStatus.serviceStatus}</option>
+									            </c:if>
+										    </c:forEach>
+										</select>
+									</div>
+								</div>
+							</div> 
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="col-sm-12" for="">Office Email</label>
+									<div class="col-sm-12">
+										<input type="email" class="form-control form-control-sm " name="officeEmail" value="${staffDetails.officeEmail}" id="officeEmail"
+											onchange="checkEmail(this);" maxlength="100">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="col-sm-12" for="">UAN No.</label>
+									<div class="col-sm-12">
+										<input type="text" class="form-control form-control-sm " name="uan" id="uan" value="${staffDetails.uan}" maxlength="20" onchange="checkUanNumber()">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="col-sm-12" for="">CPF/GPF No.</label>
+									<div class="col-sm-12">
+										<input type="text" class="form-control form-control-sm "  name="cpf" id="cpf" value="${staffDetails.cpf}" maxlength="20" onchange="checkCpfNumber()">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2">
+							    <div class="form-group">
+							        <label class="col-sm-12 required">Staff Category</label>
+							        <div class="col-sm-12">
+							            <select class="form-control form-select require" name="staffCategory" id="staffCategorys" data-plugin-selectTwo onchange="showAdditionalField()">
+							                <option value=""><spring:message code="label.common.select"></spring:message></option>
+							                <option value="GOV" ${'GOV' eq staffDetails.staffCategory ? 'selected' : ''}>Government</option>
+							                <option value="NON_GOV" ${'NON_GOV' eq staffDetails.staffCategory ? 'selected' : ''}>Non-Government</option>
+							            </select>
+							        </div>
+							    </div>
+                            </div>
+
+                                                        <div class="col-md-2" id="staffGradeFields" style="display: ${'GOV' eq staffDetails.staffCategory ? 'block' : 'none'};">
+                            							    <div class="form-group">
+                            							        <label class="col-sm-12 required" for="grade0">Staff Grade</label>
+                            							        <div class="col-sm-12">
+                            							            <select class="form-control form-select" name="payGrade" id="payGrade0" data-plugin-selectTwo>
+                            											<option value="0"><spring:message code="label.common.select"></spring:message></option>
+                            											<c:forEach var="grade" items="${satffLoadData.payGrade}">
+                            												<option value="${grade.paygradeId}"
+                            												${grade.paygradeId eq staffDetails.payGrade.paygradeId ? 'selected' : ''}>
+                            												${grade.paygradeName} </option>
+                            											</c:forEach>
+                            										</select>
+                            							        </div>
+                            							    </div>
+                            							</div>
+
+                            							<div class="col-md-2" id="payCommTypeFields" style="display: ${'GOV' eq staffDetails.staffCategory ? 'block' : 'none'};">
+                            							    <div class="form-group">
+                            							        <label class="col-sm-12 required" for="payCommType0">Pay Commission Type</label>
+                            							        <div class="col-sm-12">
+                            							           <select class="form-control form-select" name="commissionType" id="commissionType0" data-plugin-selectTwo onchange="updatePayBandList()">
+                            											<option value="0"><spring:message code="label.common.select"></spring:message></option>
+                            											<c:forEach var="payComm" items="${satffLoadData.payCommType}">
+                            												<option value="${payComm.paycommTypeId}"
+                            												${payComm.paycommTypeId eq staffDetails.payCommType.paycommTypeId ? 'selected' : ''}>
+                            												${payComm.paycommTypeName}</option>
+                            											</c:forEach>
+                            										</select>
+                            							        </div>
+                            							    </div>
+                            							</div>
+                            							<div class="col-md-2" id="payBandFieldss" style="display:none">
+                            							    <div class="form-group">
+                            							        <label class="col-sm-12" for="payBand0">Pay Band</label>
+                            							        <div class="col-sm-12">
+                            							            <select class="form-control form-select" name="staffPayVariablesMap.payBand.paybandId" id="payBand0" data-plugin-selectTwo>
+                            											<option value="0"><spring:message code="label.common.select"></spring:message></option>
+                            											<c:forEach var="band" items="${payBand}">
+                            											    <option value="${band.paybandId}" ${band.paybandId eq empeBasicDetails.staffPayVariablesMap.payBand.paybandId ? 'selected' : ''}>${band.paybandName}</option>
+                            											</c:forEach>
+                            										</select>
+                            							        </div>
+                            							    </div>
+                            							</div>
+								
+								
+							<div style="margin-top: 20px">
+								<h6 class="headingbg mb-4">Office, Department &amp; Designation Assignment :</h6>
+							</div>
+							
+							<div class="table-responsive">
+								<table class="table table-striped table-bordered">
+									<thead>
+										<tr>
+											<th style="">Organization</th>
+											<th style="">Level</th>
+											<th style="">Level Name</th>
+											<th style="">Role</th>
+											<th style="">Is Primary</th>
+											<th style="">From Date</th>
+											<th style="">To Date</th>
+											<th style="text-align: center;">
+												<button type="button" class="add-button btn btn-xs btn-success addBtn" id="plus_employement">
+													<i class="fa fa-plus" aria-hidden="true"></i>
+												</button>
+											</th>
+										</tr>
+									</thead>
+									<tbody class="appendBox" id="emplmnt">
+							
+							 <c:choose>
+								<c:when test="${not empty staffDetails.staffDeptRoleMapList}">
+								
+								<c:forEach items="${staffDetails.staffDeptRoleMapList}" var="departRole" varStatus="status">
+								<tr class="append-box emp" class="row emp" id="row0">
+								<td>
+									<div class="form-group">
+										<div class="col-md-12">
+											 <input type="hidden" value="${classObjectValue}" id="classObjectValueId" />
+											<select name="employmentList[${status.index}].objectIdAndType"  class="form-control form-control-sm validId8 require" id="objectIdAndTypeId${status.index}"  onchange="getLevelListByOrganization(this)">
+												<option value="">Select Organization<%-- [${String.valueOf(departRole.objectId).concat('##').concat(departRole.userLevel)}] --%></option>
+												<c:forEach items="${organizationList}" var="organization">
+													<option value="${organization.combineTwo}" <c:if test="${organization.combineTwo eq String.valueOf(departRole.objectId).concat('##').concat(departRole.objectType)}">selected</c:if>>${organization.organizationName}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</td>
+								<td>
+									<div class="form-group">
+										<div class="col-sm-12" ${empeBasicDetails.staffCollegeDeptRoleMap.levelId ne null ? 'style="pointer-events:none;"' : ''}>
+											<select class="form-control form-select validId1 require" name="employmentList[${status.index}].levelData" id="levelSelect${status.index}" onchange="getActualLevelNameListByLevelCodeAndOrgId(this)" data-plugin-selectTwo>
+												<option value=""><spring:message code="label.common.select"></spring:message></option>
+												<c:forEach var="level" items="${departRole.levelList}">
+													<option value="${level.organizationStructure.objectId}##${level.levelCode}##${level.organizationStructure.objectType}" ${String.valueOf(level.organizationStructure.objectId).concat('##').concat(level.levelCode).concat('##').concat(level.organizationStructure.objectType) eq String.valueOf(departRole.objectId).concat('##').concat(departRole.userLevel).concat('##').concat(departRole.objectType) ? 'selected':''}>${level.levelCode}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</td>
+								<td>
+									<div class="form-group">
+										<input type="hidden" class="validId7" id="staffDeptMapId${status.index}" name="employmentList[${status.index}].staffDeptMapId" value="${departRole.staffDeptMapId}">
+										<div class="col-sm-12" ${empeBasicDetails.staffCollegeDeptRoleMap.departmentId.levelName ne null ? 'style="pointer-events:none;"' : ''}>
+											<select class="form-control form-select empcls validId2 require" name="employmentList[${status.index}].actualLeveldata" id="levelNameSelect${status.index}" onchange="getRoleListByActualLevel(this)" data-plugin-selectTwo>
+												<option value=""><spring:message code="label.common.select"></spring:message></option>
+												<c:forEach var="actualLevel" items="${departRole.actualLevelList}">
+													<option value="${actualLevel.combineTwo}" ${actualLevel.entityId eq departRole.userLevelId ? 'selected' : ''}>${actualLevel.organizationName}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</td>
+								<td>
+									<div class="form-group">
+										<div class="col-sm-12">
+											<select class="form-control form-select validId3 require" name="employmentList[${status.index}].roleId" id="roleSelect${status.index}" data-plugin-selectTwo >
+												<option value=""><spring:message code="label.common.select"></spring:message></option>
+												<c:forEach var="role" items="${departRole.roleList}">
+													<option value="${role.roleId}" ${role.roleId eq departRole.roleId.roleId ? 'selected' : ''}>${role.displayName}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</td>
+								<td>
+									<div class="form-group">
+										<div class="col-sm-12 datepicker-box">
+                                                <select class="form-control form-select isprimary validId4 require" name="employmentList[${status.index}].isPrimary" id="isPrimary${status.index}" data-plugin-selectTwo onchange="checkIsprimary();" >
+												<option value="false" ${!departRole.isPrimary ? 'selected' : ''}>NO</option>
+												<option value="true" ${departRole.isPrimary ? 'selected' : ''}>YES</option>
+											</select>						
+									</div>
+									</div>
+								</td>
+									<td>
+										<div class="form-group">
+											<div class="col-sm-12 datepicker_con">
+												<input type="text" class="form-control datepicker form-control-sm validId5 require" name="employmentList[${status.index}].fromDate" id="fromDate${status.index}" readonly="readonly" onchange="validateDate()" value="<fmt:formatDate value="${departRole.fromDate}" pattern="dd/MM/yyyy" />">
+
+											</div>
+										</div>
+									</td>
+								
+								<td>
+									<div class="form-group">
+										<div class="col-sm-12 datepicker_con">
+											<input type="text" class="form-control datepicker form-control-sm validId6 require" name="employmentList[${status.index}].toDate" id="toDate${status.index}" readonly="readonly" onchange="validateDate()" value="<fmt:formatDate value="${departRole.toDate}" pattern="dd/MM/yyyy" />"><!-- 01/01/2050" -->
+
+										</div>
+									</div>
+								</td>
+								
+								<td style="text-align: center;">
+									<button type="button" title="Remove" class="btn btn-danger remove-row-fa-minus validId9 removeDiv freez" id="removeDiv${status.index}" > <i class="fa fa-trash"></i></button>
+								</td>
+							</tr>
+								</c:forEach>
+								</c:when>
+								<c:otherwise>
+							
+										<tr class="append-box emp" class="row emp" id="row0">
+											<td>
+												<div class="form-group">
+													<div class="col-md-12">
+														<input type="hidden" value="${classObjectValue}" id="classObjectValueId" />
+														<select name="employmentList[0].objectIdAndType"  class="form-control form-control-sm validId8 require" id="objectIdAndTypeId0" onchange="getLevelListByOrganization(this)">
+															<option value="">Select Organization</option>
+															<c:forEach items="${organizationList}" var="organization">
+																<option value="${organization.combineTwo}" <c:if test="${organization.combineTwo eq selectedEntityId}">selected</c:if>>${organization.organizationName}</option>
+															</c:forEach>
+														</select>
+													</div>
+												</div>
+											</td>
+											<td>
+												<div class="form-group">
+													<div class="col-sm-12" ${empeBasicDetails.staffCollegeDeptRoleMap.office.id ne null ? 'style="pointer-events:none;"' : ''}>
+														<select class="form-control form-select validId1 require" name="employmentList[0].levelData" id="levelSelect0" onchange="getActualLevelNameListByLevelCodeAndOrgId(this);" data-plugin-selectTwo>
+															<option value=""><spring:message code="label.common.select"></spring:message></option>
+															<%-- <c:forEach var="office" items="${satffLoadData.officeList}">
+																<option value="${office.id}">${office.officeName}</option>
+															</c:forEach> --%>
+														</select>
+													</div>
+												</div>
+											</td>
+											<td>
+												<div class="form-group">
+													<div class="col-sm-12" ${empeBasicDetails.staffCollegeDeptRoleMap.departmentId.departmentId ne null ? 'style="pointer-events:none;"' : ''}>
+														<select class="form-control form-select empcls validId2 require" name="employmentList[0].actualLeveldata" id="levelNameSelect0" onchange="getRoleListByActualLevel(this);" data-plugin-selectTwo>
+															<option value=""><spring:message code="label.common.select"></spring:message></option>
+														</select>
+													</div>
+												</div>
+											</td>
+											<td>
+												<div class="form-group">
+													<div class="col-sm-12">
+														<select class="form-control form-select validId3 require" name="employmentList[0].roleId" id="roleSelect0" data-plugin-selectTwo>
+															<option value=""><spring:message code="label.common.select"></spring:message></option>
+															<%-- <c:forEach var="role" items="${satffLoadData.roleIsDesignation}">
+																<option value="${role.roleId}">${role.displayName}</option>
+															</c:forEach> --%>
+														</select>
+													</div>
+												</div>
+											</td>
+											<td>
+												<div class="form-group">
+													<div class="col-sm-12 datepicker-box">
+														<select class="form-control form-select isprimary validId4 require" name="employmentList[0].isPrimary" id="isPrimary0" data-plugin-selectTwo onchange="checkIsprimary();">
+															<option value="false">NO</option>
+															<option value="true">YES</option>
+														</select>
+													</div>
+												</div>
+											</td>
+											<td>
+												<div class="form-group">
+													<div class="col-sm-12 datepicker_con">
+														<input type="text" class="form-control datepicker form-control-sm validId5 require" name="employmentList[0].fromDate" id="fromDate0" readonly="readonly" onchange="validateDate()" value="">
+
+													</div>
+												</div>
+											</td>
+											<td>
+												<div class="form-group">
+													<div class="col-sm-12 datepicker_con">
+														<input type="text" class="form-control datepicker form-control-sm validId6 require" name="employmentList[0].toDate" id="toDate0" readonly="readonly" onchange="validateDate()" value="">
+
+													</div>
+												</div>
+											</td>
+												<td style="text-align: center;">
+	               	 								<button type="button" title="Remove" class="btn btn-danger remove-row-fa-minus validId9 removeDiv" id="removeDiv0">
+	                    								<i class="fa fa-trash"></i>
+	                								</button>
+												</td>
+										</tr>
+									
+							</c:otherwise>
+							</c:choose>
+							</tbody>
+								</table>
+							</div>
+						</div>
+				
+					<div class="col-md-12 text-center" style="margin-top: 15px;">
+	                  <hr style="margin-top: 5px;" />
+	                  <div class="form-group">
+	                     <button type="button" onclick="checkForDuplicates()" class="btn btn-success btn-sm">Save</button>
+						 <a href="${contextPath}/staff/staffMemberList" class="btn btn-warning btn-sm">Back to List</a>
+	                  </div>
+	                </div>
+						</form>
+	         
+   <script>
+   var cnt = parseFloat('${not empty staffDetails.staffDeptRoleMapList.size()}');
+   $("#plus_employement").click(function() {
+	   
+	    var fields = document.getElementsByClassName("empcls");
+	    cnt = fields.length;
+	    
+	        var htmldata = '<tr class="append-box emp" class="row emp" id="row' + cnt + '">' +
+	        '<td>' +
+				'<div class="form-group">' +
+					'<div class="col-md-12">' +
+						' <input type="hidden" value="${classObjectValue}" id="classObjectValueId" />' +
+						'<select name="employmentList[' + cnt + '].objectIdAndType"  class="form-control form-control-sm validId8 require" id="objectIdAndTypeId' + cnt + '"  onchange="getLevelListByOrganization(this)">' +
+							'<option value="">Select Organization</option>' +
+							'<c:forEach items="${organizationList}" var="organization">' +
+								'<option value="${organization.combineTwo}" <c:if test="${organization.combineTwo eq selectedEntityId}">selected</c:if>>${organization.organizationName}</option>' +
+							'</c:forEach>' +
+						'</select>' +
+					'</div>' +
+				'</div>' +
+			'</td>' +
+			'<td>' +
+				'<div class="form-group">' +
+					'<div class="col-sm-12" ${empeBasicDetails.staffCollegeDeptRoleMap.office.id ne null ? 'style="pointer-events:none;"' : ''}>' +
+						'<select class="form-control form-select validId1" name="employmentList[' + cnt + '].levelData" id="levelSelect' + cnt + '" onchange="getActualLevelNameListByLevelCodeAndOrgId(this);" data-plugin-selectTwo>' +
+							'<option value=""><spring:message code="label.common.select"></spring:message></option>' +
+						'</select>' +
+					'</div>' +
+				'</div>' +
+			'</td>' +
+			'<td>' +
+				'<div class="form-group">' +
+					'<div class="col-sm-12" ${empeBasicDetails.staffCollegeDeptRoleMap.departmentId.departmentId ne null ? 'style="pointer-events:none;"' : ''}>' +
+						'<select class="form-control form-select empcls validId2" name="employmentList[' + cnt + '].actualLeveldata" id="levelNameSelect' + cnt + '" onchange="getRoleListByActualLevel(this);" data-plugin-selectTwo>' +
+							'<option value=""><spring:message code="label.common.select"></spring:message></option>' +
+						'</select>' +
+					'</div>' +
+				'</div>' +
+			'</td>' +
+			'<td>' +
+				'<div class="form-group">' +
+					'<div class="col-sm-12">' +
+						'<select class="form-control form-select validId3 require" name="employmentList[' + cnt + '].roleId" id="roleSelect' + cnt + '" data-plugin-selectTwo>' +
+							'<option value=""><spring:message code="label.common.select"></spring:message></option>' +
+						'</select>' +
+					'</div>' +
+				'</div>' +
+			'</td>' +
+			'<td>' +
+				'<div class="form-group">' +
+					'<div class="col-sm-12 datepicker-box">' +
+						'<select class="form-control form-select isprimary validId4 require" name="employmentList[' + cnt + '].isPrimary" id="isPrimary' + cnt + '" data-plugin-selectTwo onchange="checkIsprimary();">' +
+							'<option value="false">NO</option>' +
+							'<option value="true">YES</option>' +
+						'</select>' +
+					'</div>' +
+				'</div>' +
+			'</td>' +
+			'<td>' +
+				'<div class="form-group">' +
+					'<div class="col-sm-12 datepicker_con">' +
+						'<input type="text" class="form-control datepicker form-control-sm validId5 require" name="employmentList[' + cnt + '].fromDate" id="fromDate' + cnt + '" readonly="readonly" onchange="validateDate()" value="">' +
+						
+					'</div>' +
+				'</div>' +
+			'</td>' +
+			'<td>' +
+				'<div class="form-group">' +
+					'<div class="col-sm-12 datepicker_con">' +
+						'<input type="text" class="form-control datepicker form-control-sm validId6" name="employmentList[' + cnt + '].toDate" id="toDate' + cnt + '" readonly="readonly" onchange="validateDate()" value="">' +
+						
+					'</div>' +
+				'</div>' +
+			'</td>' +
+				'<td style="text-align: center;">' +
+	                '<button type="button" title="Remove" class="btn btn-danger remove-row-fa-minus validId9 removeDiv" id="removeDiv' + cnt + '">' +
+	                    '<i class="fa fa-trash"></i>' +
+	                '</button>' +
+				'</td>' +
+		'</tr>';
+
+	    $("#emplmnt").append(htmldata);
+	    cnt++;
+
+	    $('.datepicker').datepick({
+	        onShow: $.datepick.monthOnly,
+	        dateFormat: 'dd/mm/yyyy',
+	        yearRange: 'c-100:c+5',
+	        showOnFocus: true,
+	        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>'
+	    });
+	});
+
+function showAdditionalField() {
+	    var selectedCategory = document.getElementById('staffCategorys').value;
+	    var staffGradeField = document.getElementById('staffGradeFields');
+	    var payCommTypeField = document.getElementById('payCommTypeFields');
+	    // var payBandField = document.getElementById('payBandFields');
+	    if (selectedCategory === 'GOV') {
+	        staffGradeField.style.display = 'block';
+	        payCommTypeField.style.display = 'block';
+	        payBandField.style.display = 'block';
+	       // hrngsCodeFields.style.display = 'block';
+	    } else {
+	        staffGradeField.style.display = 'none';
+	        payCommTypeField.style.display = 'none';
+	        // payBandField.style.display = 'none';
+			$('#payGrade0').val(0);
+			$('#commissionType0').val(0);
+	        //hrngsCodeFields.style.display = 'none';
+	    }
+	}
+
+// 	function deleteeEmployement(cnt) {
+// 	    $("#row" + cnt).remove();
+// 	}
+
+	function checkIsprimary(){
+		 var isprimaries = document.getElementsByClassName("isprimary");
+	        var selectedYesCount = 0;
+
+	        for (var i = 0; i < isprimaries.length; i++) {
+	            if (isprimaries[i].value === "true") {
+	                selectedYesCount++;
+	            }
+	        }
+
+	        if (selectedYesCount > 1) {
+	            bootbox.alert("Only one role can be marked as primary.");
+	            
+	            for (var i = 0; i < isprimaries.length; i++) {
+	                if (isprimaries[i].value === "true") {
+	                    isprimaries[i].value = "false";
+	                }
+	            }
+	        }
+	}
+	
+	$(document).on('click','.removeDiv',function(){
+		  if($('.removeDiv').length > 1){
+			  $(this).closest('.append-box').remove();
+			  cnt--;
+			  renumberRows();
+		  }
+	});
+	
+	
+	function renumberRows() {
+	    var num1Inputs = $(".validId1").length;
+	    var num2Inputs = $(".validId2").length;
+	    var num3Inputs = $(".validId3").length;
+	    var num4Inputs = $(".validId4").length;
+	    var num5Inputs = $(".validId5").length;
+	    var num6Inputs = $(".validId6").length;
+	    var num7Inputs = $(".validId7").length;
+	    var num8Inputs = $(".validId8").length;
+	    var num9Inputs = $(".validId9").length;
+	    for (var i = 0; i < num1Inputs; i++) {
+	        var input = $(".validId1")[i];
+	         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+	        $(input).attr("name", "employmentList["+i+"].levelData");
+	    }
+	    
+	    for (var i = 0; i < num2Inputs; i++) {
+	        var input = $(".validId2")[i];
+	         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+	        $(input).attr("name", "employmentList["+i+"].actualLeveldata");
+	    }
+
+	    for (var i = 0; i < num3Inputs; i++) {
+	        var input = $(".validId3")[i];
+	         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+	        $(input).attr("name", "employmentList["+i+"].roleId");
+	    }
+
+	    for (var i = 0; i < num4Inputs; i++) {
+	        var input = $(".validId4")[i];
+	         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+	        $(input).attr("name", "employmentList["+i+"].isPrimary");
+	    }
+
+	    for (var i = 0; i < num5Inputs; i++) {
+	        var input = $(".validId5")[i];
+	         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+	        $(input).attr("name", "employmentList["+i+"].fromDate");
+	    }
+
+	    for (var i = 0; i < num6Inputs; i++) {
+	        var input = $(".validId6")[i];
+	         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+	        $(input).attr("name", "employmentList["+i+"].toDate");
+	    }
+
+	    for (var i = 0; i < num7Inputs; i++) {
+	        var input = $(".validId7")[i];
+	         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+	        $(input).attr("name", "employmentList["+i+"].staffDeptMapId");
+	    }
+
+	    for (var i = 0; i < num8Inputs; i++) {
+	        var input = $(".validId8")[i];
+	         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+	        $(input).attr("name", "employmentList["+i+"].objectIdAndType");
+	    }
+
+	    for (var i = 0; i < num9Inputs; i++) {
+	        var input = $(".validId9")[i];
+	         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+	    }
+
+	}
+
+	function asyncAjaxForData(url, data, method){
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: url,
+                type: method,
+                data: data,
+                success: function(data){
+                    resolve(data);
+                },
+                error: function(err){
+                    reject(err);
+                }
+            });
+        });
+    }
+
+	function getLevelListByOrganization(that){
+		var rowNum = that.id.match(/\d+$/)[0];
+	    $.ajax({
+	        url: "${contextPath}/api/allow/getLevelListByOrganization",
+	        method: "GET",
+	        data: { orgData: that.value },
+	        success: function(response) {
+	        	var data = JSON.parse(response);
+	        	var html = '<option value="0">- Select -</option>';
+	            $.each(data, function(index, value){
+	            	html += '<option value="'+value.orgIdNlevelCode+'">'+value.levelCode+'</option>';
+	            });
+	            $('#levelSelect'+rowNum).empty().append(html);
+	        },
+	        error: function(jqXHR, textStatus, errorThrown) {
+	            console.log("Something Went Wrong: " + errorThrown);
+	        }
+	    });
+	}
+
+	function getActualLevelNameListByLevelCodeAndOrgId(that){
+		var rowNum = that.id.match(/\d+$/)[0];
+	    $.ajax({
+	        url: "${contextPath}/api/allow/getActualLevelNameListByLevelCodeAndOrgId",
+	        method: "GET",
+	        data: { levelData: that.value },
+	        success: function(response) {
+	        	var data = JSON.parse(response);
+	        	var html = '<option value="0">- Select -</option>';
+	            $.each(data, function(index, value){
+	            	html += '<option value="'+value.entityIdNEntityName+'">'+value.entityName+'</option>';
+	            });
+	            $('#levelNameSelect'+rowNum).empty().append(html);
+	        },
+	        error: function(jqXHR, textStatus, errorThrown) {
+	            console.log("Something Went Wrong: " + errorThrown);
+	        }
+	    });
+	}
+
+	function getRoleListByActualLevel(that){
+		var rowNum = that.id.match(/\d+$/)[0];
+	    $.ajax({
+	        url: "${contextPath}/api/allow/getRoleListByActualLevel",
+	        method: "GET",
+	        data: { actualLevelData: that.value },
+	        success: function(response) {
+	        	var data = JSON.parse(response);
+	        	var html = '<option value="0">- Select -</option>';
+	            $.each(data, function(index, value){
+	            	html += '<option value="'+value.entityId+'">'+value.entityName+'</option>';
+	            });
+	            $('#roleSelect'+rowNum).empty().append(html);
+	        },
+	        error: function(jqXHR, textStatus, errorThrown) {
+	            console.log("Something Went Wrong: " + errorThrown);
+	        }
+	    });
+	}
+	
+    function checkForDuplicates() {
+    	var arr = [];
+    	var isPassed = false;
+    	
+    	if($('#emplmnt tr').length > 1){
+    		$('#emplmnt tr').each(function(index) {
+        		var allData = $('#objectIdAndTypeId'+index).val()+'-'+$('#levelSelect'+index).val()+'-'+$('#levelNameSelect'+index).val()+'-'+$('#roleSelect'+index).val()
+        		if(allData != '---'){
+        			arr.push(allData)
+        		}
+        	});
+    		isPassed = checkDuplicatesInArray(arr);
+        	if(isPassed){
+        		if(hasPrimaryTrue()){
+        			submitForm('employmentFrm');
+        		} else {
+        			bootbox.alert('One Role Should be Primary Role.');
+        		}
+        		
+        	} else {
+        		bootbox.alert('Organization, Level, Level Name & Role Should not be Duplicate.');
+        	}
+    	}else {
+    		if(hasPrimaryTrue()){
+    			submitForm('employmentFrm');
+    		} else {
+    			bootbox.alert('One Role Should be Primary Role.');
+    		}
+    	}
+    }
+    
+    function checkDuplicatesInArray(arr) {
+        for (let i = 0; i < arr.length; i++) {
+            for (let j = i + 1; j < arr.length; j++) {
+                if (arr[i] == arr[j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    function hasPrimaryTrue() {
+    	var arr = [];
+    	 $('[id^="isPrimary"]').each(function(){
+    		 arr.push($(this).val());
+    	 });
+    	 return arr.includes("true");
+    }
+
+
+	// function disablePrimaryTrue(that){
+	// 	let index = $(that).attr("id").replaceAll('isPrimary', '');
+	// 	if("true" === $(that).val()){
+	// 		$('#removeDiv'+index).addClass('freez');
+	// 		for (let i = 0; i < $('[id^="isPrimary"]').length; i++){
+	// 			if(i !== index){
+	// 				$('#removeDiv'+i).removeClass('freez');
+	// 			}
+	// 		}
+	// 	}
+	//
+	// }
+
+
+  </script>

@@ -1,0 +1,69 @@
+#=================================  STAGING-LOCAL (57)  =================================
+#spring.datasource.url=jdbc:postgresql://192.168.3.57:5432/corp_erp
+#spring.datasource.username=cmuser
+#spring.datasource.password=Pass@123#
+
+#spring.datasource.url=jdbc:postgresql://139.59.12.212:5432/corp_erp
+#spring.datasource.username=cmuser
+#spring.datasource.password=Pass@123#
+
+#spring.datasource.url=jdbc:postgresql://localhost:5433/bams_new_local
+#spring.datasource.username=postgres
+#spring.datasource.password=root
+
+#spring.datasource.url=jdbc:postgresql://localhost:5433/bams_latest_new_dump
+#spring.datasource.username=postgres
+#spring.datasource.password=root
+
+spring.datasource.url=jdbc:postgresql://139.59.12.212:5432/bams_new
+spring.datasource.username=consuser
+spring.datasource.password=Pass##2406
+
+#spring.datasource.url=jdbc:postgresql://localhost:5433/bams_2_local_new
+#spring.datasource.username=postgres
+#spring.datasource.password=root
+
+#spring.datasource.url=jdbc:postgresql://139.59.12.212:5432/bams_2
+#spring.datasource.username=consuser
+#spring.datasource.password=Pass##2406
+
+#spring.datasource.url=jdbc:postgresql://139.59.12.212:5432/construction_scst
+#spring.datasource.username=consuser
+#spring.datasource.password=Pass##2406
+
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+#spring.jpa.hibernate.ddl-auto=update
+
+
+
+
+#------------- SMTP Configuration----------------------
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+mail.smtp.host=smtp.gmail.com
+mail.smtp.ssl.trust=smtp.gmail.com
+mail.smtp.port=587
+mail.smtp.ssl.protocols=TLSv1.2
+mail.username=atmosphere.oppro@gmail.com
+mail.password=etnpkzqipiqbfqfb
+
+# 1 minute
+mail.priority.immediate=60000
+# 3 minutes
+mail.priority.high=180000
+# 5 minutes
+mail.priority.medium=300000
+# 10 minutes
+mail.priority.low=600000
+
+
+server.port=3131
+server.servlet.context-path=/heads-ipms
+UPLOAD.FILE.PATH=D://CMC-SWP-UPLOAD//UPLOADED_FILES//
+
+
+
+
+

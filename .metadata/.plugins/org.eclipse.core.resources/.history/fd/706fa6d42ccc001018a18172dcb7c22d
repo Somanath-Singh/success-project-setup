@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+		"http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+	<!-- ################################################################################################################ -->
+	<!-- #################################### LOGIN LAYOUT ################################################ -->
+	<!-- ################################################################################################################ -->
+
+	<definition name="layout.login" template="/WEB-INF/views/login.jsp"/>
+
+	<definition name="site.view.404" template="/WEB-INF/views/layout/404.jsp"/>
+
+
+
+	<!-- ################################################################################################################ -->
+	<!-- #################################### BASE LAYOUT ################################################ -->
+	<!-- ################################################################################################################ -->
+
+	<definition name="layout.base" template="/WEB-INF/views/layout/baseLayout.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/layout/header.jsp" />
+		<put-attribute name="menu" value="/WEB-INF/views/layout/menu.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/views/footer.jsp" />
+	</definition>
+
+	<!-- ################################################################################################################ -->
+	<!-- #################################### BLANK LAYOUT ############################################# -->
+	<!-- ################################################################################################################ -->
+
+	<definition name="layout.blank" template="/WEB-INF/views/layout/blankLayout.jsp">
+		<put-attribute name="title" value="" />
+		<put-attribute name="body" value="" />
+	</definition>
+
+
+
+	<!-- ################################################################################################################ -->
+	<!-- #################################### DASHBOARD ############################################# -->
+	<!-- ################################################################################################################ -->
+
+	<definition name="site.home" extends="layout.base">
+		<put-attribute name="body"  value="/WEB-INF/views/home.jsp" />
+	</definition>
+
+	<definition name="add.student.details.view" extends="layout.base">
+		<put-attribute name="body"  value="/WEB-INF/views/studentDetails.jsp" />
+	</definition>
+
+
+	<!-- ########################################Stage Config START ################################################## -->
+
+	<!-- Stage Config Tiles -->
+	<definition name="stage.config.view" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig.jsp"/>
+	</definition>
+
+	<!-- Stage Config Tiles -->
+	<definition name="stage.config.view2" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig2.jsp"/>
+	</definition>
+
+	<!-- Stage Config Tiles -->
+	<definition name="stage.config.view3" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig3.jsp"/>
+	</definition>
+
+	<!-- Stage Config Tiles -->
+	<definition name="stage.config.view4" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig4.jsp"/>
+	</definition>
+
+	<!-- Stage Config Tiles -->
+	<definition name="stage.config.view5" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig5.jsp"/>
+	</definition>
+
+	<definition name="stage.config.appList" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfigAppList.jsp"/>
+	</definition>
+
+
+	<definition name="stage.config.processFlow" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/processFlow.jsp"/>
+	</definition>
+
+	<!-- site.view.tableConfig -->
+	<definition name="site.view.tableConfig" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/OptTable.jsp"/>
+	</definition>
+
+	<!-- site.view.tableConfig -->
+	<definition name="site.view.dynamicReportGenerator" template="/WEB-INF/views/stageConfig/dynamicReport.jsp" />
+
+	<!-- site.view.tableConfig -->
+	<definition name="site.view.TblComConfig" extends="layout.blank">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/TblComConfig.jsp"/>
+	</definition>
+
+	<!-- site.view.hierarchy -->
+	<definition name="site.config.hierarchyView" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/hierarchy.jsp"/>
+	</definition>
+	<!-- site.view.viewPageData -->
+	<definition name="site.view.viewPageData" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/viewPageData.jsp"/>
+	</definition>
+
+	<definition name="site.genericDataViewFormat" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/genericDataViewFormat.jsp"/>
+	</definition>
+
+	<definition name="site.view.createActions" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/createActions.jsp"/>
+	</definition>
+
+	<definition name="site.view.roleWiseStageTabConfig" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/roleWiseStageTabConfig.jsp"/>
+	</definition>
+
+
+	<definition name="site.view.stageTabConfig" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/stageTabConfig.jsp"/>
+	</definition>
+
+	<definition name="stage.share.entity.map" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/shareEntityMapModules.jsp"/>
+	</definition>
+
+	<definition name="site.view.roleWiseStatusTabViewConfig" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/roleWiseStatusTabViewConfig.jsp"/>
+	</definition>
+
+	<definition name="site.view.logView" template="/WEB-INF/views/stageConfig/logViewer.jsp"/>
+
+	<!-- stage.config.view4List -->
+	<definition name="stage.config.view4List" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig4List.jsp"/>
+	</definition>
+
+	<!-- stage.config.viewConfigView4 -->
+	<definition name="stage.config.viewConfigView4" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/viewConfigView4.jsp"/>
+	</definition>
+
+	<definition name="site.view.createActionType" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/createActionType.jsp"/>
+	</definition>
+
+	<definition name="site.view.workFlowApiDetails" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/workFlowApiDetails.jsp"/>
+	</definition>
+
+	<definition name="site.view.createNativeQueryAndShareEntity" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/stageConfig/createNativeQueryAndShareEntity.jsp"/>
+	</definition>
+
+
+	<!-- ########################################Stage Config END ################################################## -->
+	
+
+</tiles-definitions>

@@ -1,0 +1,514 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/AadharVaidator.js"></script>
+<%--<jsp:useBean id="strUtils" class="com.aashdit.demography.utils.ApplicationStringUtils"/>--%> 
+            <div class="content">
+                <div class="panel-header bg-primary-gradient">
+					<div class="page-inner">
+						<div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+ 							<div>
+								<h2 class="text-blue pb-2 fw-bold">Manage Fund</h2>
+							</div> 
+							<div class="ml-md-auto py-1 py-md-0">
+								<a href="${contextPath}" class="btn btn-sm btn-border btn-blue btn-round mr-2"><i class="fa fa-home"></i></a>
+								<a href="#" class="btn btn-sm btn-border btn-blue btn-round mr-2">/ Manage Fund</a>
+							</div>
+						</div>
+					</div>
+				</div>
+                <div class="page-inner">
+                    <div class="row mt--2">
+                        <div class="col-md-12">
+                            <div class="card full-height">
+                                <div class="card-header">
+                                    <h4 class="card-title">View Fund </h4>
+                                    <div class="panel-actions">
+                                        <a href="#" class="fa fa-caret-down"></a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                
+                                  <form class="form-horizontal" action="${contextPath}/fnd/fund/add" method="post" enctype="multipart/form-data" id="fundForm">
+								    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="col-md-12 smallInput required" for="">Financial Year :</label>
+                                                <div class="col-md-12">
+                                                    <select class="form-control form-control-sm" id="finyearId" name="finyear.finyearId">
+                                                        <option value="">--Select--</option>
+                                                        <c:forEach items="${lstFinyear}" var="finyear">
+															<option value="${finyear.finyearId}" ${finyear.finyearId eq fund.finyear.finyearId ?'selected':'' }>${finyear.finYear}</option>
+														</c:forEach>
+                                                        
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="required">Fund Creation Dateee :</label>
+												<div class="col-md-12 datepicker_con">
+													<input type="text" class="form-control form-control-sm disbursDate" name="transDate" id="transDate" readonly="readonly" required="required"  value="<fmt:formatDate pattern="dd/MM/yyyy" value='${fund.transDate}' />" >
+												</div>
+											</div>
+										</div>
+							            <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="col-md-12 smallInput required" for="">Fund Type :</label>
+                                                <div class="col-md-12">
+                                                    <select class="form-control form-control-sm" id="fundTypeId" name="fundType.fundTypeId" id="fundTypeId">
+                                                        <option value="">--Select--</option>
+                                                        <c:forEach items="${lstFundType}" var="fundType">
+															<option value="${fundType.fundTypeId}" ${fundType.fundTypeId eq fund.fundType.fundTypeId ?'selected':'' }>${fundType.fundTypeName}</option>
+														</c:forEach>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="col-md-3 ">
+                                            <div class="form-group">
+                                                <label class="col-md-12 smallInput required" for="">Component Name :</label>
+                                                <div class="col-md-12">
+                                                    <select class="form-control form-control-sm" name="schemeId" id="schemeId" onchange="findEntityListBySchemeId(this.value)">
+                                                       <option value="">--Select--</option>
+                                                        <c:forEach items="${mstSchemeList}" var="mstScheme">
+															<option value="${mstScheme.schemeId}" ${mstScheme.schemeId eq fund.entitySchemeMapping.scheme.schemeId ?'selected':'' }>${mstScheme.schemeName}</option>
+														</c:forEach>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 ">
+                                            <div class="form-group">
+                                                <label class="col-md-12 smallInput required" for="">Entity Type :</label>
+                                                <div class="col-md-12">
+                                                    <select class="form-control form-control-sm" id="entityTypeId" name="entitySchemeMapping.entitySchemeId" onchange="getEntityNameByEntityTypeOrDistrictId();">
+                                                        <option value="">--Select--</option>
+                                                        <c:forEach items="${lstEntitySchemeMapping}" var="entitySchemeMapping">
+															<option value="${entitySchemeMapping.entitySchemeId}" ${entitySchemeMapping.entitySchemeId eq fund.entitySchemeMapping.entitySchemeId ?'selected':'' }>${entitySchemeMapping.cboType.valueEn}</option>
+														</c:forEach>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 hidden" id="districtDiv">
+                                            <div class="form-group">
+                                                <label class="col-md-12 smallInput required" for=""> District Name:</label>
+                                                <div class="col-md-12">
+                                                    <select class="form-control form-control-sm" name="districtId" id="districtId" onchange="getEntityNameByEntityTypeOrDistrictId();">
+                                                       <option value="">--Select--</option>
+                                                       <c:forEach items="${districtList}" var="district">
+															<option value="${district.districtId}" ${district.districtId eq fund.entityBeneficiaryMapping.district.districtId ?'selected':'' }>${district.districtName}</option>
+														</c:forEach> 
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- <div class="col-md-3 hidden" id="entityDiv">
+                                            <div class="form-group">
+                                                <label class="col-md-12 smallInput required" for=""> Entity Name :</label>
+                                                <div class="col-md-12">
+                                                    <select class="form-control form-control-sm" id="entityId" name="entityBeneficiaryMapping.entityBeneficiaryId">
+                                                        <option value="">--Select--</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div> -->
+                                        <%-- <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="required">Sanction No :</label>
+                                                <div class="col-md-12">
+												   <input type="text" class="form-control form-control-sm" id="sanctionNo" name="sanctionNo" value="${fund.sanctionNo}" maxlength="15" onchange="checkDuplicateSanctionNo(this.value);" >
+                                                </div>
+                                            </div>
+                                        </div> --%>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="required">Sanction No :</label>
+                                                <div class="col-md-12">
+												   <select class="form-control form-control-sm" id="sanctionNo" name="sanctionNo">
+                                                        <option value="">--Select--</option>
+                                                     <%--    <c:forEach items="${fundList}" var="fundList"> --%>
+															<option value="${fund.sanctionNo}" selected>${fund.sanctionNo}</option>
+														<%-- </c:forEach> --%>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="col-md-12 smallInput required" >Amount :</label>
+                                                <div class="col-md-12">
+                                                    	<input type="hidden" class="form-control form-control-sm x-turnover" id="turnover1" name="amount" value="${fund.amount}" maxlength="20">
+												<input type="text" class="form-control form-control-sm x-turnover NumbersOnlyForAmount" id="turnover1Converted" value="${fund.amount}" maxlength="20" onchange="currencyConverter(this.value,'turnover1Converted')">
+                                                </div>
+                                            </div>
+                                        </div>
+										<%-- <div class="col-md-3">
+											<div class="form-group">
+												<label class="col-md-12 required1" for="schemeCode">Entity Level</label>
+												<div class="col-md-12">
+													<input type="text" class="form-control form-control-sm " value="${fund.entityBeneficiaryMapping.entityLebel.valueEn}"
+														name="blockCode" required="required">
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-md-12 required1" for="schemeCode">Entity Name</label>
+												<div class="col-md-12">
+													<input type="text" class="form-control form-control-sm " value="${fund.entityBeneficiaryMapping.beneficiaryName}"
+														name="blockCode" required="required">
+												</div>
+											</div>
+										</div> --%>
+                                    </div>
+                                  
+											<!-- <div class="panel-body"> -->
+															<!-- <div class="row"> -->
+																<div class="col-md-12 mt-4">
+																	<table class=" table table-striped table-bordered table-hover"
+																					 id="dynamicTable"> 
+																		<thead>
+																			<tr style="background-color: #d3e2f7;">
+																				<th>Date</th>
+																				<th>Remark By</th>
+																				<th>Remark</th>
+																				<th>View Document</th>													
+																			</tr>
+																		</thead>
+																		<tbody id="tbd">
+																	 	<c:forEach items="${fundStageHistoryList}" var="fundStageHistory"> 
+																			<tr>
+																				<td><fmt:formatDate pattern="dd-MM-yyyy" value="${fundStageHistory.createdAt}" /></td>
+																				
+																				<td></td>
+																				<td>${empty fundStageHistory.remark ? 'N/A': fundStageHistory.remark}</td>
+																				<td>
+																					<c:choose>
+																						<c:when test="${not empty fundStageHistory.document}">
+																						<a type="button" href="${contextPath}/fnd/fund/stageHistory/view/document?applicationId=${fundStageHistory.stageHistoryId}" target="_blank"  draggable="false">View Document</a>
+																						</c:when>
+																						<c:otherwise>
+																						<a style="color:red;font-size: 13px;">Not Available</a>
+																						</c:otherwise>
+																					</c:choose>
+																				</td>
+																			</tr>
+																	     </c:forEach> 
+																		</tbody>
+																	</table>
+																</div>
+															<!-- </div> -->
+														<!-- </div>  -->
+                                    <div class="col-md-12 text-center mt-2">
+											<c:if test="${fund.status ne 'APPROVED'}">
+											<c:forEach items="${stageForwardedRules}" var="stageForwardedRule">
+											    <c:if test="${(stageForwardedRule.fromStageMaster.role.roleId eq fund.stageForwardedRule.toStageMaster.role.roleId) and (stageForwardedRule.showInPage eq true)}">
+											     	<button type="button"  class="${stageForwardedRule.actionType.color}" data-bs-toggle="modal" data-bs-target="#staticBackdrop" onclick="actionByAuthority(${stageForwardedRule.forwardedId},${fund.fundId})" >${stageForwardedRule.actionType.actionNameEn}</button>
+											    </c:if>
+											</c:forEach>
+											  </c:if>
+											  <c:choose>
+												  <c:when test="${viewType eq 'REQUESTED_BDG' }">
+													<a class="btn btn-sm btn-danger"
+														href="${contextPath}/fnd/fund/requested/list?tabCode=${tabCode}">
+														Back </a>
+												   </c:when>
+												   <c:otherwise>
+													<a class="btn btn-sm btn-danger"
+														href="${contextPath}/fnd/fund/list?tabCode=${tabCode}">Back </a>
+												   </c:otherwise>
+											</c:choose>
+							          </div>
+                                    
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+  <form  method="POST" action="${contextPath}/fnd/fund/actionByAuthority" enctype="multipart/form-data" id="authForm">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+<input type="hidden" name="bnfApplicationId" id="bnfApplicationId"/>
+<input type="hidden" name="forwardedId" id="forwardedId"/>
+<input type="hidden" name="viewType" id="viewType" value="${viewType}"/>
+
+<input type="hidden" name="tabCode" id="tabCode" value="${tabCode}"/>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+		<h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body" style="height:191px;">
+			<div class="col-md-12">
+				  <div class="form-group">
+					  <label class="col-md-12 required1" for="applicantName">Attached Document</label>
+					  <div class="col-md-12">
+					  <input type="file" class="form-control" name="attachedDocument" id="attachedDocument" onchange="imageCheck(this);">
+					  </div>
+				  </div>
+			</div>
+			  <div class="col-md-12">
+				  <div class="form-group">
+					  <label class="col-md-12 required" for="applicantName">Remarks</label>
+						<textarea name="txtMsg" rows="2" cols="20" id="txtRemark" class="form-control" maxlength="200" required="required"></textarea>
+						  <!-- <div class="chrtr_lmt">
+							  <small>Maximum Characters <input size="3"
+								  id="spnDescription" value="200" name="text_num"
+								  readonly="readonly" class="remaining">
+							  </small>
+						  </div> -->
+				  </div>
+		   </div>
+		 </div>
+		<div class="modal-footer">
+			<button type="submit" class="btn btn-success">Send</button>
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		
+		</div>
+	</div>
+	</div>
+</div>
+   
+</form>
+
+<div id="grievanceHistModal" class="modal fade" role="dialog">
+	<div class="modal-dialog modal-lg">
+	  <!-- Modal content-->
+	  <div class="modal-content" >
+		<div class="modal-header" style="background-color:#9dfdd8; color:#fff;">
+			<h4 class="modal-title">Authority Form</h4>
+		  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		</div>
+		<div class="modal-body" style="height:191px;">
+		 <div class="col-md-12">
+		 <div class="col-md-4">
+			   <div class="form-group">
+				   <label class="col-md-12 required1" for="applicantName">Attached Document</label>
+				   <div class="col-md-12">
+				   <input type="file" class="form-control" name="attachedDocument" id="attachedDocument" onchange="imageCheck(this);">
+				   </div>
+			   </div>
+			  </div>
+		 </div>
+		   <div class="col-md-12">
+			<div class="col-md-9">
+			   <div class="form-group">
+				   <label class="col-md-12 required" for="applicantName">Remarks</label>
+					 <textarea name="txtMsg" rows="2" cols="20" id="txtRemark" class="form-control" maxlength="200" required="required"></textarea>
+					   <!-- <div class="chrtr_lmt">
+						   <small>Maximum Characters <input size="3"
+							   id="spnDescription" value="200" name="text_num"
+							   readonly="readonly" class="remaining">
+						   </small>
+					   </div> -->
+			   </div>
+		   </div>
+		</div>
+	  </div>
+	  <div class="modal-footer">
+	  <button type="submit" class="btn btn-success">Send</button>
+	  <button type="button" id="resetId"  class="btn btn-danger" class="close" data-dismiss="modal">Close</button>
+	   </div>
+	</div>
+</div>
+</div> 
+<script>
+ function actionByAuthority(forwardedId,applicationId){
+		 $("#bnfApplicationId").val(applicationId);
+		 $("#forwardedId").val(forwardedId);
+		//  $("#grievanceHistModal").modal();
+	 }
+</script>          
+ <script>
+ function findSubHeadListByHeadId(headId){
+		$.ajax({
+			type : "GET",
+			url : '${contextPath}/ecashcommon/findSubHeadListByHeadId',
+			dataType : "json",
+			data : {
+				"headId" : headId,
+			},
+			success : function(response) {
+				var html = "<option value='' selected>-Select-</option>";
+				var data = response;
+				if (data != "" && data != null && data.length > 0) {
+					$.each(data, function(index, value) {
+						html = html + "<option value="+value.subHeadId+">"
+								+ value.subHeadName + "</option>";
+					});
+				}
+				$('#subHeadId').empty().append(html);
+			},
+			error : function(error) {
+				bootbox.alert("Something went wrong !!!");
+			}
+		});
+}
+ 
+ function findEntityListBySchemeId(schemeId){
+		$.ajax({
+			type : "GET",
+			url : '${contextPath}/ecashcommon/findEntityListBySchemeId',
+			dataType : "json",
+			data : {
+				"schemeId" : schemeId,
+			},
+			success : function(response) {
+				var html = "<option value='' selected>-Select-</option>";
+				var data = response;
+				if (data != "" && data != null && data.length > 0) {
+					$.each(data, function(index, value) {
+						html = html + "<option value="+value.entitySchemeId+">"
+								+ value.entityName + "</option>";
+					});
+				}
+				$('#entityTypeId').empty().append(html);
+			},
+			error : function(error) {
+				bootbox.alert("Something went wrong !!!");
+			}
+		});
+}
+ 
+ $('.NumbersOnlyForAmount').keypress(
+			function(event) {
+				var regex = new RegExp("^[0-9.]+$");
+				var key = String.fromCharCode(!event.charCode ? event.which
+						: event.charCode);
+				if (!regex.test(key)) {
+					event.preventDefault();
+					return false;
+				}
+});
+ 
+ $(function() {
+	 $('.disbursDate').datepick({
+				onShow : $.datepick.monthOnly,
+				dateFormat : 'dd/mm/yyyy',
+				yearRange : "-100:+20",
+				maxDate: '0',
+				showOnFocus : true,
+				showTrigger : '<button type="button" class="trigger">'
+						+ '<i class="fa fa-calendar"></i></button>',
+			   onSelect: function(selected) {
+			     var date = new Date(selected);
+			  
+			     
+					var fyear= $("#finyearId option:selected").text().split("-");
+				    	var firstDate = 01 + "/" + 04 + "/" +fyear[0];
+				    	var lastDate =  31 + "/" + 03 + "/" +fyear[1];	
+					
+					var sDate = firstDate.replace(/(\d+[/])(\d+[/])/, '$2$1');
+					var tDate = lastDate.replace(/(\d+[/])(\d+[/])/, '$2$1');
+					var data1 = new Date(sDate);
+					var data2 = new Date(tDate);
+				    if((date <= data2 && date >= data1)) {
+				    //alert(this.id);
+				    }else{
+				    	 $("#"+this.id).val("");
+				    	 bootbox.alert("Please select date between the financial year .")
+				    }
+			    }
+			}); 
+}); 
+ 
+ function saveFundForm(){
+	 if($("#finyearId").val() == ""){
+		bootbox.alert("Please Select Financial Year.");
+		$("#accountNo").focus();
+		return false;
+	 }else if($("#transDate").val() == ""){
+		bootbox.alert("Please select Fund Creation Date.");
+		$("#transDate").focus();
+		return false;
+	 }else if($("#fundTypeId").val() == ""){
+		bootbox.alert("Please select Fund Type.");
+		$("#fundTypeId").focus();
+		return false;
+	 }else if($("#turnover1Converted").val() == ""){
+		bootbox.alert("Please enter amount .");
+		$("#turnover1Converted").focus();
+		return false;
+	 }else{
+		 var flag = window.confirm("Do you want to continue ?");
+	  		if (flag == true) {
+	  			$('#fundForm select').prop('disabled', false);
+	  			$("#fundForm").submit();
+	  		}else{
+	  			e.preventDefault();
+	  		} 
+	 }
+ }
+ 
+ function getEntityNameByEntityTypeOrDistrictId(){
+	 
+		entitySchemeId=$("#entityTypeId").val();
+		districtId = $("#districtId").val();
+		 
+		 $.ajax({
+				type : "GET",
+				url : '${contextPath}/ecashcommon/getEntityNameByEntityTypeOrDistrictId',
+				dataType : "json",
+				data : {
+					"entitySchemeId" : entitySchemeId,
+					"districtId" : districtId,
+				},
+				success : function(response) {
+					var html = "<option value='' selected>-Select-</option>";
+					var lebelCode = response.lebelCode;
+					var data = response.entityList;
+					if (data != "" && data != null && data.length > 0) {
+						$.each(data, function(index, value) {
+							html = html + "<option value="+value.entityBnfMapId+">"
+									+ value.entityName + "</option>";
+						});
+					}
+					if(lebelCode=='STATE'){
+						$('#entityId').empty().append(html);
+						$("#districtDiv").addClass("hidden");
+						$("#entityDiv").removeClass("hidden");
+					}else if(lebelCode=='DISTRICT'){
+						$('#entityId').empty().append(html);
+						$("#districtDiv").addClass("hidden");
+						$("#entityDiv").removeClass("hidden");
+					}else if(lebelCode=='INSTITUTE' && districtId == ''){
+						$("#districtDiv").removeClass("hidden");
+						$("#entityDiv").removeClass("hidden");
+					}else if(lebelCode =='INSTITUTE' && districtId != ''){
+						$('#entityId').empty().append(html);
+						$("#districtDiv").removeClass("hidden");
+						$("#entityDiv").removeClass("hidden");
+					}else{
+						$("#districtDiv").addClass("hidden");
+						$('#entityId').empty().append(html);
+						$("#entityDiv").removeClass("hidden");
+					}
+					$("#entityId").val('${fund.entityBeneficiaryMapping.entityBeneficiaryId}');
+				},
+				error : function(error) {
+					bootbox.alert("Something went wrong !!!");
+				}
+			});
+		 
+	 }
+ 
+ $(document).ready(function() {
+		$("#fundForm input").prop("disabled", true);
+		$('#fundForm select').prop('disabled', true);
+		$(".datepick-trigger").prop('disabled', true);
+		getEntityNameByEntityTypeOrDistrictId();
+	});
+ $("#resetId").click(function(){
+	 $("#txtRemark").val("");
+	 $("#attachedDocument").val("");
+ });
+ </script>           

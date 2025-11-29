@@ -1,0 +1,160 @@
+package com.aashdit.construction.service;
+
+import com.aashdit.construction.model.ApplicationModuleMst;
+import com.aashdit.construction.model.EntityAppModuleMap;
+import com.aashdit.construction.repository.ApplicationModuleMstRepository;
+import com.aashdit.construction.repository.EntityAppModuleMapRepository;
+import com.aashdit.umt3.model.RoleRightLevelMaster;
+import com.aashdit.umt3.service.AccessService;
+import com.aashdit.umt3.service.RoleService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+public class EntityModuleMapServiceImpl implements EntityModuleMapService {
+	
+ 	@Autowired
+    private EntityAppModuleMapRepository entityAppModuleMapRepository;
+
+    @Autowired
+    private AccessService accessService;
+    
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private ApplicationModuleMstRepository applicationModuleMstRepository;
+	    
+	 @Override
+	    public void entityModuleMap(List<Long> moduleIds, Long entityId, Class<?> entityClass) {
+	        try {
+
+	            Optional<RoleRightLevelMaster> roleRightLevelMaster = accessService.getRoleRightLevelMasterByClass(entityClass);
+	            if (roleRightLevelMaster.isEmpty()) {
+	                return;
+	            }
+
+	            String levelCode = roleRightLevelMaster.get().getLevelCode();
+	            List<EntityAppModuleMap> entityAppList = entityAppModuleMapRepository.findAllByObjectIdAndObjectTypeAll(entityId, levelCode);
+
+	            // Deactivate existing mappings
+	            if (entityAppList != null && !entityAppList.isEmpty()) {
+	                entityAppList.forEach(detail -> detail.setIsActive(false));
+	                entityAppModuleMapRepository.saveAll(entityAppList);
+	            }
+
+	            // Process and save new or reactivated mappings
+	            if (moduleIds != null && !moduleIds.isEmpty()) {
+	                for (Long moduleId : moduleIds) {
+	                    if (moduleId == null) {
+	                        continue;
+	                    }
+	                    EntityAppModuleMap map = entityAppModuleMapRepository
+	                            .findByObjectIdAndObjectTypeAndAppModuleId_Id(entityId, levelCode, moduleId)
+	                            .orElse(new EntityAppModuleMap());
+
+	                    map.setIsActive(true);
+	                    map.setObjectId(entityId);
+	                    map.setObjectType(levelCode);
+	                    map.setAppModuleId(applicationModuleMstRepository.findById(moduleId)
+	                            .orElseThrow(() -> new RuntimeException("Application Module not found")));
+
+	                    entityAppModuleMapRepository.save(map);
+	                }
+	            }
+	        } catch (Exception e) {
+	            log.error("Error in EntityLevelServiceImpl::entityModuleMap", e);
+	        }
+	    }
+
+	@Override
+	public void entityModuleMap(String[] moduleCodes, Long entityId, Class<?> entityClass) {
+		try {
+			Optional<RoleRightLevelMaster> roleRightLevelMaster = accessService.getRoleRightLevelMasterByClass(entityClass);
+			if (roleRightLevelMaster.isEmpty()) {
+				return;
+			}
+
+			String levelCode = roleRightLevelMaster.get().getLevelCode();
+			List<EntityAppModuleMap> entityAppList = entityAppModuleMapRepository.findAllByObjectIdAndObjectTypeAll(entityId, levelCode);
+
+			// Deactivate existing mappings
+			if (entityAppList != null && !entityAppList.isEmpty()) {
+				entityAppList.forEach(detail -> detail.setIsActive(false));
+				entityAppModuleMapRepository.saveAll(entityAppList);
+			}
+
+			// Process and save new or reactivated mappings
+			if (moduleCodes != null) {
+				for (String moduleCode : moduleCodes) {
+					if (moduleCode == null) {
+						continue;
+					}
+					Optional<ApplicationModuleMst> applicationModuleMst = applicationModuleMstRepository.findByModuleCode(moduleCode);
+					if (applicationModuleMst.isEmpty()) {
+						continue;
+					}
+					EntityAppModuleMap map = entityAppModuleMapRepository
+							.findByObjectIdAndObjectTypeAndAppModuleId_Id(entityId, levelCode, applicationModuleMst.get().getId())
+							.orElse(new EntityAppModuleMap());
+
+					map.setIsActive(true);
+					map.setObjectId(entityId);
+					map.setObjectType(levelCode);
+					map.setAppModuleId(applicationModuleMst.get());
+
+					entityAppModuleMapRepository.save(map);
+				}
+			}
+
+		}catch (Exception e) {
+			log.error("Error in EntityLevelServiceImpl::entityModuleMap", e);
+		}
+	}
+
+	@Override
+	    public List<Long> getAppModuleIdByEntityIdAndCode(Long governingBodyId, Class<?> entityClass) {
+	        Optional<RoleRightLevelMaster> roleRightLevelMasterByLevelKeyClass = roleService.getRoleRightLevelMasterByLevelKeyClass(entityClass.getSimpleName() + ".class");
+	        if (!roleRightLevelMasterByLevelKeyClass.isPresent()) {
+	            return new ArrayList<>();
+	        }
+	        String code = roleRightLevelMasterByLevelKeyClass.get().getLevelCode();
+	        List<Long> appModulIds= new ArrayList<>();
+	        List<EntityAppModuleMap> entityAppList= new ArrayList<>();
+	        entityAppList=entityAppModuleMapRepository.findAllByIsActiveTrueAndObjectIdAndObjectType(governingBodyId,code);
+	        if(entityAppList!=null && !entityAppList.isEmpty()) {
+	            appModulIds=entityAppList.stream().map(a->a.getAppModuleId().getId()).collect(Collectors.toList());
+
+	        }
+	        return appModulIds;
+	    }
+
+	@Override
+	public List<EntityAppModuleMap> getPublicAndEntitySpecificEntityLevelCodeListList(Long entityId, String entityLevel) {
+		List<EntityAppModuleMap> entityHierarchyList = new ArrayList<>();
+		try {
+			entityAppModuleMapRepository.findAllByObjectIdAndObjectTypeAllActive(entityId, entityLevel).forEach(entityAppModuleMap -> {
+				EntityAppModuleMap mMap = new EntityAppModuleMap();
+				mMap.setEntityAppId(entityAppModuleMap.getEntityAppId());
+				mMap.setAppModuleId(entityAppModuleMap.getAppModuleId());
+				mMap.setObjectType(entityAppModuleMap.getObjectType());
+				mMap.setObjectId(entityAppModuleMap.getObjectId());
+				mMap.setIsActive(entityAppModuleMap.getIsActive());
+				mMap.setAppModuleId(entityAppModuleMap.getAppModuleId());
+				entityHierarchyList.add(mMap);
+
+			});
+		} catch (Exception e) {
+			log.error("Error in EntityModuleMapServiceImpl::getPublicAndEntitySpecificEntityLevelCodeListList", e);
+		}
+		return entityHierarchyList;
+	}
+
+}

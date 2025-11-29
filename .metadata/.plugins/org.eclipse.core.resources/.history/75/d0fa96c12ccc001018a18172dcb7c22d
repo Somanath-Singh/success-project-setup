@@ -1,0 +1,445 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+
+<%-- External Resources --%>
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+
+<%-- Inline CSS --%>
+<style>
+    .freeze {
+        pointer-events: none;
+    }
+    .card-title-add {
+        font-size: 14px;
+        margin: 0;
+        color: #000 !important;
+        font-weight: 500;
+    }
+    .btns {
+        border-radius: 0.2rem;
+        line-height: 14px;
+        padding: 6px 7px 6px 6px;
+        font-size: 13px;
+    }
+    .card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        padding: 10px;
+    }
+    .project-supercard {
+        border: 2px solid #ff6f61; /* Vibrant coral border */
+        border-radius: 0.5rem;
+        background: linear-gradient(135deg, #fff5f5, #fefefe); /* Soft gradient background */
+        padding: 20px;
+        margin-top: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+        box-shadow: 0 6px 12px rgba(255, 111, 97, 0.2); /* Subtle shadow with accent color */
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .project-card {
+        margin-bottom: 15px;
+        border: 2px solid #4ecdc4; /* Teal border for contrast */
+        border-radius: 0.5rem;
+        padding: 15px;
+        background: linear-gradient(135deg, #ffffff, #f9fdfd); /* Light gradient */
+        max-width: 100%;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .project-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(78, 205, 196, 0.1) 0%, transparent 70%);
+        animation: rotate 10s linear infinite;
+        z-index: 0;
+    }
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .project-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 10px 20px rgba(78, 205, 196, 0.3);
+        background: linear-gradient(135deg, #ffffff, #e6fafa);
+    }
+    .project-card h6 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #2c3e50; /* Dark slate for readability */
+        position: relative;
+        z-index: 1;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .project-card p {
+        margin: 0;
+        font-size: 1rem;
+        color: #34495e; /* Dark gray-blue for contrast */
+        position: relative;
+        z-index: 1;
+        line-height: 1.4;
+    }
+    .project-card .card-header {
+        background: linear-gradient(90deg, #4ecdc4, #45b7cd); /* Gradient header */
+        padding: 10px;
+        border-bottom: 2px solid #e0e0e0;
+        border-radius: 0.3rem 0.3rem 0 0;
+        color: #fff;
+        font-weight: 600;
+    }
+    .project-card .card-body {
+        padding-top: 15px;
+        position: relative;
+        z-index: 1;
+    }
+</style>
+
+<%-- Breadcrumb Navigation --%>
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Add BAMS Proposal</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa-solid fa-house"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Add Proposal</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<%-- Main Content --%>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <%-- Card Header --%>
+            <div class="card-header">
+                <c:choose>
+                    <c:when test="${not empty bamsRequisition.bamsRequisitionId}">
+                        <h5 class="card-title">Update Proposal</h5>
+                    </c:when>
+                    <c:otherwise>
+                        <h5 class="card-title">Add Proposal</h5>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
+            <%-- Card Body --%>
+            <div class="card-body">
+                <form class="form-horizontal" action="${contextPath}/BamsRequisition/saveBAMSRequisition" method="POST" id="bamsRequisitionForm" enctype="multipart/form-data">
+                    <%-- Hidden Inputs --%>
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <input type="hidden" id="cipherText" name="cipherText" value="">
+                    <input type="hidden" name="bamsRequisitionId" id="bamsRequisitionId" value="${bamsRequisition.bamsRequisitionId}">
+                    <input type="hidden" id="buttonCode" name="buttonCode">
+
+                    <%-- BAMSRequisition Details Form --%>
+                    <div class="row">
+                        <%-- BAMSRequisition Type --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Proposal Type:</label>
+                            <select id="bamsRequisitionType" name="bamsRequisitionType" class="form-control form-control-sm form-select" required>
+                                <option value="" selected disabled>- Select -</option>
+                                <c:forEach var="reqType" items="${bamsRequisitionTypeList}">
+                                    <option value="${reqType.valueEn}" ${bamsRequisition.bamsRequisitionType == reqType.valueEn ? 'selected' : ''}>
+                                        ${reqType.valueEn}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+
+                        <%-- District --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">District:</label>
+                            <select class="form-control form-control-sm form-select" id="distId" name="distId" required>
+                                <option value="0" selected disabled>- Select -</option>
+                                <c:forEach var="district" items="${districtList}">
+                                    <option value="${district.districtId}" ${district.districtId eq bamsRequisition.distId ? 'selected' : ''}>
+                                        ${district.districtName}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+
+                        <%-- Affiliation --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Affiliation Number:</label>
+                            <input type="text" id="affiliation" name="affiliation" placeholder="Enter Affiliation" class="form-control form-control-sm" required maxlength="15" value="${bamsRequisition.affiliation}">
+                        </div>
+
+                        <%-- Student Strength --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Student Strength:</label>
+                            <input type="number" id="studentStrength" name="studentStrength" placeholder="Enter Student Strength" class="form-control form-control-sm" required min="0" max="999999" value="${bamsRequisition.studentStrength}">
+                        </div>
+
+                        <%-- Land Record --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Land Record (acres):</label>
+                            <input type="text" id="landRecord" name="landRecord" pattern="^\d*\.?\d{0,2}$" placeholder="e.g., 12.55" class="form-control form-control-sm NumbersOnlyForAmount" required maxlength="10" value="${bamsRequisition.landRecord}">
+                        </div>
+
+                        <%-- Latitude --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Latitude:</label>
+                            <input type="number" step="any" id="latitude" name="latitude" placeholder="Enter Latitude" class="form-control form-control-sm" required min="-90" max="90" value="${bamsRequisition.latitude}">
+                        </div>
+
+                        <%-- Longitude --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Longitude:</label>
+                            <input type="number" step="any" id="longitude" name="longitude" placeholder="Enter Longitude" class="form-control form-control-sm" required min="-180" max="180" value="${bamsRequisition.longitude}">
+                        </div>
+
+                        <%-- Supporting Document --%>
+                        <div class="form-group col-md-3">
+                            <label>Supporting Proposal Document:</label>
+                            <div class="position-relative">
+                                <input type="file" id="supportingDocument" name="supportingDocument" class="form-control form-control-sm" onchange="uploadFileCheck(this)">
+                                <c:if test="${not empty bamsRequisition.supportingDocumentPath}">
+                                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${bamsRequisition.supportingDocumentPath}', 'BAMSREQUISITION_DOCUMENT')" title="View Document">
+                                        <i class="fa-regular fa-eye" title="View Document"></i>
+                                    </button>
+                                    <span style="font-size:12px;color:#7b3f00;font-weight:600;">${bamsRequisition.supportingDocumentPath}</span>
+                                </c:if>
+                                <div id="selectedFileName" class="mt-1 text-muted" style="font-size:0.9em;"></div>
+                            </div>
+                        </div>
+
+                        <%-- Legal Document Reference --%>
+                        <div class="form-group col-md-3">
+                            <label>Legal Document Reference:</label>
+                            <div class="position-relative">
+                                <input type="file" id="legalDocumentReference" name="legalDocumentReference" class="form-control form-control-sm" onchange="uploadFileCheck(this)">
+                                <c:if test="${not empty bamsRequisition.legalDocumentReferencepath}">
+                                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${bamsRequisition.legalDocumentReferencepath}', 'BAMSREQUISITION_LEGAL')" title="View Document">
+                                        <i class="fa-regular fa-eye" title="View Document"></i>
+                                    </button>
+                                    <span style="font-size:12px;color:#7b3f00;font-weight:600;">${bamsRequisition.legalDocumentReferencepath}</span>
+                                </c:if>
+                                <div id="selectedLegalFileName" class="mt-1 text-muted" style="font-size:0.9em;"></div>
+                            </div>
+                        </div>
+
+                        <%-- Affiliation Document --%>
+                        <div class="form-group col-md-3">
+                            <label>Affiliation Document:</label>
+                            <div class="position-relative">
+                                <input type="file" id="affiliationDocument" name="affiliationDocument" class="form-control form-control-sm" onchange="uploadFileCheck(this)">
+                                <c:if test="${not empty bamsRequisition.affiliationDocumentPath}">
+                                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${bamsRequisition.affiliationDocumentPath}', 'BAMSREQUISITION_AFFILIATION')" title="View Document">
+                                        <i class="fa-regular fa-eye" title="View Document"></i>
+                                    </button>
+                                    <span style="font-size:12px;color:#7b3f00;font-weight:600;">${bamsRequisition.affiliationDocumentPath}</span>
+                                </c:if>
+                                <div id="selectedAffiliationFileName" class="mt-1 text-muted" style="font-size:0.9em;"></div>
+                            </div>
+                        </div>
+
+                        <%-- Sketch Map --%>
+                        <div class="form-group col-md-3">
+                            <label>Sketch Map:</label>
+                            <div class="position-relative">
+                                <input type="file" id="sketchMap" name="sketchMap" class="form-control form-control-sm" onchange="uploadFileCheck(this)">
+                                <c:if test="${not empty bamsRequisition.sketchMapPath}">
+                                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${bamsRequisition.sketchMapPath}', 'BAMSREQUISITION_SKETCH')" title="View Document">
+                                        <i class="fa-regular fa-eye" title="View Document"></i>
+                                    </button>
+                                    <span style="font-size:12px;color:#7b3f00;font-weight:600;">${bamsRequisition.sketchMapPath}</span>
+                                </c:if>
+                                <div id="selectedSketchMapFileName" class="mt-1 text-muted" style="font-size:0.9em;"></div>
+                            </div>
+                        </div>
+
+                        <%-- Description --%>
+                        <div class="form-group col-md-6">
+                            <label class="required">Description:</label>
+                            <textarea id="description" name="description" rows="3" class="form-control form-control-sm" maxlength="500" required>${bamsRequisition.description}</textarea>
+                        </div>
+                    </div>
+
+                   <%-- Form Actions --%>
+							<div class="col-md-12 mt-3 text-center">
+							
+							    <!-- Back Button -->
+							    <button type="button" class="btn btn-secondary btns" onclick="goBack()">Back</button>
+							
+							    <!-- Save Button: visible only when creating new requisition -->
+							    <c:if test="${empty bamsRequisition.bamsRequisitionId}">
+							        <button type="button" class="btn btn-primary btns" onclick="submitFormWithCode('SAVE')">Save</button>
+							    </c:if>
+							
+							    <!-- Approve / Reject Buttons: visible only when updating existing requisition -->
+							    <c:if test="${not empty bamsRequisition.bamsRequisitionId}">
+							        <button type="button" class="btn btn-success btns" onclick="submitFormWithCode('UPDATE')">Approve</button>
+							        <button type="button" class="btn btn-danger btns" onclick="submitFormWithCode('UPDATE')">Reject</button>
+							    </c:if>
+							
+							</div>
+                </form>
+
+                <%-- Related Buildings Section (Displayed in Edit Mode) --%>
+                <c:if test="${not empty bamsRequisition.bamsRequisitionId and not empty bamsRequisition.latitude and not empty bamsRequisition.longitude}">
+                    <div class="mt-4">
+                        <h5>Related Buildings</h5>
+                        <div class="card project-supercard">
+                            <div class="card-body">
+                                <div class="row">
+                                    <c:forEach var="project" items="${relatedProjects}">
+                                        <div class="col-12 col-md-4">
+                                            <div class="card project-card">
+                                                <div class="card-header">
+                                                    <h6>${project.projectName}</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p><strong>Building Code:</strong> ${project.projectCode}</p>
+                                                    <p><strong>Building Type:</strong> ${project.projectType}</p>
+                                                    <p><strong>Completion Date:</strong> ${project.completionDate}</p>
+                                                    <p><strong>Latitude:</strong> ${project.latitude}</p>
+                                                    <p><strong>Longitude:</strong> ${project.longitude}</p>
+                                                    <p><strong>Distance:</strong> <fmt:formatNumber value="${project.distanceInKm}" pattern="#.##" /> km</p>
+                                                    <!-- Added static demo fields -->
+						                            <p><strong>Strength:</strong> 500</p>
+						                            <p><strong>Vacant:</strong> 25</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                    <c:if test="${empty relatedProjects}">
+                                        <div class="col-12">
+                                            <p class="text-center text-muted">No related buildings found within the radius.</p>
+                                        </div>
+                                    </c:if>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%-- Document View Form --%>
+<form action="${contextPath}/BamsRequisition/viewFile" method="get" id="documentFormView" target="_blank">
+    <input type="hidden" name="cipherText" id="cipherTextView">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="fileName" id="fileName" />
+    <input type="hidden" name="moduleName" id="moduleName" />
+</form>
+
+<%-- JavaScript Section --%>
+<script>
+function submitFormWithCode(code) {
+    event.preventDefault();
+    $("#buttonCode").val(code);
+    var bamsRequisitionType = $('#bamsRequisitionType').val();
+    var distId = $('#distId').val();
+    var description = $('#description').val();
+    var affiliation = $('#affiliation').val();
+    var studentStrength = $('#studentStrength').val();
+    var landRecord = $('#landRecord').val();
+    var latitude = $('#latitude').val();
+    var longitude = $('#longitude').val();
+
+    // Validation Checks
+    if (bamsRequisitionType == "") {
+        bootbox.alert("Please select BAMS Proposal Type.");
+        return false;
+    } else if (distId == "0" || distId == null) {
+        bootbox.alert("Please select District.");
+        return false;
+    } else if (description == "") {
+        bootbox.alert("Please enter Description.");
+        return false;
+    } else if (affiliation == "") {
+        bootbox.alert("Please enter Affiliation.");
+        return false;
+    } else if (studentStrength == "") {
+        bootbox.alert("Please enter Student Strength.");
+        return false;
+    } else if (landRecord == "") {
+        bootbox.alert("Please enter Land Record.");
+        return false;
+    } else if (latitude == "" || latitude < -90 || latitude > 90) {
+        bootbox.alert("Please enter a valid Latitude between -90 and 90.");
+        return false;
+    } else if (longitude == "" || longitude < -180 || longitude > 180) {
+        bootbox.alert("Please enter a valid Longitude between -180 and 180.");
+        return false;
+    }
+
+    var bizContent = $("#bamsRequisitionForm").serializeArray();
+    $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    bootbox.confirm("Do you want to continue?", function (result) {
+        if (result) {
+            $('#bamsRequisitionForm').submit();
+        }
+    });
+}
+
+function viewDocument(fileName, moduleName) {
+    $("#fileName").val(fileName);
+    $("#moduleName").val(moduleName);
+    var bizContent = $("#documentFormView").serializeArray();
+    $("#cipherTextView").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    $("#documentFormView").submit();
+}
+
+function uploadFileCheck(that) {
+    var ValidFileExtension = ['pdf', 'jpg', 'jpeg', 'png'];
+    if (that.files && that.files[0]) {
+        var fileName = that.files[0].name;
+        var extension = fileName.split('.').pop().toLowerCase();
+        if ($.inArray(extension, ValidFileExtension) == -1) {
+            bootbox.alert("Please upload only .pdf, .jpg, .jpeg, or .png files.");
+            $(that).val("");
+            return false;
+        }
+        if (that.files[0].size > 512000) { // 500KB
+            bootbox.alert("File size exceeds maximum file size of 500 KB!");
+            $(that).val("");
+            return false;
+        }
+        var targetId = that.id === 'supportingDocument' ? '#selectedFileName' :
+                       that.id === 'legalDocumentReference' ? '#selectedLegalFileName' :
+                       that.id === 'affiliationDocument' ? '#selectedAffiliationFileName' :
+                       '#selectedSketchMapFileName';
+        $(targetId).text(fileName);
+    } else {
+        bootbox.alert("Unsupported file format, please check your file extension.");
+        $(that).val("");
+    }
+}
+
+$(document).ready(function () {
+    $(".datepicker").datepick({
+        onShow: $.datepick.monthOnly,
+        dateFormat: "dd-mm-yyyy",
+        yearRange: "c-20:c+10",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>'
+    });
+});

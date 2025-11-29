@@ -1,0 +1,288 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<link href="${contextPath}/assets/css/dashboard.css" rel="stylesheet" type="text/css" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6"><h4 class="change-color">Add Asset</h4></div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="${contextPath}/home"><i class="fa fa-home"></i></a>
+                </li>
+                <li class="breadcrumb-item active">Add Asset</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Card Form -->
+<div class="card">
+    <div class="card-header">
+        <c:choose>
+            <c:when test="${not empty asset}">
+                <h5 class="card-title">Update Asset</h5>
+            </c:when>
+            <c:otherwise>
+                <h5 class="card-title">Add Asset</h5>
+            </c:otherwise>
+        </c:choose>
+    </div>
+    <div class="card-body">
+        <form action="${contextPath}/asset/save" id="assetForm" method="post">
+            <input type="hidden" id="cipherText" name="cipherText">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+            <input type="hidden" id="assetId" name="assetId" value="${asset.assetId}" />
+
+            <div class="row">
+                <!-- Asset Name -->
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="required">Asset Name :</label>
+                        <input type="text" id="assetName" name="assetName" value="${asset.assetName}" maxlength="50"
+                               class="form-control form-control-sm disablecopypaste" required />
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+					<div class="form-group">
+						<label class="required">Asset Type :</label> <select
+							id="assetType" name="assetType"
+							class="form-control form-control-sm form-select" required>
+
+							<option value="" selected>- Select -</option>
+
+							<c:forEach var="ast" items="${assetTypeList}">
+								<option value="${ast.valueEn}"${asset.assetType == ast.valueEn ? 'selected' : ''}>
+									${ast.valueEn}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</div>
+                
+                <!-- Asset Code -->
+				<c:if test="${not empty asset.assetId}">
+					<div class="col-md-3">
+						<div class="form-group">
+							<label>Asset Code :</label> <input type="text" id="assetCode"
+								name="assetCode" value="${asset.assetCode}" maxlength="50"
+								class="form-control form-control-sm disablecopypaste" readOnly />
+						</div>
+					</div>
+				</c:if>
+
+				<!-- Asset Life Span -->
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="required">Asset Life Span :</label>
+                        <input type="number" step="0.01" id="assetLifeSpan" name="assetLifeSpan"
+                               value="${asset.assetLifeSpan}" class="form-control form-control-sm" oninput="limitDigits(this, 5);"  required />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="text-center mt-4">
+                <c:choose>
+                    <c:when test="${not empty asset}">
+                        <input type="button" value="Update" class="btn btn-success btn-sm" onclick="submitAssetData()">
+                        <a href="${contextPath}/asset/add" class="btn btn-warning btn-sm">Back</a>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="button" value="Submit" class="btn btn-success btn-sm" onclick="submitAssetData()">
+                        <a href="${contextPath}/home" class="btn btn-warning btn-sm">Back</a>
+                        <button type="reset" class="btn btn-danger btn-sm">Reset</button>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Asset List -->
+<div class="col-md-12 mt-3">
+    <c:if test="${empty asset}">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Asset List</h5></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="basic-datatables" class="table table-bordered table-hover exportbtn">
+                        <thead>
+                        <tr>
+                            <th class="text-center" style="width:60px">Sl.No</th>
+                            <th>Asset Name</th>
+                            <th>Asset Code</th>
+                             <th>Asset Type</th>
+                            <th>Life Span</th>
+                             <th class="text-center">Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <c:forEach items="${assetList}" var="asset" varStatus="count">
+                            <tr>
+                                <td class="text-center">${count.count}</td>
+                                <td>${asset.assetName}</td>
+                                <td>${asset.assetCode}</td>
+                                <td>${asset.assetType}</td>
+                                
+<%--                                 <td>${asset.assetLifeSpan}</td> --%>
+                                <td>
+								    <c:set var="years" value="${asset.assetLifeSpan.intValue()}"/>
+								    <c:set var="months" value="${(asset.assetLifeSpan * 10) % 10}"/>
+								    <c:choose>
+								        <c:when test="${months == 0}">
+								            ${years} years
+								        </c:when>
+								        <c:otherwise>
+								            ${years} years ${months} months
+								        </c:otherwise>
+								    </c:choose>
+								</td>
+                               <td class="text-center">
+								    <button type="button"
+								            class="btn btn-sm toggleStatusBtn ${asset.isActive ? 'btn-success' : 'btn-danger'}"
+								            onclick="toggleAssetStatus(${asset.assetId}, ${asset.isActive})">
+								        <i class="fa ${asset.isActive ? 'fa-unlock' : 'fa-lock'}"></i>
+								    </button>
+								</td>
+                                <td class="text-center">
+                                    <button class="btn btn-warning btn-sm" onclick="editAssetForm(${asset.assetId})" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </c:if>
+</div>
+
+<!-- Scripts -->
+<script>
+function submitAssetData() {
+    var assetId = $("#assetId").val();
+    var assetName = $("#assetName").val();
+    var assetLifeSpan = $("#assetLifeSpan").val();
+
+    if (!assetName || assetName.trim() === "") {
+        bootbox.alert("Please enter Asset Name");
+        $("#assetName").focus();
+        return false;
+    } else if (!assetLifeSpan || parseFloat(assetLifeSpan) <= 0) {
+        bootbox.alert("Please enter valid Asset Life Span");
+        $("#assetLifeSpan").focus();
+        return false;
+    } else {
+        $.ajax({
+            type: "GET",
+            url: contextPath + "/asset/validate-assetName",
+            data: { 
+                assetName: assetName.trim(),
+                assetId: assetId 
+            },
+            success: function(isDuplicate) {
+                if (isDuplicate === true) {
+                    bootbox.alert("Asset Name already exists. Please provide another.");
+                    $("#assetName").val("").focus();
+                    return false;
+                } else {
+                    submitAssetForm(); 
+                }
+            },
+            error: function(err) {
+                console.error("Error validating asset name:", err);
+                submitAssetForm();
+            }
+        });
+    }
+}
+
+function submitAssetForm() {
+    var bizContent = $("#assetForm").serializeArray();
+    $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    bootbox.confirm("Do You Want To Continue?", function(result) {
+        if (result) {
+            showLoader();
+            $("#assetForm").submit();
+        }
+    });
+}
+
+    function editAssetForm(id) {
+        $("#assetEditId").val(id);
+        var bizContent = $("#editForm").serializeArray();
+        $("#editCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+        bootbox.confirm("Do You Want To Continue?", function(result) {
+            if (result) {
+                showLoader();
+                $("#editForm").submit();
+            }
+        });
+    }
+    
+    function toggleAssetStatus(assetId, status) {
+        let msg = status === true 
+            ? "Do you want to In-Activate this Asset?" 
+            : "Do you want to Activate this Asset?";
+
+        bootbox.confirm(msg, function (result) {
+            if (result) {
+                showLoader();
+                $.ajax({
+                    type: "GET",
+                    url: "${contextPath}/asset/toggle-status",
+                    data: { 
+                    	assetId: assetId 
+                    	},
+                    success: function (isActive) {
+                        hideLoader();
+                        var button = $("button[onclick*='toggleAssetStatus(" + assetId + ",']");
+                        if (isActive === true) {
+                            button.removeClass("btn-danger").addClass("btn-success");
+                            button.html('<i class="fa fa-unlock"></i>');
+                            button.attr("onclick", "toggleAssetStatus(" + assetId + ", true)");
+                        } else if (isActive === false) {
+                            button.removeClass("btn-success").addClass("btn-danger");
+                            button.html('<i class="fa fa-lock"></i>'); 
+                            button.attr("onclick", "toggleAssetStatus(" + assetId + ", false)");
+                        } else {
+                            bootbox.alert("Something went wrong while updating asset status.");
+                        }
+                    },
+                    error: function (error) {
+                        hideLoader();
+                        console.error("Error toggling asset status:", error);
+                        bootbox.alert("Server error occurred. Please try again.");
+                    }
+                });
+            }
+        });
+    }
+
+    function limitDigits(input, maxDigits) {
+        let val = input.value.replace(/[^0-9]/g, '');
+
+        if (val.length > maxDigits) {
+            val = val.slice(0, maxDigits);
+        }
+
+        input.value = val;
+    }
+
+
+    
+</script>
+
+<form action="${contextPath}/asset/edit" method="post" id="editForm">
+    <input type="hidden" id="editCipherText" name="cipherText">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" id="assetEditId" name="assetId" />
+</form>

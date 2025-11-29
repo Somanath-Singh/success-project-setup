@@ -1,0 +1,334 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="voucherTypee" value="${voucherDto.voucherTypeId}" />
+<c:set var="stageId" value="${voucherStageId}"/>
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+
+<style>
+.modaltabledata th {
+    line-height: 16px;
+    font-size: 13px !important;
+    font-weight: 400;
+}
+.tablemodal .modal-footer{
+padding:0
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-exit{
+margin-top:7px;
+}
+.modaltop-data {
+    font-size: 14px;
+}
+.tablemodal .modal-body {
+    padding-bottom: 0;
+}
+.lftdata {
+    width: 50%;
+    float: left;
+    font-size: 14px;
+}
+.rgtdata {
+    width: 50%;
+    float: right;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+.is-invalid {
+	border-color: red;
+}
+
+table.tableizer-table {
+	width: 100%;
+	font-size: 13px;
+	border: 1px solid #CCC;
+	letter-spacing: -0.75px;
+	font-family: "Open Sans", Arial, sans-serif;
+}
+
+.tableizer-table td {
+	padding: 1px 2px 1px 3px;
+	border: 1px dotted #CCC;
+}
+
+.tableizer-table th {
+	padding: 1px;
+	margin: 1px;
+	border: 1px dotted #CCC;
+	font-weight: bold;
+}
+
+.tableizerTitleRow {
+	text-align: left;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+.table>tbody>tr>td {
+	word-break: break-all;
+}
+
+.datepicker_con>input {
+	width: 100%;
+	border-radius: 3px;
+	border: 1px solid #aaaaaa;
+}
+
+.datepicker_con>button {
+	display: none;
+}
+
+.dif-color {
+	background: #094328;
+}
+
+ .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-left {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header-right {
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .nested-table th, .nested-table td {
+            padding: 5px;
+            font-size: 12px;
+        }
+
+        .nested-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .nested-table th, .nested-table td {
+            border: 1px solid #ddd;
+        }
+
+        .transaction-table-wrapper {
+            padding: 10px 0;
+        }
+
+</style>
+
+<script>
+$(function()
+{
+	$('#datatable-default').dataTable({
+ 		"bSort": false,
+ 		"autoWidth": false
+	});
+})
+</script>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">General Ledger Report</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">General Ledger Report</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">General Ledger Report</h5>
+			</div>
+				<div class="card-body" id="partyDtlsInRequest">
+										<form class="form-horizontal form-bordered" action="${contextPath}/report/getGeneralLedgerReportData" method="get" id="filter" >
+                                             <input type="hidden" value="true" id="labelmsg" name="labelmsg">
+										     <div class="row"> 
+										     
+								            <c:set var="ownFunctions" value="getSelectedLowerEntity" />
+										    <c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+											<c:set var="upperOrDown" value="down" />
+											<c:set var="functionList2" value=""/>
+											<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+												<div class="col-md-2 col-sm-3">
+												    <div class="form-group">
+												        <label for="FinancialYear" class="required">Select Financial Year :</label>
+												        <div class="col-md-12">
+												            <select class="form-control require remove form-select" name="finYearId" id="finYearId" onchange="getFinYearStartEndDates(this.value,'N');" data-plugin-selectTwo>
+												                <c:forEach items="${loadData.finYearList}" var="fin">
+												                    <option value="${fin.finyearId}" ${fin.finyearId eq finYearId ?'selected':''}>${fin.finYear}</option>
+												                </c:forEach>
+												            </select>
+												        </div>
+												    </div>
+												</div>
+
+												<%-- <div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="FinancialYear" class="required ">Division </label> 
+														  <div class="col-md-12">
+															<select class="form-control require remove" name="officeMasterId" id="officeMasterId" onchange="gettingDepartmentList(this.value,0);" data-plugin-selectTwo>
+										                        <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+										                        <c:forEach items="${loadData.officeMasterList}" var="off">
+																	  <option value="${off.id}"${off.id eq officeMasterId?'selected':''}>${off.name}</option> 
+																</c:forEach>
+										                 	</select>
+														</div>
+													</div>
+												</div> --%>
+									            <div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="section" class="required">Account Name :</label>
+														<div class="">
+															<select class="form-control require  remove form-select" id="accountId" name="accountId">
+																 <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+										                        <c:forEach items="${loadData.accountList}" var="acc">
+																	  <option value="${acc.id}"${acc.id eq accountId? 'selected':''}>${acc.name}</option> 
+																</c:forEach>
+															</select>
+														</div>
+													</div>
+												</div>
+												<div class="form-group col-md-2">
+		 		                                   <label for="startDate" class="required">Start Date :</label>
+		 		                                   <div class="datepicker-box"> 
+		 		                                       <input type="text" class="form-control datepicker require  remove disabled" id="startDate" name="startDate" value="${startDate}" autocomplete="off" maxlength="25" readonly>
+				                                   </div>
+					                            </div>
+												<div class="form-group col-md-2">
+		 		                                   <label for="endDate" class="required">End Date :</label>
+		 		                                   <div class="datepicker-box"> 
+		 		                                       <input type="text" class="form-control datepicker require  remove disabled" id="endDate" name="endDate" value="${endDate}" autocomplete="off" maxlength="25" readonly>
+				                                   </div>
+					                            </div>
+											</div>
+										
+											
+											<div class="row mt-3">
+							                    <div class="col-sm-12" style="">
+							                    	
+							                    
+							                        <div class="form-group text-center">
+							                            <button type="button" class="btn btn-success" onclick="submitFormData();" style="">
+							                                <spring:message code="COMMON.BUTTON.FILTER" />
+							                            </button>
+							                            <a href="${contextPath}/home">
+							                                <input type="button" class="btn btn-warning" value=<spring:message code="COMMON.BUTTON.BACK"></spring:message>>
+							                            </a>
+							                        </div>
+							                    </div>
+							                </div> 
+							                
+							   
+							    
+									     </form>
+									     <hr>
+									      <div class="col-md-12 col-sm-12" style="text-align:center">
+								<!-- <img src="/fams/assets/image/aashdit-A.png" style="width: 48px;">
+									<h3>AASHDIT TECHNOLOGIES LLP.</h3>
+									<h5>4th floor, Galaxy Mall,Raghunathpur, Bhubaneswar</h5> -->
+									<h5>${loadData.organisationName}</h5>
+								</div>
+							                
+						   <table class="table table-bordered">
+							        <thead>
+							            <tr>
+							                <th class="text-center">Sl No.</th>
+						                    <th>Voucher No. & Date	</th>
+						                    <!-- <th>Office	</th> -->
+						                    <th>Party Code & Name</th>
+						                    <th>Project Code & Name</th>
+						                    <th>Work Code & Name</th>
+						                    <th>Narration</th>
+						                    <th class="text-end">Debit Amt. (Rs.)</th>
+						                    <th class="text-end">Credit Amt. (Rs.)</th>
+							            </tr>
+							        </thead>
+							        <tbody>
+							            <c:forEach var="data" items="${accountLedgherReportData}" varStatus="count">
+							                <tr class="">
+							                   <td class="text-center">${count.count}</td>
+							                   <td>${data.finalVoucherNo} (${data.finalVoucherDate})</td>
+							                  <%--  <td>${data.officeName}</td> --%>
+							                   <td>${data.partyCode} | ${data.partyName}</td>
+							                   <td>${data.projectCode} | ${data.projectName}</td>
+							                   <td>${data.workCode} | ${data.workName}</td>
+							                   <td>${data.narration}</td>
+							                   <td class="text-end">${data.debitAmount}</td>
+							                   <td class="text-end">${data.creditAmount}</td>
+							                </tr>
+						                </c:forEach>
+							        </tbody>
+							    </table>
+									  </div>
+								   </div>
+							</section>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+ 
+
+<script>
+
+$(document).ready(function() {
+
+});
+
+function submitFormData(){
+	if($("#upperEntityId").val()==''){
+		bootbox.alert("please select the entity..");
+		return false;
+	}
+	if(validateForm()){
+	 if(encryptFormData('filter', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('filter');
+		 }
+	}
+}
+function getSelectedLowerEntity(){
+	var entityIdLevelCombo= '${entityIdLevelCombo}';
+	 $("#upperEntityId").val(entityIdLevelCombo);
+ }
+
+</script>

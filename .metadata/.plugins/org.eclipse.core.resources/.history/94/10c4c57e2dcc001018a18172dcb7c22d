@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="get_work_estimation_vs_invoice_amount" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f70fe413-6596-44e0-a4f6-72896d6cc2b6">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ERP_FAMS"/>
+	<queryString language="SQL">
+		<![CDATA[select * from fams.get_work_estimation_vs_invoice_amount()]]>
+	</queryString>
+	<field name="project_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="project_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="project_name"/>
+	</field>
+	<field name="project_code" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="project_code"/>
+		<property name="com.jaspersoft.studio.field.label" value="project_code"/>
+	</field>
+	<field name="estimation_no" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="estimation_no"/>
+		<property name="com.jaspersoft.studio.field.label" value="estimation_no"/>
+	</field>
+	<field name="estimation_date" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="estimation_date"/>
+		<property name="com.jaspersoft.studio.field.label" value="estimation_date"/>
+	</field>
+	<field name="work_estimation_id" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="work_estimation_id"/>
+		<property name="com.jaspersoft.studio.field.label" value="work_estimation_id"/>
+	</field>
+	<field name="total_estimated_amount" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="total_estimated_amount"/>
+		<property name="com.jaspersoft.studio.field.label" value="total_estimated_amount"/>
+	</field>
+	<field name="total_invoice_amount" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="total_invoice_amount"/>
+		<property name="com.jaspersoft.studio.field.label" value="total_invoice_amount"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="550" height="30" backcolor="#578EAD" uuid="ce62e877-bb96-466a-a85c-1795166690f0"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Work Estimation vs Invoice Amount]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="80" height="30" uuid="1268c965-3148-4d35-8b10-4ef656a9af97">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a62fd3ea-442f-45aa-b343-c8a68472f370"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Project Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="80" y="0" width="79" height="30" uuid="4a2bddc6-4440-4ee4-b815-371e18dbfa73">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="85fb0ca9-0860-46fd-810f-8bb5608003c8"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Project Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="159" y="0" width="100" height="30" uuid="bd5b7ac8-fa29-48ae-b3ea-3eccc75a8466">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4c4c064d-7ea6-4345-987a-8a0845e9fbfc"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Estimation No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="259" y="0" width="100" height="30" uuid="e89fb899-daa6-4491-974e-f8a8460165be">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2e52d65a-9bc6-4439-8ec1-4682ad9266a3"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Estimation Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="359" y="0" width="90" height="30" uuid="142c19fb-cfdd-4b53-837c-4ecf3f3c57ec">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c00352b1-4f14-44e0-a7dc-a258a343854a"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Estimated Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="449" y="0" width="101" height="30" uuid="63c33f80-ecc3-4603-9d88-b9677f244edc">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cde6adf5-7883-419a-8814-08a284c1a804"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Invoice Amount]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="79" height="30" uuid="c7c9605f-e969-42ab-ad10-774fb9f39566">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a62fd3ea-442f-45aa-b343-c8a68472f370"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{project_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="0" width="79" height="30" uuid="588e103b-5145-4453-93d7-de85a28d802b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="85fb0ca9-0860-46fd-810f-8bb5608003c8"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{project_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="159" y="0" width="99" height="30" uuid="58f18961-959e-4cbe-b46a-ee697db31a3e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4c4c064d-7ea6-4345-987a-8a0845e9fbfc"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{estimation_no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="259" y="0" width="100" height="30" uuid="f51f0bab-af0a-4ba3-92b7-0c605c02479f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2e52d65a-9bc6-4439-8ec1-4682ad9266a3"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{estimation_date} == null || $F{estimation_date}.toString().trim().isEmpty() 
+    ? "N/A" 
+    : new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{estimation_date})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="359" y="0" width="90" height="30" uuid="0c908e6b-96c8-4569-a4f4-de3827fe4264">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c00352b1-4f14-44e0-a7dc-a258a343854a"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{total_estimated_amount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="449" y="0" width="101" height="30" uuid="8f3a6419-7424-4a8a-a03c-de1e3a499b1c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cde6adf5-7883-419a-8814-08a284c1a804"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{total_invoice_amount}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

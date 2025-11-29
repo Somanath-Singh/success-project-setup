@@ -1,0 +1,459 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<link href="${contextPath}/assets/css/dashboard.css" rel="stylesheet"
+	type="text/css" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Add Asset Transaction</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i
+						class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active">Add Asset Transaction</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+
+<div class="card">
+	<div class="card-header">
+		<c:choose>
+			<c:when test="${not empty assetTransaction}">
+				<h5 class="card-title">Update Asset Transaction</h5>
+			</c:when>
+			<c:otherwise>
+				<h5 class="card-title">Add Asset Transaction</h5>
+			</c:otherwise>
+		</c:choose>
+	</div>
+	<div class="card-body">
+		<form action="${contextPath}/assetTransaction/save"
+			id="assetTransactionForm" method="post">
+			<input type="hidden" id="cipherText" name="cipherText"> <input
+				type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+			<input type="hidden" id="assetTransactionId"
+				name="assetTransactionId"
+				value="${assetTransaction.assetTransactionId}" /> <input
+				type="hidden" id="isActive" name="isActive"
+				value="${assetTransaction.isActive}" />
+
+			<div class="row">
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput required" for="financialYear">Financial
+							Year :</label>
+						<div class="">
+							<select class="form-control form-control-sm form-select"
+								id="financialYearId" name="financialYearId"
+								onchange="getProjectByFinancialYear(this.value)">
+								<option value="0" selected disabled>- Select -</option>
+								<c:forEach items="${financialYearList}" var="fy"
+									varStatus="index">
+									<option value="${fy.financialYearId}"
+										${ fy.financialYearId eq assetTransaction.financialYearId ? 'selected' : ''}>${fy.financialYear}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="smallInput required" for="projectId">Building
+							:</label>
+						<div class="">
+							<select class="form-control form-control-sm select2 form-select"
+								id="projectId" name="projectId"
+								onchange="LoadProjectEstimationByProjectId(this.value)">
+								<option value="0" selected disabled>- Select -</option>
+								<c:if test="${not empty assetTransaction}">
+									<c:forEach items="${projectList}" var="project">
+										<option value="${project.projectId}"
+											${ project.projectId eq assetTransaction.projectId ? 'selected' : ''}>
+											${project.projectName}</option>
+									</c:forEach>
+								</c:if>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label>Asset :</label>
+						<div class="col-md-12">
+							<select id="assetId" name="assetId"
+								class="form-control form-control-sm form-select select2"
+								onchange="getAssestLifeSpanByAssetId(this.value);getAssetTypeByAssetId(this.value);">
+								<option value="0" selected disabled>- Select -</option>
+								<c:forEach items="${assetList}" var="asset">
+									<option value="${asset.assetId}"
+										${asset.assetId eq assetTransaction.assetId ? 'selected' : ''}>${asset.assetName}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-12 required">Purchase No :</label>
+						<div class="col-md-12">
+							<input type="text" id="purchaseNo" name="purchaseNo"
+								value="${assetTransaction.purchaseNo}" maxlength="20"
+								class="form-control form-control-sm disablecopypaste"
+								required="required" />
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-12">Asset Type :</label>
+						<div class="col-md-12">
+							<input type="text"  id="assetType"
+								name="assetType" value="${assetTransaction.assetType}"
+								class="form-control form-control-sm" readonly />
+						</div>
+					</div>
+				</div>				
+
+				<div class="col-md-3">
+					<label class="required">Purchase Date :</label>
+					<div class="datepicker-box">
+						<input type="text" id="purchaseDate" name="purchaseDate"
+							value="${assetTransaction.purchaseDate}"
+							class="form-control form-control-sm datepicker " required
+							readonly>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-12 required">Quantity :</label>
+						<div class="col-md-12">
+							<input type="number" step="0.01" id="quantity" name="quantity"
+								value="${assetTransaction.quantity}"
+								class="form-control form-control-sm"
+								oninput="validateInput(this);" required />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-12 required">Price :</label>
+						<div class="col-md-12">
+							<input type="number" step="0.01" id="price" name="price"
+								value="${assetTransaction.price}"
+								class="form-control form-control-sm"
+								oninput="validateInput(this);" required />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-12">Total Price :</label>
+						<div class="col-md-12">
+							<input type="number" step="0.01" id="totalPrice"
+								name="totalPrice" value="${assetTransaction.totalPrice}"
+								class="form-control form-control-sm" readonly />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-12">Asset Life Span :</label>
+						<div class="col-md-12">
+							<input type="number" step="0.01" id="assetLifeSpan"
+								name="assetLifeSpan" value="${assetTransaction.assetLifeSpan}"
+								class="form-control form-control-sm" readonly />
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="text-center mt-4">
+				<c:choose>
+					<c:when test="${not empty assetTransaction}">
+						<input type="button" value="Update" class="btn btn-success btn-sm"
+							onclick="submitAssetData()">
+						<a href="${contextPath}/assetTransaction/add"
+							class="btn btn-warning btn-sm">Back</a>
+					</c:when>
+					<c:otherwise>
+						<input type="button" value="Submit" class="btn btn-success btn-sm"
+							onclick="submitAssetData()">
+						<a href="${contextPath}/home" class="btn btn-warning btn-sm">Back</a>
+						<button type="reset" class="btn btn-danger btn-sm">Reset</button>
+					</c:otherwise>
+				</c:choose>
+			</div>
+
+		</form>
+	</div>
+</div>
+
+<div class="col-md-12 mt-3">
+	<c:if test="${empty assetTransaction}">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Asset Transaction List</h5>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table id="basic-datatables"
+						class="table table-bordered table-hover exportbtn">
+						<thead>
+							<tr>
+								<th class="text-center" style="width: 60px">Sl.No</th>
+								<th>Purchase No</th>
+								<th>Purchase Date</th>
+								<th>Asset</th>
+								<th>Quantity</th>
+								<th>Price</th>
+								<th>Total Price</th>
+								<th class="text-center">Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach items="${transactionList}" var="t" varStatus="count">
+								<tr>
+									<td class="text-center">${count.count}</td>
+									<td>${t.purchaseNo}</td>
+									<td>${t.purchaseDate}</td>
+									<td>${t.assetName}</td>
+									<td>${t.quantity}</td>
+									<td>${t.price}</td>
+									<td>${t.totalPrice}</td>
+									<td class="text-center">
+										<button class="btn btn-warning btn-sm"
+											onclick="editAssetForm(${t.assetTransactionId})" title="Edit">
+											<i class="fas fa-edit"></i>
+										</button>
+									</td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</c:if>
+</div>
+
+<script>
+
+function submitAssetData() {
+    var assetTransactionId = $("#assetTransactionId").val();
+    var financialYearId = $("#financialYearId").val();
+    var projectId = $("#projectId").val();
+    var assetId = $("#assetId").val();
+    var purchaseNo = $("#purchaseNo").val();
+    var purchaseDate = $("#purchaseDate").val();
+    var quantity = $("#quantity").val();
+    var price = $("#price").val();
+    var totalPrice = $("#totalPrice").val();
+
+    if (!financialYearId || financialYearId === "0") {
+        bootbox.alert("Please select a Financial Year");
+        $("#financialYearId").focus();
+        return false;
+    }else if (!projectId || projectId === "0") {
+        bootbox.alert("Please select a Project");
+        $("#projectId").focus();
+        return false;
+    }else if (!assetId || assetId === "0") {
+        bootbox.alert("Please select an Asset");
+        $("#assetId").focus();
+        return false;
+    }else if (!purchaseNo || purchaseNo.trim() === "") {
+        bootbox.alert("Please enter Purchase No");
+        $("#purchaseNo").focus();
+        return false;
+    }else if (!purchaseDate || purchaseDate.trim() === "") {
+        bootbox.alert("Please select Purchase Date");
+        $("#purchaseDate").focus();
+        return false;
+    }else if (!quantity || parseFloat(quantity) <= 0) {
+        bootbox.alert("Please enter valid Quantity");
+        $("#quantity").focus();
+        return false;
+    }else if (!price || parseFloat(price) <= 0) {
+        bootbox.alert("Please enter valid Price");
+        $("#price").focus();
+        return false;
+    }else if (!totalPrice || parseFloat(totalPrice) <= 0) {
+        bootbox.alert("Please enter Total Price");
+        $("#totalPrice").focus();
+        return false;
+    }else{
+    	  $.ajax({
+    	        type: "GET",
+    	        url: "${contextPath}/assetTransaction/validate-purchaseNo",
+    	        data: 
+    	        	{ 
+    	        	purchaseNo: purchaseNo, 
+    	        	assetTransactionId: assetTransactionId
+    	        	},
+    	        success: function(isDuplicate) {
+    	            if (isDuplicate === true) {
+    	                bootbox.alert("Purchase No already exists. Please provide another.");
+    	                $("#purchaseNo").val("").focus();
+    	                return false;
+    	            } else {
+    	                submitAssetForm(); 
+    	            }
+    	        },
+    	        error: function(err) {
+    	            console.error("Error validating purchaseNo:", err);
+    	            submitAssetForm(); 
+    	        }
+    	    });
+    }
+}
+
+    function submitAssetForm() {
+        var bizContent = $("#assetTransactionForm").serializeArray();
+        $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+        bootbox.confirm("Do You Want To Continue?", function(result) {
+            if (result) {
+                showLoader();
+                $("#assetTransactionForm").submit();
+            }
+        });
+    }
+
+    function editAssetForm(id) {
+        $("#assetTransactionEditId").val(id);
+        var bizContent = $("#editForm").serializeArray();
+        $("#editCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+        bootbox.confirm("Do You Want To Continue?", function(result) {
+            if (result) {
+                showLoader();
+                $("#editForm").submit();
+            }
+        });
+    }
+    
+    function getProjectByFinancialYear(finYearId){
+        $.ajax({
+            url: "${contextPath}/common/fetch-approved-project-by-financialYear",
+            type: "GET",
+            data: {
+            	financialYearId: finYearId
+            },
+            success: function (projects) {
+       
+                var projectSelect = $("#projectId");
+                projectSelect.empty(); 
+                projectSelect.append('<option value="0" selected disabled>- Select -</option>');
+                
+                $.each(projects, function(index, project) {
+                    projectSelect.append('<option value="' + project.projectId + '">' + project.projectName + '</option>');
+                });
+            },
+            error: function (error) {
+                bootbox.alert("Error fetching projects :",error);
+            }
+        });
+    }
+    
+    function getAssestLifeSpanByAssetId(assetId){
+        $.ajax({
+            url: "${contextPath}/assetTransaction/fetchAssetLifeSpanByAssetId",
+            type: "GET",
+            data: {
+            	assetId: assetId
+            },
+            success: function (assetLifeSpan) {
+                $("#assetLifeSpan").val(assetLifeSpan);
+            },
+            error: function (error) {
+                bootbox.alert("Error fetching asset life span :",error);
+            }
+        });
+    }
+    
+    function getAssetTypeByAssetId(assetId){
+    	debugger;
+        $.ajax({
+            url: "${contextPath}/assetTransaction/getAssetTypeByAssetId",
+            type: "GET",
+            data: {
+            	assetId: assetId
+            },
+            success: function (assetType) {
+                $("#assetType").val(assetType);
+            },
+            error: function (error) {
+                bootbox.alert("Error fetching asset life span :",error);
+            }
+        });
+    }
+    
+    $(document).ready(function () {
+        $(".datepicker").datepick({
+            onShow: $.datepick.monthOnly,
+            dateFormat: "dd-mm-yyyy",
+            yearRange: "c-20:c+10",
+            showOnFocus: true,
+            showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+            onSelect: function () {
+                applyStartEndDateLimit();
+            }
+        });
+    });
+    
+    
+    function validateInput(input) {
+    	let value = input.value;     
+        value = value.replace(/[^0-9.]/g, "");     
+        let parts = value.split(".");
+        if (parts.length > 2) {
+            value = parts[0] + "." + parts.slice(1).join("");
+        }      
+        if (parts[1] && parts[1].length > 2) {
+            parts[1] = parts[1].slice(0, 2);
+            value = parts.join(".");
+        }
+      
+        if (value.length > 12) {
+            value = value.slice(0, 12);
+        }
+
+        input.value = value;
+    }
+    
+    
+    $(document).ready(function() {
+        function calculateTotal() {
+            let quantity = parseFloat($("#quantity").val()) || 0;
+            let price = parseFloat($("#price").val()) || 0;
+            let total = quantity * price;
+            $("#totalPrice").val(total.toFixed(2));
+        }
+        $("#quantity, #price").on("input", function() {
+            calculateTotal();
+        });
+
+        calculateTotal();
+    });
+    
+</script>
+
+<form action="${contextPath}/assetTransaction/edit" method="post"
+	id="editForm">
+	<input type="hidden" id="editCipherText" name="cipherText"> <input
+		type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" id="assetTransactionEditId"
+		name="assetTransactionId" />
+</form>

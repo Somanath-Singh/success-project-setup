@@ -1,0 +1,320 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+<style>
+    .btn-danger {
+        border-bottom: 1px solid #dc3545;
+        padding: 7px 10px;
+    }
+</style>
+					<!-- #######################################################  EDUCATION DETAILS TAB  ####################################################### -->
+					
+						<form action="${contextPath}/staff/saveStaffDetails" id="education" method="post" enctype="multipart/form-data">
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+							<input type="hidden" id="staffId" name="staffId" value="${staffDetails.staffId}" />
+	                         <input type="hidden" name="pageCode" id="pageCode" value="education"/> 
+
+							<h6 class="headingbg mb-4" style="margin-top: 25px;">Education Details :
+								<br>
+								<br>
+								Add New Row
+								<button type="button" id="plus_empEdu" class="btn btn-xs btn-success add-row-fa-plus" onclick="addEducationDtlsRow();" title="Add New Row" style="width: auto;padding:6px 8px;">
+									<i class="fa fa-plus"></i>
+								</button>
+							</h6>
+
+							<c:choose>
+								<c:when test="${ empty staffDetails.staffEducationList}">
+									<div class="row">
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-sm-12 required" for="empEducationalQualification">Educational Qualification</label>
+												<input type="hidden" id="staffEductId" class="validIdIndexx" name="staffEducationList[0].staffEduId"/>
+												<div class="col-sm-12">
+													<select class="form-control form-select require edu validAreaIndexx" name="staffEducationList[0].qualificationId" data-plugin-selectTwo id="empEducationalQualification0" >
+														<option value=""><spring:message code="label.common.select"></spring:message></option>
+														<c:forEach var="educ" items="${satffLoadData.educList}">
+															<option value="${educ.qualificationId}" ${educ.qualificationId eq mapEduc.qualificationId.qualificationId ? 'selected' : ''}>${educ.qualificationName}</option>
+														</c:forEach>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-sm-12 required">University/Board</label>
+												<div class="col-sm-12">
+													<input type="text" class="form-control form-control-sm require validFacIndexx" name="staffEducationList[0].universityBoardName" id="universitySchoolName0" maxlength="50" value="${mapEduc.universityBoardName}">
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-sm-12 required">Institution</label>
+												<div class="col-sm-12">
+													<input type="text" class="form-control form-control-sm require validMokIndexx" name="staffEducationList[0].institutionName" id="institution0" maxlength="50" value="${mapEduc.institutionName}">
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-sm-12 required">Passing Year</label>
+												<div class="col-sm-12">
+													<input type="text" class="NumbersOnlyWithoutDot form-control require form-control-sm NumbersOnly validDumIndexx" name="staffEducationList[0].yearOfPassing" id="yearOfPassing0" maxlength="4" value="${mapEduc.yearOfPassing}" onchange="validateYear(this)">
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-sm-12 required">Percentage</label>
+												<div class="col-sm-12">
+													<input type="text" class="form-control form-control-sm percentageOnly require validRumIndex" name="staffEducationList[0].marksPercentage" id="percentageCGPA0" maxlength="6" value="${mapEduc.marksPercentage}" onblur="validateDecimalField('percentageCGPA0',2,6,'Percentage')">
+												</div> 
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-sm-12 required">Stream</label>
+												<div class="col-sm-12">
+													<input type="text" class="form-control form-control-sm require validPumIndex" name="staffEducationList[0].streamName" id="stream0" maxlength="50" value="${mapEduc.streamName}">
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-sm-12">Upload Certificate</label>
+												<div class="col-sm-12">
+													<input type="file" name="certificate" id="fileUpload0" class="form-control form-control-sm validNumIndex" value="${mapEduc.universityBoardName}" />
+													<p style="font-size: 12px;color:#0000ffb8;">(.pdf, .png, .jpg and .jpeg, max 2 MB)</p>
+													<c:if test="${not empty mapEduc.certificateUploadPath}">
+														<a class="download-doc-href btn btn-primary position-absolute" title="Download" target="_blank" href="${contextPath}/staff/downloadDoc/${staffDetails.staffCode}/certificate" style="right: 0; top:0; padding:8px;">
+															<i class="fa-solid fa-download"></i>
+														</a>
+													</c:if>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row"><div id="eduTbody"></div></div>
+								</c:when>
+								<c:otherwise>
+									<c:forEach items="${staffDetails.staffEducationList}" var="mapEduc" varStatus="status">
+										<div class="row <c:if test="${status.index gt 0}"> add-multi-row</c:if>" id="edurow${status.index}">
+											<input type="hidden" id="staffId" name="staffId" value="${empeBasicDetails.staffMaster.staffId}" />
+											<input type="hidden" class="validIdIndexx" id="staffEductId" name="staffEducationList[${status.index}].staffEduId" value="${mapEduc.staffEduId}" />
+											<input type="hidden" id="eduStatus${status.index}" name="staffEducationList[${status.index}].eduStatus" value="false" />
+
+											<div class="col-md-3">
+												<div class="form-group">
+													<c:if test="${status.index eq 0}"><label class="col-sm-12 required" for="empEducationalQualification">Educational Qualification</label></c:if>
+													<div class="col-sm-12">
+														<select class="form-control form-select require edu validAreaIndexx" name="staffEducationList[${status.index}].qualificationId" data-plugin-selectTwo id="empEducationalQualification${status.index}" >
+															<option value=""><spring:message code="label.common.select"></spring:message></option>
+															<c:forEach var="educ" items="${satffLoadData.educList}">
+																<option value="${educ.qualificationId}" ${educ.qualificationId eq mapEduc.qualificationId.qualificationId ? 'selected' : ''}>${educ.qualificationName}</option>
+															</c:forEach>
+														</select>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-3">
+												<div class="form-group">
+													<c:if test="${status.index eq 0}"><label class="col-sm-12 required">University/Board</label></c:if>
+													<div class="col-sm-12">
+														<input type="text" class="form-control form-control-sm require validFacIndexx" name="staffEducationList[${status.index}].universityBoardName" id="universitySchoolName${status.index}" maxlength="50" value="${mapEduc.universityBoardName}">
+													</div>
+												</div>
+											</div>
+											<div class="col-md-3">
+												<div class="form-group">
+													<c:if test="${status.index eq 0}"><label class="col-sm-12 required">Institution</label></c:if>
+													<div class="col-sm-12">
+														<input type="text" class="form-control form-control-sm require validMokIndexx" name="staffEducationList[${status.index}].institutionName" id="institution${status.index}" maxlength="50" value="${mapEduc.institutionName}">
+													</div>
+												</div>
+											</div>
+											<div class="col-md-3">
+												<div class="form-group">
+													<c:if test="${status.index eq 0}"><label class="col-sm-12 required">Passing Year</label></c:if>
+													<div class="col-sm-12">
+														<input type="text" class="NumbersOnlyWithoutDot form-control require form-control-sm NumbersOnly validDumIndexx" name="staffEducationList[${status.index}].yearOfPassing" id="yearOfPassing${status.index}" maxlength="4" value="${mapEduc.yearOfPassing}" onchange="validateYear(this)">
+													</div>
+												</div>
+											</div>
+											<div class="col-md-3">
+												<div class="form-group">
+													<c:if test="${status.index eq 0}"><label class="col-sm-12 required">Percentage</label></c:if>
+													<div class="col-sm-12">
+														<input type="text" class="float-number form-control require form-control-sm percentageOnly validRumIndex" name="staffEducationList[${status.index}].marksPercentage" id="percentageCGPA${status.index}" maxlength="5" value="${mapEduc.marksPercentage}" onblur="validateDecimalField('percentageCGPA' + ${status.index},2,6,'Percentage')">
+													</div>
+												</div>
+											</div>
+											<div class="col-md-3">
+												<div class="form-group">
+													<c:if test="${status.index eq 0}"><label class="col-sm-12 required">Stream</label></c:if>
+													<div class="col-sm-12">
+														<input type="text" class="form-control form-control-sm require validPumIndex" name="staffEducationList[${status.index}].streamName" id="stream${status.index}" maxlength="50" value="${mapEduc.streamName}">
+													</div>
+												</div>
+											</div>
+											<div class="col-md-3">
+												<div class="form-group">
+													<c:if test="${status.index eq 0}"><label class="col-sm-12">Upload Certificate</label></c:if>
+													<div class="col-sm-12 position-relative">
+														<c:if test="${not empty mapEduc.certificateUploadPath}">
+															<a class="download-doc-href btn btn-primary position-absolute" title="File Download" href="${contextPath}/staff/downloadDoc/${mapEduc.staffEduId}/certificate" target="_blank" style="right: 0; top: 0;padding: 8px;">
+																<i class="fa-solid fa-download view-upld-doc-fa"></i>
+															</a>
+														</c:if>
+														<input type="file" name="certificate" id="fileUpload${status.index}" class="form-control form-control-sm validNumIndex" value="${mapEduc.universityBoardName}" <c:if test="${status.index gt 0}"> style="width: 98%; display: inline;" </c:if> onchange="uploadFileCheck(this);" />
+														<p style="font-size: 12px;color:#0000ffb8;">(.pdf, .png, .jpg and .jpeg, max 2 MB)</p>
+														<c:if test="${status.index gt 0}">
+															<button type="button" onclick="deleteEduRow('${status.index}');" class="  btn btn-danger remove-row-fa-minus" >
+																<i class="fa fa-trash"></i>
+															</button>
+														</c:if>
+													</div>
+												</div>
+											</div>
+										</div>
+									</c:forEach>
+
+									<div style="width: 100%"><div id="eduTbody"></div></div>
+								</c:otherwise>
+							</c:choose>
+							<div id="empEduTbody"></div>
+							<%-- <div class="col-md-12 text-center" style="margin-top: 15px;">
+								<hr style="margin-top: 5px;" />
+								<div class="form-group">
+									<c:if test="${_StaffDetails.serviceStatusCode eq 'ONSERVICE' || _StaffDetails.serviceStatusCode eq 'SUSPENDED'}">
+									<button type="button" class="btn-submit" onclick="validateEducationFormData();">Update</button>
+									</c:if>
+									<a href="" class="btn btn-cancel">Cancel</a>
+								</div>
+							</div> --%>
+							<div class="col-md-12 text-center" style="margin-top: 15px;">
+	                  <hr style="margin-top: 5px;" />
+	                  <div class="form-group">
+	                     <button type="button" onclick="submitForm('education');" class="btn btn-success btn-sm">Save</button>
+						 <a href="${contextPath}/staff/staffMemberList" class="btn btn-warning btn-sm">Back to List</a>
+	                  </div>
+	               </div>
+						</form>
+						
+<script>
+
+						function addEducationDtlsRow() {
+							var empEduCount=0;
+							var fields = document.getElementsByClassName("edu");
+							empEduCount = fields.length;
+							
+							
+						    var htmldata = '<div class="row add-multi-row btn-color" id="edurow' + empEduCount + '"><input type="hidden" class="validIdIndexx" id="staffEductId' + empEduCount + '" name="staffEducationList[' + empEduCount + '].staffEductId" />';
+						    htmldata += '<div class="col-md-3"><div class="form-group"><div class="col-sm-12"><select name="staffEducationList[' + empEduCount + '].qualificationId" id="empEducationalQualification' + empEduCount + '" class="form-control form-select require edu validAreaIndexx"> <option value=""><spring:message code="label.common.select"></spring:message></option><c:forEach var="educ" items="${satffLoadData.educList}"><option value="${educ.qualificationId}" ${educ.qualificationId eq editBranchMaster.bankBranchMaster.bankId.bankId ? 'selected' : ''}>${educ.qualificationName}</option></c:forEach></select></div></div></div>';
+						    htmldata += '<div class="col-md-3"><div class="form-group"><div class="col-sm-12"><input type="text" class="form-control form-control-sm require validFacIndexx" name="staffEducationList[' + empEduCount + '].universityBoardName" id="universitySchoolName' + empEduCount + '" maxlength="50"></div></div></div>';
+						    htmldata += '<div class="col-md-3"><div class="form-group"><div class="col-sm-12"><input type="text" class="form-control form-control-sm require validMokIndexx" name="staffEducationList[' + empEduCount + '].institutionName" id="institution' + empEduCount + '" maxlength="50"></div></div></div>';
+						    htmldata += '<div class="col-md-3"><div class="form-group"><div class="col-sm-12"><input type="text" class="NumbersOnlyWithoutDot form-control form-control-sm NumbersOnly require validDumIndexx" name="staffEducationList[' + empEduCount + '].yearOfPassing" id="yearOfPassing' + empEduCount + '" maxlength="4" onchange="validateYear(this)"></div></div></div>';
+						    htmldata += '<div class="col-md-3"><div class="form-group"><div class="col-sm-12"><input type="text" class="float-number form-control form-control-sm percentageOnly require validRumIndex" name="staffEducationList[' + empEduCount + '].marksPercentage" id="percentageCGPA' + empEduCount + '" maxlength="6" onblur="validateDecimalField(\'percentageCGPA' + empEduCount + '\',2,6,\'Percentage\')"></div></div></div>';
+
+						    htmldata += '<div class="col-md-3" ><div class="form-group"><div class="col-sm-12"><input type="text" class="form-control form-control-sm require validPumIndex" name="staffEducationList[' + empEduCount + '].streamName" id="stream' + empEduCount + '" maxlength="50"></div></div></div>';
+						    htmldata += '<div class="col-md-3"><div class="form-group"><input type="file" name="certificate" id="fileUpload' + empEduCount + '" class="form-control form-control-sm validNumIndex" /><p style="font-size: 12px;color:#0000ffb8;">(.pdf, .png, .jpg and .jpeg, max 2 MB)</p></div></div>';
+						    htmldata += '<div class="col-md-2" ><button type="button" onclick="deleteEduRow(' + empEduCount + ');" class=" btn btn-danger remove-row-fa-minus" ><i class="fa fa-trash"></i></button></div></div></div>';
+
+						    var qualificationId = $("#empEducationalQualification" + (empEduCount-1)).val();
+						    var universityId = $("#universitySchoolName" + (empEduCount-1)).val();
+						    var institution = $("#institution" + (empEduCount-1)).val();
+						    var yearOfPassing = $("#yearOfPassing" + (empEduCount-1)).val();
+						    var percentageCGPA = $("#percentageCGPA" + (empEduCount-1)).val();
+                             
+						    if ( qualificationId !== "" && universityId !== "" && institution !== "" && yearOfPassing !== "" && percentageCGPA !== "") {
+						    	//newRow.innerHTML = htmldata;
+						    	// document.getElementById("eduTbody").appendChild(newRow);
+						    	$("#eduTbody").append(htmldata);
+						        empEduCount++;
+						    } else {
+						        bootbox.alert("Can't add empty row");
+						        count11 = currRowCount;
+						        $("#eduTbody").val(currRowCount);
+						    }
+						}
+						
+						
+						function deleteEduRow(rowId) {
+							var rowToDelete = "#edurow" + rowId;
+							$("#eduStatus"+rowId).val(true);
+							$(rowToDelete).remove();
+							//removeTransactionRow(rowId,'eduTbody','edurow','deleteEduRow');
+
+							empEduCount=rowId--;
+							renumberRowsEdu();
+						}
+
+						function renumberRowsEdu() {
+							var numIdInputs = $(".validIdIndexx").length;
+							var numAreaInputs = $(".validAreaIndexx").length;
+							var numFacInputs=  $(".validFacIndexx").length;
+							var numMokInputs=  $(".validMokIndexx").length;
+							var numDumInputs=  $(".validDumIndexx").length;
+							var validRumIndex=  $(".validRumIndex").length;
+							var validPumIndex=  $(".validPumIndex").length;
+							var validNumIndex=  $(".validNumIndex").length;
+							for (var i = 0; i < numIdInputs; i++) {
+								var input = $(".validIdIndexx")[i];
+								$(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+								$(input).attr("name", "staffEducationList["+i+"].staffEduId");
+							}
+
+							for (var i = 0; i < numAreaInputs; i++) {
+								var input = $(".validAreaIndexx")[i];
+								$(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+								$(input).attr("name", "staffEducationList["+i+"].qualificationId");
+							}
+
+							for (var i = 0; i < numFacInputs; i++) {
+								var input = $(".validFacIndexx")[i];
+								$(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+								$(input).attr("name", "staffEducationList["+i+"].universityBoardName");
+							}
+
+							for (var i = 0; i < numMokInputs; i++) {
+								var input = $(".validMokIndexx")[i];
+								$(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+								$(input).attr("name", "staffEducationList["+i+"].institutionName");
+							}
+
+							for (var i = 0; i < numDumInputs; i++) {
+								var input = $(".validDumIndexx")[i];
+								$(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+								$(input).attr("name", "staffEducationList["+i+"].yearOfPassing");
+							}
+
+							for (var i = 0; i < validRumIndex; i++) {
+								var input = $(".validRumIndex")[i];
+								$(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+								$(input).attr("name", "staffEducationList["+i+"].marksPercentage");
+							}
+
+							for (var i = 0; i < validPumIndex; i++) {
+								var input = $(".validPumIndex")[i];
+								$(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+								$(input).attr("name", "staffEducationList["+i+"].streamName");
+							}
+
+							for (var i = 0; i < validNumIndex; i++) {
+								var input = $(".validNumIndex")[i];
+								$(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+								// $(input).attr("name", "staffEducationList["+i+"].contactNumber");
+							}
+						}
+</script>
+						
+						
+						
+
+	         
+	         

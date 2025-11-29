@@ -1,0 +1,424 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+	<c:set var="userDetails" value="${serviceOutcome.data}"/> 
+<sec:authentication var="principal" property="principal" />
+
+<style>
+.mandotory::before {
+  content: '* '; /* Display an asterisk followed by a space before the header text */
+  color: red;    /* Optionally, set the color to red or any other desired color */
+}
+
+.required::before {
+  content: '* '; /* Display an asterisk followed by a space before the header text */
+  color: red;    /* Optionally, set the color to red or any other desired color */
+}
+.disabled-dropdown {
+    pointer-events: none;
+    background-color: #eee; /* Optional: Change the background color to visually indicate it's disabled */
+}
+
+.mandatory-field {
+    border: 1px solid #b3432f;
+/*     background-color: #ffb2a8; /* Adjust the background color as needed */ */
+}
+
+	.hidden {
+    display: none;
+}
+
+.add-more {
+    padding: 0;
+    height: 18px;
+    width: 18px;
+    background: green;
+    border: 0px;
+    color: #fff;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 50px;
+    margin-left: 2px;
+    font-size: 9px;
+   }
+      .main-panel {
+    position: fixed;
+    top: 67px;
+    left: 0px; 
+    /* width: calc(100% - 265px); */
+    width: 100%;
+    height: 100vh;
+    transition: 0.5s all;
+    padding: 5px;
+}
+
+.requiredFieldStarMark {
+	color: red;
+	font-size: 15px;
+}
+.hide_scroll .table-responsive {
+    overflow-y: hidden;
+    scrollbar-color: #94bcf7 transparent;
+}
+</style>
+<div class="container-fluid">
+    <div class="breadcrumb_conatiner">
+            <div class="col-md-6">
+               <h4 class="change-color">Vacancy Details</h4>
+            </div>
+            <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Vacancy Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+            
+            <div class="row">
+                <div class="col-md-12">
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h5 class="card-title">Vacancy Details</h5>
+                    </div>
+                    <div class="card-body">
+
+				     <div class="row">
+		                <div class="col-md-12">
+		                    <div class="card">
+		                        <div class="card-body hide_scroll">
+		                            <div class="table-responsive">
+		                            	<table class="DataTable table table-bordered">
+		                            		<thead>
+		                            			<tr>
+		                            				<th style="text-align:center;">Sl No.</th>
+		                            				<th>Organization Name</th>
+		                            				<th>Entity Name</th>
+		                            				<th>Designation</th>
+		                            				<th>Vacancy Location</th>
+		                            				<th>Job Type</th>
+		                            				<th>Publish Date</th>
+		                            				<th>Application Deadline Date</th>
+		                            				<th>View Details</th>
+<%-- 		                            				<c:if test="${level eq 'PUBLIC'}"> --%>
+                    				                 <th>Apply</th>
+<%--                     				                </c:if> --%>
+		                            			</tr>
+		                            		</thead>
+		                            		<tbody>
+		                            		    <c:forEach items="${vacancyList}" var="vaca" varStatus="count">
+			                            		    <tr>
+			                            		      <td style="text-align:center;">${count.count}</td>
+			                            		      <td>${vaca.corporateName}</td>
+			                            		      <td>${vaca.levelName}</td>
+			                            		      <td>${vaca.roleId.displayName}</td>
+			                            		      <td>${vaca.jobLocation.jobLocationName}</td>
+			                            		      <td>${vaca.jobType.jobTypeName}</td>
+			                            		      <td>
+													    <c:choose>
+													        <c:when test="${not empty vaca.publicationDate}">
+													            <fmt:formatDate value="${vaca.publicationDate}" pattern="dd/MM/yyyy" />
+													        </c:when>
+													        <c:otherwise>
+													            NA
+													        </c:otherwise>
+													    </c:choose>
+													 </td>
+													 <td>
+													    <c:choose>
+													        <c:when test="${not empty vaca.applicationDeadline}">
+													            <fmt:formatDate value="${vaca.applicationDeadline}" pattern="dd/MM/yyyy" />
+													        </c:when>
+													        <c:otherwise>
+													            NA
+													        </c:otherwise>
+													    </c:choose>
+													  </td>
+													  <td>
+													    <button title="View Job Description" type="button" 
+							                                onclick="viewDetails('${vaca.vacancyId}')" class="btn btn-xs btn-primary">
+							                                <i class="fas fa-eye"></i> View
+							                            </button>
+													  </td>
+<%-- 												<c:if test="${level eq 'PUBLIC'}">	   --%>
+			                            		      <td>
+<%-- 			                            		        <button title="View Job Description and Apply" type="button" onclick="openModal('${vaca.vacancyId}')" class="btn btn-xs btn-primary"> --%>
+<!-- 														    <i class="fas fa-briefcase"></i> Apply -->
+<!-- 														</button> -->
+														  <c:choose>
+										                        <c:when test="${vaca.checkedVacstatus == 'Active'}">
+										                            <button title="View Job Description and Apply" type="button" 
+										                                onclick="openModal('${vaca.vacancyId}')" class="btn btn-xs btn-primary">
+										                                <i class="fas fa-briefcase"></i> Apply
+										                            </button>
+										                        </c:when>
+										                        <c:otherwise>
+										                            <span>${vaca.checkedVacstatus}</span>
+										                        </c:otherwise>
+									                    </c:choose>
+												 	  </td>
+<%-- 												    </c:if>	   --%>
+			                            			</tr>
+		                            			</c:forEach>
+		                            		</tbody>
+		                            	</table>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+                     </div>
+
+			  </div>
+			</div>
+		  </div>
+	 </div>
+	 
+	 
+	 <!-- Modal -->
+<div id="registrationModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enter Your Registration Number</h5>
+                <button type="button" class="close" onclick="closeModal()" aria-label="Close" style="font-size:37px;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="registrationNumber">Registration Number</label>
+                    <input type="text" id="registrationNumber" class="form-control" placeholder="Enter your registration number">
+                    <small id="errorText" class="text-danger" style="display: none;">Registration number is required.</small>
+                </div>
+                <div class="mt-3">
+                    <p class="text-muted">
+                        Not registered? 
+                        <a href="${contextPath}/public/getCandidateRegistrationPage" class="text-primary">Sign up here</a>.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="validateAndProceed()">Proceed</button>
+                <button type="button" class="btn btn-danger" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="messageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">${applied_message}</h5>
+                <!-- Close button (cross mark) -->
+                <button type="button" class="close" onclick="closeModal()" aria-label="Close" style="font-size: 37px;" data-bs-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+  </body>
+</html>
+<form action="${contextPath}/public/candApplyPpge" method="post" id="candApplyPpge">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+<input type="hidden" name="hiddenVacId"  id="hiddenVacId" value="">
+<input type="hidden" name="hiddenRegistrationNumber"  id="hiddenRegistrationNumber" value="">
+</form>
+<script>
+
+function submitForm() {
+    debugger;
+
+    // Array of field objects: { fieldId, errorMessage, isRequired }
+    const fields = [
+    	 { id: "objectIdAndTypeId", message: "Please select organization.", isRequired: true },
+    	 { id: "levelSelect", message: "Please select a level.", isRequired: true },
+    	 { id: "levelNameSelect", message: "Please select a level name.", isRequired: true },
+    	 { id: "roleSelect", message: "Please select a role.", isRequired: true },
+        { id: "jobLocationId", message: "Please select a Job Location.", isRequired: true },
+        { id: "jobTypeId", message: "Please select a Job Type.", isRequired: true },
+        { id: "noOfVacancy", message: "No.of is required.", isRequired: true },
+        { id: "salaryMin", message: "Minimum Salary is required.", isRequired: true },
+        { id: "salaryMax", message: "Maximum Salary is required.", isRequired: true },
+        { id: "jobSummary", message: "Job Summary is required.", isRequired: true }, 
+        { id: "keyResponsibilities", message: "Key Responsibilities are required.", isRequired: true }, 
+        { id: "qualificationId", message: "Please select a Qualification.", isRequired: true },
+        { id: "skillsRequired", message: "Skills Required is required.", isRequired: true }, 
+        { id: "preferredQualifications", message: "Preferred Qualifications is required.", isRequired: true }, 
+//         { id: "applicationDeadline", message: "Application Deadline is required.", isRequired: false },
+        { id: "recruiterContact", message: "Recruiter Contact is required.", isRequired: true },
+        { id: "jobBenefits", message: "Job Benefits are required.", isRequired: false }, 
+        { id: "workSchedule", message: "Work Schedule is required.", isRequired: false },
+        { id: "travelRequirements", message: "Please specify Travel Requirements.", isRequired: false },
+//         { id: "isPublished", message: "Please specify if the Job is Published.", isRequired: false },
+//         { id: "publicationDate", message: "Publication Date is required when Published.", isRequired: false },
+    ];
+
+
+//     if ($("#isPublished").is(":checked")  && $("#publicationDate").val().trim()=='') {
+//         alert("Publication Date is required when the job is published.");
+//         $("#publicationDate").focus();
+//         return false;
+//     }
+
+//     if ($("#publicationDate").val().trim()!='' && $("#applicationDeadline").val().trim()=='') {
+//         alert("Application Deadline is required when Publication Date is set.");
+//         $("#applicationDeadline").focus();
+//         return false;
+//     }
+    
+//  // Validate that publication date is less than or equal to application deadline
+//   const publicationDateValue = $("#publicationDate").val().trim();
+//   const applicationDeadlineValue = $("#applicationDeadline").val().trim();
+
+// 	if (publicationDateValue !== '' && applicationDeadlineValue !== '') {
+// 	    const publicationDate = parseDate(publicationDateValue);
+// 	    const applicationDeadline = parseDate(applicationDeadlineValue);
+	
+// 	    if (publicationDate > applicationDeadline) {
+// 	        alert("Publication Date cannot be greater than the Application Deadline.");
+// 	        $("#publicationDate").focus();
+// 	        return false;
+// 	    }
+// 	}
+    
+    // Validate fields
+    for (const field of fields) {
+        const element = document.getElementById(field.id);
+        if (field.isRequired && (!element || !element.value.trim())) {
+            alert(field.message);
+            element.focus();
+            return false;
+        }
+    }
+
+    // Validate salary range
+    const salaryMin = parseFloat(document.getElementById("salaryMin").value);
+    const salaryMax = parseFloat(document.getElementById("salaryMax").value);
+
+    if (salaryMin > salaryMax) {
+    	bootbox.alert("Minimum Salary cannot be greater than Maximum Salary.");
+        document.getElementById("salaryMin").focus();
+        return false;
+    }
+
+    // Optional confirmation message
+    const confirmMessage = "Do you want to proceed with saving this vacancy?";
+    if (!confirm(confirmMessage)) {
+        return false;
+    }else{
+    	  // Submit the form
+        document.getElementById("saveVaccancy").submit();
+    }
+
+}
+
+
+let currentVacId = null;
+
+// Function to open the modal
+function openModal(vacId) {
+    currentVacId = vacId;
+    document.getElementById("registrationModal").style.display = "block";
+    $("#registrationNumber").val('');
+}
+
+// Function to close the modal
+function closeModal() {
+    document.getElementById("registrationModal").style.display = "none";
+    document.getElementById("registrationNumber").value = ""; // Reset the input
+    document.getElementById("errorText").style.display = "none"; // Hide error
+    
+    document.getElementById("messageModal").style.display = "none";
+  //  location.reload(); 
+}
+
+// Function to validate the registration number and proceed
+function validateAndProceed() {
+    const registrationNumber = document.getElementById("registrationNumber").value.trim();
+    const errorText = document.getElementById("errorText");
+
+    if (!registrationNumber) {
+        errorText.style.display = "block"; // Show error message
+    } else {
+        errorText.style.display = "none"; // Hide error message
+        checkRegdNum(currentVacId,registrationNumber); // Call the function with the vacancy ID
+    }
+}
+
+
+function viewDetails(vacId){
+	document.getElementById("hiddenVacId").value = vacId;
+   // document.getElementById("hiddenRegistrationNumber").value = 0;
+    document.getElementById("candApplyPpge").submit();
+}
+
+// Function to submit the form
+function getApplyPage(vacId,registrationNumber) {
+    document.getElementById("hiddenVacId").value = vacId;
+    document.getElementById("hiddenRegistrationNumber").value = registrationNumber;
+    document.getElementById("candApplyPpge").submit();
+}
+
+
+
+function parseDate(input) {
+    const parts = input.split('/'); // Split by "/"
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Months are 0-based in JavaScript
+    const year = parseInt(parts[2], 10);
+
+    return new Date(year, month, day);
+}
+
+function checkRegdNum(currentVacId,registrationNumber){
+	debugger
+	 $.ajax({
+	        url: "${contextPath}/public/checkRegistrationNumber",
+	        type: "GET",
+	        data: {
+	            "registrationNumber": registrationNumber,
+	            "currentVacId":currentVacId,
+	        },
+
+	        success: function (response) {
+	            if (response == 'SIGNUP') {
+	                bootbox.alert("Registration number not found. Please sign up first .");
+	                $("#registrationNumber").val('');
+	                return false;
+	            }else if(response == 'APPLIED'){
+// 	            	 bootbox.alert("You have already applied for this vacancy.");
+// 		                $("#registrationNumber").val('');
+	            	getApplyPage(currentVacId,registrationNumber);
+	            } else {
+	            	getApplyPage(currentVacId,registrationNumber);
+	            }
+	        }
+	    });
+}
+
+$(document).ready(function() {
+	debugger
+	//$('#messageModal').modal('show');
+    var appliedMessage = '${applied_message}';
+    
+    if (appliedMessage != '') {
+        // Show the modal using jQuery
+        $('#messageModal').modal('show');
+    }
+    
+});
+</script>

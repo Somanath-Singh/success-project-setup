@@ -1,0 +1,44 @@
+package com.aashdit.prod.heads.common.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.aashdit.prod.heads.hims.umt.utils.Auditable;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "t_asset_procurement_additional_cost", schema = "asset_mgmt")
+public class AdditionalCost extends Auditable<Long> implements Serializable {
+
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "add_cost_id", nullable = false)
+    private Long addCostId;
+    
+    @Column(name = "add_cost_name", nullable = false)
+    private String addCostName;
+    
+    @Column(name = "add_cost")
+    private double addCost;
+    
+    @Column(name = "add_cost_type", nullable = false)
+    private String addCostType;
+    
+    @Column(name = "add_cost_type_id", nullable = false)
+    private Long addCostTypeId;
+}

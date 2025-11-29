@@ -1,0 +1,197 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<div class="breadcrumb_conatiner">
+              <div class="col-md-6">
+                <h4 class="change-color">Add Store</h4>
+              </div>
+              <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                  	<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+					<li class="breadcrumb-item active" aria-current="page">Add Store</li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+
+              <div class="row">
+                <div class="col-md-12">
+				<div class="card">
+                    <div class="card-header">
+                      <h5 class="card-title">Add Store</h5>
+                    </div>
+                    <div class="card-body">
+		<form  method="POST" action="${contextPath}/inventory/store/save" id="addStoreFrm">
+		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+		<input type="hidden" id="storeId" name="storeId"  value="${store.storeId }">
+		<input type="hidden" class="" id="encodedDataaddStoreFrm" name="encodedDataFrm" value="" />
+		<div class="row">
+		 <div class="col-md-12" >  
+		 	<div class="row align-items-center">
+
+			<c:if test="${isThisLevelIsCreator}">
+				<c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+				<c:set var="upperOrDown" value="down" />
+				<c:set var="isMultiple" value="true" />
+				<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+			</c:if>
+
+
+
+		 		<div class="form-group col-md-2">
+		 			<label class="col-md-12 required" for="text">Store Name:</label>
+		 			<input class="form-control form-control-sm thisisRequiredField" type="text" id="storeName" name="storeName"  placeholder="Enter Store name" value="${store.storeName}" maxlength="30" >
+		 		</div>
+		 		<div class="form-group col-md-2">
+		 			<label class="col-md-12 " for="text">Store Code:</label>
+		 			<input class="form-control form-control-sm" type="text" name="storeCodeStr" id="storeCode" placeholder="Store code" value="${store.storeCodeStr}" maxlength="100" readonly>
+		 		</div>
+
+				 
+
+				<c:if test="${not empty store.storeId }">
+					<div class="form-group col-md-1 mt-3 toggleTrueFalse" data-label-on="True" data-label-off="False" data-toggle-width="90">
+						<input type="checkbox" value="${store.isActive}" class="toggleCheckBox" ${store.isActive == 'true' ? 'checked' : ''} id="parametros_MOSTRAPEDIDOS" name="isActive" />
+						<label class="clickToggle" for="parametros_MOSTRAPEDIDOS"></label>
+					</div>
+				</c:if>
+
+				
+
+		 		<div class="col-md-12 btn-div">
+		 		 <input type="button" class="btn btn-success" value="${not empty store.storeId  ? 'Update' : 'Save' }" onclick="validateForms()">
+		       	<a type="button"  class="btn  btn-danger" onclick="backToModule()">Cancel</a>
+
+				<c:if test="${not empty store.storeId  }">
+					<a type="button" href="${contextPath}/inventory/store/add" class="btn btn-submit" >Add New</a>
+				</c:if>
+
+		       </div>
+		 </div>
+		 </div>
+		 </div>
+	 </form>
+	 
+	 </div>
+	 </div>
+	 <div class="col-md-12 mt-3">
+	 <div class="card">
+                    <div class="card-header">
+                      <h5 class="card-title">Add Store List</h5>
+                    </div>
+                    <div class="card-body">
+
+			<div class="row">
+				<%@ include file="/WEB-INF/views/entityIdAndUserLevelListDrp.jsp"%>
+			</div>
+			
+	 <table class="datatable table table-striped table-bordered exportbtn mt-3">
+		
+	 	<thead>
+	 		<tr>
+	 			<th>Sl No</th>
+	 			<th>Store Name</th>
+	 			<th>Store Code</th>
+				<th>Creator Entity</th>
+				<th>Active/InActive</th>
+	 			<th>Action</th>
+	 		</tr>	
+	 	</thead>
+	 	<tbody>
+	 		<c:forEach items="${storeList}" var="store" varStatus="status">
+	 			<tr>
+	 				<td>${status.count}</td>
+	        		<td>${store.storeName}</td>
+	        		<td>${store.storeCodeStr}</td>
+					<td>${store.entityName}</td>
+					<td style="pointer-events: none;">
+						<div class="form-group col-md-2 mt-0 mb-0 toggleTrueFalse" data-label-on="True" data-label-off="False" data-toggle-width="90">
+							<input type="checkbox" value="${store.isActive}" class="toggleCheckBox" ${store.isActive == 'true' ? 'checked' : ''} id="parametros_MOSTRAPEDIDOS" name="isActive" disabled/>
+							<label class="clickToggle" for="parametros_MOSTRAPEDIDOS"></label>
+						</div>
+					</td>
+	                <td>
+	                	<a href="#" onclick="edit(${store.storeId})" class="btn btn-primary"  data-toggle="tooltip" title="Edit store"><i class='fa fa-pencil'></i></a>
+		            </td>	
+	 			</tr>
+	 		</c:forEach>
+	 	</tbody>
+	 </table>
+
+	 </div>
+	
+	 </div>
+	 </div>
+	 </div>
+	 </div>
+	 <form  method="get" action="${contextPath}/inventory/store/add" id="edit">
+     	<input type="hidden" id="storeIddd" name="storeId"  value="">
+     	<input type="hidden" class="" id="encodedDataedit" name="encodedDataedit" value="" />
+     </form>
+<form  method="post" action="${contextPath}/inventory/store/delete" id="deleteStore">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" id="storeIdd" name="storeId"  value="">
+</form>
+<script>
+function backToModule(){
+       let currentModuleCode =  localStorage.getItem('currentModuleCode');
+       $('#moduleId').val(enc_password(currentModuleCode));
+       $('#moduleForm').submit();
+    }
+    function edit(id){
+        $("#storeIddd").val(id);
+        encryptFormData("edit", tableOrTbodyIDS, tableOrTbodyKeys);
+        $("#edit").submit();
+    }
+	function validateForms(){
+		let orgIdAndTypeId = $("#orgIdAndTypeId").val();
+		let storeName = $("#storeName").val();
+		let upperEntityId = $("#upperEntityId").val();
+		let isValid = false;
+		if(orgIdAndTypeId == ""){
+			bootbox.alert("Please select organization");
+		}else if(storeName == ""){
+			bootbox.alert("Please enter store name");
+		}else if(upperEntityId == ""){
+			bootbox.alert("Please select Mappping Entity");
+		}else{
+			isValid = true;
+		}
+
+		if(isValid){
+			bootbox.confirm({
+				message: "Are you sure you want to save this store?",
+				buttons: {
+					confirm: {
+						label: 'Yes',
+						className: 'btn-success'
+					},
+					cancel: {
+						label: 'No',
+						className: 'btn-danger'
+					}
+				},
+				callback: function (result) {
+					if(result){
+						encryptFormData("addStoreFrm", tableOrTbodyIDS, tableOrTbodyKeys);
+						$("#addStoreFrm").submit();
+					}
+				}
+			});
+		}
+		
+	}
+	function deleteStore(id){
+		$("#storeIdd").val(id);
+		$("#deleteStore").submit();
+	}
+
+</script>

@@ -1,0 +1,754 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<%-- <script src="${contextPath}/resources/javascripts/accountMaster.js"></script>
+<script src="${contextPath}/resources/javascripts/common.js"></script>
+<script src="resources/javascripts/createAccountMaster.js"></script> --%>
+<%@ page import="com.aashdit.fams.utils.ApplicationStringUtilsFams" %>
+<style>
+.table-striped>tbody>tr:nth-of-type(odd) {
+    --bs-table-accent-bg: rgb(247 249 244) !important;
+    /* color: var(--bs-table-striped-color); */
+}
+.accordion-item{
+    background: #ffffff9c;
+    border-radius: 5px;
+    border: none;
+}
+
+</style>
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Create Work Order</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+	        <ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home" title="Home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Work Order</li>
+			</ol>
+        </nav>
+     </div>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h6 class="card-title">Create Work Order</h6>
+    </div>
+    <div class="card-body" style="display:block">
+        <div class="col-md-12">
+            <form class="form-horizontal form-bordered"  id="workOrderForm"  action="${contextPath}/workOrder/manage" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                    <input type="hidden" name="editWorkOrderId" value="${workOrderDetails.workOrderId}"/>
+                    <input type="hidden" name="cipherText" id="hdnData"/>
+                <div class="row">
+                
+                <%@ include file="/WEB-INF/views/entityIdAndUserLevelListDrp.jsp"%>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required" for="projectHeadId">Project:</label>
+                            <div class="col-md-12">
+                                <select class="form-select required require" name="project" id="projectHeadId" onchange="featchWorkEstimationByProject(this.value,0,'workEstId');" >
+                                    <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+                                    <c:forEach items="${projectMasterList}" var="head">
+                                        <option value="${head.projectId}" ${workOrderDetails.project.projectId eq head.projectId ? 'selected' :''}>${head.projectName}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required" for="workEstId">Work Estimation:</label>
+                            <div class="col-md-12">
+                                <select class="form-select required require" name="workEstId" id="workEstId" >
+                                    <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12" for="workOrderName">Work Order Number:</label>
+                            <div class="col-md-12">
+                                <input type="text" name="workOrderName" class="form-control " id="workOrderName"
+                                value="${workOrderDetails.workOrderNo}" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12" for="workOrderDocument">Work Order Document:</label>
+                            <div class="col-md-12">
+                                <input type="file" name="workOrderDocument" class="form-control " id="workOrderDocument">
+
+                                <c:if test="${not empty workOrderDetails.workOrderDocumentPath}">
+                                    <button type="button" onclick="viewDocument('${workOrderDetails.workOrderDocumentPath}', 'WorkOrder')" class="btn btn-primary unfreezeField">Download</button>
+                                </c:if>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12" for="agreementDocument">Agreement Document:</label>
+                            <div class="col-md-12">
+                                <input type="file" name="agreementDocument" class="form-control" id="agreementDocument">
+
+                                <c:if test="${not empty agreementDetails.agreementDocument}">
+                                    <button type="button" onclick="viewDocument('${agreementDetails.agreementDocument}', 'WorkAgreement')" class="btn btn-primary unfreezeField">Download</button>
+                                </c:if>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required" for="workAmount">Amount:</label>
+                            <div class="col-md-12">
+                                <input type="text" name="workAmount" class="form-control text-end amount-field numberWithTwoDesimal require" id="workAmount"
+                                value="${workOrderDetails.amount}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required" for="completionInMonth">Completion in Month:</label>
+                            <div class="col-md-12">
+                                <input type="text" name="completionInMonth" class="form-control require" id="completionInMonth"
+                                value="${workOrderDetails.completionInMonth}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required" for="startDate">Start Date:</label>
+                            <div class="col-md-12 datepicker_con">
+                                <input type="text" name="startDate" class="form-control  require" id="startDate"
+                                       value="<fmt:formatDate value='${workOrderDetails.startDate}' pattern='dd/MM/yyyy'/>" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-12 required" for="endDate">End Date:</label>
+                                <div class="col-md-12 datepicker_con">
+                                    <input type="text" name="endDate" class="form-control  require" id="endDate"
+                                           value="<fmt:formatDate value='${workOrderDetails.endDate}' pattern='dd/MM/yyyy'/>" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                    <!-- Additional fields -->
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12" for="agreementNo">Agreement Number:</label>
+                            <div class="col-md-12">
+                                <input type="text" name="agreementNo" class="form-control" id="agreementNo"
+                                value="${agreementDetails.agreementNo}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12" for="agreementDate">Agreement Date:</label>
+                            <div class="col-md-12 datepicker_con">
+                                <input type="text" name="agreementDate" class="form-control " id="agreementDate"
+                                       value="<fmt:formatDate value='${agreementDetails.agreementDate}' pattern='dd/MM/yyyy'/>" readonly>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required" for="contractorId">Contractor Name:</label>
+                            <div class="col-md-12">
+                                <select class="form-select required require" name="contractorId" id="contractorId"
+                                onchange="fetchPartyDetails(this.value)">
+                                    <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+                                    <c:forEach items="${partyDetails}" var="party">
+                                        <option value="${party.partyId}"
+                                        ${party.partyId eq workOrderDetails.contractor.partyId ? 'selected':''}>${party.partyName}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required" for="constructionType">Construction Type:</label>
+                            <div class="col-md-12">
+                                <input type="text" name="constructionType" class="form-control require" id="constructionType"
+                                value="${workOrderDetails.constructionType}">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="margin-top: 30px;">
+
+                    <div class="card-header">
+                        <h6 class="card-title">Contractor Details</h6>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required">Bank Name:</label>
+                            <div class="col-md-12">
+                                <b><label id="bankName">${workOrderDto.bankName}</label></b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required">Branch:</label>
+                            <div class="col-md-12">
+                                <b><label id="branch">${workOrderDto.branch}</label></b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required">Account No:</label>
+                            <div class="col-md-12">
+                                <b><label id="accountNo">${workOrderDto.accountNo}</label></b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required">IFSC Code:</label>
+                            <div class="col-md-12">
+                                <b><label id="ifscCode">${workOrderDto.ifscCode}</label></b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required">GST No:</label>
+                            <div class="col-md-12">
+                                <b><label id="gstNo">${workOrderDto.gstNo}</label></b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-12 required">PAN:</label>
+                            <div class="col-md-12">
+                                <b><label id="pan">${workOrderDto.pan}</label></b>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                    <div class="col-lg-12" style="margin-top:20px;">
+                        <div class="form-group">
+                            <label class="col-md-12" for="remarks">Remarks:</label>
+                            <div class="col-md-12">
+                                <textarea name="remarks" class="form-control" id="remarks"
+                                style="height: 80px;">${workOrderDetails.remarks}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+            <%-- 	<div class="col-sm-12" style="margin-top:30px;">
+                        <div class="form-group text-center">
+                            <input type="button" class="btn btn-success"  onclick="customValidation('workOrderForm')"
+                            value="${not empty projectMaster.projectId ? 'Update' : 'Save'}" />
+                            <input type="button" class="btn btn-danger"
+                            onclick="window.location.href='${contextPath}/mst/createProjectMaster.htm'" value="Back" />
+                        </div>
+                    </div> --%>
+
+
+                                     <div class="row">
+                            <div class="col-sm-12" style="margin-top: 30px;">
+                                 <div class="form-group text-center">
+                                        <c:set var="dynamicFromId" value="workOrderForm" scope="request" />
+                                            <c:set var="wonFunction" value="customValidation('workOrderForm')"/>
+                                            <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+                                </div>
+                            </div>
+                      </div>
+
+                </div>
+            </form>
+        </div>
+
+                                        <!--  Work Order List -->
+<%-- <div class="row">
+
+<%@ include file="/WEB-INF/views/entityIdAndUserLevelListDrp.jsp"%>
+    <div class="col-lg-12">
+        <div class="accordion" id="accordionExample1">
+            <div class="panel-actions">
+                  <c:choose>
+                      <c:when test="${not empty dto.accountId}">
+                          <c:set var="sectionHead" value="none"></c:set>
+                      </c:when>
+                      <c:when test="${empty dto.accountId}">
+                          <c:set var="sectionHead" value="block"></c:set>
+                      </c:when>
+                  </c:choose>
+              </div>
+        <div class="accordion-item">
+          <div id="collapseTwo" class="accordion-collapse collapse show"
+            aria-labelledby="headingtwo"
+            data-bs-parent="#accordionExample1">
+            <h4 style="">Work Order List</h4>
+              <div class="col-md-12">
+                          <table class="mb-none DataTable table-bordered exportbtn" id="datatable-default">
+
+                              <thead>
+                                  <tr>
+                                      <th class="width42Percent">Sl No.</th>
+                                      <th>Project Name</th>
+                                      <th class="width17Percent">Work Code</th>
+                                      <th class="width11Percent">Work order Date</th>
+                                      <th class="width10Percent">Work Amount</th>
+                                      <th class="width10Percent">Work Start Date</th>
+                                      <th class="width10Percent">Work End Date</th>
+                                      <th>Action</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                <c:forEach items="${workList}" var="work" varStatus="status">
+                                    <tr class="gradeX">
+                                        <td>${status.count}</td>
+                                        <td>${work.project.projectName}</td>
+                                        <td>${work.workOrderNo}</td>
+
+                                        <!-- Formatting workOrderDate -->
+                                        <td><fmt:formatDate value="${work.workOrderDate}" pattern="MM/dd/yyyy"/></td>
+
+                                        <td style="text-align: right;">${work.amount}</td>
+
+                                        <!-- Formatting startDate -->
+                                        <td><fmt:formatDate value="${work.startDate}" pattern="MM/dd/yyyy"/></td>
+
+                                        <!-- Formatting endDate -->
+                                        <td><fmt:formatDate value="${work.endDate}" pattern="MM/dd/yyyy"/></td>
+
+                                        <td>
+                                            <input type="hidden" name="accountId" id="account_ids">
+                                            <a class="btn btn-sm text-white btn-circle btn-warning"
+                                            title="<spring:message code='COMMON.BUTTON.ICONEDIT'/>"
+                                            onclick="edit('${work.workOrderId}')">
+                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                              </tbody>
+                          </table>
+              </div>
+          </div>
+    </div>
+  </div>
+</div>
+                          </div> --%>
+                        </div>
+                    </div>
+
+						</div>
+          			</div>
+        
+        
+        <div class="main-content mt-3">
+   
+    <form action="${contextPath}/mst/manageProject" method="POST" id="finalSubmit">
+	    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+	    <input type="hidden" name="cipherText" id="hdnData"/>
+    </form>
+    <%--  <form action="${contextPath}/workOrder/edit" method="get" id="editForm">
+	    <input type="hidden" class="remove" name="woId" id="woId"/>
+    </form> --%>
+        </div>
+    </section>
+    
+    <form action="${contextPath}/download/download" method="get" id="formDownLoad"  target="_blank">
+    <input type="hidden" name="code" id="code"/>
+    <input type="hidden" name="module" id="module"/>
+    <input type="hidden" name="filename" id="filename"/>
+  </form>
+  
+ 
+
+	<script>
+
+$(document).ready(function() {
+
+    var existingContractId = '${workOrderDetails.contractor.partyId}';
+    debugger;
+    if(existingContractId && existingContractId !=''){
+        debugger;
+        fetchPartyDetails(existingContractId);
+    }
+    
+    var workEstId='${workOrderDetails.workEstimation.estimationId}';
+    var projectId='${workOrderDetails.project.projectId}'
+
+    if(workEstId && workEstId!='' && projectId && projectId!=''){
+    	featchWorkEstimationByProject(projectId,workEstId,'workEstId');
+    }
+
+    // Mobile Number Validation
+    // $('#mobileNumber').on('blur', function() {
+    //     var mobileNumber = $(this).val();
+    //     var mobilePattern = /^91\d{10}$/;
+    //     if (!mobilePattern.test(mobileNumber)) {
+    //         alert("Please enter a valid 10-digit mobile number starting with '91'.");
+    //         $(this).val('');
+    //         return false;
+    //     }
+    // });
+
+
+
+    // GST Number Validation
+    // $('#gstNo').on('blur', function() {
+    //     var gstNo = $(this).val();
+    //     var gstPattern = /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}$/;
+    //     if (!gstPattern.test(gstNo)) {
+    //         alert("Please enter a valid GST number (e.g., 22AAAAA0000A1Z5).");
+    //         $(this).val('');
+    //         return false;
+    //     }
+    // });
+
+
+
+    // // PAN Number Validation
+    // $('#pan').on('blur', function() {
+    //     var panNo = $(this).val();
+    //     var panPattern = /^[A-Z]{5}\d{4}[A-Z]{1}$/;
+    //     if (!panPattern.test(panNo)) {
+    //         alert("Please enter a valid PAN number (e.g., CLSPB9345F).");
+    //         $(this).val('');
+    //         return false;
+    //     }
+    // });
+
+
+
+    // Numeric Field Validation (Amount, IFSC Code, etc.)
+    $('.numeric-only').on('blur', function() {
+        if (!$.isNumeric($(this).val())) {
+            alert("Please enter a valid amount");
+            $(this).val('');
+            return false;
+        }
+    });
+});
+
+
+	 function viewDocument(imageName,ProjectMaster) {
+	        $("#module").val(ProjectMaster);
+	        $("#filename").val(imageName);
+
+	        if (encryptFormData('formDownLoad', tableOrTbodyIDS, tableOrTbodyKeys)) {
+	            $('#formDownLoad').submit();
+	        }
+		}
+
+	 function customValidation(formId){
+		 if(validateForm()){
+			 if(encryptFormData(formId, tableOrTbodyIDS, tableOrTbodyKeys)){
+					 confirmation(formId);
+				 }
+			}
+		 
+		 
+	 }
+	/* const customValidation = async (formId) => {
+	    const requiredFields = document.querySelectorAll('.required');
+	    let validationFailed = false;
+
+	    // Check for required fields
+	    for (const field of requiredFields) {
+	        const inputId = field.getAttribute('for');
+	        const inputField = document.getElementById(inputId);
+	        
+	        // Check if the input field exists
+	        if (inputField && !inputField.value) {
+	            inputField.style.borderColor = 'red';
+	            await showNotification(true, field.textContent.replace(/:/g, "") + " is required.");
+	            setTimeout(() => {
+	                inputField.style.borderColor = '';
+	            }, 3000);
+	            validationFailed = true;
+	            break; // Exit the loop if validation fails
+	        }
+	    }
+
+	    if (!validationFailed) {
+	        // Confirmation dialog
+	        bootbox.confirm({
+	            message: "Do you want to save all work order details?",
+	            buttons: {
+	                confirm: {
+	                    label: 'Yes',
+	                    className: 'btn-success'
+	                },
+	                cancel: {
+	                    label: 'No',
+	                    className: 'btn-danger'
+	                }
+	            },
+	            callback: async (result) => {
+	                if (result) {
+	                    // Handle the encryption and form submission
+	                    const encryptFormDataResult = await encryptHiddenFormData(formId);
+	                    if (encryptFormDataResult) {
+	                        $('#hdnData').val(encryptFormDataResult);
+	                        $('#workOrderForm').submit();
+	                    } else {
+	                        showNotification(true, 'Unable to process your request. Please try again later.');
+	                    }
+	                }
+	            }
+	        });
+	    }
+
+	    return false; // Prevent default form submission
+	}; */
+
+
+
+
+/* function edit(projectId){
+    	debugger
+    	$("#woId").val(projectId);
+			 if(encryptFormData('editForm', tableOrTbodyIDS, tableOrTbodyKeys)){
+					 confirmation('editForm');
+				 }
+    } */
+    
+    
+    
+    $(document).ready(function() {
+
+    	 var groupId='${dto.accountGroupId}';
+    	  var subGroup='${dto.accountSubGroupId}';
+    	  if(groupId!=''){
+    		 getAccountSubGroups(groupId,subGroup);
+    	  }
+    	
+    	var val = '${not empty dto.scheduleIds}';
+    	if(val=='true'){
+    		getSubSchedule();
+    	}   	
+    });
+    
+    
+    
+
+    
+    function validateNameAndCode(element)
+    {
+    	var result = element.value.replace(/[\u005F\u003D\u200B-\u200D\u201A-\u201E\u2013-\u2122\uFEFF\!@#$^&*+<>\\\/|\?~{}())(\:%]/g,'');
+    	element.value =result;
+    }
+    
+    
+    function showDiv(select){
+    	   if(select.value == "Bank"){
+    	    document.getElementById('bankDiv').style.display = "block";
+    	    document.getElementById('office').style.display = "block";
+    	   }else if(select.value == "Cash"){
+    		   document.getElementById('office').style.display = "block";
+    		   document.getElementById('bankDiv').style.display = "none";
+    	   }else{
+    	   
+    	    document.getElementById('bankDiv').style.display = "none";
+    	    document.getElementById('office').style.display = "none";
+    	   }
+    	}    
+        
+        
+        // AJAX call functionality
+
+        function fetchPartyDetails(partyId) {
+            debugger;
+            if (partyId && partyId != '0') {
+                $.ajax({
+                    url:  '${contextPath}/common/api/getPartyDetailsById',
+                    type: 'GET',
+                    data: { partyId: partyId },
+                    success: function(response) {
+                        if (response.outcome) {
+                            $('#gstNo').text(response.result.gstNo || 'NA');
+                            $('#pan').text(response.result.panNo || 'NA');
+                            $('#bankName').text(response.result.bankName || 'NA');
+                            $('#branch').text(response.result.branchName || 'NA');
+                            $('#accountNo').text(response.result.accountNo || 'NA');
+                            $('#ifscCode').text(response.result.IFCS || 'NA');
+                            $('#address').text(response.result.address || 'NA');
+                            $('#email').text(response.result.email || 'NA');
+                            $('#phno').text(response.result.phno || 'NA');
+                        } else if (response.result && response.result.error) {
+                            $('#gstNo').text('NA');
+                            $('#pan').text('NA');
+                            $('#bankName').text('NA');
+                            $('#branch').text('NA');
+                            $('#accountNo').text('NA');
+                            $('#ifscCode').text('NA');
+                            $('#address').text('NA');
+                            $('#email').text('NA');
+                            $('#phno').text('NA');
+                        }
+                    },
+                    error: function() {
+                        alert('An error occurred while fetching party details.');
+                    }
+                });
+        }else  {
+            $('#gstNo').text('NA');
+            $('#pan').text('NA');
+            $('#bankName').text('NA');
+            $('#branch').text('NA');
+            $('#accountNo').text('NA');
+            $('#ifscCode').text('NA');
+            $('#address').text('NA');
+            $('#email').text('NA');
+            $('#phno').text('NA');
+        }
+}
+
+    
+    function getAccountSubGroups(groupId,selectedSubGrp){
+        debugger
+        $.ajax({
+            type: "GET",
+            url: '${contextPath}/mst/getAccountSubGroups',
+            data: {
+                "accountId": AES256.encrypt(groupId), 
+            },
+            success: function(response) {
+                var subScheduleDropdown = $('#subAccountGroup');
+                subScheduleDropdown.empty();
+                $.each(JSON.parse(response), function(index, value) { 
+                    subScheduleDropdown.append($('<option>', {
+                        value: value.accountGroupId, 
+                        text: value.accountGroupCode + ' | ' + value.accountGroupName 
+                    }));
+                });
+                
+                if(selectedSubGrp!=''){
+                	$("#subAccountGroup").val(selectedSubGrp);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error occurred: " + status + " " + error);
+            }
+        });
+    }
+
+
+
+    function getSubSchedule(){
+    	debugger
+        var selectedScheduleIds = $('#scheduleId').val();
+        if (selectedScheduleIds.length > 0) {
+            $.ajax({
+                type: "GET",
+                url: '${contextPath}/mst/getSubSchedules',
+                data: {
+                    "scheduleIds":AES256.encrypt(JSON.stringify(selectedScheduleIds)),
+                },
+                contentType: "application/json; charset=utf-8",
+                success: function(response) {
+                    var subScheduleDropdown = $('#subScheduleId');
+                    subScheduleDropdown.empty();
+                    $.each(response, function(index, subSchedule) {
+                        subScheduleDropdown.append($('<option>', {
+                            value: subSchedule.scheduleId,
+                            text: subSchedule.scheduleCode + ' | ' + subSchedule.scheduleName
+                        }));
+                    });
+                    
+                    debugger
+                    	var result = '${not empty dto.subScheduleIds}';
+                    	if(result=='true'){
+                    		var values = $(".hdnSubSchIds");
+                    		var preSelectedSubScheduleIds=[];
+                    		 $.each(values, function(index, elem) {
+                    			 preSelectedSubScheduleIds.push(elem.value);
+                             });
+                    		 if(preSelectedSubScheduleIds.length > 0){
+                    			 subScheduleDropdown.val(preSelectedSubScheduleIds).trigger('change');
+                    		 }
+                    	}
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error occurred: " + status + " " + error);
+                }
+            });
+        }
+    }
+
+
+    function getBankBranchList()
+    {
+    	var bankId = $('#bankName').val();
+    	var trHTML='<option value="">' +labelDropdownTextSelect+ '</option>';
+    	$.ajax({
+    		url : './getBankBranchList.htm',
+    		type:'GET',
+    		data : ({
+    				bankId : $('#bankName').val()
+    			}),
+    		cache:false,
+    		asynch:false,
+    		success : function(response) 
+    		{
+    			if(response !="")
+    			{
+    				var obj=jQuery.parseJSON(response);		
+    				$.each(obj, function(i, value) 
+    				{
+    					trHTML +='<option value="'+value.id+'">'+value.branchName+'</option>';
+    				}); 
+    				$('#bankBranchId').empty().append(trHTML); 
+    			}
+    			else
+    			{
+    				$('#bankBranchId').empty().append(trHTML); 
+    			}
+    		},
+    		error:function(transport)
+    		{
+    			$('#bankBranchId').empty().append(trHTML); 
+    		}
+    		
+    	});
+    	
+    }
+    
+   
+    
+</script>
+								
+		

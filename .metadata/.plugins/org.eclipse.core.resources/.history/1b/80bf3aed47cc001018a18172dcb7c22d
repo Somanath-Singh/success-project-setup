@@ -1,0 +1,2766 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+    <!-- template-outside-layout -->
+    <definition name="template-def" template="/WEB-INF/views/layout/default/defaultLayout.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/layout/header.jsp"/>
+        <put-attribute name="body" value=""/>
+        <put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp"/>
+    </definition>
+
+    <definition name="layout.base" template="/WEB-INF/views/layout/baselayout.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/layout/header.jsp"/>
+        <put-attribute name="menu" value="/WEB-INF/views/menu.jsp"/>
+        <put-attribute name="body" value=""/>
+        <put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp"/>
+        <put-attribute name="pageScripts" value=" "/>
+    </definition>
+
+    <definition name="layout.module" template="/WEB-INF/views/layout/modulelayout.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/layout/header.jsp"/>
+        <put-attribute name="body" value=""/>
+        <put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp"/>
+        <put-attribute name="pageScripts" value=" "/>
+    </definition>
+
+    <definition name="layout.blank" template="/WEB-INF/views/layout/blankLayout.jsp">
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <definition name="template-blank" template="/WEB-INF/views/layout/blankLayout.jsp">
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <definition name="error.layout" template="/WEB-INF/views/layout/errorLayout.jsp">
+        <put-attribute name="title" value="kaushalya"/>
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <!-- <definition name="layout.login" template="/WEB-INF/views/login.jsp"/> -->
+
+    <definition name="layout.login" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/login.jsp"/>
+    </definition>
+
+    
+    <definition name="site.session.timeout" template="/WEB-INF/views/nosession.jsp"/>
+    <definition name="site.privacy.policy" template="/WEB-INF/views/privacyPolicy.jsp"/>
+
+    <!-- BEG Home for various Roles -->
+    <definition name="site.system.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/system.jsp"/>
+    </definition>
+
+    <definition name="site.admin.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/dashboard.jsp"/>
+    </definition>
+
+    <definition name="site.deo.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/dashboard.jsp"/>
+    </definition>
+
+
+    <definition name="site.cdpo.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/dashboard.jsp"/>
+    </definition>
+
+    <definition name="site.dswo.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/dashboard.jsp"/>
+    </definition>
+
+    <definition name="site.sa.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/dashboard.jsp"/>
+    </definition>
+
+
+    <!-- END Home for various Roles -->
+    
+    
+     <!-- Start Project Estimation -->
+     
+     
+    <definition name="site.addProject" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/ProjectEstimation/addProjectEstimation.jsp"/>
+    </definition>
+    
+       <definition name="site.viewProject" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/ProjectEstimation/viewProjectEstimation.jsp"/>
+    </definition>
+    
+     <definition name="viewprojectdetails" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/masters/viewprojectdetails.jsp" />
+	</definition>
+     
+     <!-- END Project Estimation -->
+    
+    <!-- Administartion Module -->
+    <definition name="site.admin.user.acl.configure" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/configureACL.jsp"/>
+    </definition>
+
+    <definition name="site.admin.acl.list" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/listACL.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.module" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/listModules.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.module.add" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/addModule.jsp"/>
+    </definition>
+
+    <definition name="site.addBank" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/addBankMaster.jsp"></put-attribute>
+    </definition>
+
+    <!-- User Management -->
+
+    <definition name="site.umt.userProfile" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/userProfile.jsp"/>
+    </definition>
+
+    <definition name="site.umt.public.registration" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/umt/userRegistration.jsp"/>
+    </definition>
+
+    <definition name="site.umt.changePassword" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/changePassword.jsp"/>
+    </definition>
+
+    <definition name="site.umt.userList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/userList.jsp"/>
+    </definition>
+
+    <definition name="site.umt.addUser" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/addUser.jsp"/>
+    </definition>
+
+    <definition name="site.umt.userEdit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/userEdit.jsp"/>
+    </definition>
+
+    <definition name="site.umt.userView" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/userView.jsp"/>
+    </definition>
+    <!-- sso -->
+    <definition name="application" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/sso/application.jsp"/>
+    </definition>
+    <definition name="roleApplicationMap" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/sso/roleApplicationMap.jsp"/>
+    </definition>
+
+    <!-- Core -->
+    <definition name="site.admin.roleList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleList.jsp"/>
+    </definition>
+
+    <definition name="site.admin.roleEdit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleEdit.jsp"/>
+    </definition>
+
+    <definition name="site.admin.roleView" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleView.jsp"/>
+    </definition>
+
+    <definition name="site.admin.roleLevelMapList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleLevelMapList.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.module.edit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/editModule.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.menu" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/listMenu.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.menu.edit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/editMenu.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.menu.add" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/addMenu.jsp"/>
+    </definition>
+
+    <definition name="admin.menu.role.map" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleMenuMap.jsp"/>
+    </definition>
+
+    <definition name="admin.mobile.menu.role.map" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleMobileMenuMap.jsp"/>
+    </definition>
+
+    <definition name="admin.menu.reorder" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/reorderMenu.jsp"/>
+    </definition>
+
+    <definition name="app.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/home.jsp"/>
+    </definition>
+
+    <definition name="admin.permission.map" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/menuPermissionMap.jsp"/>
+    </definition>
+
+    <definition name="site.system.support" extends="template-blank">
+        <put-attribute name="body" value="/WEB-INF/views/system/support/dbPage.jsp"/>
+    </definition>
+
+    <definition name="site.admin.loginHistory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/loginHistory.jsp"/>
+    </definition>
+
+    <definition name="site.admin.loginHistory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/loginHistory.jsp"/>
+    </definition>
+
+
+    <!-- ================================ ERROR CONFIGURATION ====================================================== -->
+
+    <definition name="site.unauthorizedError" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/unauthorizedError.jsp"/>
+    </definition>
+
+    <definition name="site.accessdenied" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/403.jsp"/>
+    </definition>
+
+    <definition name="site.defaultError" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/400.jsp"/>
+    </definition>
+
+    <definition name="site.400" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/400.jsp"/>
+    </definition>
+
+    <definition name="site.401" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/401.jsp"/>
+    </definition>
+
+    <definition name="site.403" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/403.jsp"/>
+    </definition>
+
+    <definition name="site.404" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/404.jsp"/>
+    </definition>
+
+    <definition name="site.405" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/405.jsp"/>
+    </definition>
+
+    <definition name="site.500" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/500.jsp"/>
+    </definition>
+
+    <definition name="site.503" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/503.jsp"/>
+    </definition>
+
+    <definition name="site.unknownError" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/unknownError.jsp"/>
+    </definition>
+
+
+    <!-- ================================ MASTER ====================================================== -->
+    <definition name="master.branch" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/bankBranchMaster.jsp"/>
+    </definition>
+
+
+    <!-- ########################################Stage Config START ################################################## -->
+
+    <!-- Stage Config Tiles -->
+    <definition name="stage.config.view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig.jsp"/>
+    </definition>
+
+    <!-- Stage Config Tiles -->
+    <definition name="stage.config.view2" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig2.jsp"/>
+    </definition>
+
+    <!-- Stage Config Tiles -->
+    <definition name="stage.config.view3" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig3.jsp"/>
+    </definition>
+
+    <!-- Stage Config Tiles -->
+    <definition name="stage.config.view4" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig4.jsp"/>
+    </definition>
+
+    <!-- Stage Config Tiles -->
+    <definition name="stage.config.view5" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig5.jsp"/>
+    </definition>
+
+    <definition name="stage.config.appList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfigAppList.jsp"/>
+    </definition>
+
+
+    <definition name="stage.config.processFlow" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/processFlow.jsp"/>
+    </definition>
+
+    <!-- site.view.tableConfig -->
+    <definition name="site.view.tableConfig" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/OptTable.jsp"/>
+    </definition>
+
+    <!-- site.view.tableConfig -->
+    <definition name="site.view.dynamicReportGenerator" template="/WEB-INF/views/stageConfig/dynamicReport.jsp" />
+
+    <!-- site.view.tableConfig -->
+    <definition name="site.view.TblComConfig" extends="template-blank">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/TblComConfig.jsp"/>
+    </definition>
+
+    <!-- site.view.hierarchy -->
+    <definition name="site.config.hierarchyView" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/hierarchy.jsp"/>
+    </definition>
+    <!-- site.view.viewPageData -->
+    <definition name="site.view.viewPageData" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/viewPageData.jsp"/>
+    </definition>
+
+    <definition name="site.genericDataViewFormat" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/genericDataViewFormat.jsp"/>
+    </definition>
+
+    <definition name="site.view.createActions" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/createActions.jsp"/>
+    </definition>
+
+    <definition name="site.view.roleWiseStageTabConfig" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/roleWiseStageTabConfig.jsp"/>
+    </definition>
+
+
+    <definition name="site.view.stageTabConfig" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageTabConfig.jsp"/>
+    </definition>
+
+    <definition name="stage.share.entity.map" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/shareEntityMapModules.jsp"/>
+    </definition>
+
+    <definition name="site.view.roleWiseStatusTabViewConfig" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/roleWiseStatusTabViewConfig.jsp"/>
+    </definition>
+
+    <definition name="site.view.logView" template="/WEB-INF/views/stageConfig/logViewer.jsp"/>
+
+    <!-- stage.config.view4List -->
+    <definition name="stage.config.view4List" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig4List.jsp"/>
+    </definition>
+
+    <!-- stage.config.viewConfigView4 -->
+    <definition name="stage.config.viewConfigView4" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/viewConfigView4.jsp"/>
+    </definition>
+
+    <definition name="site.view.createActionType" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/createActionType.jsp"/>
+    </definition>
+
+    <definition name="site.view.workFlowApiDetails" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/workFlowApiDetails.jsp"/>
+    </definition>
+
+    <definition name="site.view.createNativeQueryAndShareEntity" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/createNativeQueryAndShareEntity.jsp"/>
+    </definition>
+
+
+    <!-- ########################################Stage Config END ################################################## -->
+
+
+    <definition name="master.branch" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/bankBranchMaster.jsp"/>
+    </definition>
+
+
+    <definition name="site.report.allStaffRpt" extends="layout.base">
+        <put-attribute name="body" value="/CMC-SWP/src/main/webapp/WEB-INF/jasperReports/allStaffRpt.jrxml"/>
+    </definition>
+
+
+    <!-- ASSET MODULE TILES START -->
+
+    <!-- ####################################### Master START ################################################## -->
+    <definition name="site.master.category" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addCategory.jsp"/>
+    </definition>
+    <definition name="site.master.subcategory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addSubCategory.jsp"/>
+    </definition>
+    <definition name="site.master.itemType" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addItemType.jsp"/>
+    </definition>
+    <definition name="site.master.uom" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addUom.jsp"/>
+    </definition>
+    <definition name="site.master.store" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addStore.jsp"/>
+    </definition>
+    <definition name="site.master.assetVendor" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addVendor.jsp"/>
+    </definition>
+    <definition name="site.master.item" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addItem.jsp"/>
+    </definition>
+    <definition name="site.master.asset" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addAsset.jsp"/>
+    </definition>
+    <definition name="site.master.assetDtls" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/viewAssetDtls.jsp"/>
+    </definition>
+    <definition name="site.item.stock.adjustment" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/inventory/stock/itemStockAdjustment.jsp"/>
+    </definition>
+    <!-- ####################################### Master End ################################################## -->
+
+
+    <!-- #######################################  Stock Start ################################################## -->
+
+    <definition name="site.stock.item" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/inventory/stock/stockDtls.jsp"/>
+    </definition>
+
+    <!-- #######################################  Stock End ################################################## -->
+
+    <!-- #######################################  Requisition START ################################################## -->
+
+    <definition name="site.addRequisition" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/requisition/addRequisition.jsp"/>
+    </definition>
+
+    <definition name="site.trackRequisition" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/requisition/trackRequisition.jsp"/>
+    </definition>
+
+    <definition name="site.requisition.send.rfq" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/requisition/sendRfqApprovedRequisition.jsp"/>
+    </definition>
+    <!-- #######################################  Requisition End ################################################## -->
+
+
+    <!-- #######################################  Rfq Quote START ################################################## -->
+
+    <definition name="site.sendRfq" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/quotation/sendRfq.jsp"/>
+    </definition>
+
+    <definition name="site.vendorRfq" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/quotation/vendorRrfq.jsp"/>
+    </definition>
+
+    <definition name="site.quotation.tracker" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/quotation/quotationTracker.jsp"/>
+    </definition>
+
+    <definition name="site.quotation.comparisson" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/quotation/quotationComparision.jsp"/>
+    </definition>
+
+    <definition name="site.viewRfqQuote" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/quotation/viewRfq.jsp"/>
+    </definition>
+
+    <definition name="responseThankyouPage" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/quotation/responsePage.jsp"/>
+    </definition>
+    <!-- #######################################  Rfq Quote End ################################################## -->
+
+    <!-- #######################################  Purchase Order START ################################################## -->
+    <definition name="site.purchase.generate" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/purchaseOrder/generatePurchase.jsp"/>
+    </definition>
+    <definition name="site.purchase.tracker" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/purchaseOrder/purchaseTracker.jsp"/>
+    </definition>
+    <definition name="site.purchase.view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/purchaseOrder/viewPurchase.jsp"/>
+    </definition>
+    <definition name="site.purchase.invoice" extends="layout.blank">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/assetInvProc/procurement/purchaseOrder/purchaseOrderInvoice.jsp"/>
+    </definition>
+
+    <definition name="site.direct.purchase.generate" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/purchaseOrder/generateDirectPo.jsp"/>
+    </definition>
+    <definition name="site.close.po" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/purchaseOrder/closePo.jsp"/>
+    </definition>
+    <!-- #######################################  Purchase Order End ################################################## -->
+
+    <!-- #######################################  Mrn Or Grn START ################################################## -->
+    <definition name="site.grnormrn.view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/grn/grnOrMrn.jsp"/>
+    </definition>
+
+    <definition name="site.create.mrn" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/grn/createMrn.jsp"/>
+    </definition>
+
+    <definition name="site.create.grn" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/grn/createGrn.jsp"/>
+    </definition>
+
+    <definition name="site.track.grn" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/grn/trackGrn.jsp"/>
+    </definition>
+
+    <definition name="site.view.grn" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/grn/viewGrn.jsp"/>
+    </definition>
+
+    <definition name="site.grn.bill" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/grn/billPayment.jsp"/>
+    </definition>
+
+    <definition name="site.grn.billinvoice" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/procurement/grn/grnBillInvoice.jsp"/>
+    </definition>
+    <!-- #######################################  Mrn Or Grn End ################################################## -->
+
+    <!-- #######################################  Item Issue Request START ################################################## -->
+    <definition name="site.inventory.issueRequest" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/inventory/issueRequest/issueRequest.jsp"/>
+    </definition>
+
+    <definition name="site.inventory.trackIssueRequestLst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/inventory/issueRequest/trackIssueRequest.jsp"/>
+    </definition>
+
+
+    <definition name="site.inventory.itemDishbursement" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/inventory/issueRequest/itemDishburseMent.jsp"/>
+    </definition>
+
+    <definition name="site.inventory.createitemDishbursement" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/inventory/issueRequest/createDishburseMent.jsp"/>
+    </definition>
+    <!-- #######################################  Item Issue Request End ################################################## -->
+
+    <!-- #######################################  Asset Report Start ################################################## -->
+    <definition name="asset.jasper.mrn.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/report/mrnReport.jsp"/>
+    </definition>
+
+    <definition name="asset.jasper.po.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/report/poReport.jsp"/>
+    </definition>
+
+    <definition name="asset.jasper.po.pending.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/report/pendingPoReport.jsp"/>
+    </definition>
+
+    <definition name="asset.jasper.stock.adjust.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/report/stockAdjustReport.jsp"/>
+    </definition>
+
+    <definition name="asset.jasper.grn.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/report/grnReport.jsp"/>
+    </definition>
+    <definition name="asset.jasper.store.wise.item.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/report/storeWiseItemReport.jsp"/>
+    </definition>
+
+    <definition name="asset.jasper.inspection.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/report/inspectionReport.jsp"/>
+    </definition>
+
+    <definition name="asset.jasper.inventory.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/report/inventoryReport.jsp"/>
+    </definition>
+
+
+    <!-- #######################################  Asset Report End ################################################## -->
+
+
+    <!-- ASSET MODULE TILES END	-->
+
+
+    <!-- FDMS MODULE TILES START -->
+
+    <definition name="site.master.hierarchyLvl" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/master/hierarchyLvl.jsp"/>
+    </definition>
+
+
+    <definition name="site.master.hierarchyAdd" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/master/hierarchyAdd.jsp"/>
+    </definition>
+
+    <definition name="site.master.hierarchyList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/master/hierarchyList.jsp"/>
+    </definition>
+
+    <definition name="site.master.hierarchyEdtNview" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/master/hierarchyEdtNview.jsp"/>
+    </definition>
+
+
+    <definition name="site.budgetAdd" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/fdms/budget/budgetAdd.jsp"/>
+    </definition>
+    <definition name="site.viewBudget" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/fdms/budget/budgetView.jsp"/>
+    </definition>
+
+    <definition name="bdg.budget.requestedlist" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/fdms/budget/budgetReqList.jsp"/>
+    </definition>
+    <definition name="expnd.expenditure.list" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/fdms/expenditure/expenditureList.jsp"/>
+    </definition>
+
+    <definition name="expnd.expenditure.add" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/fdms/expenditure/expenditureAdd.jsp"/>
+    </definition>
+    <definition name="site.viewExpenditure" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/fdms/expenditure/expenditureView.jsp"/>
+    </definition>
+
+    <definition name="site.fdms.budget.add" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/fdms/budget/fdmsAddBudget.jsp"/>
+    </definition>
+    <definition name="site.fdms.budget.list" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/fdms/budget/fdmsBudgetList.jsp"/>
+    </definition>
+    <definition name="site.fdms.budget.view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/fdms/budget/fdmsBudgetView.jsp"/>
+    </definition>
+
+    <definition name="site.utilizationAdd" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/fdms/uc/utilizationAdd.jsp"/>
+    </definition>
+
+
+    <!-- FDMS MODULE TILES END -->
+
+
+    <!-- Rental Module Tiles Start -->
+
+    <!--start master -->
+
+    <definition name="site.tenants.add" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/addTenants.jsp"/>
+    </definition>
+
+    <definition name="site.tenants.view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/viewTenants.jsp"/>
+    </definition>
+
+    <definition name="site.tenants.list" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/tenantsList.jsp"/>
+    </definition>
+
+    <definition name="site.admin.addAgent" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/addAgent.jsp"/>
+    </definition>
+
+    <definition name="site.admin.viewAgent" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/viewAgent.jsp"/>
+    </definition>
+
+    <definition name="site.admin.agentList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/agentList.jsp"/>
+    </definition>
+
+
+    <definition name="site.rentConfig.add" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/rentConfigAdd.jsp"/>
+    </definition>
+
+    <definition name="site.rentConfig.list" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/rentConfigList.jsp"/>
+    </definition>
+
+    <!--end master -->
+
+    <!-- BeMC START -->
+
+    <definition name="site.tenant.home" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/paymentList.jsp"/>
+    </definition>
+
+    <definition name="site.tenant.paymentFinal" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/paymentFinal.jsp"/>
+    </definition>
+
+    <definition name="site.bank.bankPaymentList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/bankPaymentList.jsp"/>
+    </definition>
+    <definition name="wardAdd" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/wardAdd.jsp"/>
+    </definition>
+    <definition name="site.admin.wardList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/wardList.jsp"/>
+    </definition>
+    <definition name="zoneAdd" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/zoneAdd.jsp"/>
+    </definition>
+    <definition name="site.admin.zoneList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/zoneList.jsp"/>
+    </definition>
+    <definition name="shopAdd" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/addShop.jsp"/>
+    </definition>
+
+    <definition name="shopArrayAdd" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/shopArrayAdd.jsp"/>
+    </definition>
+
+    <definition name="site.admin.shopList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/master/shopList.jsp"/>
+    </definition>
+
+    <!-- BeMC END -->
+
+    <!-- Report Start -->
+
+    <definition name="site.admin.defaultersReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/report/defaultersReport.jsp"/>
+    </definition>
+
+    <definition name="site.admin.agentwiseReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/report/agentwiseReport.jsp"/>
+    </definition>
+
+    <definition name="site.admin.rentCollecReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/report/rentCollecReport.jsp"/>
+    </definition>
+
+    <definition name="site.admin.tenantReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/report/tenantReport.jsp"/>
+    </definition>
+
+    <definition name="site.admin.tenantWiseReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/report/tenantWiseReport.jsp"/>
+    </definition>
+
+    <definition name="site.admin.wardWiseReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/report/wardWiseReport.jsp"/>
+    </definition>
+
+    <definition name="site.admin.rentGenerate" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rentCollection/report/rentGenerate.jsp"/>
+    </definition>
+
+    <!-- Report End -->
+
+
+    <!-- Rental Module Tiles End -->
+
+
+    <!-- ================Litigation Management System Start ==================-->
+    <definition name="site.createCase" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/createCase.jsp"/>
+    </definition>
+
+    <definition name="site.manageInterimOrderDetails" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/manageInterimOrderDetails.jsp"/>
+    </definition>
+    <definition name="site.listInterimOrderDetails" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/listInterimOrderDetails.jsp"/>
+    </definition>
+    <definition name="site.assignCaseAdvocate" extends="layout.base">
+        <put-attribute name="body"  value="/WEB-INF/views/litigation/assignCaseAdvocate.jsp"/>
+    </definition>
+    <definition name="site.counterAffidavit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/counterAffidavit.jsp"/>
+    </definition>
+    <definition name="site.listCounterAffidavit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/listCounterAffidavit.jsp"/>
+    </definition>
+    <definition name="site.judgement" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/judgement.jsp"/>
+    </definition>
+    <definition name="site.listJudgement" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/listJudgement.jsp"/>
+    </definition>
+    <!-- ====================== BENEFICIARY START============================== -->
+	<!-- ============================================================ -->
+
+	<definition name="site.bnf.addBeneficiary" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/eCashbook/beneficiary/addBeneficiary.jsp"/>
+	</definition>
+
+	<definition name="site.bnf.viewBeneficiary" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/eCashbook/beneficiary/viewBeneficiary.jsp"/>
+	</definition>
+
+	<definition name="site.bnf.viewStudent" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/beneficiary/viewStudent.jsp"></put-attribute>
+	</definition>
+
+	<definition name="site.bnf.entityBeneficiaryMap" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/beneficiary/entityBeneficiaryMap.jsp"></put-attribute>
+	</definition>
+
+	<definition name="site.bnf.entityBeneficiaryMapList" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/beneficiary/entityBeneficiaryMapList.jsp"></put-attribute>
+	</definition>
+
+	<definition name="site.bnf.addStudent" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/beneficiary/addStudent.jsp"></put-attribute>
+	</definition>
+
+	<!-- ====================== BUDGET START============================== -->
+	<!-- ============================================================ -->
+	<definition name="bdg.budget.add" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/budget/budgetAdd.jsp"></put-attribute>
+	</definition>
+
+	 <definition name="bdg.budget.list" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/budget/budgetList.jsp"></put-attribute>
+	</definition>
+
+	<definition name="bdg.budget.view" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/budget/budgetView.jsp"></put-attribute>
+	</definition>
+
+
+    <definition name="site.registeredCaseList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/registeredCaseList.jsp"/>
+    </definition>
+    <definition name="site.editCase" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/editCase.jsp"/>
+    </definition>
+    <definition name="site.courtWiseCaseReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/courtWiseCaseReport.jsp"/>
+    </definition>
+    <definition name="site.priorityWiseCaseReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/priorityWiseCaseReport.jsp"/>
+    </definition>
+    <definition name="site.litigationDashboard" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/litigationDashboard.jsp"/>
+    </definition>
+
+    <definition name="site.courtType" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/courtType.jsp"/>
+    </definition>
+    <definition name="site.saveCourtDetails" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/saveCourtDetails.jsp"/>
+    </definition>
+    <definition name="site.deleteCourtType" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/delete-courtType.jsp"/>
+    </definition>
+    <definition name="site.editCourtType" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/edit-courtType.jsp"/>
+    </definition>
+    <definition name="site.createCaseType" extends="layout.base">
+        <put-attribute name="body"  value="/WEB-INF/views/litigation/createCaseType.jsp"/>
+    </definition>
+    <definition name="site.createCaseType" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/createCaseType.jsp"/>
+    </definition>
+    <definition name="site.edit-caseType" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/edit-caseType.jsp"/>
+    </definition>
+    <definition name="site.delete-caseType" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/delete-caseType.jsp"/>
+    </definition>
+    <definition name="site.manageAdvocate" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/manageAdvocate.jsp"/>
+    </definition>
+    <definition name="site.manageAdvocate" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/manageAdvocate.jsp"/>
+    </definition>
+    <definition name="site.edit-advocate" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/edit-advocate.jsp"/>
+    </definition>
+    <definition name="site.delete-advocate" extends="layout.base">
+        <put-attribute name="body"  value="/WEB-INF/views/litigation/delete-advocate.jsp"/>
+    </definition>
+    <definition name="site.closeCase" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/closeCase.jsp"/>
+    </definition>
+    <definition name="site.allCaseListForEmployee" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/allCaseListForEmployee.jsp"/>
+    </definition>
+
+    <definition name="site.viewAttachmentForCase" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/viewAttachmentForCase.jsp"/>
+    </definition>
+
+    <definition name="site.actionTakenJudgmentList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/actionTakenJudgmentList.jsp"/>
+    </definition>
+
+
+    <definition name="site.actionTakenListOfJudgment" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/actionTakenListOfJudgmentList.jsp"/>
+    </definition>
+    <definition name="bdg.budget.bdgReqList" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/budget/bdgReqList.jsp"></put-attribute>
+	</definition>
+
+	<definition name="bdg.budgetShare.list" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/demography/budgetShare.jsp"></put-attribute>
+	</definition>
+
+	<!-- ====================== Expenditure START============================== -->
+	<!-- ============================================================ -->
+	<definition name="fnd.expenditure.add" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/expenditure/expenditureAdd.jsp"></put-attribute>
+	</definition>
+
+	 <definition name="fnd.expenditure.list" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/expenditure/expenditureList.jsp"></put-attribute>
+	</definition>
+
+	<definition name="fnd.expenditure.view" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/expenditure/expenditureView.jsp"></put-attribute>
+	</definition>
+
+	<!-- ====================== FUND START============================== -->
+
+    <definition name="site.litigationDashboard" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/litigationDashboard.jsp"/>
+    </definition>
+
+    <definition name="site.viewComments" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/viewComments.jsp"/>
+    </definition>
+
+    <definition name="site.viewCaseWiseComments" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/viewCaseWiseComments.jsp"/>
+    </definition>
+
+    <definition name="site.courtWiseReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/courtWiseReport.jsp"/>
+    </definition>
+
+    <definition name="site.closeCaseList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/litigation/closeCaseList.jsp"/>
+    </definition>
+
+    <definition name="site.districtMineralReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dmf/project/districtMineralFoundtnReport.jsp"/>
+    </definition>
+     <definition name="fnd.fund.add" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/fund/fundAdd.jsp"></put-attribute>
+	</definition>
+
+
+	<definition name="fnd.transaction.add" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/fund/transactionAdd.jsp"></put-attribute>
+	</definition>
+
+	<definition name="fnd.transaction.list" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/fund/transactionList.jsp"></put-attribute>
+	</definition>
+
+	 <definition name="fnd.fund.list" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/fund/fundList.jsp"></put-attribute>
+	</definition>
+
+	<definition name="fnd.fund.view" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/fund/fundView.jsp"></put-attribute>
+	</definition>
+
+
+    <!-- ================Litigation Management System End ==================-->
+
+    <definition name="fnd.fund.fndReqList" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/fund/fndReqList.jsp"></put-attribute>
+	</definition>
+
+	<definition name="fnd.uc.add" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/fund/fndUCAdd.jsp"></put-attribute>
+	</definition>
+
+
+	<definition name="fnd.uc.view" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/fund/fndUCView.jsp"></put-attribute>
+	</definition>
+
+	<definition name="fnd.uc.list" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/fund/fndUCList.jsp"></put-attribute>
+	</definition>
+
+
+
+	<definition name="fnd.expenditure.view" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/expenditure/expenditureView.jsp"></put-attribute>
+	</definition>
+
+	<definition name="fnd.income.add" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/income/incomeAdd.jsp"></put-attribute>
+	</definition>
+
+	 <definition name="fnd.income.list" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/income/incomeList.jsp"></put-attribute>
+	</definition>
+
+	<definition name="fnd.income.view" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/income/incomeView.jsp"></put-attribute>
+	</definition>
+
+	<!-- ====================== FUND END ============================== -->
+  <definition name="admin.entitySchemeMapping.add" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/common/entitySchemeMapping.jsp"></put-attribute>  			
+							
+	</definition>
+	
+	
+	<definition name="admin.entitySchemeMapping.list" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/eCashbook/common/entitySchemeMapList.jsp"></put-attribute>  			
+							
+	</definition>
+
+
+    <definition name="admin.fundtype.list" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/eCashbook/demography/addFundType.jsp"></put-attribute>
+
+    </definition>
+    <definition name="admin.head.list" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/eCashbook/demography/addHead.jsp"></put-attribute>
+
+    </definition>
+
+    <definition name="admin.subhead.list" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/eCashbook/demography/addSubHead.jsp"></put-attribute>
+
+    </definition>
+    <definition name="admin.scheme.list" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/eCashbook/demography/addScheme.jsp"></put-attribute>
+
+    </definition>
+    <definition name="fnd.subfund.add" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/eCashbook/fund/subfund.jsp"></put-attribute>
+    </definition>
+    <definition name="admin.entity.list" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/eCashbook/demography/addEntityType.jsp"></put-attribute>
+
+    </definition>
+
+    <!-- ====================== RTI START ============================== -->
+    <definition name="rtiPortal.rtiApplication" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rtiPortal/rtiApplication.jsp"></put-attribute>
+
+    </definition>
+    <definition name="rtiPortal.rtiAcknowledgement" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/rtiPortal/rtiAcknowledgement.jsp"></put-attribute>
+
+    </definition>
+
+    <definition name="rtiPortal.viewRequestDepttWise" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/rtiPortal/viewRequestDepttWise.jsp"></put-attribute>
+
+    </definition>
+
+    <definition name="rtiPortal.trackingStatus" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/rtiPortal/trackingStatus.jsp"></put-attribute>
+
+    </definition>
+
+    <definition name="rtiPortal.firstAppeal" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/rtiPortal/firstAppeal.jsp"></put-attribute>
+
+    </definition>
+
+    <definition name="rtiPortal.viewFirstAppeal" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/rtiPortal/viewFirstAppeal.jsp"></put-attribute>
+
+    </definition>
+
+    <definition name="rtiPortal.viewRequest" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/rtiPortal/viewRequest.jsp"></put-attribute>
+
+    </definition>
+
+    <definition name="rtiPortal.firstAppeal" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/rtiPortal/firstAppeal.jsp"></put-attribute>
+
+    </definition>
+
+    <definition name="rtiPortal.formDverification" extends="layout.base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/rtiPortal/formDverification.jsp"></put-attribute>
+
+    </definition>
+
+
+
+    <definition name="site.module.directory" extends="layout.module">
+        <put-attribute name="body" value="/WEB-INF/views/moduleDirectory.jsp"></put-attribute>
+    </definition>
+
+
+    <!-- ######################################    DMS Start   ############################################## -->
+
+    <definition name="site.dms.view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/DMS/folderFileList.jsp" />
+    </definition>
+
+    <definition name="site.dms.share.view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/DMS/shareFolderFileList.jsp" />
+    </definition>
+
+    <definition name="site.dms.update.shareentity" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/DMS/updateShareEntity.jsp" />
+    </definition>
+
+    <definition name="site.dms.view.byKey" template="/WEB-INF/views/DMS/folderFilesOnApiKey.jsp" />
+
+    <definition name="site.dms.free.link.view" template="/WEB-INF/views/DMS/freeViewPage.jsp" />
+
+    <!-- ######################################    DMS End   ############################################## -->
+
+
+    <!-- ######################################    Grievance Start   ############################################## -->
+
+  <definition name="site.grievence.master.category" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addCategory.jsp"/>
+    </definition>
+    <definition name="site.grievence.master.subcategory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addSubCategory.jsp"/>
+    </definition>
+
+
+    <definition name="site.addPublicGrievence" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addPublicGrievence.jsp"/>
+    </definition>
+
+    <definition name="site.addGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addGrievence.jsp"/>
+    </definition>
+    <definition name="site.grievenceList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/listGrievence.jsp"/>
+    </definition>
+
+    <definition name="site.addGrievanceDpt" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addGrievanceDpt.jsp"/>
+    </definition>
+    <definition name="site.editGrievance" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/editGrievance.jsp"/>
+    </definition>
+    <definition name="site.listGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/grievanceList.jsp"/>
+    </definition>
+
+    <definition name="site.reqListGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/reqListGrievence.jsp"/>
+    </definition>
+    <definition name="site.grievanceDeptList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/grievanceDeptList.jsp"/>
+    </definition>
+
+    <definition name="site.viewGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewGrievance.jsp"/>
+    </definition>
+    <definition name="site.viewPublicGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewPublicGrievance.jsp"/>
+    </definition>
+    <definition name="site.viewDeptGrievance" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewDeptGrievance.jsp"/>
+    </definition>
+    <definition name="site.searchGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/searchGrievance.jsp"/>
+    </definition>
+    <definition name="site.searchPublicGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/publicSearchGrievance.jsp"/>
+    </definition>
+    <definition name="site.lodgeGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/lodgeGrievance.jsp"/>
+    </definition>
+    <!-- ######################################    Grievance Jasper Start   ############################################## -->
+
+    <definition name="site.rpt.grievanceTrackingDetailsData" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/grievanceReport/grievanceTrackingDetailsData.jsp"/>
+	    </definition>
+
+	     <definition name="site.rpt.budgetVarianceFilterPage" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/grievanceReport/budgetVarianceFilterPage.jsp"/>
+	    </definition>
+
+
+<!--    Debasish Barik-->
+        <definition name="site.rpt.grievance.categorize" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/grievanceReport/grievanceCategorizeReport.jsp"/>
+        </definition>
+
+    <!-- ######################################    Grievance End   ############################################## -->
+
+	<!-- ######################################   MASTER START  ############################################## -->
+	   <definition name="municipality-form" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/Municipality/municipalityOnboard.jsp"/>
+	    </definition>
+	    
+	   <definition name="department-form" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/masters/departmentForm.jsp"/>
+	    </definition>
+	
+	   <definition name="governingBody-form" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/governingBody/governingBodyOnboarding.jsp"/>
+	    </definition>
+	    
+	    <definition name="section-form" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/masters/sectionForm.jsp"/>
+	    </definition>
+	
+	<!-- ######################################   MASTER END  ############################################## -->
+	
+	<!-- ######################################   STAFF ONBOARDING   ############################################## -->
+	   <definition name="staffOnBoarding-form" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/staffOnBoarding/staffOnboarding.jsp"/>
+	    </definition>
+	
+	   <definition name="staffMembers" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/staffOnBoarding/staffMemberList.jsp"/>
+	    </definition>
+	<!-- ######################################   STAFF ONBOARDING END  ############################################## -->
+
+<!-- ######################################   Master Data Start  ############################################## -->
+	
+	<definition name="site.financialYearMst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/financialYearMst.jsp"/>
+    </definition>
+
+	<definition name="site.bankBranchMst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/bankBranchMst.jsp"/>
+    </definition>
+
+	<definition name="site.schemeMst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/schemeMst.jsp"/>
+    </definition>
+
+	<definition name="site.programMst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/programMst.jsp"/>
+    </definition>
+    
+    <definition name="site.facilitiesMapMst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/facilitiesMapMst.jsp"/>
+    </definition>
+<!-- ######################################   Master Data END  ############################################## -->
+
+
+<!-- ######################################   RTI Data Start  ############################################## -->
+	
+	<definition name="site.addRtiDept" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rti/addRtiDept.jsp"/>
+    </definition>
+    
+    <definition name="site.rtiDeptList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rti/rtiDeptList.jsp"/>
+    </definition>
+    
+    <definition name="site.allocateRtiQuestion" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rti/allocateRtiQuestion.jsp"/>
+    </definition>
+    
+    <definition name="site.rtiQuestionByDepartment" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rti/rtiQuestionByDepartment.jsp"/>
+    </definition>
+    
+    <definition name="site.rtiPdfGenerationReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rti/rtiPdfReport.jsp"/>
+    </definition>
+    
+    <definition name="site.viewRtiQuestion" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rti/viewRtiQuestion.jsp"/>
+    </definition>
+    
+     <definition name="site.rtiViewAnswerPdf" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rti/rtiViewPdfReport.jsp"/>
+    </definition>
+
+	<definition name="site.rtiQuestionList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rti/rtiQuestionList.jsp"/>
+    </definition>
+    
+    <definition name="site.answerList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rti/answerList.jsp"/>
+    </definition>
+    
+    <definition name="site.viewRtiAnswer" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/rti/viewRtiAnswer.jsp"/>
+    </definition>
+    
+    <definition name="site.officeMasterPage" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/officeMasterPage.jsp"/>
+    </definition>
+
+    <definition name="site.createStructure" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/createStructure.jsp"/>
+    </definition>
+
+    <definition name="site.createNewStructure" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/createStructure2.jsp"/>
+    </definition>
+    
+     <definition name="site.facilityAssetMapping" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/facilityAssetMapping.jsp"/>
+    </definition>
+    
+    <!--#################### e-CashBook UC View #############################-->
+    <definition name="site.ucView" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/eCashbook/uc/ucView.jsp"></put-attribute>
+	</definition>
+
+	<definition name="site.rentAgreementConfig" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/rentAgreement/rentAgreementConfig.jsp"></put-attribute>
+	</definition>
+	
+	
+
+    <!--#################### Vehicle #############################-->
+
+    <definition name="add.mst.vehicletype" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hiring/addVehicleType.jsp"></put-attribute>
+    </definition>
+    <definition name="add.mst.vehicle" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hiring/addVehicle.jsp"></put-attribute>
+    </definition>
+	
+	<definition name="site.getRentCollectionPage" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/rentAgreement/rentCollectionPage.jsp"></put-attribute>
+	</definition>
+	
+	<definition name="site.getRentPaymentDetails" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/rentAgreement/rentPaymentDetails.jsp"></put-attribute>
+	</definition>
+	
+	<definition name="site.generateRentAgreementInvoice" extends="layout.blank">
+		<put-attribute name="body" value="/WEB-INF/views/rentAgreement/generateRentAgreementInvoice.jsp"></put-attribute>
+	</definition>
+	
+	    <definition name="generate.vehicle.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hiring/generateVehicleOnboardingReport.jsp"></put-attribute>
+    </definition>
+
+    <definition name="view.vehicle.report" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/hiring/vehiclePaymentHistory.jsp"/>
+    </definition>
+	
+	<definition name="site.viewRentAgreementInvoice" extends="layout.blank">
+		<put-attribute name="body" value="/WEB-INF/views/rentAgreement/viewRentAgreementInvoice.jsp"></put-attribute>
+	</definition>
+
+
+    <!--#################### Hoarding #############################-->
+    <definition name="add.hoarding.inventory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hoarding/addInventory.jsp"></put-attribute>
+    </definition>
+
+    <definition name="list.hoarding.details.view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hoarding/hoardingDetailsView.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.hoarding.complaint.management" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hoarding/complaintManagement.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.hoarding.booking.reservation" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hoarding/bookingHoarding.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.hoarding.client.management" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hoarding/clientManagement.jsp"></put-attribute>
+    </definition>
+
+    <definition name="generate.campaign.report" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/hoarding/generateCampaignReport.jsp"></put-attribute>
+    </definition>
+
+    <!--#################### Audit #############################-->
+    <definition name="site.add.auditmst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/addAuditMst.jsp"></put-attribute>
+    </definition>
+    <definition name="site.add.audit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/addAudit.jsp"></put-attribute>
+    </definition>
+    <definition name="site.audit.checklist" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/auditCheckList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.audit.execution" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/auditExecution.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.audit.issue" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/auditIssue.jsp"></put-attribute>
+    </definition>
+    <definition name="site.audit.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/auditReport.jsp"></put-attribute>
+    </definition>
+    <definition name="site.audit.review" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/auditReview.jsp"></put-attribute>
+    </definition>
+    <definition name="site.audit.corrective" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/auditCorrective.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.add.checklist.name" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/addCheckListName.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.add.checklist.item.name" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/addCheckListItemName.jsp"></put-attribute>
+    </definition>
+
+    <!--#################### Add Area #############################-->
+    <definition name="site.addArea" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hoarding/addArea.jsp"/>
+    </definition>
+
+    <definition name="site.add.audit.checklist" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/addCheckList.jsp"></put-attribute>
+    </definition>
+
+
+
+    <!--#################### FAMS MODULE START #############################-->
+	     
+	     <!-- party creation page -->
+	<definition name="site.partyMaster" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/partyMaster.jsp" />
+	</definition>
+	
+	<!-- Accountgroup -->
+	<definition name="site.accountGroupMaster" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/accountGroupMaster.jsp"/>
+	</definition>
+	
+	<definition name="site.subAccountGroupMaster" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/subAccountGroupMaster.jsp"/>
+	</definition>
+	
+	<!-- subAccountGroupMaster -->
+	<definition name="site.scheduleSubScheduleMaster" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/scheduleSubScheduleMaster.jsp"/>
+	</definition>
+	
+	<definition name="master.accountMaster" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/accountMaster.jsp" />
+	</definition>
+	
+	<definition name="site.projectMaster" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/projectMaster.jsp" />
+	</definition>
+	
+	<definition name="site.HsnsacCodeMaster" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/HsnsacCodeMaster.jsp" />
+	</definition>
+	
+	<!-- work creation page -->
+	<definition name="site.workMaster" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/workMaster.jsp" />
+	</definition>
+	
+	<!-- invoice page -->
+	<definition name="site.invoice" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/invoice.jsp" />
+	</definition>
+	
+	<!-- invoice list page -->
+	<definition name="site.invoiceList" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/invoiceList.jsp" />
+	</definition>
+	
+	<!--############################################### BUDGET ###################################### -->
+	<definition name="site.budgetGroup" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/Budget/budgetGroupMst.jsp" />
+	</definition>
+	
+	<definition name="site.budgetSubGroup" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/Budget/budgetSubGroup.jsp" />
+	</definition>
+	
+	<definition name="site.budgetSubGroupEntityMap" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/Budget/budgetSubGroupEntityMap.jsp" />
+	</definition>
+	
+	<definition name="site.addBudget" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/Budget/budgetCreation.jsp" />
+	</definition>
+	
+	<!--############################################### VOUCHER ###################################### -->
+	<!-- Journal Voucher -->
+	<definition name="site.journalVoucher" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/voucher/journalVoucher/journalVoucher.jsp" />
+	</definition>
+	<definition name="site.journalVoucherList" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/voucher/journalVoucher/journalVoucherList.jsp" />
+	</definition>
+	
+	<!-- Journal Voucher end -->
+	<!-- Payment Voucher -->
+	<definition name="site.paymentVoucher" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/voucher/paymentVoucher/paymentVoucher.jsp" />
+	</definition>
+	<definition name="site.paymentVoucher.list" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/voucher/paymentVoucher/paymentVoucherList.jsp" />
+	</definition>
+	
+	<!-- Payment Voucher -->
+	
+	<!-- Receipt Voucher -->
+	<definition name="site.receiptVoucher" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/voucher/receiptVoucher/receiptVoucher.jsp" />
+	</definition>
+	
+	<definition name="site.receiptVoucherList" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/voucher/receiptVoucher/receiptVoucherList.jsp" />
+	</definition>
+	
+	<!-- Receipt Voucher -->
+	<!--############################################### VOUCHER END ###################################### -->
+	
+	<!-- Expenditure Master -->
+	<definition name="site.expenditure" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/Expenditure/manageExpenditure.jsp" />
+	</definition>
+	
+	<definition name="site.fund.request" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/Expenditure/fundRequest.jsp" />
+	</definition>
+	
+	<definition name="site.payment.receipt" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/paymentReciept.jsp" />
+	</definition>
+	
+	<definition name="site.invoice.collection.list" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/invoiceCollectionList.jsp" />
+	</definition>
+	
+	<definition name="site.project.milestone" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/project/projectMilestone.jsp" />
+	</definition>
+	
+	<definition name="site.delivery.milestone" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/project/deliveryMilestone.jsp" />
+	</definition>
+	
+	<definition name="site.projectPhaseMap" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/projectPhaseMap.jsp" />
+	</definition>
+	
+	<definition name="site.work.order" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/workOrderAgreement.jsp" />
+	</definition>
+
+	<definition name="site.work.order.list" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/workOrderAgreementList.jsp" />
+	</definition>
+
+	<definition name="site.addUnitOfMeasurement" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/addUnitOfMeasurement.jsp" />
+	</definition>
+	
+	<definition name="project.milstone.details" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/milestone/projectMilestoneDetails.jsp" />
+	</definition>
+	
+	<definition name="project.invoiceGenerationOfProjectMistoneDetaislPage" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/milestone/invoiceGenerationOfProjectMistoneDetaislPage.jsp" />
+	</definition>
+	
+	<!--############################################### REPORT SECTION START ###################################### -->
+	
+	<definition name="fams.reports.container" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/reports/famsReportContainer.jsp" />
+	</definition>
+	<definition name="report.bank.cash" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/reports/bankCashReport.jsp" />
+	</definition>
+	
+	<definition name="report.inc.exp" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/reports/incomeExpenditure.jsp" />
+	</definition>
+	
+	<definition name="report.rptTrialBalAllLedgers" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/reports/trialBalanceLedgerWise.jsp" />
+	</definition>
+	
+	<definition name="report.voucher.mismatch" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/reports/voucherMisMatch.jsp" />
+	</definition>
+	
+	<definition name="report.account.ledger" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/reports/accountLedgerReport.jsp" />
+	</definition>
+	
+	<definition name="report.account.ledger.partywise" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/reports/accountLedgerPartyWiseReport.jsp" />
+	</definition>
+	
+	
+	<definition name="site.rptGSTR1Details" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/FAMS/reports/rptGSTR1Details.jsp"/>
+	</definition> 
+
+	<definition name="site.rptGSTR2Details" extends="layout.base">
+			<put-attribute name="body" value="/WEB-INF/views/FAMS/reports/rptGSTR2Details.jsp"/>
+		</definition>
+	
+	<definition name="site.taxInvoice" extends="layout.base">
+			<put-attribute name="body" value="/WEB-INF/views/FAMS/reports/rptGSTInvoiceDetails.jsp"/>
+	</definition>
+	
+	<!--############################################### REPORT SECTION END ###################################### -->
+	<!--############################################### CREDIT & DEBIT NOTE START ###################################### -->
+	
+	<definition name="credit.debit.note" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/creditDebitNote/creditDebitNote.jsp" />
+	</definition>
+	
+	<definition name="creditdebitnote.list" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/creditDebitNote/creditDebitNoteList.jsp" />
+	</definition>
+	
+	<!--############################################### CREDIT & DEBIT NOTE END ###################################### -->
+	
+	<!--############################################### ESTIMATION ###################################### -->
+	
+	<definition name="estimate.add" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/workEstimation.jsp" />
+	</definition>
+	
+	<definition name="estimate.list" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/workEstimationList.jsp" />
+	</definition>
+	
+	<!--############################################### ESTIMATION END ###################################### -->
+	
+	<!--############################################### BOQ START ###################################### -->
+	
+	<definition name="manage.boq" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/manageBOQ.jsp" />
+	</definition>
+	
+	<definition name="manage.boq.list" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/boqList.jsp" />
+	</definition>
+	
+	<definition name="boq.measurement" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/boqMeasurement.jsp" />
+	</definition>
+	
+	<definition name="boq.measurement.entry" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/boqMeasurementEntry.jsp" />
+	</definition>
+	
+	<definition name="boq.measurement.list" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/boqMeasurementList.jsp" />
+	</definition>
+	
+	<definition name="boq.measurement.details" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/boqMeasurementDetails.jsp" />
+	</definition>
+	
+	<!--############################################### BOQ END ###################################### -->
+	 <!--############################################### DEVIATION STATEMENT START ######################################  -->
+	   
+	<definition name="manage.deviation" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/deviationStatement.jsp" />
+	</definition>
+	
+	<definition name="manage.running.bill" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/runningBill.jsp" />
+	</definition>
+	
+	<!--############################################### DEVIATION STATEMENT END ######################################  -->
+	
+	<!--############################################### IPMS INVOICE START ######################################  -->
+	
+	<definition name="ipms.invoice" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/ipmsInvoice.jsp" />
+	</definition>
+	
+	<!--############################################### IPMS INVOICE END ######################################  -->
+	
+	<definition name="site.updateOpnClsBlnc" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/milestone/updateOpnClsBlnc.jsp"/>
+	</definition>
+	
+	<!--###################################### PHASE START #########################################  -->
+	
+	<definition name="site.addPhase" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/master/addPhase.jsp"/>
+	</definition>
+	
+	<!--####################################### PHASE END ##########################################  -->
+	     <!-- ================================ IPMS JASPER REPORT ================================= -->
+
+	     <definition name="report.ipmsReportMainPage" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/report/ipmsReportMainPage.jsp"/>
+		</definition>
+
+		<definition name="site.file.spb" extends="layout.blank">
+	    <put-attribute name="body" value="/WEB-INF/views/FAMS/ipms/report/manageSPBfile.jsp"/>
+		</definition>
+
+	     <!-- ================================ IPMS JASPER REPORT END================================= -->
+
+     
+      <!--#################### FAMS MODULE END #############################-->
+
+
+    <!-- ================================ PAY ROLL ================================= -->
+    <!-- Pay Code Master -->
+    <definition name="site.payrollpaycode" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/payrollPaycodes.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.staffSpecificPaycode" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/staffSpecificPaycode.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.staffTaxCalculationList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/incomeTax/staffTaxCalculationList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.staffIncomeTax" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/incomeTax/staffIncomeTaxDetails.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.staffTaxmonthlyDeposit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/incomeTax/itaxDepositMonthly.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.staffTaxDepositQuarterly" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/incomeTax/itaxDepositQuarterly.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.staffTaxCalculationDetails" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/incomeTax/staffTaxCalculationDetails.jsp"></put-attribute>
+    </definition>
+
+    <definition name="process.regularPayroll" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/process/regularPayroll.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.salaryLeave" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/process/salaryLeave.jsp"></put-attribute>
+    </definition>
+
+    <definition name="nonDrawalSalary" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/process/nonDrawalSalary.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.arrearSalary" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/process/arrearSalary.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.retain.arrearSalary" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/process/retainArrearSalaryProccess.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.surrenderLeave" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/process/surrenderLeave.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.pr-bonus-incntv" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/process/bonusIncentive.jsp"></put-attribute>
+    </definition>
+    <definition name="site.gratuity" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/process/gratuity.jsp"></put-attribute>
+    </definition>
+    <!-- 	============================================== Attendance process ================================================= -->
+
+    <definition name="site.processAttendance" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/attendance/processAttendance.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.staffVpf" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/staffVpf.jsp"></put-attribute>
+    </definition>
+
+    <definition name="hrms.pr.insurance.getInsuranceDetails" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/payroll/declarations/insurancePolicy.jsp"></put-attribute>
+    </definition>
+
+    <!-- 	============================================== Promotion ================================================= -->
+
+    <definition name="site.getStaffPromotion" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/staffPromotion.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.staffPromotionWFlowList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/staffPromotionWFlowList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.staffDemotionWFlowList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/staffDemotionWFlowList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.getPromotionOrDemotionMode" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/promotionDemotionType.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.duePromotions" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptPromotionDue.jsp"></put-attribute>
+    </definition>
+
+    <definition name="staff.promotionRollConfiguration" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/promotion/promotionRoleConfiguration.jsp"></put-attribute>
+    </definition>
+
+    <definition name="staff.newTransfer" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/staffTransferNew.jsp"></put-attribute>
+    </definition>
+
+    <definition name="staff.transferTypeNew" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/transferTypeNew.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.hrms.workFlowDesgnwiseProcess" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/workflow/workFlowDesgnwiseProcess.jsp"></put-attribute>
+    </definition>
+
+    <definition name="hrms.common.stafflist" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/commonStaffList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="staff.newTransferWorkflow" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/transferWorkflowNew.jsp"></put-attribute>
+    </definition>
+
+    <!-- 	============================================== Promotion End ================================================= -->
+    <!-- ================================ HRMS/LOAN MANAGEMENT ====================================================== -->
+    <definition name="loan.advance.add" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/loanAndAdvance/addLoanAndAdvanceDetails.jsp" />
+    </definition>
+
+    <definition name="site.loan.preClosureLoanApplication" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/loanAndAdvance/preClosureLoanApplication.jsp" />
+    </definition>
+
+
+    <definition name="loan.apply" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/loanAndAdvance/applyForLoan.jsp" />
+    </definition>
+
+    <definition name="site.sanctionAppliedLoan" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/loanAndAdvance/sanctionAppliedLoan.jsp" />
+    </definition>
+
+    <definition name="site.sanctionLoanApplicationList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/loanAndAdvance/sanctionLoanApplicationList.jsp" />
+    </definition>
+
+    <definition name="site.festivaleAdvance" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/loanAndAdvance/loanAdvancefestival.jsp" />
+    </definition>
+
+    <!-- Staff Suspension -->
+    <definition name="site.staffSuspensionList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/staffSuspensionList.jsp" />
+    </definition>
+    <definition name="hrms.suspension" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/staffSuspension.jsp"></put-attribute>
+    </definition>
+    <definition name="hrms.revoke" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/staffSuspensionRevoke.jsp"></put-attribute>
+    </definition>
+    <definition name="site.suspension.workflow" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/staffSuspensionWFlow.jsp"></put-attribute>
+    </definition>
+    <definition name="site.revoke.workflow" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/staffMgmt/revokeWflow.jsp"></put-attribute>
+    </definition>
+
+    <!-- ============================================disciplinary-Proceedings-start========================================== -->
+
+    <definition name="site.staffdisciplinary" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/discProceedings/sataffDiscplinaryProceesing.jsp" />
+    </definition>
+
+    <definition name="site.staffdisciplinaryList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/discProceedings/staffdisciplinaryList.jsp" />
+    </definition>
+
+
+
+    <definition name="site.staffdisciplinaryView" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/discProceedings/staffdisciplinaryView.jsp" />
+    </definition>
+
+    <definition name="site.punishment" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/discProceedings/punishment.jsp" />
+    </definition>
+
+    <definition name="site.sub_punishment" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/discProceedings/sub_punishment.jsp" />
+    </definition>
+
+    <definition name="site.alligationCategory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/discProceedings/alligationCategory.jsp" />
+    </definition>
+
+
+    <!-- ============================================disciplinary-Proceedings-end========================================== -->
+
+
+    <!-- ============================================================= PAR MODULE START =================================================================-->
+
+    <definition name="site.par.add" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/par/addpar.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.par.key" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/par/keypar.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.par.list" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/par/parlist.jsp"></put-attribute>
+    </definition>
+
+
+    <definition name="site.par.rating" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/par/parratingdtl.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.par.skpi" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/par/staffkpi.jsp"></put-attribute>
+    </definition>
+
+
+    <definition name="site.par.configure" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/par/configure.jsp"></put-attribute>
+    </definition>
+
+
+    <definition name="site.par.rcvlist" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/par/parrcvlist.jsp"></put-attribute>
+    </definition>
+
+
+    <!-- ============================================================= PAR MODULE END =================================================================-->
+     
+     <!--#################### RTI Report Start #############################-->
+	     <definition name="site.rtiRequestReport" extends="layout.base">
+		    <put-attribute name="body" value="/WEB-INF/views/rti/rtiRequestReportByObjectId.jsp"/>
+		 </definition>
+
+     	 <definition name="site.rtiResponseListReport" extends="layout.base">
+		    <put-attribute name="body" value="/WEB-INF/views/rti/rtiResponseListReport.jsp"/>
+		 </definition>
+
+		 <definition name="site.rtiDocListReport" extends="layout.base">
+		    <put-attribute name="body" value="/WEB-INF/views/rti/rtiDocListReport.jsp"/>
+		 </definition>
+
+		 <definition name="site.rtiRequestStatusReport" extends="layout.base">
+		    <put-attribute name="body" value="/WEB-INF/views/rti/rtiRequestStatusReport.jsp"/>
+		 </definition>
+
+		 <definition name="site.rtiQuesAvgResolutionTime" extends="layout.base">
+		    <put-attribute name="body" value="/WEB-INF/views/rti/rtiQuesAvgResolutionTime.jsp"/>
+		 </definition>
+
+		 <!--#################### RTI Report End #############################-->
+ 		 <definition name="reports.hrms.designationWiseStaffs" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptDesignationWiseStaffs.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.hrms.giaGrantStaffs" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptGiaGrantStaffs.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.hrms.rptEmployeeLeave" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptEmployeeLeave.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.hrms.collegewiseemployee" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptCollegeWiseEmployeeList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.rptJoiningList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptJoiningList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.retirementList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptRetirementList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.bonusIncentiveList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptBonusIncentiveList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="report.rptAnnualPayslip" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptAnnualPayslip.jsp"></put-attribute>
+    </definition>
+
+    <definition name="srvcBook.staffServiceBook" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptServiceBook.jsp"></put-attribute>
+    </definition>
+
+    <definition name="report.rptPayrollReportList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptPayrollReportList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.hrms.disciplinaryProceedingsReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptStaffDp.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.hrms.staffDetails" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptStaffDetails.jsp"></put-attribute>
+    </definition>
+    <definition name="reports.rptAttendanceList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptAttendanceList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.rptSeniorityList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptSeniorityList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.hrms.rptTourList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptStaffTourList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.hrms.rptPar" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptParReport.jsp"></put-attribute>
+    </definition>
+
+
+    <definition name="reports.rptTransferList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptTransferList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.rptLoanAdvList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptLoanAdvList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.rptStaffPromotionList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptStaffPromotionList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.rptLeaveTakenList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptLeaveTaken.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.rptStaffDemotionList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptStaffDemotionList.jsp"></put-attribute>
+    </definition>
+
+
+    <definition name="reports.rptSuspensionList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptStaffSuspensionList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.rptStaffRevokeList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptStaffRevokeList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.rptGradeWiseStaffPromotionList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptGradeWisePromotionDetails.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.rptGradeWiseStaffDemotionList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptGradeWiseDemotionDetails.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.hrms.rptLoanForeCloserList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/reports/rptLoanForeCloserList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.dataEntryStatusReport" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/report/dataEntryStatusReport.jsp"></put-attribute>
+    </definition>
+    
+      <definition name="site.addGrievanceErrorMaster" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/addGrievanceErrorMaster.jsp"></put-attribute>
+    </definition>
+
+
+    <!-- ================================================  END : HRMS Reports  ================================================ -->
+
+    <!-- ================================================  START : Facility Reports  ================================================ -->
+
+    <definition name="reports.rptOrgWiseFacility" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/facilityReports/rptOrgWiseFacility.jsp"></put-attribute>
+    </definition>
+
+    <definition name="reports.rptFacilityWiseAmenities" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/facilityReports/rptFacilityWiseAmenities.jsp"></put-attribute>
+    </definition>
+
+    <!-- ================================================  END : Facility Reports  ================================================ -->
+
+    <!-- ================================================  START : TOUR  ================================================ -->
+
+    <definition name="tour.tourRoleConfig" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/tourRoleConfig.jsp"></put-attribute>
+    </definition>
+
+    <definition name="tour.tourRequest" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/tourRequest.jsp"></put-attribute>
+    </definition>
+
+    <definition name="tour.tourCancel" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/tourCancel.jsp"></put-attribute>
+    </definition>
+
+    <definition name="tour.requestedTourList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/requestedTourList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="tour.requestedTourApprovalList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/requestedTourApprovalList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="tour.tourReimburementList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/tourReimburementList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="tour.tourExtensionList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/tourExtensionList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="tour.tourReimbursement" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/tourReimbursement.jsp"></put-attribute>
+    </definition>
+
+    <definition name="tour.tourFinalReport" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/tourFinalReport.jsp"></put-attribute>
+    </definition>
+
+    <definition name="tour.tourExtension" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/tourExtension.jsp"></put-attribute>
+    </definition>
+
+    <definition name="tour.tourReimburementApprovalList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/tourReimburementApprovalList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="tour.tourExtensionApprovalList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/tour/tourExtensionApprovalList.jsp"></put-attribute>
+    </definition>
+
+    <!-- ================================================  END : TOUR  ================================================ -->
+
+ 		 <definition name="site.advBranchRoleMap" extends="layout.base">
+		    <put-attribute name="body" value="/WEB-INF/views/litigation/advBranchRoleMap.jsp"/>
+		 </definition>
+
+    <definition name="site.litigationStatusWiseCaseList" extends = "layout.base">
+        <put-attribute name ="body" value ="/WEB-INF/views/litigation/statusWiseCaseListRpt.jsp"/>
+    </definition>
+
+    <definition name="site.litigationCaseWiseJudgements" extends = "layout.base">
+        <put-attribute name ="body" value ="/WEB-INF/views/litigation/caseWiseJudgementDetailsRpt.jsp"/>
+    </definition>
+
+    <definition name="site.litigationCaseWiseStakeholders" extends = "layout.base">
+        <put-attribute name ="body" value ="/WEB-INF/views/litigation/caseWiseStakeholdersDetailsRpt.jsp"/>
+    </definition>
+    
+    <!-- ============================================= START : Leave Management =================================================== -->
+    <definition name="site.ltm.addLeaveType" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/hrms-parent/leave/leaveTypeMaster.jsp"></put-attribute>
+	</definition>
+	
+	  <definition name="site.leaveTypeMapping" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/hrms-parent/leave/leaveTypeMapping.jsp"></put-attribute>
+	</definition>
+
+    <definition name="site.leaveAllotment" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/leave/leaveAllotment.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.leaveApplication" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/leave/leaveApplication.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.workFlowLeaveApplicationList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/leave/workFlowLeaveApplicationList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.workFlowLeaveEncashmentList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/leave/workFlowLeaveEncashmentList.jsp"></put-attribute>
+    </definition>
+
+    <definition name="site.leaveEncashment" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/leave/leaveEnchasement.jsp"></put-attribute>
+    </definition>
+
+    <!-- ============================================= END : Leave Management   =================================================== -->
+    <!-- ================================================  Allowance Module: Start  ================================================ -->
+    <definition name="site.allowanceType" extends = "layout.base">
+        <put-attribute name ="body" value ="/WEB-INF/views/hrms-parent/allowances/allowanceTypeMaster.jsp"/>
+    </definition>
+ 
+     <definition name="site.monthlyAllowance" extends = "layout.base">
+        <put-attribute name ="body" value ="/WEB-INF/views/hrms-parent/allowances/monthlyAllowance.jsp"/>
+    </definition>
+    <!-- ================================================  Allowance Module: End  ================================================ -->
+<!-- ============================================= START : Recruitment Module =================================================== -->
+    <definition name="vaccancy.page" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/addVaccancy.jsp" />
+	</definition>
+	
+	 <definition name="vacancy.approval" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/vacancyApproval.jsp" />
+	</definition>
+	
+	 <definition name="regd.candidateRegistrationPage" extends="layout.blank">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/candidateRegistration.jsp" />
+	</definition>
+	
+	<definition name="view.vacancy" extends="layout.blank">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/vacancyDetails.jsp" />
+	</definition>
+	
+	<definition name="applyPage" extends="layout.blank">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/applyPage.jsp" />
+	</definition>
+	
+	<definition name="view.appliedStatus" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/viewAppliedStatus.jsp" />
+	</definition>
+	
+	<definition name="wflow.interviewScheduleProcess" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/interviewScheduleProcess.jsp" />
+	</definition>
+	
+	<definition name="wflow.interviewRoundProcess" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/interviewRoundProcess.jsp" />
+	</definition>
+	
+	<definition name="wflow.getApplicantAllDetails" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/getApplicantAllDetails.jsp" />
+	</definition>
+	
+	<definition name="wflow.finalSelectedCandidate" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/finalSelectedCandidate.jsp" />
+	</definition>
+	
+	<definition name="wflow.interviewRoundProcessForInterviewer" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/interviewRoundProcessForInterviewer.jsp" />
+	</definition>
+	
+	<definition name="wflow.getOfrLetterAprvlPage" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/recruitment/getOfrLetterAprvlPage.jsp" />
+	</definition>
+ <!-- ================================================  END ================================================ -->
+ 
+ 
+    <definition name="site.hrms.holidays" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/hrms-parent/holiday/holiday.jsp"></put-attribute>
+    </definition>
+    <!--===============================================================================================================================-->
+
+
+<!--     ===================================Facility============================================= -->
+
+    <definition name="site.add.addAmenities" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/facility-mgmt/addAmenities.jsp"/>
+	</definition>
+
+	<definition name="site.bookPlaceForEvent" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/facility-mgmt/bookPlaceForEvent.jsp"/>
+	</definition>
+
+	<definition name="site.facility.request" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/facility-mgmt/facilityRequest.jsp"/>
+	</definition>
+
+	<definition name="site.actionOnEventBooking" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/facility-mgmt/eventApprovalProcess.jsp"/>
+	</definition>
+
+	<definition name="view.newFac.rqst" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/facility-mgmt/viewNewFacRqst.jsp"/>
+	</definition>
+
+	<definition name="add.mst.aminities" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/facility-mgmt/addMstAminities.jsp"/>
+	</definition>
+
+    <!-- ================================================  Pension Module: Start  ================================================ -->
+    <definition name="site.pensionCalculation" extends = "layout.base">
+        <put-attribute name ="body" value ="/WEB-INF/views/hrms-parent/payroll/pensionCalculation.jsp"/>
+    </definition>
+
+    <!-- ================================================  Pension Module: End  ================================================ -->
+
+
+    <!-- ================================================  Maintenance: Start  ================================================ -->
+        <definition name="workOrderCommonView" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/maintenance/workorder/workOrderCommonView.jsp" />
+        </definition>
+        <definition name="addMoreSpares" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/maintenance/workorder/department/addMoreSpareParts.jsp"/>
+        </definition>
+        <definition name="viewWorkOrderHistory" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/maintenance/workorder/viewWorkOrderHistory.jsp" />
+        </definition>
+        <definition name="site.item.wodetails" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/inventory/stocks/itemWoDetails.jsp" />
+        </definition>
+        <definition name="maintenance.createWorkRequest" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/maintenance/workrequest/createWorkRequest.jsp" />
+        </definition>
+        <definition name="editWorkRequest" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/maintenance/workrequest/editWorkRequest.jsp" />
+        </definition>
+        <definition name="viewWorkRequest" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/maintenance/workrequest/viewWorkRequest.jsp" />
+        </definition>
+        <definition name="workRequestsList" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/maintenance/workrequest/manageWorkRequestByDept.jsp" />
+        </definition>
+
+        <definition name="workRequestTracker" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/maintenance/workrequest/workRequestTracker.jsp" />
+        </definition>
+
+        <definition name="viewWorkRequestHistory" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/maintenance/workrequest/viewWorkRequestHistory.jsp" />
+        </definition>
+
+        <definition name="counterJobView" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/maintenance/counterBaseView.jsp"/>
+        </definition>
+        
+        <definition name="workOrderList" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/maintenance/workorder/workOrderList.jsp" />
+        </definition>
+        
+        <definition name="site.addMaintenance" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/masters/addMaintenance.jsp" />
+        </definition>
+        
+        <definition name="site.getMaintenceRepair" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/masters/maintenceRepair.jsp" />
+        </definition>
+        
+        <definition name="site.getMaintenceRequestList" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/masters/maintenceRequestList.jsp" />
+        </definition>
+    <!-- ================================================  Maintenance: End  ================================================ -->
+
+	<definition name="addProject" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/masters/addProject.jsp" />
+	</definition>
+	<definition name="site-view-projectDetails" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/masters/projectDetails.jsp" />
+	</definition>
+	
+	<definition name="site-view-inspection" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/inspection/inspectionDetails.jsp" />
+	</definition>
+	
+	<definition name="master.school" extends="layout.base">
+	<put-attribute name="body" value="/WEB-INF/views/masters/school.jsp"> </put-attribute>
+	</definition>
+	
+	<definition name="site.workOrder" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/workorder/manageWorkOrder.jsp"/>
+	</definition>
+	
+	<definition name="site.manageAgency" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/agency/manageAgency.jsp"/>
+	</definition>
+	
+	<definition name="site.agencyList" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/agency/agencyList.jsp"/>
+	</definition>
+	
+	<definition name="site.workOrderList" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/workorder/workOrderList.jsp"/>
+	</definition>
+	
+	<definition name="assign.task" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/assign-task/assignTask.jsp"/>
+	</definition>
+	
+	<definition name="assign.inspection" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assign-task/assignInspection.jsp"/>
+    </definition>
+
+    <definition name="inspection-detail-view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/inspection/inspectionDetailView.jsp" />
+    </definition>
+    
+    <definition name="maintenance-detail-view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/maintenanceDetailView.jsp" />
+    </definition>
+    
+      <definition name="infra.work.bill" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/workBill/infraWorkBill.jsp" />
+    </definition>
+    
+     <definition name="scst.construction.dashboard" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/dashboard.jsp" />
+    </definition>
+    
+    <definition name="project.details.by.agency" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/report/projectDetailsByAgency.jsp" />
+    </definition>
+    
+     <definition name="scst.maintenance.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/report/maintenanceReport.jsp" />
+    </definition>
+    
+    <definition name="scst.cashbook.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/report/e-cashbookReport.jsp" />
+    </definition>
+    
+    <definition name="expenditure.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/report/ExpenditureReport.jsp" />
+    </definition>
+    
+     <definition name="audit.management" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/audit/auditManagement.jsp" />
+    </definition>
+    
+    <definition name="project.agency.performance" extends="layout.base">
+    	<put-attribute name="body" value="/WEB-INF/views/report/projectAgencyPerformance.jsp" />
+	</definition>
+	
+	<definition name="project.performance" extends="layout.base">
+    	<put-attribute name="body" value="/WEB-INF/views/report/projectPerformance.jsp" />
+	</definition>
+	
+	<definition name="school.performance" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/report/schoolPerformance.jsp" />
+    </definition>
+    
+     <definition name="scst.school.report" extends="layout.base">
+    	<put-attribute name="body" value="/WEB-INF/views/report/schoolDetaildReport.jsp"/>
+    </definition>
+    
+	
+    <definition name="scst.legacyProject.report" extends="layout.base">
+    	<put-attribute name="body" value="/WEB-INF/views/report/legacyProjectReport.jsp"/>
+    </definition>
+    
+    <definition name="site.selection.details" extends="layout.base">
+    	<put-attribute name="body" value="/WEB-INF/views/siteSelection/siteSelectionDetails.jsp"/>
+    </definition>
+    
+    <definition name="site.selection.list" extends="layout.base">
+    	<put-attribute name="body" value="/WEB-INF/views/siteSelection/siteSelectionList.jsp"/>
+    </definition>
+    
+     <definition name="item.of.work" extends="layout.base">
+    	<put-attribute name="body" value="/WEB-INF/views/masters/itemOfWork.jsp"/>
+    </definition>
+    
+    <definition name="asset.transaction.details" extends="layout.base">
+    	<put-attribute name="body" value="/WEB-INF/views/assetBams/assetTransaction.jsp"/>
+    </definition>
+    
+    <definition name="asset.details" extends="layout.base">
+    	<put-attribute name="body" value="/WEB-INF/views/assetBams/asset.jsp"/>
+	</definition>
+    
+        <!-- ######################################    Grievance Start   ############################################## -->
+
+  <definition name="site.grievence.master.category" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addCategory.jsp"/>
+    </definition>
+    
+    <definition name="site.grievence.master.subcategory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addSubCategory.jsp"/>
+    </definition>
+
+    <definition name="site.addPublicGrievence" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addPublicGrievence.jsp"/>
+    </definition>
+
+    <definition name="site.addGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addGrievence.jsp"/>
+    </definition>
+    <definition name="site.grievenceList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/listGrievence.jsp"/>
+    </definition>
+
+    <definition name="site.addGrievanceDpt" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addGrievanceDpt.jsp"/>
+    </definition>
+    <definition name="site.editGrievance" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/editGrievance.jsp"/>
+    </definition>
+    <definition name="site.listGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/grievanceList.jsp"/>
+    </definition>
+
+    <definition name="site.reqListGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/reqListGrievence.jsp"/>
+    </definition>
+    <definition name="site.grievanceDeptList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/grievanceDeptList.jsp"/>
+    </definition>
+
+    <definition name="site.viewGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewGrievance.jsp"/>
+    </definition>
+    <definition name="site.viewPublicGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewPublicGrievance.jsp"/>
+    </definition>
+    <definition name="site.viewDeptGrievance" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewDeptGrievance.jsp"/>
+    </definition>
+    <definition name="site.searchGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/searchGrievance.jsp"/>
+    </definition>
+    <definition name="site.searchPublicGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/publicSearchGrievance.jsp"/>
+    </definition>
+    <definition name="site.lodgeGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/lodgeGrievance.jsp"/>
+    </definition>
+    
+    <!-- ######################################    Grievance Jasper Start   ############################################## -->
+
+    <definition name="site.rpt.grievanceTrackingDetailsData" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/grievanceReport/grievanceTrackingDetailsData.jsp"/>
+	    </definition>
+
+	     <definition name="site.rpt.budgetVarianceFilterPage" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/grievanceReport/budgetVarianceFilterPage.jsp"/>
+	    </definition>
+
+        <definition name="site.rpt.grievance.categorize" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/grievanceReport/grievanceCategorizeReport.jsp"/>
+        </definition>
+        
+		<definition name="site.auditManagementList" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/audit/auditManagementList.jsp" />
+        </definition>
+    <!-- ######################################    Grievance End   ############################################## -->
+    
+    <definition name="legacy.projects" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/legacyProject/legacyproject.jsp"/>
+    </definition>
+    
+    <definition name="leg.projects" extends="layout.base">
+    	<put-attribute name="body" value="/WEB-INF/views/legacyProject/addlegacyproject.jsp"/>
+	</definition>
+    
+    <!-- Add chatbot definition -->
+		<definition name="chatbot" extends="layout.base">
+		    <put-attribute name="body" value="/WEB-INF/views/chartBot.jsp"/>
+		</definition>
+
+	<!-- FAQ Page Definition -->
+	<definition name="site.viewFaq" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/faq/manageFaq.jsp" />
+	</definition>
+	
+	<!-- Add Requisition -->
+    <definition name="addBAMSRequisition" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/BAMSrequisition/addBAMSRequisition.jsp" />
+    </definition>
+
+	<!-- BAMS Master -->    
+	  <definition name="scst.bams-master" extends="layout.base">
+		<put-attribute name="body"
+			value="/WEB-INF/views/masters/bamsMaster.jsp" />
+	</definition>
+    <!-- Add PSU Project -->
+	<definition name="addPsuProject" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/psuProject/addPsuProject.jsp" />
+	</definition>
+	
+	 <definition name="onGoingProjectList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/onlyJsp/onGoingProjectList.jsp" />
+    </definition>
+    
+    <definition name="projectAssign" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/onlyJsp/projectAssign.jsp" />
+    </definition>
+	
+	<!-- New definition for DWO Progress -->
+    <definition name="scst.dwo.progress" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/report/DWO_progress.jsp" />
+    </definition>
+
+    <!-- New definition for Progress Report -->
+    <definition name="scst.progress.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/report/progressReport.jsp" />
+    </definition>
+    
+<!--     <definition name="agencyRegistration" extends="layout.base"> -->
+<!--         <put-attribute name="body" value="/WEB-INF/views/agencyRegistration.jsp" /> -->
+<!--     </definition> -->
+    
+    <definition name="ongoing.project.data" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/ongoingproject.jsp" />
+    </definition>
+    
+    <definition name="agency.registration.details" extends="layout.base">
+      <put-attribute name="body" value="/WEB-INF/views/agency/agencyRegistration.jsp"/>
+    </definition>
+    
+<!--     <definition name="otpVerification" extends="layout.base"> -->
+<!--         <put-attribute name="body" value="/WEB-INF/views/onlyJsp/otpVerification.jsp" /> -->
+<!--     </definition> -->
+    
+    <definition name="scst.maintenance.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/report/legacyMaintenanceReport.jsp" />
+    </definition>
+    
+    <!-- Add Proposal -->
+    <definition name="addBAMSProposal" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/BAMSrequisition/addBAMSProposal.jsp" />
+    </definition>
+	<definition name="scst.onGoingProjectList" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/report/onGoingProjectList.jsp" />
+	</definition>
+	
+<!-- 	<definition name="scst.report.assignproject" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/report/projectAssign.jsp" />
+	</definition> -->
+	
+	<definition name="scst.dwo.itda.all.progress" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/report/DWO_ITDA_ALL_progress.jsp" />
+    </definition>
+	
+	<!-- static pages start -->
+	
+	 <definition name="onGoingProjectList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/onlyJsp/onGoingProjectList.jsp" />
+    </definition>
+    
+    <definition name="projectAssign" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/onlyJsp/projectAssign.jsp" />
+    </definition>
+	
+    <definition name="scst.dwo.progress" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/onlyJsp/DWO_progress.jsp" />
+    </definition>
+
+    <definition name="scst.progress.report" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/onlyJsp/progressReport.jsp" />
+    </definition>
+    
+    <!-- static pages end -->
+
+	<definition name="bamsRequisitionList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/BAMSrequisition/bamsRequisitionList.jsp" />
+    </definition>
+    
+	<definition name="buildingStrengthReport" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/onlyJsp/buildingStrengthReport.jsp" />
+	</definition>
+	
+	
+	<!-- ============================================= BAMS ============================================= -->
+	
+	<definition name="building-planning-details" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/BAMS/building-planning-details/building-tabs.jsp" />
+	</definition>
+	
+	<definition name="building-planning-details-list" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/BAMS/building-planning-details/building-planning-details-list.jsp" />
+	</definition>
+	
+	<definition name="add.fund.distribution" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/BAMS/fund-distribution/add-fund-distribution.jsp" />
+	</definition>
+	
+	<definition name="edit.fund.distribution" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/BAMS/fund-distribution/edit-fund-distribution.jsp" />
+	</definition>
+	
+	<definition name="fund.distribution.list" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/BAMS/fund-distribution/fund-distribution-list.jsp" />
+	</definition>
+		<definition name="planning.building.filter" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/BAMS/filter-building-page/filter-building-data.jsp" />
+	</definition>
+	
+	 <definition name="asset.details" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/BAMS/asset-management/manageAsset.jsp" />
+    </definition>
+    
+     <definition name="asset.management.list" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/BAMS/asset-management/assetDetailsList.jsp" />
+    </definition>
+    
+        	<!--============================== BAMS-LEGANCY =======================================================  -->
+		<definition name="bamsLegacy-manage" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/BAMS/BamsLegacy/bamsLegacy-manage.jsp" />
+	</definition>
+	
+	<definition name="bams-maintenance-manage" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/BAMS/BamsMangement/bams-maintance.jsp" />
+	</definition>
+	
+	<definition name="weo-inspection-manage" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/BAMS/WEO Inspection/weoinspection.jsp" />
+	</definition>
+	
+	
+		<definition name="weo.inspection.list" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/BAMS/WEO Inspection/weoInspectionList.jsp" />
+	</definition>
+	       
+    <definition name="site.monitoring-list" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/execution/executionList.jsp" />
+	</definition>
+	
+	<definition name="bams.report.buildingPerformance" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/report/buildingPerformanceReport.jsp" />
+	</definition>
+	
+	
+	<!--============================== UC =======================================================  -->
+	<definition name="bams.report.buildingDetails" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/report/viewBuildingDetails.jsp" />
+	</definition>
+	
+	<definition name="get.uc" extends="layout.base">
+	    <put-attribute name="body" value="/WEB-INF/views/BAMS/UC/UcMgmt.jsp" />
+	</definition>
+	
+</tiles-definitions>
+

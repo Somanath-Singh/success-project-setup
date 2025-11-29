@@ -1,0 +1,79 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Building & assetss Management System</title>
+
+<!-- 🔥 CRITICAL FIX: JQUERY & BOOTBOX FIRST - BEFORE ANYTHING -->
+<script src="${contextPath}/assetss/js/jquery.js"></script>
+<script src="${contextPath}/assetss/vendor/bootbox/bootbox.all.js"></script>
+<script src="${contextPath}/assetss/utilsJs/dataEncryption.js"></script>
+
+<!-- Fonts and icons -->
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- FontAwesome -->
+<link href="${contextPath}/assetss/fonts/css/all.min.css" rel="stylesheet">
+<!-- Bootstrap5 -->
+<link href="${contextPath}/assetss/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<!-- Bootstrap Select Picker -->
+<link href="${contextPath}/assetss/vendor/bootstrap-selectpicker/bootstrap-select.min.css" rel="stylesheet" type="text/css">
+<!-- DataTable css -->
+<link href="${contextPath}/assetss/vendor/datatable/datatables.min.css" rel="stylesheet" />
+<!-- Datepicker css -->
+<link href="${contextPath}/assetss/vendor/datepicker/jquery.datepick.css" rel="stylesheet" />
+<!-- Custom CSS -->
+<link href="${contextPath}/assetss/css/style.css" rel="stylesheet" type="text/css">
+
+<!-- START -->
+<!-- This Area is Only For Project specific CSS, PluginCss, style -->
+<!-- END -->
+</head>
+<body>
+    <%@ include file="/WEB-INF/views/message.jsp"%>
+    <tiles:insertAttribute name="body" />
+    
+    <!-- ✅ ALL OTHER SCRIPTS - NOW SAFE (jQuery already loaded) -->
+    <!-- Bootstrap bundle js -->
+    <script src="${contextPath}/assetss/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Select Picker -->
+    <script src="${contextPath}/assetss/vendor/bootstrap-selectpicker/bootstrap-select.min.js"></script>
+    <!-- DataTable js -->
+    <script src="${contextPath}/assetss/vendor/datatable/datatables.min.js"></script>
+    <!-- Datepicker js -->
+    <script src="${contextPath}/assetss/vendor/datepicker/jquery.plugin.min.js"></script>
+    <script src="${contextPath}/assetss/vendor/datepicker/jquery.datepick.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>window.ctxPath='${contextPath}';</script>
+    <script src="${contextPath}/assetss/js/custom.js"></script>
+    <script src="${contextPath}/assetss/utilsJs/commonFunctions.js"></script>
+    <script src="${contextPath}/assetss/utilsJs/helperFunctionsScripts.js"></script>
+    <script src="${contextPath}/assetss/utilsJs/validate.js"></script>
+    <script src="${contextPath}/assetss/js/encrypt/AesUtil.js"></script>
+    <script src="${contextPath}/assetss/js/encrypt/aes.js"></script>
+    <script src="${contextPath}/assetss/js/encrypt/pbkdf2.js"></script>
+    <script src="${contextPath}/assetss/js/encrypt/lbase.js"></script>
+    
+    <form id="moduleForm" action="${contextPath}/moduleDirectory" method="post">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+        <input type="hidden" name="moduleCode" id="moduleId" />
+    </form>
+    
+<script>
+    function backToModule(){
+       let currentModuleCode = localStorage.getItem('currentModuleCode');
+       $('#moduleId').val(enc_password(currentModuleCode));
+       $('#moduleForm').submit();
+    }
+</script>
+</body>
+</html>

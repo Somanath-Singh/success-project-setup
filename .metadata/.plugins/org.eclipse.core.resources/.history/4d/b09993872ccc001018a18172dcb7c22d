@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="claimReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a2c7cdb5-3048-427c-98da-6f05c6022f3a">
+	<property name="com.jaspersoft.studio.data.sql.tables">
+		<![CDATA[dF91bXRfcm9sZSAsMTUsNTUxLGY0MmI3NDc1LWRmMGEtNGYyZC04YWIxLTQxYjQ4ZDczMmU4Yjt0
+X2hyX21vbnRobHlfYWxsb3dhbmNlICwxNSwxNSw0NTQxMjFkNy1kOWFjLTRhNzQtYmVhMi1lNjhl
+ZjRhODI5OTA7dF9ocl9zdGFmZl9tYXN0ZXIgLDQzOCwyNSxjMWNjNGRhZC1jZDkzLTQ1YmItOTEx
+MC05MmY3ZTk1YWM5Yzg7dF91bXRfdXNlciAsMjIzLDQyMiwyNTc4MmIzMi03MTg4LTRlNTgtODFl
+My02MWMzOTMyMmI1NWY7dF9ocl9zdGFmZl9hbGxvd2FuY2VzX21hcCAsMjIzLDk0LGU1OWY3MzI4
+LWIxZTQtNGU4Mi04Mzk2LThkNDJiYTBlNTNlOTs=]]>
+	</property>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="crop_erp"/>
+	<parameter name="monthlyAllowanceId" class="java.lang.Long"/>
+	<parameter name="yearId" class="java.lang.String"/>
+	<parameter name="monthId" class="java.lang.Long"/>
+	<parameter name="employmentTypeId" class="java.lang.Long"/>
+	<parameter name="allowanceTypeId" class="java.lang.Long"/>
+	<parameter name="allowanceType" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT thsm.staff_name || '(' || thsm.staff_code || ')' AS staff_name_with_code,
+	thsam.vehicle_no,
+	thsam.amount,
+	' ' AS staff_signature
+FROM t_hr_staff_allowances_map thsam
+	JOIN t_hr_monthly_allowance thma ON
+	 thma.monthly_allowances_id = thsam.monthly_allowances_id
+	JOIN t_hr_staff_master thsm ON
+	 thsam.staff_id = thsm.staff_id
+	JOIN t_umt_user tuu ON
+	 tuu.email = thsm.email
+	JOIN t_umt_role tur ON
+	 tur.role_id = tuu.primary_role_id
+WHERE
+	 thsam.monthly_allowances_id = $P{monthlyAllowanceId}
+	 AND thma.financial_year = $P{yearId}
+	 AND thma.month_id = $P{monthId}
+	 AND thma.employment_type_id = $P{employmentTypeId}
+	 AND thma.allowance_type_id = $P{allowanceTypeId}
+	 AND thsam.amount >0]]>
+	</queryString>
+	<field name="staff_name_with_code" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="staff_name_with_code"/>
+		<property name="com.jaspersoft.studio.field.label" value="staff_name_with_code"/>
+	</field>
+	<field name="vehicle_no" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="vehicle_no"/>
+		<property name="com.jaspersoft.studio.field.label" value="vehicle_no"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="t_hr_staff_allowances_map"/>
+	</field>
+	<field name="amount" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="amount"/>
+		<property name="com.jaspersoft.studio.field.label" value="amount"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="t_hr_staff_allowances_map"/>
+	</field>
+	<field name="staff_signature" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="staff_signature"/>
+		<property name="com.jaspersoft.studio.field.label" value="staff_signature"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="51" splitType="Stretch">
+			<staticText>
+				<reportElement x="270" y="10" width="301" height="31" uuid="992465bf-1ba8-4e38-8552-e814143c0c3c"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="22" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Claim Report]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="10" y="10" width="250" height="30" uuid="6d41f7df-590e-4567-ac6b-058f61e61348"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="22" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{allowanceType}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="40" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="10" width="160" height="30" uuid="fd4fa74e-2214-4ff6-a0fa-0b4f9b559ed1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="070b73d5-f986-4729-ab9b-8c859ebb253f"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Staff Name (Code)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="10" width="110" height="30" uuid="56c2d937-4ccb-4004-af77-dc1a826e2c94">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ffcc95e9-2ee8-443a-b440-e5be6633d3f1"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vehicle No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="10" width="120" height="30" uuid="185f0076-b30a-4f4c-9197-3fff31a86349">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3bd2c350-31a5-430b-8195-8044eba96d3e"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="5">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="390" y="10" width="160" height="30" uuid="9c6abb4e-e4b7-4240-abf3-70fc4856396b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="37ff53cf-987e-49cd-ba25-fa0208bc3b37"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Signature]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="160" height="30" uuid="3f78468a-54f6-4816-ab3e-7a41c70cef98">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="070b73d5-f986-4729-ab9b-8c859ebb253f"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1">
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{staff_name_with_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="0" width="110" height="30" uuid="f15bb1d5-072b-446d-a4b0-efdf1ea69408">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ffcc95e9-2ee8-443a-b440-e5be6633d3f1"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1">
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{vehicle_no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="270" y="0" width="120" height="30" uuid="3dfdb6cd-ba56-4b8b-ac9d-9b92ef04045b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3bd2c350-31a5-430b-8195-8044eba96d3e"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="5">
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="390" y="0" width="160" height="30" uuid="dd7a8810-1ae7-413d-8927-86339764798c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="37ff53cf-987e-49cd-ba25-fa0208bc3b37"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1">
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{staff_signature}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="90" splitType="Stretch"/>
+	</pageFooter>
+</jasperReport>

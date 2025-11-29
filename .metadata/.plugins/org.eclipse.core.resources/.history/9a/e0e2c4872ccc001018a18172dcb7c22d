@@ -1,0 +1,286 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+<script src="${contextPath}/assets/js/moment.js"></script>
+
+
+<link href="${contextPath}/assets/full-calender/bootsrtap-icon.css">
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}"/>
+
+
+
+
+<div class="breadcrumb_conatiner">
+                <div class="col-md-6">
+	      <h4 class="change-color">Facility</h4>
+	   </div>
+	   <div class="col-md-6">
+	      <nav aria-label="breadcrumb" style="float: right;">
+	         <ol class="breadcrumb">
+	            <li class="breadcrumb-item"><a href="${contextPath}/home">Home</a></li>
+	            <li class="breadcrumb-item active" aria-current="page">Facility Request List</li>
+	         </ol>
+	      </nav>
+	   </div>
+            </div>
+
+
+<div class="card cardContainerNotFirst">
+<div class="card-header"><h5 class="card-title">Facility Request List</h5></div>
+	<div class="card-body">		
+		<div class="col-md-12" id="tabs">
+			<ul class="nav nav-tabs mb-3" >
+				<li class="nav-item"><a class="nav-link ${tabName eq 'Pending' ? 'active' : ''}"
+					data-bs-toggle="tab" href="#pending" onclick="fetchFilterData('Pending')">Pending</a></li>
+				<li class="nav-item"><a class="nav-link ${tabName eq 'Approved' ? 'active' : ''}" data-bs-toggle="tab"
+					href="#approved" onclick="fetchFilterData('Approved')">Approved</a></li>
+				<li class="nav-item"><a class="nav-link ${tabName eq 'Rejected' ? 'active' : ''}" data-bs-toggle="tab"
+					href="#reject" onclick="fetchFilterData('Rejected')">Rejected</a></li>
+			</ul>
+			<div class="tab-content">
+				<div class="tab-pane fade show active" id="pending">
+					<div class="col-md-12">
+						<table
+							class="datatable table table-striped table-bordered exportbtn">
+							<thead>
+								<tr>
+									<th>Sl. No</th>
+									<th>Facility Type</th>
+									<th>Facility Name</th>
+									<th>Purpose</th>
+									<th>Justification</th>
+									<th>Amount</th>
+									<th>College Name</th>
+									<th>Status</th>
+									<c:if test="${tabName eq 'Rejected'}">
+										<th>Reject Remark</th>
+									</c:if>
+									<c:if test="${tabName eq 'Pending'}">
+										<th>Action</th>
+									</c:if>
+									
+								</tr>
+							</thead>
+							<tbody>
+							<c:set var="pendingCount" value="1" />
+								<c:forEach items="${facilityRequest}" var="facility"
+									varStatus="count">
+									
+										<tr>
+											<td>${count.count}</td>
+											<td>${facility.facilityId.facilityType.facilityTypeName}</td>
+											<td>${facility.facilityId.facilityName}</td>
+											<td>${facility.purpose}</td>
+											<td>${facility.justification}</td>
+											<td style="text-align: right;">${facility.provisionalAmount}</td>
+											<th>${facility.collegeName}</th>
+											<td>${facility.status}</td>
+											<c:if test="${tabName eq 'Rejected'}">
+												<th>${facility.remark}</th>
+											</c:if>
+											<c:if test="${tabName eq 'Pending'}">
+												<td>
+													<a href="#" class="btn btn-primary" onclick="takeAction('${facility.facilityRequestId}','APPROVED');"
+													title="Approve"><i class="fa fa-check"></i></a>
+													<a href="#" class="btn btn-primary" onclick="takeAction('${facility.facilityRequestId}','REJECTED');"
+													title="Reject"><i class="fa fa-times"></i></a>
+												</td>
+											</c:if>
+										</tr>
+										
+									
+								</c:forEach>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Remark Modal -->
+<div class="modal fade" id="remark-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title required" style="color: black;" id="exampleModalLabel">Reject Remark</h5>
+				<button type="button" class="btn-close"  data-bs-dismiss="modal" aria-label="Close" onclick="dismisRemarkModal()"></button>
+			</div>
+			
+			<div class="modal-body">
+				<textarea class="form-control" id="modal-remarks" name="remarks"></textarea>
+				<span id="alert-message-id"></span>
+			</div>
+			
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="modalSubmit();">Save</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+<form action="${contextPath}/facility/requestList" method="get" id="filterForm">
+   <input type="hidden" name="tabName" value="" id="tabName" />
+   <input type="hidden" name="action"  id="action" />
+</form>
+
+
+<form action="${contextPath}/facility/manageRequest.htm" method="post" id="saveEventFormId">
+	<input type="hidden" id="cipherText" name="cipherText">
+   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+   <input type="hidden" name="status" id="status"/>
+   <input type="hidden" name="requestId" id="requestId"/>
+   <input type="hidden" name="remark" id="remark"/>
+</form>
+
+<script type="text/javascript" src="${contextPath}/assets/full-calender/full-calender.js"></script>
+<script type="text/javascript" src="${contextPath}/assets/full-calender/global-full-calender.js"></script>
+<script>
+
+
+
+// fetch filter data on tab change
+function fetchFilterData(tab){
+	$('#tabName').val(tab);
+	$('#filterForm').submit();
+}
+
+function dismisRemarkModal(){
+	$('#alert-message-id').text('');
+	$('#modal-remarks').val('')
+	$('#remark-modal').modal('hide');
+}
+
+function modalSubmit(){
+	if($('#modal-remarks').val() === ''){
+		$('#alert-message-id').text('Please provide reject remark.');
+		return false;
+	}else{
+		$('#remark').val($('#modal-remarks').val());
+		finalActionSubmit($('#action').val());
+	}
+}
+
+// modal functionality
+function takeAction(id,status){
+	setRequestIdAndStatus(id,status);
+	if(status === 'REJECTED'){
+		$('#remark-modal').modal('show');
+		$('#action').val('reject');
+	}else if(status === 'APPROVED'){
+		$('#action').val('approve');
+		finalActionSubmit($('#action').val());
+	}	
+}
+
+
+function finalActionSubmit(action){
+	var bizContent = $("#saveEventFormId").serializeArray();
+	 $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+	 if(action === 'reject'){
+		$("#saveEventFormId").submit();
+	 }else{
+		bootbox.confirm("Do you want to "+action +" ?",
+   			function(result){
+   				if(result){
+   					showLoader();
+   					$("#saveEventFormId").submit();
+   				}
+	   	});
+	 }		
+}
+
+
+
+function setRequestIdAndStatus(id,status){
+		$('#requestId').val(id);
+		$('#status').val(status);
+}
+
+
+
+// ajax call section
+  function getFacilityListByFacilityType(typeId) {
+	 var encodedTypeId = btoa(typeId);
+	 $.ajax({
+			type : "GET",
+			url : '${contextPath}/facility/getFacilityListByFacilityType',
+			dataType: "json",
+			data : {
+				"typeId" : encodedTypeId,							
+			},
+			success: function (response) {
+	            try {
+	            	 var data = response;
+	                var html = "<option value='0'>--select--</option>";
+	                $.each(data, function (index, value) {
+	                    html += "<option value=" + value.facilityId + ">" + value.facilityName + "</option>";
+	                });
+	                $('#facilityId').empty().append(html);
+	            } catch (error) {
+	                bootbox.alert("Error parsing response.");
+	            }
+	        },
+	        error: function (error) {
+	            bootbox.alert("FacilityList Not Found.");
+	        }
+		});
+}
+ 
+
+	
+	
+	function getIndoorOrOutdoorByFacilityId(value) {
+	    var status = '';
+	    showLoader();
+	    if (value != 0) {
+	        $.ajax({
+	            url: window.ctxPath + '/facilityManagement/getIndoorOrOutdoorByFacilityId',
+	            method: 'GET',
+	            data: { facilityId: value },
+	            async: false, // Set async to false to make the request synchronous
+	            success: function(data) {
+	                var resp = data;
+	                if (resp.length > 0) {
+	                    if (resp.split('(')[1].split(')')[0] == 'INDOOR') {
+	                        status = true;
+	                    } else {
+	                        status = false;
+	                    }
+	                }
+	            },
+	            error: function(xhr, status, error) {
+	                console.error("Something went wrong.");
+	            }
+	        });
+	    }
+	    hideLoader();
+	    return status;
+	}
+
+
+
+	// validation functionality
+
+	function validateAmount(object){
+		if(object.value != null && object.value != ''){
+			object.value = parseFloat(object.value).toFixed(2);
+		}
+	}
+
+	
+</script>
+

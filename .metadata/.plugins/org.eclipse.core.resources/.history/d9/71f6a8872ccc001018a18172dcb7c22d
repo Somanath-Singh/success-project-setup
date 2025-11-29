@@ -1,0 +1,131 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+
+<style>
+.is-invalid {
+	border-color: red;
+}
+
+table.tableizer-table {
+	width: 100%;
+	font-size: 13px;
+	border: 1px solid #CCC;
+	letter-spacing: -0.75px;
+	font-family: "Open Sans", Arial, sans-serif;
+}
+
+.tableizer-table td {
+	padding: 1px 2px 1px 3px;
+	border: 1px dotted #CCC;
+}
+
+.tableizer-table th {
+	padding: 1px;
+	margin: 1px;
+	border: 1px dotted #CCC;
+	font-weight: bold;
+}
+
+.tableizerTitleRow {
+	text-align: left;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+.table>tbody>tr>td {
+	word-break: break-all;
+}
+
+.datepicker_con>input {
+	width: 100%;
+	border-radius: 3px;
+	border: 1px solid #aaaaaa;
+}
+
+.datepicker_con>button {
+	display: none;
+}
+
+.autocomplete-suggestions {
+	width: 345px !important;
+}
+
+.searchParamDiv1 {
+	width: 14%;
+}
+
+.searchParamDiv1 label {
+	font-weight: 600;
+}
+
+.searchParamDiv2 {
+	width: 04%;
+	text-align: center;
+	padding-top: 26px;
+}
+
+.searchParamDiv2 label {
+	font-weight: bold;
+	font-size: 15px !important;
+}
+
+#partyListTable>tbody>tr>td {
+	font-size: 13.5px;
+}
+
+#partyListTable>thead>tr>th {
+	background: #d8d8d8;
+}
+</style>
+
+<script>
+$(function()
+{
+	$('#datatable-default').dataTable({
+ 		"bSort": false,
+ 		"autoWidth": false
+	});
+})
+</script>
+<div class="row">
+    <div class="col-md-12 col-sm-12 mt-3" style="">
+        <h6><u> VOUCHER WORKFLOW HISTORY </u></h6>
+    </div>
+    <div class="col-md-12">
+       <table class="table table-bordered" id="datatable">
+            <thead>
+                <tr>
+                    <th style="text-align:center;">Sl. No.</th>
+                    <th>Action</th>
+                    <th>Action Taken By & Taken As [Role]	</th>
+                    <th>Action Date	</th>
+                    <th>Action Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach items="${voucherHistoryList}" var="history" varStatus="st">
+                    <tr class="gradeX">
+                        <td style="text-align:center;">${st.count}</td>
+                        <td>${history.action}</td>
+                        <td>${history.actionTakenByAndRole}</td>
+                        <td> <c:set var="doj" value="${fn:split(history.actionDate, ' ')}" />
+                        <fmt:parseDate pattern="yyyy-MM-dd" value="${doj[0]}" var="parsedDate2" />
+                        <fmt:formatDate value="${parsedDate2}" pattern="MM/dd/yyyy" var="parsDt" />
+                        ${parsDt}</td>
+                        <td>${history.actionRemarks}</td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+    </div>
+</div>

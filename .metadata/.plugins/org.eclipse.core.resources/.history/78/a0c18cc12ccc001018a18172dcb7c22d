@@ -1,0 +1,560 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<link href="${contextPath}/assets/css/dashboard.css" rel="stylesheet" type="text/css" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<style>
+.model-width {
+    max-width: 45%;
+    margin: 1.75rem auto;
+}
+</style>
+
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">View Assign Work Inspection</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Assign Work Inspection</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">Assign User To Create Work Inspection</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+<!--                     <label class="smallInput required" for="projectId">Project:</label> -->
+                    <label class="smallInput required" for="projectId">Building:</label>
+                    <select class="form-control form-control-sm select2 form-select" id="projectId" name="projectId" onchange="LoadProjectEstimationByProjectId(this.value);">
+                        <option value="0" selected disabled>- Select -</option>
+                        <c:forEach items="${projectList}" var="project">
+                            <option value="${project.projectId}">${project.projectName}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+				<div class="form-group">
+					<label class="col-md-12 required" for="projectEstimationId">Plan Estimation :</label>
+					<div class="col-md-12">
+						<select id="projectEstimationId" name="projectEstimationId" class="form-control form-control-sm form-select select2" required="required" onchange="LoadWorkOrderByProjectEstimationId(this.value)">
+							<option value="0" selected disabled>- Select -</option>
+						</select>
+					</div>
+				</div>
+			</div>	
+			<div class="col-md-3" id="workOrderDropDown" style="display:none;">
+				<div class="form-group">
+					<label class="col-md-12 required" for="workOrderId">Work Order :</label>
+					<div class="col-md-12">
+						<select id="workOrderId" name="workOrderId" class="form-control form-control-sm form-select select2" required="required">
+							<option value="0" selected disabled>- Select -</option>
+						</select>
+					</div>
+				</div>
+			</div>	
+        </div>
+        
+         <div class="row mt-4">
+            <div class="col-md-12 text-center">
+                <button type="button" class="btn btn-success" onclick="getData()">Fetch</button>
+                <a href="${contextPath}/home" type="button" class="btn btn-warning btn-sm">Back</a>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h5 class="card-title">Work Order List Of Assigned user</h5>
+    </div>
+    <div class="card-body">
+        <div class="nav nav-tabs mb-2 tabnav" id="AssignInspectionTabs" role="tablist">
+            <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab"
+                data-bs-target="#tab1" type="button" role="tab">Not Assigned Inspections</button>
+            <button class="nav-link" id="tab2-tab" data-bs-toggle="tab"
+                data-bs-target="#tab2" type="button" role="tab">Assigned Inspections</button>
+        </div>
+
+        <div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="container text-center my-4">
+                        <div class="tab-content" id="AssignInspectionTabsContent">
+                            <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+                                <table class="table table-hover table-bordered mt-3">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Sl.No</th>
+                                            <th>Work Order Name (Work Code)</th>
+                                            <th>Plan Estimation No</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="workOrder-table-body">
+                                        <!-- Not assigned workOrder will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+                                <table class="table table-hover table-bordered mt-3">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Sl.No</th>
+                                            <th>Work Order Name (Work Code)</th>
+                                            <th>Plan Estimation No</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="exist-workOrder-table-body">
+                                        <!-- Assigned workOrder will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="assignedUser" tabindex="-1" aria-labelledby="assignedUserLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignedUserLabel">Assign Users</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="assignedUserBody">
+                <!-- User assignment form will be populated here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+let openedInspectionCheckboxes = [];
+
+	function getData() {
+		
+		const projectId = $('#projectId').val();
+		const projectEstimationId = $('#projectEstimationId').val();
+		const workOrderId = $('#workOrderId').val();
+		
+		if (!projectId) {
+			bootbox.alert("Please select a project .");
+			return;
+		}else if (!projectEstimationId) {
+			bootbox.alert("Please select a project Estimation .");
+			return;
+		}else if (!workOrderId) {
+			bootbox.alert("Please select a WorkOrder.");
+			return;
+		}else{
+			fetchWorkOrderByWorkOrderId(workOrderId);
+			fetchExistWorkOrderByWorkOrderId(workOrderId);
+		}
+	}
+	
+	function LoadProjectEstimationByProjectId(projectId) {
+		
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/common/fetchApprovedProjectEstimationByProject",
+	        data: {
+	        	projectId: projectId,
+	        },
+	        success: function (estimations) {
+	        	$('#workOrderDropDown').hide();
+	            var projectEstimation = $('#projectEstimationId'); 
+	            projectEstimation.empty();
+	            projectEstimation.append('<option value="" selected disabled>- Select -</option>');
+	
+	            $.each(estimations, function(index, estimation) {
+	            	projectEstimation.append('<option value="' + estimation.estimationId + '">' + estimation.estimationNo + '</option>');
+	            });
+	        },
+	        error: function (error) {
+	            console.error("Error fetching project estimation:", error);
+	        }
+	    });
+	}
+	
+	function LoadWorkOrderByProjectEstimationId(projectEstimationId) {
+		
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/common/fetch-approved-workOrder-by-projectEstimation",
+	        data: {
+	        	projectEstimationId: projectEstimationId,
+	        },
+	        success: function (workOrder) {
+	        	
+	        	if(workOrder === null){
+	        		bootbox.alert("WorkOrder has not been approved with this Estimation");
+	        		return;
+	        	}
+	        	
+	            $('#workOrderDropDown').show();
+	            
+	            var workOrderData = $('#workOrderId'); 
+	            
+	            workOrderData.empty();
+	            workOrderData.append('<option value="0" disabled>- Select -</option>');
+	            workOrderData.append('<option selected value="' + workOrder.workOrderId + '">' + workOrder.workOrderName + '</option>');
+	        },
+	        error: function (error) {
+	            console.error("Error fetching Work Order :", error);
+	        }
+	    });
+	}
+
+    function submitFormData(formElement) {
+    	const form = $(formElement);
+    	const formId = form.attr("id");
+        const workOrderId = form.find("input[name='workOrderId']").val();
+        const assignData = collectAssignTaskData(formElement);
+
+        if (!assignData) return;
+
+        const assign = JSON.parse(assignData);
+        
+        if (formId.startsWith("assignTaskForm-") && assign.assignTaskUserDetailsDto.length === 0) {
+            bootbox.alert("Please select at least one user to assign.");
+            return false;
+        }
+
+        $.ajax({
+            url: "${contextPath}/assign/is-inspection-exist",
+            type: "GET",
+            data: {
+            	workOrderId: workOrderId,
+                assignId: assign.assignId || null
+            },
+            success: function (checked) {
+                if (!checked) {
+                    form.find(".cipher-text").val(enc_password(assignData));
+                    bootbox.confirm("Do you want to submit the form?", function (result) {
+                        if (result === true) {
+                            showLoader();
+                            form.submit();
+                        }
+                    });
+                } else {
+                    bootbox.alert("Inspection is already assigned.");
+                }
+            },
+            error: function (error) {
+                bootbox.alert("Error checking inspection: " + error.statusText);
+            }
+        });
+    }
+
+    function collectAssignTaskData(formElement) {
+        const form = $(formElement);
+        const selectedUsers = [];
+
+        form.find('input.user-checkbox:checked').each(function () {
+            const $checkbox = $(this);
+            const $row = $checkbox.closest('tr');
+            const assignUserId = $row.find('input[name="assignUserId"]').val() || null;
+
+            selectedUsers.push({
+                userId: $checkbox.data("user-id"),
+                assignUserId: assignUserId
+            });
+        });
+
+        const assignTask = {
+            assignId: form.find("input[name='assignId']").val() || null,
+            workOrderId: form.find("input[name='workOrderId']").val(),
+            isActive: form.find("input[name='isActive']").val() === "true",
+            assignTaskUserDetailsDto: selectedUsers
+        };
+        return JSON.stringify(assignTask);
+    }
+
+    function showLoader() {
+        $(".loader-div").css("display", "flex");
+    }
+
+    function fetchWorkOrderByWorkOrderId(workOrderId) {
+        
+        $.ajax({
+            type: "GET",
+            url: "${contextPath}/assign/get-work-inspections-by-workOrder",
+            data: { 
+            	workOrderId: workOrderId
+            	},
+            	success: function (workOrder) {
+            	    var tbody = $("#workOrder-table-body");
+            	    tbody.empty();
+            	    
+            	    if(workOrder.isFinalPhase){
+            	    	bootbox.alert("Work Inspection has been completed ,can't assign more user.");
+            	    }
+
+            	    if (workOrder) {
+            	        var work = workOrder;
+            	        var row = '<tr data-workOrder-row="' + work.workOrderId + '">'
+            	            + '<td>1</td>'
+            	            + '<td>' + (work.workOrderName || 'N/A') + ' (' + (work.workOrderCode || 'N/A') + ')</td>'
+            	            + '<td>' + (work.planEstimationNo || 'N/A') + '</td>'
+            	            + '<td>'
+            	            + '<input type="checkbox" class="form-check-input workOrder-toggle-new" '
+            	            + 'data-id="' + work.workOrderId + '" '
+            	            + 'data-name="' + work.workOrderName + '" '
+            	            + (work.isFinalPhase ? 'disabled' : '') + '>'
+            	            + '</td>'
+            	            + '</tr>';
+            	        tbody.append(row);
+            	    } else {
+            	        tbody.append('<tr><td colspan="4" class="text-center">No unassigned WorkOrder found.</td></tr>');
+            	    }
+
+            	    attachUserCheckboxHandler();
+            	},
+            error: function (xhr) {
+                bootbox.alert("Error loading unassigned workOrder: " + xhr.statusText);
+            }
+        });
+    }
+    
+    function attachUserCheckboxHandler() {
+        $(".workOrder-toggle-new").off("change").on("change", function () {
+            const checkbox = $(this);
+            const workOrderId = checkbox.data("id");
+            const workOrderName = checkbox.data("name");
+
+            if (checkbox.is(":checked")) {
+                openedInspectionCheckboxes.push(checkbox);
+                $.ajax({
+                    type: "GET",
+                    url: "${contextPath}/assign/get-user-workOrder-data",
+                    data: { workOrderId: workOrderId },
+                    success: function (data) {
+                        let modalTitle = workOrderName + " - Assign Users";
+                        let modalBody = '';
+
+                        if (!data || !Array.isArray(data.assignedTaskUserDto) || data.assignedTaskUserDto.length === 0) {
+                            modalBody = '<div class="text-center text-muted p-3"><em>No users available for assignment.</em></div>';
+                        } else {
+                            modalBody = '<form method="POST" action="' + contextPath + '/assign/save-assign-inspection" '
+                                + 'class="assign-task-form" id="assignTaskForm-' + workOrderId + '">'
+                                + '<input type="hidden" name="cipherText" class="cipher-text" value=""/>'
+                                + '<input type="hidden" name="_csrf" class="_csrf" value="' + $("input[name='_csrf']").val() + '"/>'
+                                + '<input type="hidden" name="assignId" class="assign-id" value="' + (data.assignId || '') + '"/>'
+                                + '<input type="hidden" name="isActive" class="is-active" value="' + (data.isActive || 'true') + '"/>'
+                                + '<input type="hidden" name="workOrderId" class="workOrder-id" value="' + workOrderId + '"/>'
+                                + '<div class="inspection-box p-2 rounded bg-white">'
+                                + '<table class="table table-hover table-bordered text-center mb-2">'
+                                + '<thead class="table-light"><tr><th style="width:8%;">Sl.No</th><th style="width:40%;">User Name</th><th style="width:8%;">Action</th></tr></thead><tbody>';
+
+                            $.each(data.assignedTaskUserDto, function (index, user) {
+                                const isChecked = user.isAssigned ? 'checked' : '';
+                                const isDisabled = user.isAssigned ? 'disabled readonly' : '';
+                                modalBody += '<tr>'
+                                    + '<td>'
+                                    + (index + 1)
+                                    + '<input type="hidden" name="assignUserId" value="' + (user.assignUserId || '') + '" />'
+                                    + '</td>'
+                                    + '<td>' + (user.userName || 'User ID: ' + user.userId) + '</td>'
+                                    + '<td><input type="checkbox" class="user-checkbox" '
+                                    + 'name="userIds" value="' + user.userId + '" '
+                                    + 'data-user-id="' + user.userId + '" '
+                                    + 'data-workOrder-id="' + workOrderId + '" '
+                                    + isChecked + ' ' + isDisabled + '></td>'
+                                    + '</tr>';
+                            });
+
+                            modalBody += '</tbody></table></div>'
+                                + '<div class="modal-footer">'
+                                + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>'
+                                + '<button type="button" class="btn btn-primary px-3 py-2" '
+                                + 'data-workOrder-id="' + workOrderId + '" onclick="submitFormData(this.form)">Assign</button>'
+                                + '</div></form>';
+                        }
+
+                        $("#assignedUserLabel").text(modalTitle);
+                        $("#assignedUserBody").html(modalBody);
+
+                        const modalElement = document.getElementById('assignedUser');
+                        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+                        modalInstance.show();
+                    },
+                    error: function (xhr) {
+                        bootbox.alert("Failed to load users: " + xhr.statusText);
+                        checkbox.prop("checked", false);
+                    }
+                });
+            }
+        });
+
+        $('#assignedUser').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+            openedInspectionCheckboxes.forEach(cb => cb.prop("checked", false));
+            openedInspectionCheckboxes = [];
+        });
+    }
+
+    function fetchExistWorkOrderByWorkOrderId(workOrderId) {
+        $.ajax({
+            type: "GET",
+            url: "${contextPath}/assign/get-work-inspections-by-workOrder",
+            data: { 
+            	workOrderId: workOrderId
+            	},
+           	success: function (workOrder) {
+           	    var tbody = $("#exist-workOrder-table-body");
+           	    tbody.empty();
+
+	           	 if (workOrder) {
+	           	    var work = workOrder;
+	           	    var row = '<tr data-workOrder-row="' + work.workOrderId + '">'
+	           	        + '<td>1</td>'
+	           	        + '<td>' + (work.workOrderName || 'N/A') + ' (' + (work.workOrderCode || 'N/A') + ')</td>'
+	           	        + '<td>' + (work.planEstimationNo || 'N/A') + '</td>'
+	           	        + '<td>'
+	           	        + '<input type="checkbox" class="form-check-input workOrder-toggle-exist" '
+	           	        + 'data-id="' + work.workOrderId + '" '
+	           	        + 'data-name="' + work.workOrderName + '">'
+	           	        + '</td>'
+	           	        + '</tr>';
+	           	    tbody.append(row);
+	           	} else {
+	           	    tbody.append('<tr><td colspan="4" class="text-center">No unassigned WorkOrder found.</td></tr>');
+	           	}
+
+           	    attachCheckedUserCheckboxHandler();
+           	},
+            error: function (xhr) {
+                bootbox.alert("Error loading assigned inspections: " + xhr.statusText);
+            }
+        });
+    }
+
+    function attachCheckedUserCheckboxHandler() {
+        $(".workOrder-toggle-exist").off("change").on("change", function () {
+            const checkbox = $(this);
+            const workOrderId = checkbox.data("id");
+            const workOrderName = checkbox.data("name");
+
+            if (checkbox.is(":checked")) {
+                openedInspectionCheckboxes.push(checkbox);
+                $.ajax({
+                    type: "GET",
+                    url: "${contextPath}/assign/get-assigned-task-by-workOrder",
+                    data: { workOrderId: workOrderId },
+                    success: function (task) {
+                        let modalTitle = workOrderName + " - Assigned Users";
+                        let modalBody = '';
+                        const assignedUsers = task.assignedTaskUserDto || [];
+                        const assignId = task.assignId || '';
+                        const isActive = task.isActive === true ? 'true' : 'false';
+
+                        if (Array.isArray(assignedUsers) && assignedUsers.length > 0) {
+                            modalBody = '<form method="POST" action="' + contextPath + '/assign/save-assign-inspection" '
+                                + 'class="assign-task-form" id="editAssignTaskForm-' + workOrderId + '">'
+                                + '<input type="hidden" name="cipherText" class="cipher-text" value=""/>'
+                                + '<input type="hidden" name="_csrf" class="_csrf" value="' + $("input[name='_csrf']").val() + '"/>'
+                                + '<input type="hidden" name="assignId" class="assign-id" value="' + assignId + '"/>'
+                                + '<input type="hidden" name="isActive" class="is-active" value="' + isActive + '"/>'
+                                + '<input type="hidden" name="workOrderId" class="workOrder-id" value="' + workOrderId + '"/>'
+                                + '<div class="inspection-box p-2 rounded bg-white">'
+                                + '<table class="table table-hover table-bordered text-center mb-2">'
+                                + '<thead class="table-light"><tr><th style="width:8%;">Sl.No</th><th style="width:40%;">User Name</th><th style="width:8%;">Action</th></tr></thead><tbody>';
+
+                            $.each(assignedUsers, function (index, user) {
+                                const isChecked = user.isAssigned ? 'checked' : '';
+                                modalBody += '<tr>'
+                                    + '<td>'
+                                    + (index + 1)
+                                    + '<input type="hidden" name="assignUserId" value="' + (user.assignUserId || '') + '" />'
+                                    + '</td>'
+                                    + '<td>' + (user.userName || 'User ID: ' + user.userId) + '</td>'
+                                    + '<td><input type="checkbox" class="user-checkbox" '
+                                    + 'name="userIds" value="' + user.userId + '" '
+                                    + 'data-user-id="' + user.userId + '" '
+                                    + 'data-workOrder-id="' + workOrderId + '" '
+                                    + isChecked + '></td>'
+                                    + '</tr>';
+                            });
+
+                            modalBody += '</tbody></table></div>'
+                                + '<div class="modal-footer">'
+                                + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>'
+                                + '<button type="button" class="btn btn-primary px-3 py-2" '
+                                + 'data-workOrder-id="' + workOrderId + '" onclick="submitFormData(this.form)">Update</button>'
+                                + '</div></form>';
+                        } else {
+                            modalBody = '<div class="text-center text-muted p-3"><em>No users assigned for inspection "' + workOrderName + '"</em></div>';
+                        }
+
+                        $("#assignedUserLabel").text(modalTitle);
+                        $("#assignedUserBody").html(modalBody);
+
+                        const modalElement = document.getElementById('assignedUser');
+                        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+                        modalInstance.show();
+                    },
+                    error: function (xhr) {
+                        bootbox.alert("Failed to load assigned users: " + xhr.statusText);
+                        checkbox.prop("checked", false);
+                    }
+                });
+            }
+        });
+
+        $('#assignedUser').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+            openedInspectionCheckboxes.forEach(cb => cb.prop("checked", false));
+            openedInspectionCheckboxes = [];
+        });
+    }
+    
+    $(document).ready(function () {
+		$('.nav-link').on('click', function () {
+			const controller = $(this).data('controller');
+			const action = $(this).data('action');
+			const projectId = $('#projectId').val();
+			const projectEstimationId = $('#projectEstimationId').val();
+			const workOrderId = $('#workOrderId').val();
+			var contextPath = '${contextPath}';
+
+			if (!projectId) {
+				bootbox.alert("Please select a project first.");
+				return;
+			}else if (!projectEstimationId) {
+				bootbox.alert("Please select a project Estimation .");
+				return;
+			}else if (!workOrderId) {
+				bootbox.alert("Please select a WorkOrder.");
+				return;
+			}else{
+				const url = contextPath + '/' + controller + '/' + action;
+				
+				if (action === 'get-work-inspections-by-workOrder') {
+					fetchWorkOrderByWorkOrderId(projectId);
+				} else if (action === 'get-assigned-task-by-workOrder') {
+					fetchExistWorkOrderByWorkOrderId(projectId);
+				}
+			}
+		});
+	});
+    
+</script>

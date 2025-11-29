@@ -1,0 +1,621 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet"
+	href="${contextPath}/assets/js/plugin/jquery_autocomplete/jquery.autocomplete.css" />
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="resources/javascripts/common.js"></script>
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+<script src="${contextPath}/assets/appJs/validation/invoice.js"></script>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	margin: 20px;
+}
+
+.product-list {
+	margin-bottom: 20px;
+}
+
+.form-control {
+	margin-right: 10px;
+	margin-bottom: 0px;
+}
+
+.btn-add-product {
+	margin-top: 10px;
+	padding: 10px 20px;
+	background-color: #007bff;
+	color: #fff;
+	border: none;
+	cursor: pointer;
+}
+
+.btn-add-product:hover {
+	background-color: #0056b3;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+}
+
+th, td {
+	border: 1px solid #ddd;
+	padding: 8px;
+}
+
+th {
+	background-color: #1c985f;
+	text-align: left;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f5f5f5;
+	margin: 0;
+	padding: 0;
+}
+
+.container {
+	max-width: 800px;
+	margin: 50px auto;
+	background: #fff;
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+header {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+h1 {
+	font-size: 24px;
+	margin: 0;
+}
+
+.form-group {
+	margin-bottom: 15px;
+}
+
+label {
+	display: block;
+	margin-bottom: 5px;
+}
+
+input[type="text"], input[type="date"], select {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+
+.product-list {
+	margin: 20px 0;
+}
+
+.product-item {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.product-item input {
+	flex: 1;
+}
+
+.totals {
+	background: #f9f9f9;
+	padding: 10px;
+	margin: 20px 0;
+}
+.error-border {
+	border: 2px solid red !important;
+}
+
+.total-item {
+	display: flex;
+	justify-content: space-between;
+	padding: 5px 0;
+}
+
+button[type="button"] {
+	background: #007bff;
+	color: #fff;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+button[type="submit"] {
+	background: #28a745;
+	color: #fff;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+	display: block;
+	width: 100%;
+	margin-top: 20px;
+}
+
+button:hover {
+	opacity: 0.9;
+}
+
+.remove-btn {
+    background-color: #dc3545 !important; 
+    border-color: #dc3545 !important; 
+    color: white !important; 
+}
+
+.remove-btn:hover {
+    background-color: #c82333; /* Darker red on hover */
+    border-color: #bd2130; /* Darker border on hover */
+}
+
+</style>
+
+<script>
+	$(function()
+	{
+		$('#datatable-default').dataTable({
+			"bSort": false,
+			"autoWidth": false
+		});
+	})
+</script>
+
+<div class="container-fluid">
+<!-- Start::row-1 -->
+<div class="row">
+	<div class="col-xl-12">
+		<div class="card custom-card">
+			<div class="top-left"></div>
+			<div class="top-right"></div>
+			<div class="bottom-left"></div>
+			<div class="bottom-right"></div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-md-12">
+						<section class="panel">
+							<header class="panel-heading">
+								<div>
+									<div id="c" tabindex="1"></div>
+								</div>
+								<h4 class="panel-title">
+									<span>Expenditure Manage </span>
+								</h4>
+
+							</header>
+							<div class="panel-body" id="partyDtlsInRequest">
+								<div class="col-md-12">
+									<form class="form-horizontal form-bordered" id="expenditureForm" action="${contextPath}/expenditure/manage" method="post">
+
+                                      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                      <input type="hidden" id="expenditureId" name="expenditureId" value="${expenditure.expenditureId}">
+							          <input type="hidden" id="cipherText" name="cipherText" value="">
+                                      <div class="row">
+                                      </div>
+										<div class="row">
+											<div class="col-md-3">
+												<div class="form-group">
+												<label for="invoice-id">Financial Year</label> 
+													<select id="finYear" name="finYear" class="form-control">
+														<option value="" >Select Year</option>
+														<c:forEach items="${finYearList}" var="finYear" varStatus="status">
+															<option value="${finYear.finYearId}" 
+															${finYear.finYearId eq expenditure.financialYear.finYearId ? 'selected' : ''}
+															>${finYear.finYear}</option>
+														</c:forEach>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-3">
+												<div class="form-group">
+													<label for="invoice-id">Account Head</label> 
+													<select id="accountHeadId" name="accountHeadId" class="form-control">
+														<option value="" selected>Select Account</option>
+														<c:forEach items="${accountHead}" var="ledger" varStatus="status">
+															<option value="${ledger.accountId}"
+															${expenditure.accountLedgerMaster.accountId eq ledger.accountId ? 'selected':''}
+															>${ledger.accountName}</option>
+														</c:forEach>
+													</select>
+												</div>
+											</div>
+											
+											<div class="col-md-2">
+												<div class="form-group">
+													<label for="invoice-id">Balance Amount</label> 
+													<input type="text" class="form-control text-end amount-field"
+														name="baseAmount" id="baseAmount" value="5000" readonly>
+												</div>
+											</div>
+											
+
+											<div class="row">
+                                      <h6 class="panel-title"><span>Expenditure Details</span></h6>
+                                      </div>
+										</div>
+										<div class="row">
+                                      </div>
+									<div class="table-responsive">
+										<c:set var="totalExpense" value="0" />
+										<table id="product-table Data-table" >
+											<thead>
+												<tr>
+													<th width="80px">Sl No.</th>
+													<th width="700px">Expenditure Description</th>
+													<th width="150px">Amount</th>
+                                                    <th width="60px"> <button type="button" class="btn btn-info btn-add-product">+</button></th>
+												</tr>
+											</thead>
+											<tbody id="tbd">
+												<c:if test="${not empty expenditure.expenditureDetails}">
+													<c:forEach items="${expenditure.expenditureDetails}" var="details" varStatus="status">
+														<tr>
+															<td>${status.count}</td>
+															<td>
+																<textarea class="form-control" id="expenditureDescription${status.index}" name="expenditureDetailsDtoList[${status.index}].expenditureDescription" 
+																placeholder="description" rows="4" maxlength="500">${details.expensesDescription}</textarea>
+															</td>
+															<td>
+																<input type="text" class="form-control text-end " id="expenditureAmount${status.index}" name="expenditureDetailsDtoList[${status.index}].expenditureAmount"  
+																value="${details.expenseAmount}"
+																placeholder="amount">
+															</td>
+															<td>
+																<button type="button" class="btn btn-danger remove-btn " onclick="removeRow(this)">-</button>
+															</td>
+														</tr>
+														<!-- Add the amount to the total -->
+            											<c:set var="totalExpense" value="${totalExpense + details.expenseAmount}" />
+													</c:forEach>
+												</c:if>
+												<c:if test="${empty expenditure.expenditureDetails}">
+														<tr>
+															<td>1</td>
+															<td>
+																<textarea class="form-control" id="expenditureDescription0" name="expenditureDetailsDtoList[0].expenditureDescription" placeholder="description" rows="4" maxlength="500"></textarea>
+															</td>
+															<td>
+																<input type="text" class="form-control text-end" id="expenditureAmount0" name="expenditureDetailsDtoList[0].expenditureAmount"  placeholder="amount">
+															</td>
+															<td>
+																<button type="button" class="btn btn-danger remove-btn" onclick="removeRow(this)">-</button>
+															</td>
+														</tr>
+												</c:if>											
+											</tbody>
+											<tfoot>
+												<tr>
+													<td colspan="2" class="text-end"><strong>Total:</strong></td>
+													<td class="text-end"><strong>${totalExpense}</strong></td>
+													<td></td>
+												</tr>
+											</tfoot>
+										</table>
+									</div>
+
+									<input type="hidden" class="form-control" name="totalAmount"  id="totalAmount" >
+									</div>
+									<div class="row">
+										<div class="col-sm-12" style="margin-top: 30px;">
+											<div class="form-group text-center">
+												<input type="button" class="btn btn-success"
+													onclick="formSubmit()" value="${not empty expenditure.expenditureId ? 'Update' : 'Save'}" /> <a
+													href="${contextPath}/expenditure/add"><input type="button"
+													class="btn btn-danger"
+													value=<spring:message code="COMMON.BUTTON.BACK"></spring:message>></a>
+											</div>
+										</div>
+									</div>
+								</form>
+								<div class="col-md-12" style="margin-top: 10px;">
+									<h6 class="panel-title"><span>Expenditure List</span></h6>
+									<div class="table-responsive">
+										<table id="expenditure-table" >
+											<thead>
+												<tr>
+													<th width="80px">Sl No.</th>
+													<th>Expenditure Type</th>
+													<th width="150px">Amount</th>
+                                                    <th width="80px"> Action</th>
+												</tr>
+											</thead>
+											<tbody id="expenditure-tbl-body">
+												<c:forEach items="${expenditureList}" var="expenditure" varStatus="status">
+													<tr>
+														<td>${status.count}</td>
+														<td>
+															${expenditure.expenditureType}
+														</td>
+														<td>
+															${expenditure.expenditureTotalAmount}</td>
+														<td>
+															<button type="button" class="btn btn-warning edit-btn" onclick="edit(${expenditure.expenditureId})">
+																<i class="fas fa-edit" title="edit"></i>
+															</button>
+														</td>
+													</tr>	
+												</c:forEach>											
+												<!-- Add more rows as needed -->
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+				<hr>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--End::row-1 -->
+
+
+<form action="${contextPath}/expenditure/edit" id="editExpenditureForm"
+	method="GET">
+	<input type="hidden" name="encodedId" id="encodedId" value="" />
+</form>
+
+<form class="form-horizontal form-bordered" id="editPartyDetails"
+	action="${contextPath}/mst/editPartyDetails.htm" method="post">
+	<input type="hidden" name="partyId" id="partyIdForEdit2" value="" /> <input
+		type="hidden" name="cipherText" id="cipherText1" /> <input
+		type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+</form>
+
+<script>
+var url='${contextPath}';
+
+$(document).ready(function() {
+
+	// amount format initializing when page loads for first 
+$('.amount-format').on('blur', function () {
+        let value = parseFloat($(this).val());
+
+        if (!isNaN(value)) {
+            // Format the value to two decimal places
+            $(this).val(value.toFixed(2));
+        } else {
+            // If the input is not a valid number, clear the field
+            $(this).val('');
+        }
+    });
+
+
+	$("input[name^='billingFromPartyName']").autocomplete({
+	    serviceUrl: '${contextPath}/inv/findPartyDetailByAutocomplete.htm',
+	    paramName: "clientcode",
+	    delimiter: ",",
+	    width: '150px',
+	    transformResult: function(response) {
+	        return {
+	            suggestions: $.map($.parseJSON(response), function(item) {
+	                return {
+	                    value: item.clientcode,
+	                    data: item.clientid
+	                };
+	            })
+	        };
+	    },
+	    onSelect: function (suggestion) {
+	        var selectedRow = parseInt(this.parentNode.parentNode.rowIndex) - 1;
+	        document.getElementById("partyId").value = suggestion.data;
+
+	        getPartyDetails(suggestion.data,'BILLINGPARTY');
+	    }
+	});
+
+
+	$("input[name^='billingToPartyName']").autocomplete({
+	    serviceUrl: '${contextPath}/inv/findPartyDetailByAutocomplete.htm',
+	    paramName: "clientcode",
+	    delimiter: ",",
+	    width: '150px',
+	    transformResult: function(response) {
+	        return {
+	            suggestions: $.map($.parseJSON(response), function(item) {
+	                return {
+	                    value: item.clientcode,
+	                    data: item.clientid
+	                };
+	            })
+	        };
+	    },
+	    onSelect: function (suggestion) {
+	        var selectedRow = parseInt(this.parentNode.parentNode.rowIndex) - 1;
+	        document.getElementById("billingToPartyId").value = suggestion.data;
+
+	        getPartyDetails(suggestion.data,'BILLINGTOPARTY');
+	    }
+	});
+});
+
+async function getPartyDetails(partyBillingId, fieldVal) {
+	//debugger;
+
+        try {
+            const response = await $.ajax({
+                url: `${contextPath}/inv/getPartyDetails.htm`,
+                type: 'GET',
+                data: { partyId: partyBillingId },
+                cache: false
+            });
+
+            if (response !== "") {
+                if (fieldVal === "BILLINGPARTY") {
+                    const details =JSON.parse(response) ;
+                    document.getElementById("partyAddress").value = details.address;
+                    document.getElementById("partyGst").value = (details.gstNo !== "null" && details.gstNo !== null) ? details.gstNo : "";
+                    document.getElementById("partyPan").value = details.panNo;
+                    document.getElementById("partyMobileNo").value = (details.phno !== "null" && details.phno !== null) ? details.phno : "";
+                    document.getElementById("partyEmail").value = details.email;
+                }else{
+                	const details =JSON.parse(response) ;
+                    document.getElementById("toAddress").value = details.address;
+                    document.getElementById("topartyGst").value = (details.gstNo !== "null" && details.gstNo !== null) ? details.gstNo : "";
+                    document.getElementById("topartyPan").value = details.panNo;
+                    document.getElementById("toMobileNo").value = (details.phno !== "null" && details.phno !== null) ? details.phno : "";
+                    document.getElementById("toEmail").value = details.email;
+                }
+            } else {
+                // alert("No Details Found");
+            }
+        } catch (error) {
+            // alert("No Details Found");
+        }
+
+}
+
+
+// Edit functionality 
+function edit(expenditureId) {
+    // Encode the ID using Base64
+    const encodedId = btoa(expenditureId); // btoa() encodes a string to Base64
+
+    // Set the encoded ID in the hidden input field
+    $('#encodedId').val(encodedId);
+
+    // Submit the form
+    $('#editExpenditureForm').submit();
+}
+
+
+document.querySelector('.btn-add-product').addEventListener('click', function () {
+    // Get the table body element
+    const tbody = document.getElementById('tbd');
+    
+    // Get the current row count
+    const rowCount = tbody.rows.length;
+    
+    // Create a new row
+    const newRow = document.createElement('tr');
+    
+    // Construct the HTML content using single quotes and concatenation
+    newRow.innerHTML = '<td>' + (rowCount + 1) + '</td>' +
+                       '<td>' +
+                       '<textarea class="form-control" id="expenditureDescription' + rowCount + '" ' +
+                       'name="expenditureDetailsDtoList[' + rowCount + '].expenditureDescription" ' +
+                       'placeholder="description" rows="4" maxlength="500"></textarea>' +
+                       '</td>' +
+                       '<td>' +
+                       '<input type="text" class="form-control text-end" id="expenditureAmount' + rowCount + '" ' +
+                       'name="expenditureDetailsDtoList[' + rowCount + '].expenditureAmount" ' +
+                       'placeholder="amount">' +
+                       '</td>' +
+                       '<td>' +
+                       '<button type="button" class="btn btn-danger remove-btn" onclick="removeRow(this)">-</button>' +
+                       '</td>';
+    
+    // Append the new row to the table body
+    tbody.appendChild(newRow);
+});
+
+// Function to remove a row
+function removeRow(button) {
+    const tbody = document.getElementById('tbd');
+	debugger;
+    // Check if there's only one row left
+    if (tbody.rows.length === 1) {
+        alert("You cannot remove all the rows. At least one row must remain.");
+        return;
+    }
+
+    // Remove the selected row
+    const row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+    
+    // Re-number the rows
+    updateRowIndices();
+}
+
+
+// Function to update row indices after removing a row
+function updateRowIndices() {
+    const rows = document.querySelectorAll('#tbd tr');
+    rows.forEach((row, index) => {
+        row.cells[0].innerText = index + 1;
+        row.querySelector('textarea').id = 'expenditureDescription' + index;
+        row.querySelector('textarea').name = 'expenditureDetailsDtoList[' + index + '].expenditureDescription';
+        row.querySelector('input').id = 'expenditureAmount' + index;
+        row.querySelector('input').name = 'expenditureDetailsDtoList[' + index + '].expenditureAmount';
+    });
+}
+
+
+function dueAmount(){
+	var rowCount = document.getElementById("tbd").rows.length;
+	var total = 0.00;
+	for (var i = 0; i < rowCount; i++) {
+	    var totalElement = document.getElementById("total" + i);
+	    if (totalElement) {
+	        var totalValue = parseFloat(totalElement.value) || 0;
+	        total += totalValue;
+	    }
+	}
+	var dueAmount = total;  // If dueAmount is meant to be double the total, use total * 2 instead.
+	//console.log("Total: " + total);
+	//console.log("Due Amount: " + dueAmount);
+   $("#dueAmount").val(dueAmount.toFixed(2));
+
+}
+
+function formSubmit() {
+    let isValid = true;
+    const rowCount = document.getElementById("tbd").rows.length;
+    const balanceAmount = parseFloat($('#baseAmount').val()); // Convert balance amount to a number
+    let totalAmount = 0;
+
+    // Reset previous error styles
+    $('#tbd textarea, #tbd input').removeClass('error-border');
+
+    // Validate each row
+    for (let i = 0; i < rowCount; i++) {
+        const productName = $('#expenditureDescription'+i);
+        const expenditureAmount = $('#expenditureAmount'+i);
+
+        // Check if fields are empty or invalid
+        if (productName.val().trim() === "" || expenditureAmount.val().trim() === "" || expenditureAmount.val().trim() === "0") {
+            bootbox.alert("Please fill in all mandatory fields.");
+            productName.addClass('error-border');
+            expenditureAmount.addClass('error-border');
+            isValid = false;
+            return false; // Exit the function early if invalid
+        }
+
+        totalAmount += parseFloat(expenditureAmount.val()) || 0; // Add expenditure amount to total
+    }
+
+    // Check if total amount exceeds balance amount
+    if (totalAmount > balanceAmount) {
+        bootbox.alert("Sum of Expenditure amount cannot exceed the balance amount.");
+        return false;
+    }
+
+    // Confirm and submit if validation passes
+    if (isValid && window.confirm("Do you want to save the data?")) {
+        $("#expenditureForm").submit();
+    }
+}
+
+
+</script>

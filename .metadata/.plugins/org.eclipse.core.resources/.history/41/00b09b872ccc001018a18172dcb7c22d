@@ -1,0 +1,432 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<form action="${contextPath}/building/sanction/save" id="sanctionWorkForm" method="post" enctype="multipart/form-data">
+  <input type="hidden" id="cipherText2" name="cipherText2" value="">
+  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+  <input type="hidden" id="sanctionTabId" name="sanctionTabId" value="2" />
+  <input type="hidden" id="sanctionId" name="sanctionId" value="${building.sanctionDTO.sanctionId}"  />
+  <input type="hidden" id="buildingIdTab2" name="buildingIdTab2" value="${building.buildingDTO.buildingId != null ? building.buildingDTO.buildingId : buildingIdTab2}" />
+  <input type="hidden" id="currentStatus2" name="currentStatus2" value="${building.buildingDTO.currentStatus}" />
+  <input type="hidden" id="isFinalSubmit" name="isFinalSubmit" />
+	
+  <div class="">
+
+    <!-- ==================== SANCTION DETAILS ==================== -->
+		<div class="card mb-3">
+			<div class="form-section-header">Sanction Details</div>
+			<div class="card-body">
+				<div class="row g-3">
+					<div class="col-md-3">
+						<label for="sanctionNumber" class="required">Sanction
+							Number :</label> <input type="text" id="sanctionNumber"
+							name="sanctionNumber" class="form-control form-control-sm"
+							placeholder="Enter Sanction Number"
+							value="${building.sanctionDTO.sanctionNumber}" maxlength=15>
+					</div>
+					<div class="col-md-3">
+						<label for="sanctionDate" class="required">Sanction Date :</label>
+						<div class="datepicker-box">
+							<input type="text" id="sanctionDate" name="sanctionDate"
+								class="form-control form-control-sm datepicker"
+								value="${building.sanctionDTO.sanctionDate}" readonly>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<label for="sanctionAmount" class="required">Sanction Amount :</label> 
+						<input type="number" id="sanctionAmount"
+							name="sanctionAmount" class="form-control form-control-sm text-end"
+							value="${building.sanctionDTO.sanctionAmount}"
+							oninput="if(this.value.length > 15) this.value = this.value.slice(0, 15);">
+					</div>
+					<div class="col-md-3">
+						<label for="sanctionAssignedTo" class="required">Sanction
+							To :</label> <select id="sanctionAssignedTo" name="sanctionAssignedTo"
+							class="form-select form-select-sm">
+							<option value="">-- Select --</option>
+							<c:forEach var="assigned" items="${sanctionedAssignList}">
+								<option value="${assigned.valueEn}"
+									${assigned.valueEn eq building.sanctionDTO.sanctionAssignedTo ? 'selected' : ''}>
+									${assigned.valueEn}</option>
+							</c:forEach>
+						</select>
+					</div>
+
+					<div class="col-md-3">
+						<label class="required" for="sanctionDocumentPath">Sanction
+							Document :</label>
+						<div class="col-md-12 position-relative">
+								<input type="file" id="sanctionDocumentPath"
+								name="sanctionDocumentPath" class="form-control form-control-sm"
+								accept=".pdf,.doc,.docx" onchange="uploadFileCheck(this)"
+								<c:if test="${not empty building.sanctionDTO.sanctionDocumentName}">data-existing="true"</c:if> />
+							<c:if test="${not empty building.sanctionDTO.sanctionDocumentName}">
+								<button type="button"
+									class="btn btn-sm btn-primary position-absolute"
+									style="right: 1px; top: 1px;"
+									onclick="viewDocument('${building.sanctionDTO.sanctionDocumentName}','SANCTION_WORK_DOCUMENT')"
+									title="Download Document">
+									<i class="fa fa-download"></i>
+								</button>
+
+								<span style="font-size: 12px; color: #7b3f00; font-weight: 600;">
+									${building.sanctionDTO.sanctionDocumentName} </span>
+							</c:if>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- ==================== DPR DETAILS ==================== -->
+    <div class="card mb-3">
+      <div class="form-section-header">DPR Details</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label for="dprDate">DPR Submission Date :</label>
+            <div class="datepicker-box">
+              <input type="text" id="dprDate" name="dprDate"
+                     class="form-control form-control-sm datepicker" value="${building.sanctionDTO.dprDate}" readonly>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label for="dprAmount">DPR Amount :</label>
+            <input type="number" id="dprAmount" name="dprAmount"
+                   class="form-control form-control-sm text-end" value="${building.sanctionDTO.dprAmount}"
+                   oninput="if(this.value.length > 15) this.value = this.value.slice(0, 15);">
+          </div>
+          
+          <div class="form-group col-md-3">
+		    <label for="dprDocumentPath">Upload DPR :</label>
+		    <div class="col-md-12 position-relative">
+		        <input type="file" id="dprDocumentPath" name="dprDocumentPath" class="form-control form-control-sm" accept=".pdf,.doc,.docx" onchange="uploadFileCheck(this)"
+		        <c:if test="${not empty building.sanctionDTO.dprDocumentName}">data-existing="true"</c:if>>
+		 	    <c:if test="${not empty building.sanctionDTO.dprDocumentName}">
+		            <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top: 1px;" onclick="viewDocument('${building.sanctionDTO.dprDocumentName}','SANCTION_WORK_DOCUMENT')" title="Download Document">
+		                <i class="fa fa-download"></i>
+		            </button> <span style="font-size: 12px;color: #7b3f00;font-weight: 600;">${building.sanctionDTO.dprDocumentName}</span>
+		        </c:if>
+		    </div>
+		</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== ADMINISTRATIVE APPROVAL DETAILS ==================== -->
+    <div class="card mb-3">
+      <div class="form-section-header">Administrative Approval Details</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label for="administrativeApprovalOrder">Approval Order No. :</label>		
+            <input type="text" id="administrativeApprovalOrder" name="administrativeApprovalOrder"
+                   class="form-control form-control-sm" placeholder="Enter Order No." value="${building.sanctionDTO.administrativeApprovalOrder}">
+          </div>
+          <div class="col-md-3">
+            <label for="administrativeApprovalDate">Approval Order Date :</label>
+            <div class="datepicker-box">
+              <input type="text" id="administrativeApprovalDate" name="administrativeApprovalDate"
+                     class="form-control form-control-sm datepicker" value="${building.sanctionDTO.administrativeApprovalDate}" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TENDER DETAILS ==================== -->
+    <div class="card mb-3">
+      <div class="form-section-header">Tender Details</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label for="tenderFloating">Tender Floating Date :</label>
+            <div class="datepicker-box">
+              <input type="text" id="tenderFloating" name="tenderFloating"
+                     class="form-control form-control-sm datepicker" value="${building.sanctionDTO.tenderFloating}" readonly maxlength=15>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label for="tenderApproval">Tender Approval Date :</label>
+            <div class="datepicker-box">
+              <input type="text" id="tenderApproval" name="tenderApproval"
+                     class="form-control form-control-sm datepicker" value="${building.sanctionDTO.tenderApproval}" readonly maxlength=15>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== WORK ORDER DETAILS ==================== -->
+    <div class="card mb-3">
+      <div class="form-section-header">Work Order Details</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label for="workOrderDate">Work Order Date :</label>
+            <div class="datepicker-box">
+              <input type="text" id="workOrderDate" name="workOrderDate"
+                     class="form-control form-control-sm datepicker" value="${building.sanctionDTO.workOrderDate}" readonly maxlength=15>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label for="workOrderNumber">Work Order Number :</label>
+            <input type="text" id="workOrderNumber" name="workOrderNumber"
+                   class="form-control form-control-sm" placeholder="Enter Work Order Number" value="${building.sanctionDTO.workOrderNumber}" maxlength=15>
+          </div>
+          <div class="col-md-3">
+            <label for="workOrderDocumentPath">Work Order Document :</label>
+            <div class="col-md-12 position-relative">
+            	<input type="file" id="workOrderDocumentPath" name="workOrderDocumentPath"
+                   class="form-control form-control-sm" accept=".pdf,.doc,.docx"
+                   onchange="uploadFileCheck(this)"
+                 <c:if test="${not empty building.sanctionDTO.workOrderDocumentName}">data-existing="true"</c:if>>
+             	<c:if test="${not empty building.sanctionDTO.workOrderDocumentName}">
+		            <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top: 1px;" onclick="viewDocument('${building.sanctionDTO.workOrderDocumentName}','SANCTION_WORK_DOCUMENT')" title="Download Document">
+		                <i class="fa fa-download"></i>
+		            </button> <span style="font-size: 12px;color: #7b3f00;font-weight: 600;">${building.sanctionDTO.workOrderDocumentName}</span>
+		        </c:if>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label for="completionDueDate">Comp. Date (Months) :</label>
+            <select id="completionDueDate" name="completionDueDate"
+                    class="form-select form-select-sm">
+              <option value="" selected disabled>Select Duration</option>
+              <c:forEach var="complitionDuration" items="${complitionDurationList}">
+				<option value="${complitionDuration.valueEn}"
+					${complitionDuration.valueEn eq building.sanctionDTO.completionDueDate ? 'selected' : ''}>
+					${complitionDuration.valueEn}</option>
+			</c:forEach>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="completionDate">Completion Date :</label>
+            <div class="datepicker-box">
+              <input type="text" id="completionDate" name="completionDate"
+                     class="form-control form-control-sm datepicker" value="${building.sanctionDTO.completionDate}" readonly>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label for="agencyContName">Agency / Cont. Name :</label>
+            <input type="text" id="agencyContName" name="agencyContName"
+                   class="form-control form-control-sm" placeholder="Enter Agency / Contractor Name" value="${building.sanctionDTO.agencyContName}"maxlength=40>
+          </div>
+          <div class="col-md-3">
+            <label for="contractorPhone">Cont. Phone Number :</label>
+            <input type="tel" id="contractorPhone" name="contractorPhone"
+                   class="form-control form-control-sm" placeholder="Enter 10-digit Phone"
+                   maxlength="10" pattern="[0-9]{10}" value="${building.sanctionDTO.contractorPhone}">
+          </div>
+          <div class="col-md-3">
+            <label for="workOrderValue">WorkOrder Value (Incl. GST) :</label>
+            <input type="number" id="workOrderValue" name="workOrderValue"
+                   class="form-control form-control-sm text-end" placeholder="â¹" min="0" value="${building.sanctionDTO.workOrderValue}"
+                    oninput="if(this.value.length > 15) this.value = this.value.slice(0, 15);">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== AGREEMENT DETAILS ==================== -->
+    <div class="card mb-3">
+      <div class="form-section-header">Agreement Details</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label for="agreementDate">Agreement Date :</label>
+            <div class="datepicker-box">
+              <input type="text" id="agreementDate" name="agreementDate"
+                     class="form-control form-control-sm datepicker" value="${building.sanctionDTO.agreementDate}" readonly>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label for="agreementDocumentPath">Agreement Document Upload :</label>
+            <div class="col-md-12 position-relative">
+            	<input type="file" id="agreementDocumentPath" name="agreementDocumentPath"
+                   class="form-control form-control-sm" accept=".pdf,.doc,.docx"
+                   onchange="uploadFileCheck(this)" 
+               <c:if test="${not empty building.sanctionDTO.agreementDocumentName}">data-existing="true"</c:if>>
+               <c:if test="${not empty building.sanctionDTO.agreementDocumentName}">
+		            <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top: 1px;" onclick="viewDocument('${building.sanctionDTO.agreementDocumentName}','SANCTION_WORK_DOCUMENT')" title="Download Document">
+		                <i class="fa fa-download"></i>
+		            </button> <span style="font-size: 12px;color: #7b3f00;font-weight: 600;">${building.sanctionDTO.agreementDocumentName}</span>
+		        </c:if>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== ACTION BUTTONS ==================== -->
+    <div class="text-end mt-3">
+		<button type="button" class="btn btn-primary btn-sm" onclick="submitSanctionForm(false)">
+	        <i class="fa fa-save me-1"></i> Draft
+	      </button>
+	      <button type="button" class="btn btn-submit btn-sm" onclick="submitSanctionForm(true)">
+	        <i class="fa fa-save me-1"></i> Final Submit
+	      </button>
+	 </div>
+
+  </div>
+</form>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+ 
+	function validateSanction() {
+		
+		var lastFilledSection = "";
+		
+	    // === SANCTION DETAILS (Always Mandatory) ===
+	    var sanctionNumber = $.trim($("#sanctionNumber").val());
+	    var sanctionDate = $.trim($("#sanctionDate").val());
+	    var sanctionAmount = $.trim($("#sanctionAmount").val());
+	    var sanctionAssignedTo = $("#sanctionAssignedTo").val();
+	    
+	 	// === Sanction Document (Mandatory) ===
+	    var sanctionDoc = $("#sanctionDocumentPath").get(0);
+	    var hasSanctionDoc = sanctionDoc && sanctionDoc.files.length > 0;
+	    var existingSanction = $("#sanctionDocumentPath").data("existing");
+
+	    if (!sanctionNumber) { 
+	        bootbox.alert("Please enter Sanction Number."); 
+	        return false; 
+	    }
+
+	    if (!sanctionDate) { 
+	        bootbox.alert("Please select Sanction Date."); 
+	        return false; 
+	    }
+
+	    if (!sanctionAmount || isNaN(sanctionAmount) || Number(sanctionAmount) <= 0) {
+	        bootbox.alert("Please enter a valid Sanction Amount greater than zero."); 
+	        return false; 
+	    }
+
+	    if (!sanctionAssignedTo) { 
+	        bootbox.alert("Please select Sanction Assigned To."); 
+	        return false; 
+	    }
+	    
+	    if (!hasSanctionDoc && !existingSanction) {
+	        bootbox.alert("Please upload Sanction Document.");
+	        return false;
+	    }
+	    
+	    lastFilledSection = "Sanction Details"
+	
+	 	// === DPR DETAILS (Optional but fully required if started) ===
+	    var dprSubmissionDate = $.trim($("#dprDate").val());
+	    var dprTotalAmount = $.trim($("#dprAmount").val());
+	    var dprFileElement = $("#dprDocumentPath").get(0);
+	    var hasDprDocument = dprFileElement && dprFileElement.files.length > 0;
+
+	    if (dprSubmissionDate || dprTotalAmount || hasDprDocument) {
+	    	
+	        if (!dprSubmissionDate) { 
+	            bootbox.alert("Please select DPR Submission Date."); 
+	            return false; 
+	        }
+	        
+	        if (!dprTotalAmount || isNaN(dprTotalAmount) || Number(dprTotalAmount) <= 0) {
+	            bootbox.alert("Please enter a valid DPR Amount greater than zero."); 
+	            return false; 
+	        }
+	        
+	        if (!hasDprDocument && !$("#dprDocumentPath").data("existing")) { 
+	            bootbox.alert("Please upload a DPR Document (PDF/DOC/DOCX)."); 
+	            return false; 
+	        }
+	        lastFilledSection = "Dpr Details"
+	    }
+	    
+	    
+	
+	    // === OTHER OPTIONAL SECTIONS (If one field filled, validate all) ===
+	    var optionalSections = [
+	        { name: "Administrative Approval", fields: ["#administrativeApprovalOrder", "#administrativeApprovalDate"] },
+	        { name: "Tender", fields: ["#tenderFloating", "#tenderApproval"] },
+	        { name: "Work Order", fields: ["#workOrderDate", "#workOrderNumber", "#workOrderDocumentPath", "#completionDueDate", "#completionDate", "#agencyContName", "#contractorPhone", "#workOrderValue"] },
+	        { name: "Agreement", fields: ["#agreementDate", "#agreementDocumentPath"] }
+	    ];
+	
+	    for (var i = 0; i < optionalSections.length; i++) {
+	        var section = optionalSections[i];
+	        var isSectionStarted = false;
+	
+	        // Detect if any field is filled
+	        for (var j = 0; j < section.fields.length; j++) {
+	            var fieldElement = $(section.fields[j]);
+	            if (fieldElement.is(":file")) {
+	                if (fieldElement.get(0).files.length > 0) isSectionStarted = true;
+	            } else if ($.trim(fieldElement.val()) !== "") {
+	                isSectionStarted = true;
+	            }
+	        }
+	
+	     	// Validate all fields if section started
+	        if (isSectionStarted) {
+	        	lastFilledSection = section.name;
+	            for (var k = 0; k < section.fields.length; k++) {
+	                var inputElement = $(section.fields[k]);
+
+	                if (inputElement.is(":file")) {
+	                    var hasFile = inputElement.get(0).files.length > 0;
+	                    var existingFile = inputElement.data("existing"); // check if already uploaded
+	                    if (!hasFile && !existingFile) {
+	                        bootbox.alert("Please upload required document in " + section.name + " section.");
+	                        return false;
+	                    }
+	                } else if ($.trim(inputElement.val()) === "") {
+	                    bootbox.alert("Please fill all mandatory fields in " + section.name + " section.");
+	                    return false;
+	                }
+	            }
+	        }
+	    }
+	    
+	    $("#currentStatus2").val(lastFilledSection);
+	
+	    return true;
+	}
+
+  // Final Submit
+  function submitSanctionForm(isFinalSubmit) {
+    if (!validateSanction()) return;
+    
+    $('#isFinalSubmit').val(isFinalSubmit);
+    
+    var bizContent2 = $("#sanctionWorkForm").serializeArray();
+	$("#cipherText2").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent2))));
+	
+	var confirmMsg = isFinalSubmit 
+    ? "This is a final submission. After saving, you cannot update the details. Do you want to proceed?" 
+    : "Do you want to save the details?";
+	
+	bootbox.confirm(confirmMsg, function(result) {
+		if (result) {
+			showLoader();
+			$("#sanctionWorkForm").submit();
+		}
+	});
+    
+  }
+  
+  $(document).ready(function () {
+    if (typeof $.datepick !== 'undefined') {
+      $(".datepicker").datepick({
+        dateFormat: "dd-mm-yyyy",
+        yearRange: "c-20:c+10",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger btn btn-sm"><i class="fa fa-calendar"></i></button>'
+      });
+    } else {
+      console.warn("jQuery Datepick plugin not loaded. Datepicker disabled.");
+    }
+  });
+  
+  
+  
+
+
+</script>

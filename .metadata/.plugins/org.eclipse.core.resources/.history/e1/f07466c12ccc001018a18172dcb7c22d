@@ -1,0 +1,219 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script type="text/javascript" src="${contextPath}/assets/utilsJs/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+
+
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Add FAQ</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+             	<c:if test="${empty faq}">
+           	 		<li class="breadcrumb-item active" aria-current="page">Add FAQ</li>
+             	</c:if>
+             	<c:if test="${not empty faq}">
+           	 		<li class="breadcrumb-item active" aria-current="page">Update FAQ</li>
+             	</c:if>
+			</ol>
+		</nav>
+	</div>
+</div>
+
+<div class="row mb-4">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">FAQ Management</h5>
+			</div>
+			<div class="card-body">
+				<form class="form-horizontal row" action="${contextPath}/faq/save-faq" method="post" id="saveFaq">
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+					<input type="hidden" id="cipherTextSave" name="cipherText" /> 
+					<input type="hidden" name="faqId" id="faqId" value="${faq.faqId}" />
+					
+					<div class="col-lg-3">
+						<div class="form-group">
+							<label for="questionEn" class="control-label required">Question In English</label>
+							<div>
+								<textarea maxlength="250"
+									class="form-control AlphaNumericSscchOnly" id="questionEn"
+									name="questionEn">${faq.questionEn}</textarea>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-3">
+						<div class="form-group">
+							<label for="questionOd" class="control-label required">Question In Odia</label>
+							<div>
+								<textarea maxlength="250"
+									class="form-control AlphaNumericSscchOnly" id="questionOd"
+									name="questionOd">${faq.questionOd}</textarea>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-3">
+						<div class="form-group">
+							<label for="answerEn" class="control-label required">Answer In English</label>
+							<div>
+								<textarea maxlength="250"
+									class="form-control AlphaNumericSscchOnly" id="answerEn"
+									name="answerEn">${faq.answerEn}</textarea>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-3">
+						<div class="form-group">
+							<label for="answerOd" class="control-label required">Answer In Odia</label>
+							<div>
+								<textarea maxlength="250"
+									class="form-control AlphaNumericSscchOnly" id="answerOd"
+									name="answerOd">${faq.answerOd}</textarea>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-sm-12 text-center mt-3">
+						<button type="button" class="btn btn-success" onclick="validateFields()">${empty faq ? 'Save' : 'Update' }</button>
+						<a href="${contextPath}/" class="btn btn-danger">Cancel</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Faq List</h5>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table class="table table-bordered inr-table exportbtn dataTable">
+						<thead>
+							<tr>
+								<th class="text-center" style="width: 80px;">Sl.No.</th>
+								<th>Question In English</th>
+								<th>Question In Odia</th>
+								<th style="width: 80px;" class="text-center">Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach items="${faqList}" var="faq" varStatus="status">
+								<tr>
+									<td class="text-center">${status.count}</td>
+									<td>${faq.questionEn}</td>
+									<td>${faq.questionOd}</td>
+									<td class="text-center"><a href="javascript:void(0);" onclick="redirectToEditFaq('${faq.faqId}')"
+										class="btn btn-warning btn-xs" title="Edit"> <i class="fas fa-edit"></i>
+										</a>
+										<button type="button"
+											class="btn btn-xs ${faq.isActive ? 'btn-success' : 'btn-danger'}"
+											title="${faq.isActive ? 'Click To Deactivate' : 'Click To Activate'}"
+											onclick="actFaq('${faq.faqId}', ${faq.isActive})">
+											<i class="${faq.isActive ? 'fa fa-lock-open' : 'fa fa-lock'}"></i>
+										</button></td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<form id="faqHiddenForm" action="" method="get">
+	<input type="hidden" id="encryptIdFaq" name="encryptId">
+</form>
+
+<form action="${contextPath}/faq/activeInactive" method="post" id="faqFormAct">
+	<input type="hidden" name="${_csrf.parameterName}"value="${_csrf.token}" /> 
+	<input type="hidden" name="encryptId" id="encryptIdFaqAct" /> 
+	<input type="hidden" name="encryptStatus" id="encryptStatusFaqAct" />
+</form>
+
+<script>
+
+function actFaq(id, currentStatus) {
+    const message = currentStatus
+      ? "Are you sure you want to deactivate this FAQ?"
+      : "Are you sure you want to activate this FAQ?";
+
+    if (window.bootbox) {
+      bootbox.confirm({
+        message: message,
+        buttons: {
+          confirm: { label: 'Yes', className: 'btn-success btn-sm' },
+          cancel:  { label: 'No',  className: 'btn-danger  btn-sm' }
+        },
+        callback: function (result) {
+          if (result) submitFaqToggle(id, !currentStatus);
+        }
+      });
+    } else {
+      if (confirm(message)) submitFaqToggle(id, !currentStatus);
+    }
+  }
+
+  function submitFaqToggle(id, newStatus) {
+    document.getElementById('encryptIdFaqAct').value      = enc_password(String(id));
+    document.getElementById('encryptStatusFaqAct').value  = enc_password(String(newStatus));
+    showLoader();
+    document.getElementById('faqFormAct').submit();
+  }
+
+
+function validateFields() {
+  var questionEn = $('#questionEn').val().trim();
+  var questionOd = $('#questionOd').val().trim();
+  var answerEn   = $('#answerEn').val().trim();
+  var answerOd   = $('#answerOd').val().trim();
+  var faqIdVal   = $('#faqId').val(); 
+
+  if (!questionEn) { bootbox.alert('Please provide question in english.'); return false; }
+  if (!questionOd) { bootbox.alert('Please provide question in odia.');   return false; }
+  if (!answerEn)   { bootbox.alert('Please provide answer in english.');  return false; }
+  if (!answerOd)   { bootbox.alert('Please provide answer in odia.');     return false; }
+
+  bootbox.confirm("Do you want to continue?", function(result) {
+    if (result) {
+    	
+      var faqId = (faqIdVal && faqIdVal.trim() !== '') ? Number(faqIdVal) : null;
+
+      const payload = {
+        faqId: faqId,
+        questionEn: questionEn,
+        questionOd: questionOd,
+        answerEn: answerEn,
+        answerOd: answerOd
+      };
+
+      const encrypted = enc_password(JSON.stringify(payload));
+      $('#cipherTextSave').val(encrypted);
+      showLoader();
+      $("#saveFaq").submit();
+    }
+  });
+  return false;
+}
+
+function redirectToEditFaq(id) {
+    $("#encryptIdFaq").val(enc_password(id));
+    $("#faqHiddenForm").attr("action", "${contextPath}/faq/edit-faq");
+    showLoader();
+    $("#faqHiddenForm").submit();
+  }
+</script>

@@ -1,0 +1,140 @@
+class loadBottomSubject{
+	constructor(apiPath, contextPath)
+	{
+		this.apiPath =  apiPath;
+		this.worker = null;
+		this.contextPath = contextPath;
+		this.data = null;
+		this.context = "STATE";
+		this.chart=null;
+	}
+
+	doFetch() {
+    		if (this.worker == null )
+		{
+			this.worker = new Worker(this.contextPath + '/assets/appJs/CommonWorker.js');
+			this.worker.addEventListener('message', (e) => this.processData(e));
+		}
+		var filterVal = $("#subjectId").val();
+		let url = this.contextPath + this.apiPath + "subjectChartData" ;
+		url = url + "?chartCall=SUBJECT_WISE&subject="+filterVal;
+
+
+		window.loadCounter++;
+		this.worker.postMessage({
+			"method" : "GET" ,
+			"url" : url ,
+			"payload" : null,
+			//subject: filterVal
+		});
+
+	}
+ processData(e) {
+    if (e.data != null) {
+        this.data = e.data;
+
+        let docVerified = [];
+        let interview = [];
+        let published = [];
+        let subject = [];
+		
+		var count=0;
+		
+		this.data.data.forEach((item) => {
+                subject.push(item.subName); 
+                docVerified.push(item.doc_Verified); 
+                interview.push(item.interview_schedule);
+                published.push(item.result_published);
+                count++;
+            });
+	if(count==0){
+		published.push(0); 
+	    interview.push(0);
+	    docVerified.push(0);
+	    subject.push($("#subjectId option:selected").text());
+	}
+
+ var options = {
+            series: [
+                { name: 'Document Approved', data: docVerified },
+                { name: 'Interview Schedule', data: interview },
+                { name: 'Result Published', data: published },
+            ],
+            chart: {
+                type: 'bar',
+                height: 180
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '35%',
+                    endingShape: 'rounded'
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                show: true,
+                width: 3,
+                colors: ['transparent']
+            },
+            xaxis: {
+                categories: subject,  
+            },
+                yaxis: {
+	        title: {
+	           
+	        },
+	        min: 0,
+	        max: 50, 
+	        tickAmount: 5, 
+	        labels: {
+	            formatter: function (value) {
+	                return value; 
+	            }
+	        }
+	    },
+            fill: {
+                opacity: 1
+            },
+           colors: ['#FFAE1A', '#FE6A49', '#006666c2'],
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return val /*+ " thousands"*/;
+                    }
+                }
+            }
+        };
+        
+        this.destroyChartById('subjectWiseId');
+
+        this.chart = new ApexCharts(document.querySelector("#subjectWiseId"), options);
+        this.chart.render();
+    	}
+    	else {
+        // If no data is found, clear the chart and handle empty state
+        if (this.chart) {
+            this.chart.destroy(); // Destroy the previous chart instance
+        }
+
+        // Optionally, display a message to indicate that no data is available
+        const emptyMessage = document.querySelector("#subjectWiseId");
+        emptyMessage.innerHTML = "<p>No data available for the selected subject.</p>";
+     }
+	}
+	
+
+	destroyChartById(elementId) {
+	  const chartElement = document.querySelector(`#${elementId}`);
+	  if (chartElement && chartElement.children.length > 0) {
+	    while (chartElement.firstChild) {
+	      chartElement.removeChild(chartElement.firstChild);
+	    }
+	  }
+	}
+
+}
+
+

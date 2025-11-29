@@ -1,0 +1,549 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<fmt:formatDate value="${now}" pattern="dd-MM-yyyy" var="currentDate" />
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<%-- <div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">WEO Inspection</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i
+						class="fa fa-home"></i> Home</a></li>
+				<li class="breadcrumb-item active">WEO Inspection Form</li>
+			</ol>
+		</nav>
+	</div>
+</div> --%>
+
+<form action="${contextPath}/weo/inspection/save" id="weoForm" method="post" enctype="multipart/form-data">
+	<input type="hidden" name="weoInspectionId"
+		id="weoInspectionId" />
+
+	<input type="hidden" name="${_csrf.parameterName}"
+		value="${_csrf.token}" /> <input type="hidden" id="cipherText"
+		name="cipherText" />
+
+	<div class="card mt-3">
+		<div class="card-header"><h5 class="card-title">WEO Inspection Details</h5></div>
+		<div class="card-body">
+			<div class="row">
+				<!-- DATE OF VISIT -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required">Date of Visit :</label>
+						<div class="datepicker-box">
+							<input type="text" id="dateOfVisit" name="dateOfVisit"
+								class="form-control form-control-sm datepicker"
+								placeholder="dd-mm-yyyy" readonly required />
+						</div>
+					</div>
+				</div>
+
+
+				<!-- DISTRICT -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required">District :</label> <select id="districtId"
+							name="districtId"
+							class="form-control form-control-sm form-select"
+							onchange="LoadBlockByDistrict(this.value)" required>
+							<option value="" disabled selected>- Select -</option>
+							<c:forEach items="${districtList}" var="d">
+								<option value="${d.districtId}"
+									${d.districtId eq inspectionDTO.districtId ? 'selected' : ''}>
+									${d.districtName}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</div>
+
+
+
+				<!-- AREA TYPE -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required">Area Type :</label> <select id="areaType"
+							name="areaType" class="form-control form-control-sm form-select"
+							onchange="toggleAreaType(this.value)" required>
+							<option value="" disabled selected>- Select -</option>
+							<option value="RURAL"
+								${inspectionDTO.areaType eq 'RURAL'?'selected':''}>Rural</option>
+							<option value="URBAN"
+								${inspectionDTO.areaType eq 'URBAN'?'selected':''}>Urban</option>
+						</select>
+					</div>
+				</div>
+
+
+
+				<!-- BLOCK (RURAL) -->
+				<div class="col-md-3 ruralSection" style="display: none;">
+					<div class="form-group">
+						<label class="required">Block :</label> <select id="blockId"
+							name="blockId" class="form-control form-control-sm form-select"
+							onchange="LoadGrampanchayatByBlock(this.value)">
+							<option value="" disabled selected>- Select -</option>
+							<c:forEach items="${blockList}" var="b">
+								<option value="${b.blockId}"
+									${b.blockId eq inspectionDTO.blockId ? 'selected':''}>
+									${b.blockName}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</div>
+
+				<!-- GP (RURAL) -->
+				<div class="col-md-3 ruralSection" style="display: none;">
+					<div class="form-group">
+						<label class="required">GramPanchayat :</label> <select id="gpId"
+							name="gpId" class="form-control form-control-sm form-select"
+							onchange="LoadVillageByGrampanchayat(this.value)">
+							<option value="" disabled selected>- Select -</option>
+							<c:forEach items="${gpList}" var="gp">
+								<option value="${gp.gpId}"
+									${gp.gpId eq inspectionDTO.gpId ? 'selected':''}>
+									${gp.gpName}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</div>
+
+
+				<!-- VILLAGE -->
+				<div class="col-md-3 ruralSection" style="display: none;">
+					<div class="form-group">
+						<label class="required">Village :</label> <select id="villageId"
+							name="villageId" class="form-control form-control-sm form-select">
+							<option value="" disabled selected>- Select -</option>
+							<c:forEach items="${villageList}" var="v">
+								<option value="${v.villageId}"
+									${v.villageId eq inspectionDTO.villageId ? 'selected':''}>
+									${v.villageName}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</div>
+
+
+				<div class="col-md-3 urbanSection" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required" for="municipalityId">Municipality Name :</label>
+						<div class="col-md-12">
+							<select id="municipalityId" name="municipalityId"
+								class="form-control form-control-sm form-select"
+								onchange="LoadWardByMunicipality(this.value)">
+								<option value="" selected disabled>- Select -</option>
+								<c:if test="${not empty municipalityList}">
+									<c:forEach var="municipality" items="${municipalityList}">
+										<option value="${municipality.municipalityId}"
+											${municipality.municipalityId eq inspectionDTO.municipalityId ? 'selected' : ''}>
+											${municipality.municipalityName}</option>
+									</c:forEach>
+								</c:if>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3 urbanSection" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required" for="wardId">Ward Name :</label>
+						<div class="col-md-12">
+							<select id="wardId" name="wardId"
+								class="form-control form-control-sm form-select">
+								<option value="" selected disabled>- Select -</option>
+								<c:if test="${not empty wardList}">
+									<c:forEach var="ward" items="${wardList}">
+										<option value="${ward.wardId}"
+											${ward.wardId eq inspectionDTO.wardId ? 'selected' : ''}>
+											${ward.wardName}</option>
+									</c:forEach>
+								</c:if>
+							</select>
+						</div>
+					</div>
+				</div>
+				<!-- BUILDING TYPE -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required">Building Type :</label> <select
+							id="buildingType" name="buildingType"
+							class="form-control form-control-sm form-select"
+							onchange="getBuildingNameByBuildingType(this.value,'buildingId');"
+							required>
+
+							<option value="" selected>- Select -</option>
+
+							<c:forEach var="buildType" items="${buildingTypeList}">
+								<option value="${buildType.valueEn}"
+									${inspectionDTO.buildingType == buildType.valueEn ? 'selected' : ''}>
+									${buildType.valueEn}</option>
+							</c:forEach>
+						</select>
+
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required">Building Name :</label> <select
+							id="buildingId" name="buildingId"
+							class="form-control form-control-sm form-select" required>
+							<option value="" selected>- Select -</option>
+						</select>
+
+
+					</div>
+				</div>
+
+				<!-- LOCATION NAME -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required">Building Location Name :</label> <input
+						type="text" id="locationName" name="locationName"
+						class="form-control form-control-sm" required />
+					</div>
+				</div>
+
+				<!-- REMARKS -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label>Remarks :</label>
+						<textarea id="remarks" name="remarks"
+						class="form-control form-control-sm"></textarea>
+					</div>
+				</div>
+
+				<!-- WEO NAME -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required">WEO Name :</label> <input type="text"
+						id="weoName" name="weoName" class="form-control form-control-sm"
+						required />
+					</div>
+				</div>
+
+				<!-- MOBILE NUMBER -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required">Mobile Number :</label> <input type="number"
+						id="mobileNumber" name="mobileNumber" maxlength="10"
+						class="form-control form-control-sm" required />
+					</div>
+				</div>
+				<!-- GEO TAGGED IMAGE -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required">Geo-tagged Image :</label>
+						<div class="geoMap position-relative">
+							<input type="file" id="geoTaggedImage" name="geoTaggedImage"
+							accept="image/*" class="form-control form-control-sm "
+							data-existing="true" />
+							<c:if test="${not empty inspectionDTO.geoTaggedImage}">
+								<div class="mb-2">
+									<div class="d-flex gap-1 eyeView">
+										<!-- View Button -->
+										<a
+											href="${contextPath}/weo/fetchGeoImageByInspectionId?inspectionId=${inspectionDTO.weoInspectionId}"
+											class="btn btn-sm btn-primary" style="padding: 6px 10px;" target="_blank"> <i
+											class="fa fa-eye"></i>
+										</a>
+									</div>
+								</div>
+							</c:if>
+						</div>
+					</div>
+				</div>
+				<div class="text-end col-md-12 mt-3">
+					<button type="button" class="btn btn-success btn-sm"
+						onclick="submitWeoForm()">
+						<i class="fa fa-save me-1"></i>
+						<c:choose>
+							<c:when test="${not empty inspectionDTO.weoInspectionId}">
+								Update
+							</c:when>
+							<c:otherwise>
+								Save
+							</c:otherwise>
+						</c:choose>
+					</button>
+				
+					<a href="${contextPath}/weo/inspection" class="btn btn-warning btn-sm"><i class="fa fa-rotate-left"></i> Back</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+<script>
+
+
+
+
+function toggleAreaType(type) {
+    const districtId = $("#districtId").val();
+
+    $(".ruralSection, .urbanSection").hide();
+
+    if (!districtId) {
+        bootbox.alert("Please select District first.");
+        $("#areaType").val("");
+        return;
+    }
+
+    if (type === "RURAL") {
+        $(".ruralSection").slideDown();
+        if('${inspectionDTO.weoInspectionId}'==='')
+        	LoadBlockByDistrict(districtId);
+    } else {
+        $(".urbanSection").slideDown();
+        if('${inspectionDTO.weoInspectionId}'==='')
+        	LoadMunicipalityByDistrict(districtId);
+    }
+}
+
+$(document).ready(function() {
+
+    const at = '${inspectionDTO.areaType}';
+
+    if (at) toggleAreaType(at);
+
+});
+
+function validateWeoInspectionForm() {
+    debugger;
+
+    const dateOfVisit = $("#dateOfVisit").val();
+    const districtId = $("#districtId").val();
+    const areaType = $("#areaType").val();
+    const buildingType = $("#buildingType").val();
+    const locationName = $("#locationName").val()?.trim();
+    const weoName = $("#weoName").val()?.trim();
+    const mobileNumber = $("#mobileNumber").val()?.trim();
+    
+    const geoImgEl = $("#geoTaggedImage").get(0);
+    const hasGeoImg = geoImgEl && geoImgEl.files.length > 0;
+    const existingGeoImg = $("#geoTaggedImage").data("existing"); 
+
+    const toDate = (d) => {
+        if (!d) return null;
+        let parts = d.split("-");
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+    };
+
+
+    if (!dateOfVisit) {
+        bootbox.alert("Please select Date of Visit.");
+        return false;
+    }
+
+    if (!districtId) {
+        bootbox.alert("Please select District.");
+        return false;
+    }
+
+    if (!areaType) {
+        bootbox.alert("Please select Area Type.");
+        return false;
+    }
+
+    if (areaType === "RURAL") {
+        if (!$("#blockId").val()) { bootbox.alert("Please select Block."); return false; }
+        if (!$("#gpId").val()) { bootbox.alert("Please select Gram Panchayat."); return false; }
+        if (!$("#villageId").val()) { bootbox.alert("Please select Village."); return false; }
+    }
+
+    if (areaType === "URBAN") {
+        if (!$("#municipalityId").val()) { bootbox.alert("Please select Municipality."); return false; }
+        if (!$("#wardId").val()) { bootbox.alert("Please select Ward."); return false; }
+    }
+
+    if (!buildingType) {
+        bootbox.alert("Please select Building Type.");
+        return false;
+    }
+
+    if (!locationName) {
+        bootbox.alert("Please enter Building Location Name.");
+        return false;
+    }
+
+    if (!weoName) {
+        bootbox.alert("Please enter WEO Name.");
+        return false;
+    }
+
+
+
+    if (!mobileNumber || mobileNumber.length !== 10) {
+        bootbox.alert("Mobile number must be exactly 10 digits.");
+        return false;
+    }
+    
+ 
+
+    if (!hasGeoImg && !existingGeoImg) {
+        bootbox.alert("Please upload Geo-tagged Image.");
+        return false;
+    }
+
+    $("#cipherText").val("Inspection File Upload");
+
+    return true;
+}
+
+$(document).ready(function () {
+    $("#mobileNumber").on("input", function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
+    });
+});
+
+
+function submitWeoForm() {
+
+    if (!validateWeoInspectionForm()) return;
+
+    let formArray = $("#weoForm")
+        .find("input:not([type='file']):not([name='_csrf']):not([name='cipherText']), select, textarea")
+        .serializeArray();
+
+    $("#cipherText").val(
+        enc_password(JSON.stringify(convertFormToJSONArray(formArray)))
+    );
+
+    bootbox.confirm("Do you want to continue?", function(result){
+        if (result) {
+            showLoader();
+            $("#weoForm").submit();
+        }
+    });
+}
+
+
+function getBuildingNameByBuildingType(buildingType, targetId) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/weo/getBuildingDetails",
+        data: { buildingType: buildingType },
+        success: function (response) {
+
+            var buildingData = response.data;
+            var selectedBuildingId = '${inspectionDTO.buildingId}'; 
+
+            var $buildingSelect = $("#" + targetId);
+            $buildingSelect.empty();
+            $buildingSelect.append('<option value="" disabled>- Select -</option>');
+
+            if (buildingData && buildingData.length > 0) {
+                $.each(buildingData, function (index, building) {
+
+                    var selected = (selectedBuildingId == building.buildingId) ? "selected" : "";
+
+                    $buildingSelect.append(
+                        '<option value="' + building.buildingId + '" ' + selected + '>' +
+                        building.buildingName +
+                        '</option>'
+                    );
+                });
+            }
+        },
+        error: function () {
+            alert("Error loading building details!");
+        }
+    });
+}
+
+$(document).ready(function () {
+    if (typeof $.datepick !== 'undefined') {
+      $(".datepicker").datepick({
+        dateFormat: "dd-mm-yyyy",
+        yearRange: "c-20:c+10",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger btn btn-sm"><i class="fa fa-calendar"></i></button>'
+      });
+    } else {
+      console.warn("jQuery Datepick plugin not loaded. Datepicker disabled.");
+    }
+  });
+</script>
+
+<c:if test="${not empty inspectionDTO}">
+	<script>
+$(document).ready(function() {
+
+    $("#dateOfVisit").val("${inspectionDTO.dateOfVisit}");
+
+    $("#areaType").val("${inspectionDTO.areaType}");
+    toggleAreaType("${inspectionDTO.areaType}");
+
+    if ("${inspectionDTO.areaType}" === "RURAL") {
+
+        $("#districtId").val("${inspectionDTO.districtId}");
+        LoadBlockByDistrict("${inspectionDTO.districtId}");
+
+        setTimeout(() => {
+            $("#blockId").val("${inspectionDTO.blockId}");
+            LoadGrampanchayatByBlock("${inspectionDTO.blockId}");
+
+            setTimeout(() => {
+                $("#gpId").val("${inspectionDTO.gpId}");
+                LoadVillageByGrampanchayat("${inspectionDTO.gpId}");
+
+                setTimeout(() => {
+                    $("#villageId").val("${inspectionDTO.villageId}");
+                }, 300);
+
+            }, 300);
+        }, 300);
+    }
+
+    if ("${inspectionDTO.areaType}" === "URBAN") {
+
+        $("#municipalityId").val("${inspectionDTO.municipalityId}");
+        LoadWardByMunicipality("${inspectionDTO.municipalityId}");
+
+        setTimeout(() => {
+            $("#wardId").val("${inspectionDTO.wardId}");
+        }, 300);
+    }
+
+    $("#buildingType").val("${inspectionDTO.buildingType}");
+    getBuildingNameByBuildingType("${inspectionDTO.buildingType}", 'buildingId');
+
+    setTimeout(() => $("#buildingId").val("${inspectionDTO.buildingId}"), 500);
+
+    $("#locationName").val("${inspectionDTO.locationName}");
+    $("#remarks").val("${inspectionDTO.remarks}");
+    $("#weoName").val("${inspectionDTO.weoName}");
+    $("#mobileNumber").val("${inspectionDTO.mobileNumber}");
+    $("#weoInspectionId").val("${inspectionDTO.weoInspectionId}");
+
+    if("${inspectionDTO.geoTaggedImage}" !== "") {
+        $("#geoTaggedImage").removeAttr("required");
+        $("#geoPreview")
+            .attr("src", "${contextPath}${inspectionDTO.geoTaggedImage}")
+            .show();
+    }
+
+});
+</script>
+</c:if>
+<script>
+$(document).ready(function () {
+    const isEditMode = "${inspectionDTO.weoInspectionId}" !== "";
+
+    if (isEditMode) {
+        console.log("Read-only mode activated");
+
+        $("#weoForm input, #weoForm textarea").prop("readonly", true);
+        $("#weoForm select").prop("disabled", true);
+        $("#geoTaggedImage").prop("disabled", true); 
+        $(".btn-success").hide();
+    }
+});
+</script>
+

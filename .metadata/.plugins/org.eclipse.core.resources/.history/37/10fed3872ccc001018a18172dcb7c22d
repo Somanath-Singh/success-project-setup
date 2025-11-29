@@ -1,0 +1,1215 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+	<c:set var="userDetails" value="${serviceOutcome.data}"/> 
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}" />
+<c:set var="currUserId" value="${principal.dbUser.userId}" />
+
+<style>
+.mandotory::before {
+  content: '* '; /* Display an asterisk followed by a space before the header text */
+  color: red;    /* Optionally, set the color to red or any other desired color */
+}
+
+.disabled-dropdown {
+    pointer-events: none;
+    background-color: #eee; /* Optional: Change the background color to visually indicate it's disabled */
+}
+
+
+	.hidden {
+    display: none;
+}
+button.datepick-trigger{
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    float: left;
+    border: 1px solid #ccc;
+    height: 28px;
+    border-radius: 0 4px 4px 0px;
+    width: 30px;
+    background: #d2d2d2;
+}
+button.datepick-trigger i{
+    color: #0f67b1;
+    font-size: 18px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+</style>	
+		<div class="breadcrumb_conatiner">
+               <div class="col-md-6">
+                   <h4 class="change-color">Create Vacancy</h4>
+               </div>
+              <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Create Vacancy</li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                  <div class="card">
+                    <div class="card-header">
+                      <c:if test="${empty dto}">
+                       <h5 class="card-title">Create Vacancy</h5>
+                      </c:if>
+                      <c:if test="${not empty dto}">
+                       <h5 class="card-title">View Vacancy</h5>
+                      </c:if>
+                    </div>
+                  <div class="card-body">
+
+				<form action="${contextPath}/vaccancy/saveVaccancy" method="post" id="saveVaccancy" class="row" style="margin-left: 0px;"
+				      enctype="multipart/form-data">
+				    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+				    <input type="hidden" name="hiddenVacancyId" id="hiddenVacancyId" value="${dto.hiddenVacancyId}" />
+				     <input type="hidden" name="buttonStatus" id="buttonStatus" value="" />
+				    <input type="hidden" name="buttonCode" id="buttonCode"/>
+				     <c:if test="${empty dto or ((currUserId eq dto.vacCreatedBy) && (dto.vacCreatedRoleId eq principal.dbUser.primaryRole.roleId))}">
+				       <c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+						<c:set var="upperOrDown" value="down" />
+						<c:set var="functionList2" value="getRoleListByActualLevel(this.value,0)"/>
+						<c:set var="checkFields" value="true"></c:set>
+						<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+						<div class="col-md-2">
+				        <div class="form-group">
+						 <label for="roleSelect" class="col-sm-12 required">Designation :</label>
+							<select class="form-control form-select validId3 require requiredField" name="roleId" id="roleSelect" data-plugin-selectTwo >
+								<option value=""><spring:message code="label.common.select"></spring:message></option>
+								<c:forEach var="role" items="${departRole.roleList}">
+									<option value="${role.roleId}" ${role.roleId eq dto.roleId ? 'selected' : ''}>${role.displayName}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+					</c:if>
+					<c:if test="${not empty dto && (currUserId ne dto.vacCreatedBy && principal.dbUser.primaryRole.roleId ne dto.vacCreatedRoleId)}">
+					 <c:set var="checkFields" value="false"></c:set>
+					 <input type="hidden" name="roleId" value="${dto.roleId}"/>
+					<input type="hidden" name="objectIdAndType" value="${dto.objectIdAndType}"/>
+					<input type="hidden" name="upperEntityIdAndType" value="${dto.upperEntityIdAndType}"/>
+
+					 <input type="hidden" name="buttonCode" id="buttonCode"/>
+					 <input type="hidden" name="buttonCode" id="buttonCode"/>
+					 <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="noOfVacancy" class="col-sm-12 required">Organization Name :</label>
+				            <input type="text" value="${dto.orgName}" required class="form-control">
+				        </div>
+				    </div>
+				    
+				     <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="noOfVacancy" class="col-sm-12 required">Down Level :</label>
+				            <input type="text" value="${dto.levelName}" required class="form-control">
+				        </div>
+				    </div>	
+				    
+				    <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="noOfVacancy" class="col-sm-12 required">Designation :</label>
+				            <input type="text" value="${dto.roleName}" required class="form-control">
+				        </div>
+				    </div>	
+				     </c:if>
+				     
+				     
+				     <c:if test="${not empty dto && (currUserId eq dto.vacCreatedBy && principal.dbUser.primaryRole.roleId ne dto.vacCreatedRoleId)}">
+					 <c:set var="checkFields" value="false"></c:set>
+					 <input type="hidden" name="roleId" value="${dto.roleId}"/>
+					<input type="hidden" name="objectIdAndType" value="${dto.objectIdAndType}"/>
+					<input type="hidden" name="upperEntityIdAndType" value="${dto.upperEntityIdAndType}"/>
+					 <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="noOfVacancy" class="col-sm-12 required">Organization Name :</label>
+				            <input type="text" value="${dto.orgName}" required class="form-control">
+				        </div>
+				    </div>
+				    
+				     <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="noOfVacancy" class="col-sm-12 required">Down Level :</label>
+				            <input type="text" value="${dto.levelName}" required class="form-control">
+				        </div>
+				    </div>	
+				    
+				    <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="noOfVacancy" class="col-sm-12 required">Designation :</label>
+				            <input type="text" value="${dto.roleName}" required class="form-control">
+				        </div>
+				    </div>	
+				     </c:if>
+				     
+				     
+				     <c:if test="${not empty dto && (currUserId ne dto.vacCreatedBy && principal.dbUser.primaryRole.roleId eq dto.vacCreatedRoleId)}">
+					 <c:set var="checkFields" value="false"></c:set>
+					 <input type="hidden" name="roleId" value="${dto.roleId}"/>
+					<input type="hidden" name="objectIdAndType" value="${dto.objectIdAndType}"/>
+					<input type="hidden" name="upperEntityIdAndType" value="${dto.upperEntityIdAndType}"/>
+					 <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="noOfVacancy" class="col-sm-12 required">Organization Name :</label>
+				            <input type="text" value="${dto.orgName}" required class="form-control">
+				        </div>
+				    </div>
+				    
+				     <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="noOfVacancy" class="col-sm-12 required">Down Level :</label>
+				            <input type="text" value="${dto.levelName}" required class="form-control">
+				        </div>
+				    </div>	
+				    
+				    <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="noOfVacancy" class="col-sm-12 required">Designation :</label>
+				            <input type="text" value="${dto.roleName}" required class="form-control">
+				        </div>
+				    </div>	
+				     </c:if>
+				    
+					 
+	   
+				    <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="jobLocation" class="col-sm-12 required">Job Location :</label>
+				            <select name="jobLocationId" id="jobLocationId"  class="form-control requiredField form-select">
+				                <option value="">---select---</option>
+				                <c:forEach var="jobLocV" items="${jobLocationList}">
+				                    <option value="${jobLocV.jobLocationId}" 
+				                            ${jobLocV.jobLocationId == dto.jobLocationId ? 'selected' : ''}>
+				                        ${jobLocV.jobLocationName}
+				                    </option>
+				                </c:forEach>
+				            </select>
+				        </div>
+				    </div>
+				
+				    <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="jobType" class="col-sm-12 required">Job Type :</label>
+				            <select name="jobTypeId" id="jobTypeId" required class="form-control requiredField form-select">
+				                <option value="">---select---</option>
+				                <c:forEach var="jobTypeV" items="${jobTypeList}">
+				                    <option value="${jobTypeV.jobTypeId}" 
+				                            ${jobTypeV.jobTypeId == dto.jobTypeId ? 'selected' : ''}>
+				                        ${jobTypeV.jobTypeName}
+				                    </option>
+				                </c:forEach>
+				            </select>
+				        </div>
+				    </div>
+				
+				    <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="noOfVacancy" class="col-sm-12 required">No. Of Vacancy :</label>
+				            <input type="text" name="noOfVacancy" id="noOfVacancy" value="${dto.noOfVacancy}" required class="form-control onClickInput greaterThanZero NumbersOnly" maxlength="6">
+				        </div>
+				    </div>
+				
+				    <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="salaryMin" class="col-sm-12 required">Salary Range (Min) :</label>
+				            <input type="text" name="salaryMin" id="salaryMin" step="0.01" value="${dto.salaryMin}" required class="form-control onClickInput greaterThanZero numberWithTwoDesimal" oninput="validateSalaryInput(this)">
+				            <span style="color: #0043ff;font-weight: 500;font-size:11px;">( In Lakhs )</span>
+				        </div>
+				    </div>
+				
+				    <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="salaryMax" class="col-sm-12 required">Salary Range (Max) :</label>
+				            <input type="text" name="salaryMax" id="salaryMax" step="0.01" value="${dto.salaryMax}" required class="form-control onClickInput greaterThanZero numberWithTwoDesimal" oninput="validateSalaryInput(this)">
+				            <span style="color: #0043ff;font-weight: 500;font-size:11px;">( In Lakhs )</span>
+				        </div>
+				    </div>
+					<div class="col-md-2">
+				        <div class="form-group">
+				            <label for="qualificationId" class="col-sm-12 required">Highest Qualification :</label>
+				            <select name="qualificationId" id="qualificationId" class="form-control requiredField form-select" required>
+				                <option value="">---select---</option>
+				                <c:forEach var="qualV" items="${qualificationList}">
+				                    <option value="${qualV.qualificationId}" 
+				                            ${qualV.qualificationId == dto.qualificationId ? 'selected' : ''}>
+				                        ${qualV.qualificationName}
+				                    </option>
+				                </c:forEach>
+				            </select>
+				        </div>
+				    </div>
+				    <div class="col-md-3">
+				        <div class="form-group">
+				            <label for="jobSummary" class="col-sm-12 required">Job Summary :</label>
+				            <textarea name="jobSummary" id="jobSummary" rows="" cols="" class="form-control requiredField unfreezeField " required>${dto.jobSummary}</textarea>
+				        </div>
+				    </div>
+				
+				    <div class="col-md-3">
+				        <div class="form-group">
+				            <label for="keyResponsibilities" class="col-sm-12 required">Key Responsibilities:</label>
+				            <textarea name="keyResponsibilities" id="keyResponsibilities" rows="" cols="" class="form-control requiredField" required>${dto.keyResponsibilities}</textarea>
+				        </div>
+				    </div>
+				
+				    
+				
+				    <div class="col-md-3">
+				        <div class="form-group">
+				            <label for="skillsRequired" class="col-sm-12 required">Skills Required :</label>
+				            <textarea name="skillsRequired" id="skillsRequired" rows="" cols="" class="form-control requiredField" required>${dto.skillsRequired}</textarea>
+				        </div>
+				    </div>
+				
+				    <div class="col-md-3">
+				        <div class="form-group">
+				            <label for="preferredQualifications" class="col-sm-12 required">Preferred Qualifications :</label>
+				            <textarea name="preferredQualifications" id="preferredQualifications" rows="" cols="" class="form-control requiredField" required>${dto.preferredQualifications}</textarea>
+				        </div>
+				    </div>
+				
+				
+				    <div class="col-md-2 hidden">
+				        <div class="form-group">
+				            <label for="recruiterContact">Recruiter Contact:</label>
+				            <input type="number" name="recruiterContact" id="recruiterContact" value="${dto.recruiterContact}" class="form-control">
+				        </div>
+				    </div>
+				    
+				   <div class="col-md-2">
+					    <div class="form-group">
+					        <label for="travelRequirements">Travel Requirements :</label>
+					        <!-- Hidden input with default false value -->
+					        <input type="hidden" name="travelRequirements" id="travelRequirementsHidden" value="false">
+					        <input type="checkbox" name="travelRequirements" id="travelRequirements" value="true" 
+					               ${dto.travelRequirements ? 'checked' : ''} 
+					               onchange="updateHiddenInput(this, 'travelRequirementsHidden')">
+					    </div>
+					</div>
+					<c:if test="${dto.stageForwardedRule.actionType.actionCode eq 'APPROVE_PUB' || dto.stageForwardedRule.actionType.actionCode eq 'PUBLISH'}">
+						<div class="col-md-2">
+							<div class="form-group position-relative">
+		                        <label for="publishDate" class="required">Publish Date :</label>
+		                        <input type="text" class="form-control publishDate_con requiredField ${dto.stageForwardedRule.actionType.actionCode eq 'APPROVE_PUB' ? 'unfreezeField' : ''}" id="publicationDate" name="publicationDate" value="${dto.publicationDate}" required readonly>
+		                    </div>
+	                    </div>
+	                    <div class="col-md-2">
+		                    <div class="form-group position-relative">
+		                        <label for="applicationDeadline" class="required">Application Deadline :</label>
+		                        <input type="text" class="form-control deadDate_con requiredField ${dto.stageForwardedRule.actionType.actionCode eq 'APPROVE_PUB' ? 'unfreezeField' : ''}" id="applicationDeadline" name="applicationDeadline" value="${dto.applicationDeadline}" required readonly>
+		                    </div>
+		                </div>
+		            </c:if>
+					
+<!-- 					<div class="col-md-2"> -->
+<!-- 					    <div class="form-group"> -->
+<!-- 					        <label for="inputEmail4">Document Required:</label> -->
+<!-- 					        <select class="form-select selectpicker" multiple aria-label="Default select example" id="docId" name="docId"> -->
+<!-- 					            <option value="">---select---</option> -->
+<%-- 					            <c:forEach items="${documentList}" var="document"> --%>
+<%-- 					                <option value="${document.id}" --%>
+<%-- 					                    <c:forEach items="${dto.docId}" var="selectedDocId"> --%>
+<%-- 					                        <c:if test="${document.id == selectedDocId}"> --%>
+<!-- 					                            selected -->
+<%-- 					                        </c:if> --%>
+<%-- 					                    </c:forEach>> --%>
+<%-- 					                    ${document.name} --%>
+<!-- 					                </option> -->
+<%-- 					            </c:forEach> --%>
+<!-- 					        </select> -->
+<!-- 					    </div> -->
+<!-- 					</div> -->
+
+
+						<div id="documentssDiv">
+					    <div class="col-md-12 table-responsive">
+					        <table class="table table-bordered" id="workflow-table">
+					            <thead>
+					                <tr>
+					                    <th><label class="required">Document Required:</label></th>
+					                    <th><label class="required">Status</th>
+					                    <th style="width: 60px;">Action</th>
+					                </tr>
+					            </thead>
+					            <tbody id="documentTableBody">
+					                <!-- Initial row, displayed if documentList is empty -->
+					                <c:if test="${empty dto.documentDTO}">
+					                    <tr>
+					                        <td>
+					                            <select class="form-select" name="documentDTO[0].docId" id="docId1">
+					                                <option value="0">--select--</option>
+						                                 <c:forEach var="document" items="${documentList}">
+						                                    <option value="${document.id}">${document.name}</option>
+						                                 </c:forEach>
+					                            </select>
+					                        </td>
+					                        <td>
+					                            <select class="form-select" name="documentDTO[0].docStatus" id="docStatus1">
+					                                <option value="0">--select--</option>
+						                            <option value="mandatory">Mandatory</option>
+						                            <option value="optional">Optional</option>        
+					                            </select>
+					                        </td>
+					                        <td class="text-center">
+					                            <button type="button" class="btn btn-xs btn-primary" id="workflowbtn" onclick="addDocuments()"> 
+					                                <i class="fa fa-plus"></i>
+					                            </button>
+					                        </td>
+					                    </tr>
+					                </c:if>
+					                <c:if test="${not empty dto.documentDTO}">
+					                	<c:forEach items="${dto.documentDTO}" var="doc" varStatus="count">
+					                		<tr>
+						                        <td>
+						                            <select class="form-select" name="documentDTO[${count.count -1}].docId" id="docId${count.count}">
+						                                <option value="0">--select--</option>
+							                                 <c:forEach var="document" items="${documentList}">
+							                                    <option value="${document.id}" ${document.id eq doc.docId?'selected':''}>${document.name}</option>
+							                                 </c:forEach>
+						                            </select>
+						                        </td>
+						                        <td>
+						                            <select class="form-select" name="documentDTO[${count.count -1}].docStatus" id="docStatus${count.count}">
+						                                <option value="0">--select--</option>
+							                            <option value="mandatory"${'mandatory' eq doc.docStatus?'selected':''}>Mandatory</option>
+							                            <option value="optional"${'optional' eq doc.docStatus?'selected':''}>Optional</option>        
+						                            </select>
+						                        </td>
+<!-- 						                        <td class="text-center"> -->
+<!-- 						                            <button type="button" class="btn btn-xs btn-primary" id="workflowbtn" onclick="addDocuments()">  -->
+<!-- 						                                <i class="fa fa-plus"></i> -->
+<!-- 						                            </button> -->
+<!-- 						                        </td> -->
+ 												<td class="text-center">
+												    <c:choose>
+												        <c:when test="${count.count == 1}">
+												            <button type="button" class="btn btn-xs btn-primary" onclick="addDocuments()"> 
+												                <i class="fa fa-plus"></i>
+												            </button>
+												        </c:when>
+												        <c:otherwise>
+												            <button type="button" class="btn btn-xs btn-danger" onclick="removeInterviewRound(this)"> 
+												                <i class="fa fa-minus"></i>
+												            </button>
+												        </c:otherwise>
+												    </c:choose>
+												</td>
+						                    </tr>
+					                	</c:forEach>
+					                </c:if>
+					            </tbody>
+					        </table>
+					    </div>
+					</div>
+
+
+					<div id="interviewRoundsDiv">
+					    <div class="col-md-12 table-responsive">
+					        <table class="table table-bordered" id="workflow-table">
+					            <thead>
+					                <tr>
+					                    <th><label class="required">Interview Round(Please arrange interview round sequentially.)</label></th>
+					                    <th><label class="required">Interview sequence</th>
+					                    <th style="width: 60px;">Action</th>
+					                </tr>
+					            </thead>
+					            <tbody id="interviewRoundsTableBody">
+					                <!-- Initial row, displayed if interviewRoundsList is empty -->
+					                <c:if test="${empty dto.interviewRounds}">
+					                    <tr>
+					                        <td>
+					                            <select class="form-select" name="interviewRounds[0].roundId" id="roundId1">
+					                                <option value="0">--select--</option>
+					                                <c:forEach var="round" items="${roundList}">
+					                                    <option value="${round.roundId}">${round.roundType}</option>
+					                                </c:forEach>
+					                            </select>
+					                        </td>
+					                        <td>
+					                            <select class="form-select" name="interviewRounds[0].orderId" id="orderId1">
+					                                <option value="0">--select--</option>
+					                                <c:forEach var="i" begin="1" end="${roundList.size()}" step="1">
+					                                    <option value="${i}">${i}</option>
+					                                </c:forEach>
+					                            </select>
+					                        </td>
+					                        <td class="text-center">
+					                            <button type="button" class="btn btn-xs btn-primary" id="workflowbtn" onclick="addInterviewRound()"> 
+					                                <i class="fa fa-plus"></i>
+					                            </button>
+					                        </td>
+					                    </tr>
+					                </c:if>
+					                <c:if test="${not empty dto.interviewRounds}">
+									    <c:forEach items="${dto.interviewRounds}" var="intrv" varStatus="count">
+									        <tr>
+									            <td>
+									                <select class="form-select" name="interviewRounds[${count.count - 1}].roundId" id="roundId${count.count}">
+									                    <option value="0">--select--</option>
+									                    <c:forEach var="round" items="${roundList}">
+									                        <option value="${round.roundId}" ${round.roundId eq intrv.roundId ? 'selected' : ''}>
+									                            ${round.roundType}
+									                        </option>
+									                    </c:forEach>
+									                </select>
+									            </td>
+									            <td>
+									                <select class="form-select" name="interviewRounds[${count.count - 1}].orderId" id="orderId${count.count}">
+									                    <option value="0">--select--</option>
+									                    <c:forEach var="i" begin="1" end="${roundList.size()}" step="1">
+									                        <option value="${i}" ${i eq intrv.orderId ? 'selected' : ''}>
+									                            ${i}
+									                        </option>
+									                    </c:forEach>
+									                </select>
+									            </td>
+									            <td class="text-center">
+												    <c:choose>
+												        <c:when test="${count.count == 1 || count.count == 2}">
+												            <button type="button" class="btn btn-xs btn-primary" onclick="addInterviewRound()"> 
+												                <i class="fa fa-plus"></i>
+												            </button>
+												        </c:when>
+												        <c:otherwise>
+												            <button type="button" class="btn btn-xs btn-danger" onclick="removeInterviewRound(this)"> 
+												                <i class="fa fa-trash"></i>
+												            </button>
+												        </c:otherwise>
+												    </c:choose>
+												</td>
+
+									        </tr>
+									    </c:forEach>
+									</c:if>
+					            </tbody>
+					        </table>
+					    </div>
+					</div>
+
+					
+				    <div class="col-md-12 text-center mt-3">
+				        <div class="form-group">
+<%-- 				            <c:if test="${empty dto.hiddenVacancyId}"> --%>
+<%-- 				              <c:if test="${level ne 'CORPORATE'}"> --%>
+<!-- 				               <button type="button" class="btn btn-primary" onclick="submitForm('sendForVerfication')">Send For Verification</button> -->
+<!-- 				               <button type="button" class="btn btn-primary" onclick="submitForm('draft')">Save As Draft</button> -->
+<%-- 				              </c:if> --%>
+<%-- 				                <c:if test="${level eq 'CORPORATE'}"> --%>
+<!-- 				               <button type="button" class="btn btn-primary" onclick="submitForm('draft')">Submit</button> -->
+<%-- 				              </c:if> --%>
+				               
+<%-- 				            </c:if> --%>
+<%-- 				             <c:if test="${not empty dto.hiddenVacancyId && dto.vacancyStatus eq 'DRAFT'}"> --%>
+<!-- 				               <button type="button" class="btn btn-primary" onclick="submitForm()">Updated</button> -->
+<%-- 				            </c:if> --%>
+<%-- 				            <a href="${contextPath}/home" class="btn btn-danger" style="margin-top: 0px;">Back</a> --%>
+								<c:set var="dynamicFromId" value="saveVaccancy" scope="request" />
+								 <c:set var="wonFunction" value="submitForm()"/>
+								 <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+				        </div>
+				    </div>
+				</form>
+
+			  </div>
+			</div>
+		  </div>
+	 </div>
+<!-- 	 <div class="row mt-3"> -->
+<!-- 		                <div class="col-lg-12"> -->
+<!-- 		                    <div class="card"> -->
+<!-- 		                        <div class="card-header"> -->
+<!-- 		                            <h5 class="card-title">Vacancy Creation List</h5> -->
+<!-- 		                        </div> -->
+<!-- 		                        <div class="card-body"> -->
+<!-- 		                            <div class="table-responsive"> -->
+<!-- 		                            	<table class="DataTable table table-bordered"> -->
+<!-- 		                            		<thead> -->
+<!-- 		                            			<tr> -->
+<!-- 		                            				<th>Sl No.</th> -->
+<!-- 		                            				<th>Vacancy Code</th> -->
+<!-- 		                            				<th>Vacancy Location</th> -->
+<!-- 		                            				<th>Job Type</th> -->
+<!-- 		                            				<th>Action</th> -->
+<!-- 		                            			</tr> -->
+<!-- 		                            		</thead> -->
+<!-- 		                            		<tbody> -->
+<%-- 		                            		    <c:forEach items="${vacancyList}" var="vaca" varStatus="count"> --%>
+<!-- 			                            		    <tr> -->
+<%-- 			                            		      <td>${count.count}</td> --%>
+<%-- 			                            		      <td>${vaca.vacancyCode}</td> --%>
+<%-- 			                            		      <td>${vaca.jobLocation.jobLocationName}</td> --%>
+<%-- 			                            		      <td>${vaca.jobType.jobTypeName}</td> --%>
+<!-- 			                            		      <td> -->
+<%-- 			                            		         <button title="Edit" type="button" onclick="getVacancyById('${vaca.vacancyId}')" class="btn btn-xs btn-warning"> --%>
+<!-- 																<i class="fas fa-edit"></i> -->
+<!-- 														 </button> -->
+<!-- 												 	  </td> -->
+<!-- 			                            			</tr> -->
+<%-- 		                            			</c:forEach> --%>
+<!-- 		                            		</tbody> -->
+<!-- 		                            	</table> -->
+<!-- 		                            </div> -->
+<!-- 		                        </div> -->
+<!-- 		                    </div> -->
+<!-- 		                </div> -->
+<!--                      </div> -->
+  </body>
+</html>
+<form action="${contextPath}/vaccancy/editVacancyDetails" method="post" id="editVacancyDetails">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+<input type="hidden" name="hiddenVacId"  id="hiddenVacId" value="">
+</form>
+<script>
+
+$(function() {
+	 $('.publishDate_con').datepick({
+	 	dateFormat: 'dd/mm/yyyy',minDate:0, showOnFocus: true,
+	 	showTrigger: '<button type="button" class="trigger " ${dto.stageForwardedRule.actionType.actionCode ne "APPROVE_PUB" ? "readonly": ""}>' +
+	 	'<i class="fa fa-calendar"></i></button>',
+	 	onSelect: function(selectedDate) {
+			 var deadDate = $('#applicationDeadline').datepick('getDate');
+			 // Convert selectedDate to a Date object
+			 deadDate=new Date(deadDate);
+			 selectedDate = new Date(selectedDate);
+			 if (deadDate != null && selectedDate > deadDate) {
+				 bootbox.alert("Publish Date always less than equal to Application Deadline date");
+				 $('#publicationDate').val("");
+				 return false;
+
+	 		}
+	 	}
+	 });
+	 $('.deadDate_con').datepick({
+		 dateFormat: 'dd/mm/yyyy',minDate:0, showOnFocus: true,
+		 showTrigger: '<button type="button" class="trigger " ${dto.stageForwardedRule.actionType.actionCode ne "APPROVE_PUB" ? "readonly": ""}>' +
+		 '<i class="fa fa-calendar"></i></button>',
+		 onSelect: function(selectedDate) {
+			 var pubDate = $('#publicationDate').datepick('getDate');
+			 // Convert selectedDate to a Date object
+			 pubDate=new Date(pubDate);
+			 selectedDate = new Date(selectedDate);
+			 if (pubDate != null && pubDate > selectedDate) {
+				 bootbox.alert("Application Deadline Date always greater than equal to Publish Date");
+				 $('#applicationDeadline').val("");
+				 return false;
+			 }
+		 }
+	 });
+});
+
+
+
+function validateInterviewRounds() {
+    const rows = document.querySelectorAll('#interviewRoundsTableBody tr');
+
+    if (rows.length < 2) {
+    	bootbox.alert("At least two Interview Rounds are required.");
+        return false;
+    }
+
+    const selectedCombinations = new Set();
+    const roundOrderMap = new Map(); // To track the smallest Order ID for each Interview Round
+
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+
+        const roundIdField = row.querySelector('select[name^="interviewRounds"][name$=".roundId"]');
+        const orderIdField = row.querySelector('select[name^="interviewRounds"][name$=".orderId"]');
+
+        if (!roundIdField || !orderIdField) {
+            console.error("Error: Round or Order ID field not found ");
+            continue;
+        }
+
+        const roundId = roundIdField.value.trim();
+        const orderId = orderIdField.value.trim();
+
+        if (roundId === "0" || roundId === "") {
+        	bootbox.alert("Please select interview round ");
+            return false;
+        }
+
+        if (orderId === "0" || orderId === "") {
+        	bootbox.alert("Please select sequence id for interview round");
+            return false;
+        }
+
+        // Convert orderId to number for validation
+        const orderIdNum = parseInt(orderId, 10);
+
+        // Validate unique (roundId, orderId) combination
+        const comboKey = roundId + "-" + orderId;
+        if (selectedCombinations.has(comboKey)) {
+            bootbox.alert(`Duplicate combination of interview round and sequence id found.`);
+            return false;
+        }
+        selectedCombinations.add(comboKey);
+
+        // Ensure the first order ID for a given round must be 1
+        if (!roundOrderMap.has(roundId)) {
+            if (orderIdNum !== 1) {
+                bootbox.alert(`The first sequence id for Interview Round  must be 1.`);
+                return false;
+            }
+            roundOrderMap.set(roundId, orderIdNum);
+        } else {
+            const minOrderId = roundOrderMap.get(roundId);
+            if (orderIdNum !== minOrderId + 1 && orderIdNum !== minOrderId) {
+                bootbox.alert(`Sequence id for interview round must follow sequence without skipping.`);
+                return false;
+            }
+            roundOrderMap.set(roundId, Math.max(minOrderId, orderIdNum));
+        }
+    }
+
+    return true;
+}
+
+
+function validateDocuments() {
+    const rows = document.querySelectorAll('#documentTableBody tr');
+
+    // Ensure at least one row is present
+    debugger
+    if (rows.length < 1) {
+    	bootbox.alert("At least one document is required.");
+        return false;
+    }
+
+    const selectedDocuments = new Set();
+
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+
+        const docIdField = row.querySelector('select[name^="documentDTO"][name$=".docId"]');
+        const docStatusField = row.querySelector('select[name^="documentDTO"][name$=".docStatus"]');
+
+        if (!docIdField || !docStatusField) {
+            console.error("Error: Document or status field not found");
+            continue;
+        }
+
+        const docId = docIdField.value.trim();
+        const docStatus = docStatusField.value.trim();
+
+        // Check if both fields are filled
+        if (!docId || docId === "0") {
+        	bootbox.alert("Please select a document.");
+            return false;
+        }
+
+        if (!docStatus || docStatus === "0") {
+        	bootbox.alert("Please select a status.");
+            return false;
+        }
+
+        // Ensure document is unique
+        if (selectedDocuments.has(docId)) {
+        	bootbox.alert("Document selection must be unique.");
+            return false;
+        }
+
+        selectedDocuments.add(docId);
+    }
+
+    return true;
+}
+
+
+function submitForm(buttonStatus) {
+    debugger;
+
+    $("#buttonStatus").val(buttonStatus);
+    
+    // Array of field objects: { fieldId, errorMessage, isRequired }
+    var fCheck = ${checkFields};
+    const fields = [
+    	 { id: "orgIdAndTypeId", message: "Please select organization.", isRequired: fCheck },
+    	 { id: "upperEntityId", message: "Please select a level.", isRequired: fCheck },
+//     	 { id: "levelNameSelect", message: "Please select a level name.", isRequired: true },
+    	 { id: "roleSelect", message: "Please select a role.", isRequired: fCheck },
+        { id: "jobLocationId", message: "Please select a Job Location.", isRequired: true },
+        { id: "jobTypeId", message: "Please select a Job Type.", isRequired: true },
+        { id: "noOfVacancy", message: "No.of is required.", isRequired: true },
+        { id: "salaryMin", message: "Minimum Salary is required.", isRequired: true },
+        { id: "salaryMax", message: "Maximum Salary is required.", isRequired: true },
+        { id: "qualificationId", message: "Please select Qualification.", isRequired: true },
+        { id: "jobSummary", message: "Job Summary is required.", isRequired: true }, 
+        { id: "keyResponsibilities", message: "Key Responsibilities are required.", isRequired: true }, 
+        { id: "skillsRequired", message: "Skills Required is required.", isRequired: true }, 
+        { id: "preferredQualifications", message: "Preferred Qualifications is required.", isRequired: true }, 
+//        { id: "jobBenefits", message: "Job Benefits are required.", isRequired: true }, 
+   //     { id: "workSchedule", message: "Work Schedule is required.", isRequired: true },
+        { id: "travelRequirements", message: "Please specify Travel Requirements.", isRequired: false },
+//         { id: "docId", message: "Please specify about document for this role.", isRequired: true },
+    ];
+
+   var role= $("#roleSelect").val();
+   if(role=="0"){
+	   $("#roleSelect").val('');
+   }
+    const level = '${level}'; 
+
+    // Update the isRequired property dynamically
+    fields.forEach(field => {
+        if (field.id === "levelSelect" || field.id === "levelNameSelect") {
+            field.isRequired = (level === "CORPORATE");
+        }
+    });
+    
+    
+    // Validate fields
+    for (const field of fields) {
+        const element = document.getElementById(field.id);
+        if (field.isRequired && (!element || !element.value.trim())) {
+            bootbox.alert(field.message);
+            element.focus();
+            return false;
+        }
+    }
+
+    // Validate salary range
+    const salaryMin = parseFloat(document.getElementById("salaryMin").value);
+    const salaryMax = parseFloat(document.getElementById("salaryMax").value);
+
+    if (salaryMin > salaryMax) {
+    	bootbox.alert("Minimum Salary cannot be greater than Maximum Salary.");
+        document.getElementById("salaryMin").focus();
+        return false;
+    }
+    
+    // Validate the Document table (minimum 2 rows)
+    if (!validateDocuments()) {
+        return false;
+    }
+    
+    
+    // Validate the Interview Round table (minimum 2 rows)
+    if (!validateInterviewRounds()) {
+        return false;
+    }
+    
+    var code='${dto.stageForwardedRule.actionType.actionCode}';
+    
+    if(code == 'APPROVE_PUB'){
+    	if($("#publicationDate").val()==''){
+    		bootbox.alert("Please choose publish date.");
+    		return false;
+    	}if($("#applicationDeadline").val()==''){
+    		bootbox.alert("Please choose Application deadline date.");
+    		return false;
+    	}
+    }
+    
+    $("#buttonCode").val($("#hdnButtonCode").val());
+
+	bootbox.confirm("Are you sure you want to take action regarding the vacancy information?",
+             function(result){
+                 if(result){
+					var dto='${dto}';
+					if(dto==''){
+						var levelId=$("#upperEntityId").val();
+						var roleId=$("#roleSelect").val();
+						//showAjaxLoader();
+						$.ajax({
+								type: "GET",
+								url: "${contextPath}/vaccancy/checkVacDuplicate", // Update with actual backend API
+								data: { levelId: levelId, roleId: roleId },
+								success: function (response) {
+									//hideAjaxLoader();
+								if(response.outcome){
+									// Submit the form
+									document.getElementById("saveVaccancy").submit();
+										//showAjaxLoader();
+								}else{
+									bootbox.alert(response.message);
+									return false;
+								}
+								},
+								error: function () {
+									console.error("Error checking duplicate for");
+								}
+							});
+						
+					}else{
+						// Submit the form
+						document.getElementById("saveVaccancy").submit();
+					}
+				
+				 }
+			 });
+    
+    // Optional confirmation message
+    // const confirmMessage = "Are you sure you want to take action regarding the vacancy information?";
+    // if (!confirm(confirmMessage)) {
+    //     return false;
+    // }else{
+    // 	var dto='${dto}';
+    // 	if(dto==''){
+    // 		var levelId=$("#upperEntityId").val();
+    //     	var roleId=$("#roleSelect").val();
+    //     	//showAjaxLoader();
+    //     	 $.ajax({
+    //     	        type: "GET",
+    //     	        url: "${contextPath}/vaccancy/checkVacDuplicate", // Update with actual backend API
+    //     	        data: { levelId: levelId, roleId: roleId },
+    //     	        success: function (response) {
+    //     	        	//hideAjaxLoader();
+    //     	           if(response.outcome){
+    //     	        	// Submit the form
+    //     	               document.getElementById("saveVaccancy").submit();
+    //     	        		//showAjaxLoader();
+    //     	           }else{
+    //     	        	   bootbox.alert(response.message);
+    //     	        	   return false;
+    //     	           }
+    //     	        },
+    //     	        error: function () {
+    //     	            console.error("Error checking duplicate for");
+    //     	        }
+    //     	    });
+        	
+    // 	}else{
+    // 		// Submit the form
+    //         document.getElementById("saveVaccancy").submit();
+    // 	}
+    // }
+
+}
+
+
+function getVacancyById(vacId){
+	debugger
+	 $("#hiddenVacId").val(vacId);
+	 $("#editVacancyDetails").submit();
+}
+
+function validateField(fieldId, errorId, regex, errorMessage) {
+	debugger
+    const field = document.getElementById(fieldId);
+    const error = document.getElementById(errorId);
+    const value = field.value.trim();
+
+    // Validate field value against the provided regex
+    if (!regex.test(value)) {
+        error.style.display = "block";
+        error.textContent = errorMessage; // Set the error message
+        field.classList.add("is-invalid");
+        field.value = ""; // Clear the field if invalid
+        return false;
+    } else {
+        error.style.display = "none";
+        field.classList.remove("is-invalid");
+    }
+}
+
+
+function updateHiddenInput(checkbox, hiddenInputId) {
+    const hiddenInput = document.getElementById(hiddenInputId);
+    hiddenInput.value = checkbox.checked ? "true" : "false";
+}
+
+function togglePublicationDate(checkbox) {
+    const publicationDateContainer = document.getElementById("publicationDateContainer");
+    const hiddenInput = document.getElementById("isPublishedHidden");
+    
+    // Update hidden input value
+    hiddenInput.value = checkbox.checked ? "true" : "false";
+
+    // Show or hide the publication date field
+    if (checkbox.checked) {
+        publicationDateContainer.style.display = "block";
+    } else {
+        publicationDateContainer.style.display = "none";
+    }
+}
+
+
+function getLevelListByOrganization(that,selData){
+	debugger
+	
+	 var setData;
+    if (selData != 0) {
+        setData = { orgData: that }; 
+    } else {
+        setData = { orgData: that.value };
+    }
+	
+    $.ajax({
+        url: "${contextPath}/api/allow/getLevelListByOrganization",
+        method: "GET",
+        data: setData,
+        success: function(response) {
+        	var data = JSON.parse(response);
+        	var html = '<option value="0">- Select -</option>';
+            $.each(data, function(index, value){
+            	html += '<option value="'+value.orgIdNlevelCode+'">'+value.levelCode+'</option>';
+            });
+            $('#levelSelect').empty().append(html);
+            if(selData!=''){
+				$('#levelSelect').val(selData);
+			}
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log("Something Went Wrong: " + errorThrown);
+        }
+    });
+}
+
+function getActualLevelNameListByLevelCodeAndOrgId(that,selData){
+	debugger
+	 var setData;
+    if (selData != 0) {
+        setData = { levelData: that }; 
+    } else {
+        setData = { levelData: that.value };
+    }
+    $.ajax({
+        url: "${contextPath}/api/allow/getActualLevelNameListByLevelCodeAndOrgId",
+        method: "GET",
+        data: setData,
+        success: function(response) {
+        	var data = JSON.parse(response);
+        	var html = '<option value="0">- Select -</option>';
+            $.each(data, function(index, value){
+            	html += '<option value="'+value.entityIdNEntityName+'">'+value.entityName+'</option>';
+            });
+            $('#levelNameSelect').empty().append(html);
+            if(selData!=''){
+				$('#levelNameSelect').val(selData);
+			}
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log("Something Went Wrong: " + errorThrown);
+        }
+    });
+}
+
+function getRoleListByActualLevel(that,selData){
+	debugger
+	 var setData;
+	    if (selData != 0) {
+	        setData = { actualLevelData: that }; 
+	    } else {
+	        setData = { actualLevelData: that};
+	    }
+    $.ajax({
+        url: "${contextPath}/api/allow/getRoleListByActualLevel",
+        method: "GET",
+        data:setData,
+        success: function(response) {
+        	var data = JSON.parse(response);
+        	var html = '<option value="0">- Select -</option>';
+            $.each(data, function(index, value){
+            	html += '<option value="'+value.entityId+'">'+value.entityName+'</option>';
+            });
+            $('#roleSelect').empty().append(html);
+            if(selData!=''){
+				$('#roleSelect').val(selData);
+			}
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log("Something Went Wrong: " + errorThrown);
+        }
+    });
+}
+
+$(document).ready(function() {
+	debugger
+   var orgData1='${dto.objectIdAndType}';
+   var upperEntityIdAndType='${dto.upperEntityIdAndType}';
+   var roleIdd='${dto.roleId}';
+   var level='${level}';
+   
+   setTimeout(function() {
+	   var upperEntityId=$("#upperEntityId").val();
+	   
+	   if(upperEntityId!='' && upperEntityIdAndType!=''){
+		   getRoleListByActualLevel(upperEntityIdAndType,roleIdd);
+	   }else if(upperEntityId!='' && upperEntityIdAndType==''){
+		   getRoleListByActualLevel(upperEntityId,0);
+	   }
+	}, 2000);
+   
+   setTimeout(function() {
+	   var check ='${not empty dto}';
+	   if(check!='false'){
+		   $("#upperEntityId").val(upperEntityIdAndType);
+	   }
+	  
+	}, 2000);
+   
+});
+
+function getFacilities(a){
+	
+}
+
+$(document).ready(function() {
+	var selRoleId='${dto.roleId}'
+	//setTimeout(getFacilities, 2000);
+	setTimeout(function() {
+// 		getRoleListByActualLevel(that,selRoleId);
+	}, 2000);
+
+});
+
+function parseDate(input) {
+    const parts = input.split('/'); // Split by "/"
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Months are 0-based in JavaScript
+    const year = parseInt(parts[2], 10);
+
+    return new Date(year, month, day);
+}
+
+function addInterviewRound() {
+	debugger
+    // Get the last row in the table body
+    var lastRow = document.querySelector('#interviewRoundsTableBody tr');
+
+    if (!lastRow) {
+    	bootbox.alert("No row available to clone.");
+        return;
+    }
+
+    // Clone the last row
+    var newRow = lastRow.cloneNode(true);
+    
+    // Reset input/select values
+    newRow.querySelectorAll("input, select").forEach(field => {
+        if (field.tagName === "SELECT") {
+            field.selectedIndex = 0; // Reset dropdown to the first option
+        } else {
+            field.value = ""; // Clear text inputs
+        }
+    });  // ✅ Closing bracket added here
+
+    // Get the current number of rows (before appending the new row)
+    var rowCount = document.querySelectorAll('#interviewRoundsTableBody tr').length;
+
+    // Update the name and ID for the new row's fields
+    var roundIdField = newRow.querySelector('select[name^="interviewRounds"][name$=".roundId"]');
+    if (roundIdField) {
+        roundIdField.name = 'interviewRounds['+rowCount+'].roundId';
+        roundIdField.id = 'roundId'+rowCount + 1;
+    }
+
+    var orderIdField = newRow.querySelector('select[name^="interviewRounds"][name$=".orderId"]');
+    if (orderIdField) {
+        orderIdField.name =  'interviewRounds['+rowCount+'].orderId';
+        orderIdField.id = 'orderId'+rowCount + 1;
+    }
+
+    // Remove the "plus" button and add a "remove" button to the new row
+    var buttonCell = newRow.querySelector('td.text-center');
+    if (buttonCell) {
+        buttonCell.innerHTML = `
+            <button type="button" class="btn btn-xs btn-danger" onclick="removeInterviewRound(this)"> 
+                <i class="fa fa-trash"></i>
+            </button>
+        `;
+    }
+    
+    // Append the new row to the table body
+    document.getElementById('interviewRoundsTableBody').appendChild(newRow);
+}
+
+function removeInterviewRound(button) {
+    var row = button.closest('tr');
+    row.parentNode.removeChild(row);
+}
+
+
+function removeInterviewRound(button) {
+    // Find the row that contains the clicked button
+    var row = button.closest('tr');
+    
+    // Remove the row from the table
+    row.remove();
+}
+
+
+function addDocuments() {
+    // Get the last row in the table body
+    var lastRow = document.querySelector('#documentTableBody tr');
+
+    if (!lastRow) {
+    	bootbox.alert("No row available to clone.");
+        return;
+    }
+
+    // Clone the last row
+    var newRow = lastRow.cloneNode(true);
+    
+    // Reset input/select values
+    newRow.querySelectorAll("input, select").forEach(field => {
+        if (field.tagName === "SELECT") {
+            field.selectedIndex = 0; // Reset dropdown to the first option
+        } else {
+            field.value = ""; // Clear text inputs
+        }
+    });  // ✅ Closing bracket added here
+
+    // Get the current number of rows (before appending the new row)
+    var rowCount = document.querySelectorAll('#documentTableBody tr').length;
+
+    // Update the name and ID for the new row's fields
+    var roundIdField = newRow.querySelector('select[name^="documentDTO"][name$=".docId"]');
+    if (roundIdField) {
+        roundIdField.name = 'documentDTO['+rowCount+'].docId';
+        roundIdField.id = 'docId'+rowCount + 1;
+    }
+
+    var orderIdField = newRow.querySelector('select[name^="documentDTO"][name$=".docStatus"]');
+    if (orderIdField) {
+        orderIdField.name =  'documentDTO['+rowCount+'].docStatus';
+        orderIdField.id = 'docStatus'+rowCount + 1;
+    }
+
+    // Remove the "plus" button and add a "remove" button to the new row
+    var buttonCell = newRow.querySelector('td.text-center');
+    if (buttonCell) {
+        buttonCell.innerHTML = `
+            <button type="button" class="btn btn-xs btn-danger" onclick="removeInterviewRound(this)"> 
+                <i class="fa fa-trash"></i>
+            </button>
+        `;
+    }
+    
+    // Append the new row to the table body
+    document.getElementById('documentTableBody').appendChild(newRow);
+}
+
+function validateSalaryInput(input) {
+    let value = input.value;
+
+    // Allow only digits and a single decimal point
+    let regex = /^\d{0,6}(\.\d{0,2})?$/; 
+    
+    // Prevent multiple dots
+    if ((value.match(/\./g) || []).length > 1) {
+        input.value = value.substring(0, value.lastIndexOf('.')); 
+        return;
+    }
+
+    // Enforce the pattern
+    if (!regex.test(value)) {
+        input.value = value.slice(0, -1);
+    }
+}
+
+</script>

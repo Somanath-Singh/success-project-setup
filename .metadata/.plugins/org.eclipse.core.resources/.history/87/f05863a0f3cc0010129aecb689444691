@@ -1,0 +1,54 @@
+package com.aashdit.prod.heads.common.model;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.aashdit.prod.heads.hims.umt.utils.NewAuditable;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "app_config_parameters")
+public class AppConfigParameters extends NewAuditable<Long> implements Serializable{
+
+
+	private static final long serialVersionUID = -7866037587870260278L;
+	
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "param_id")
+	private Long paramId;
+	
+	@Column(name = "param_description")
+	private String paramDescription;
+	
+	@Column(name = "param_code")
+	private String paramCode;
+	
+	@Column(name = "param_value")
+	private String paramValue;
+	
+	@Column(name = "effective_from_date")
+	private Date effectiveFromDate;
+	
+	@Column(name = "effective_end_date")
+	private Date effectiveEndDate;
+	
+	@Column(name = "is_active")
+	private Boolean isActive;
+}

@@ -1,0 +1,131 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<%-- <script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script> --%>
+<%-- <script src="${contextPath}/assets/appJs/validation/party-master.js"></script> --%>
+
+<%@ page import="com.aashdit.fams.utils.ApplicationStringUtilsFams" %>
+<style>
+.table .btn-success:hover{
+    border: none !important;
+}
+</style>
+
+<script>
+
+</script>
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Estimation List</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+	        <ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Estimation List</li>
+			</ol>
+        </nav>
+     </div>
+</div>
+<div class="row">
+        <div class="col-md-12">
+			<div class="card custom-card">
+				<div class="card-header">
+                    <h6 class="card-title">Estimation List</h6>
+                </div>
+				<div class="card-body">
+				<div class="row">
+				  <%@ include file="/WEB-INF/views/entityIdAndUserLevelListDrp.jsp"%>
+				<%--   <div class="row">
+					  <div class="col-sm-12" style="margin-top:30px;">
+						<div class="form-group text-center">
+							<button type="button" class="btn btn-success" onclick="workFlowStatus();"><spring:message code="COMMON.BUTTON.FILTER"></spring:message></button>
+						</div>
+					</div>
+				</div>  --%>
+						<div class="col-md-12">
+								<header class="panel-heading">
+									<div>
+										<div id="c" tabindex="1"></div>
+									</div>
+								</header>
+                        <div class="table-responsive">
+                           <table class="table DataTable table-bordered" id="datatable">
+                                <thead>
+                                    <tr>
+                                        <th >Sl. #</th>
+                                        <th>Estimation No.</th>
+                                        <th>Estimation Date</th>
+                                        <th>Estimation Amount</th>
+                                        <th>Gst per</th>
+                                        <th>Gst Amount</th>
+                                        <th>Grand Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach items="${estimationList}" var="est" varStatus="count">
+                                        <tr class="gradeX">
+                                            <td>${count.count}</td>
+                                            <td>${est.estimationNo}</td>
+                                            <td><c:choose>
+                                                <c:when test="${est.estimationDate ne null}">
+                                                   <fmt:formatDate value="${est.estimationDate}" pattern="dd/MM/yyyy" />
+                                                </c:when>
+                                                <c:otherwise>
+                                                  NA
+                                                </c:otherwise>
+                                              </c:choose></td>
+                                            <td class="text-end">${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(est.totalEstAmount)}</td>
+                                            <td class="text-end">${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(est.gstPer)}</td>
+                                            <td class="text-end">${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(est.gstAmount)}</td>
+                                            <td class="text-end">${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(est.grandTotalAmount)}</td>
+                                            <td style="text-align: center;">
+                                            <button type ="button" class="btn btn-success" onclick="editEst(${est.estimationId})">
+
+                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                            </button>
+
+
+                                             </td>
+
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                          </div>
+						</div>
+					</div>
+					</div>
+				</div>
+			</div>
+	    </div>
+	</div>
+</div>
+
+<form action="${contextPath}/estimation/edit" method="get" id="editEst">
+<input type="hidden"  name="estimationId"  id="estimationIdHd">
+</form>
+<script>
+
+
+
+function editEst(estimationId){
+	
+	 $('#estimationIdHd').val(estimationId);
+	
+	if(validateForm()){
+		 if(encryptFormData('editEst', tableOrTbodyIDS, tableOrTbodyKeys)){
+				 confirmation('editEst');
+			 }
+		}
+	
+}
+ 
+</script>

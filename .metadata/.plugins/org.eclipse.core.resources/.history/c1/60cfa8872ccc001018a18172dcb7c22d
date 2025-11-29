@@ -1,0 +1,1680 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="voucherTypee" value="${voucherDto.voucherTypeId}" />
+<!-- <script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script> -->
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+
+<style>
+.bootstrap-select .dropdown-toggle .filter-option-inner-inner {
+    line-height: 15px;
+}
+.modaltabledata th {
+    line-height: 16px;
+    font-size: 13px !important;
+    font-weight: 400;
+}
+.tablemodal .modal-footer{
+padding:0
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-submit{
+margin-top:7px;
+}
+.tablemodal .modal-footer .btn-exit{
+margin-top:7px;
+}
+.modaltop-data {
+    font-size: 14px;
+}
+.tablemodal .modal-body {
+    padding-bottom: 0;
+}
+.lftdata {
+    width: 50%;
+    float: left;
+    font-size: 14px;
+}
+.rgtdata {
+    width: 50%;
+    float: right;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+.is-invalid {
+	border-color: red;
+}
+
+table.tableizer-table {
+	width: 100%;
+	font-size: 13px;
+	border: 1px solid #CCC;
+	letter-spacing: -0.75px;
+	font-family: "Open Sans", Arial, sans-serif;
+}
+
+.tableizer-table td {
+	padding: 1px 2px 1px 3px;
+	border: 1px dotted #CCC;
+}
+
+.tableizer-table th {
+	padding: 1px;
+	margin: 1px;
+	border: 1px dotted #CCC;
+	font-weight: bold;
+}
+
+.tableizerTitleRow {
+	text-align: left;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+.table>tbody>tr>td {
+	word-break: break-all;
+}
+th .btn{
+    padding: 5px 8px;
+}
+
+.searchParamDiv1 {
+	width: 14%;
+}
+
+.searchParamDiv1 label {
+	font-weight: 600;
+}
+
+.searchParamDiv2 {
+	width: 04%;
+	text-align: center;
+	padding-top: 26px;
+}
+
+.searchParamDiv2 label {
+	font-weight: bold;
+	font-size: 15px !important;
+}
+
+#partyListTable>tbody>tr>td {
+	font-size: 13.5px;
+}
+
+#partyListTable>thead>tr>th {
+	background: #d8d8d8;
+}
+tbody#tableBody {
+    border-width: 1px;
+}
+tbody#tableBody1 {
+    border-width: 1px;
+}
+</style>
+
+<script>
+$(function()
+{
+	$('#datatable-default').dataTable({
+ 		"bSort": false,
+ 		"autoWidth": false
+	});
+})
+</script>
+<div class="breadcrumb_conatiner">
+ 	<div class="col-md-6">
+		<h4 class="change-color">Receipt Voucher</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Receipt Voucher</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+                <h5 class="card-title">Receipt Voucher</h5>
+            </div>
+			<div class="card-body" id="partyDtlsInRequest">
+									<div class="col-md-12">
+										<form class="form-horizontal form-bordered" action="${contextPath}/saveReceiptVoucher" 
+										method="POST" enctype="multipart/form-data" id="finalSubmit" >
+											<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+											<input type="hidden" value="true" id="labelmsg" name="labelmsg">
+											<input id="encodedDatafinalSubmit" name="encodedDatafinalSubmit" type="hidden" />
+										    <input type="hidden" name="voucherId" id="voucherId" value="${voucherMasterDto.voucherId}">
+<%-- 										    <input type="hidden" name="receiptId" id="receiptId" value="${voucherMasterDto.receiptId}"> --%>
+							                <input type="hidden" name="voucherTypeId" id="voucherTypeId" value="${voucherTypee}"/>
+							                <input type="hidden" name="moduleCode" id="moduleCode" value="Receipt"/>
+										
+										    <div class="row align-items-end">
+										     <c:set var="ownFunctions" value="getProjectsByEntity" />
+						                     <c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+											<c:set var="upperOrDown" value="down" />
+											<c:set var="functionList2" value="getProjectsByEntity();${voucherMasterDto.voucherId eq null?'generateProvVoucherNoBasedOnParams();':''}"/>
+											<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+										    
+										       <div class="col-md-2 col-sm-3">
+												    <div class="form-group">
+												        <label for="TxnMode" class="required">Txn Mode :</label>
+												        <div class="col-md-12">
+												            <select
+									                          class="form-control selectpicker require" id="txn-mode" name="txnMode" onchange="toggleInstrumentSection(),getAccountListByTxnMode(this.value);">
+									                          <option value="Bank" ${voucherMasterDto.txnMode eq 'Bank' ? 'selected' : '' }>Bank</option>
+									                          <option value="Cash" ${voucherMasterDto.txnMode eq 'Cash' ? 'selected' : '' }>Cash</option>
+									                        </select>
+												        </div>
+												    </div>
+												</div> 
+                  
+			 								 <div class="col-md-2 col-sm-3">
+												    <div class="form-group">
+												        <label for="FinancialYear" class="required">Financial Year :</label>
+												        <div class="col-md-12">
+												            <select class="form-control form-select require" name="finYearId" id="finYearId" onchange="generateProvVoucherNoBasedOnParams()" data-plugin-selectTwo>
+												                <option value="">
+												                    <spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/>
+												                </option>
+												                <c:forEach items="${voucherDto.finList}" var="fin">
+												                    <option value="${fin.finyearId}" 
+												                        ${fin.finyearId == voucherMasterDto.finanicalYear.finyearId ? 'selected' : ''} >
+												                        ${fin.finYear}
+												                    </option>
+												                </c:forEach>
+												            </select>
+												        </div>
+												    </div>
+												</div>
+												
+												<%-- <div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="FinancialYear" class="required">Division :</label>
+														  <div class="col-md-12">
+															<select class="form-control form-select require" name="officeMasterId" id="officeMasterId" onchange="generateProvVoucherNoBasedOnParams();" data-plugin-selectTwo>
+										                        <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+										                        <c:forEach items="${voucherDto.officeMasterList}" var="off">
+																	  <option value="${off.id}"
+																		 ${off.id eq voucherMasterDto.offMaster.id ?'selected' :'' }>
+																		${off.name}</option> 
+																</c:forEach>
+										                 	</select>
+														</div>
+													</div>
+												</div> --%>
+												
+												<!-- <div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="Department" class="required">Department :</label>
+														<div class="">
+															<select class="form-control form-select require" id="departmentId" name="departmentId"
+														       	onchange="gettingSectionList(this.value),generateProvVoucherNoBasedOnParams();">
+																<option value="">- Select -</option>
+															</select>
+														</div>
+													</div>
+												</div>
+									
+									            <div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="section" class="required">Section :</label>
+														<div class="">
+															<select class="form-control form-select require" id="sectionId" name="sectionId" onchange="generateProvVoucherNoBasedOnParams()" required>
+																<option value="">- Select -</option>
+															</select>
+														</div>
+													</div>
+												</div> -->
+												
+												<div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="ProvincialNumber" class="required">Prov. No. :</label>
+														  <div class="col-md-12">
+															 <input class="form-control form-control-sm require" type="text" id="voucherNoId" name="voucherNo" value="${voucherMasterDto.voucherNo}" readOnly>
+														</div>
+													</div>
+												</div>
+												
+												<c:set var="povDate" value="${fn:split(voucherMasterDto.voucherDate, ' ')}" />
+                                                <fmt:parseDate pattern="yyyy-MM-dd" value="${povDate[0]}" var="povDate1" />
+                                                <fmt:formatDate value="${povDate1}" pattern="dd/MM/yyyy" var="voucherDateStr" />
+												<div class="col-md-2 col-sm-3">
+													<div class="form-group ">
+														<label for="ProvincialDate" class="required">Prov. Date :</label>
+														  <div class="">
+															 <input class=" form-control form-control-sm require" type="text" id="voucherDateId" name="voucherDate" value="${voucherDateStr}" readonly>
+														</div>
+													</div>
+												</div>
+												
+												<div class="col-md-2 col-sm-3">
+													<div class="form-group">
+														<label for="VoucherNumber">Voucher No. :</label>
+														  <div class="col-md-12">
+															 <input class="form-control form-control-sm" type="text" id="finalVoucherNoId" name="finalVoucherNo" value="${voucherMasterDto.finalVoucherNo}" readOnly>
+														</div>
+													</div>
+												</div>
+												
+												<c:set var="finDate" value="${fn:split(voucherMasterDto.finalVoucherDate, ' ')}" />
+                                                <fmt:parseDate pattern="yyyy-MM-dd" value="${finDate[0]}" var="finDate1" />
+                                                <fmt:formatDate value="${finDate1}" pattern="dd/MM/yyyy" var="finalVoucherDateStr" />
+												<div class="col-md-2 col-sm-3">
+													<div class="form-group ">
+														<label for="VoucherDate">Voucher Date :</label>
+														  <div class="">
+															 <input class="form-control form-control-sm"  type="text" id="finalVoucherDateId" name="finalVoucherDate" value="${finalVoucherDateStr}" readOnly>
+														</div>
+													</div>
+												</div>
+												
+											  <div class="col-md-3 col-sm-3">
+												<div class="form-group"> 
+                                                    <label  class="required"> Bank/Cash (GL) :</label>
+                                                      <div>
+								                            <select
+								                              class="form-control form-select" data-live-search="true" aria-label="Default select example" name="glId" id="gl-id">
+								                              <option value="">-Select-</option>
+								                            </select>
+								                      </div>
+								                    </div>
+								                 </div>
+									                 
+							                     <div class="col-md-3 col-sm-3">
+													<div class="form-group"> 
+							                          <label  class="required">Amount Received (Rs.) :</label>
+							                            <div class="datepicker-box">
+									                        <input
+									                          class="form-control form-control-sm text-end" value="${voucherMasterDto.drCrAmount}" type="text" 
+									                          id="total-amount" name="drCrAmount" onblur="formatAmount(this)" readonly />
+								                      </div>
+								                   </div>
+								                 </div>
+								                 
+							                    <div class="col-md-2 col-sm-3">
+												   <div class="form-group"> 
+							                         <label>MR No. :</label>
+							                          <input class="form-control form-control-sm" id="mrNoId" name="mrNo" value="${voucherMasterDto.mrNo}" type="text"  readonly/>
+							                       </div>
+							                    </div>
+								                    
+								                    <c:set var="mrDate" value="${fn:split(voucherMasterDto.mrDate, ' ')}" />
+                                                <fmt:parseDate pattern="yyyy-MM-dd" value="${mrDate[0]}" var="mrDate1" />
+                                                <fmt:formatDate value="${mrDate1}" pattern="dd/MM/yyyy" var="mrDateStr" />
+							                    <div class="col-md-2 col-sm-3">
+												   <div class="form-group"> 
+												      <label>MR Date :</label>
+														  <div class="datepicker_con">
+															 <input class="form-control form-control-sm" type="text" id="mrDateId" name="mrDate" value="${mrDateStr}" readonly/>
+												          </div>
+							                        </div>
+							                    </div>
+							                    
+                                              <div class="col-md-3 col-sm-3">
+												  <div class="form-group">
+									                <label for="inputEmail4">Upload Document : <span style="color:#0d6efd;font-size:10px; font-weight: 600;">(pdf only)</span> </label>
+                                                    <div class="col-md-12">
+                                                       <input type="file" name="fileDocument" class="form-control form-control-sm ">
+                                                    </div>
+									            </div>
+									          </div>
+									            <c:if test="${not empty voucherMasterDto && not empty voucherMasterDto.upldDocFullPath}">
+                                                    <div class="form-group col-lg-2 col-md-2 col-sm-2 col-6">
+                                                     <button type="button" onclick="viewDocument('${voucherMasterDto.upldDocFullPath}','${voucherMasterDto.voucherTypeId.voucherTypeName}')" class="btn btn-primary unfreezeField">View</button>
+                                                    </div>
+                                                </c:if>
+
+									           </div>
+
+											
+											<div class="row" id="instrument-section">
+							                    <div class="table-responsive">
+							                      <h6 class="mt-3"><u>INSTRUMENT DETAILS</u></h6>
+							                      <table class="table table-bordered mb-none mt-1 table-hover">
+							                        <thead>
+							                          <tr>
+							                            <th>
+							                              <label class="required">Instrument Type</label>
+							                            </th>
+							                            <th>
+							                              <label class="required">Instrument No. </label>
+							                            </th>
+							                            <th class="text-end">
+							                              <label class="required text-end">Amount (Rs.) </label>
+							                            </th>
+							                            <th>
+							                              <label class="required">Instrument Date</label>
+							                            </th>
+							                            <th>
+							                              <label class="required">Drawn on Bank </label>
+							                            </th>
+							                            <%-- <c:if test="${voucherMasterDto.voucherId eq null}"> --%>
+							                            <th class="action" style="text-align: center">
+							                              <button type="button" id="addRow" class="btn btn-primary btn-sm" title="Add New Row" onclick="addRows()">
+							                                <i class="fa fa-plus" aria-hidden="true"></i>
+							                              </button>
+							                            </th>
+							                            <%-- </c:if> --%>
+							                          </tr>
+							                        </thead>
+							                        <tbody id="tableBody1">
+							                          <c:choose>
+							                            <c:when test="${not empty instrumentList}">
+							                              <c:forEach items="${instrumentList}" var="instrument" varStatus="status">
+							                                <tr>
+							                                
+							                                  <td>
+							                                    <input type="hidden"
+							                                      name="instrumentDetails[${status.index}].instrumentId" value="${instrument.id}" class="form-control form-control-sm">
+							                                       <select name="instrumentDetails[${status.index}].modeType"class="form-control form-control-sm form-select" id="modeType_${status.index}" title="Select Mode" required>
+							                                         <option value="">-- Select --</option>
+								                                      <c:forEach items="${voucherDto.receiptList}" var="mode">
+								                                        <option value="${mode.receiptModeId}"
+								                                          ${instrument.receiptMode.receiptModeId eq mode.receiptModeId
+								                                          ? 'selected' : '' }>${mode.receiptMode}</option>
+								                                      </c:forEach>
+							                                    </select>
+							                                  </td>
+							                                  
+							                                  <td>
+							                                    <input type="text" name="instrumentDetails[${status.index}].instrumentNumber"id="instrumentNumber_${status.index}"
+							                                      onblur="checkDuplicateInstrumentNumbers()" value="${instrument.instrumentNo}"
+							                                      class="form-control form-control-sm" required>
+							                                  </td>
+							                                  
+							                                  <td>
+							                                    <input type="text" name="instrumentDetails[${status.index}].amount"id="instrumentAmount_${status.index}"
+							                                      value="${instrument.instrumentAmount}" onblur="instTotalAmount();formatAmount(this)"
+							                                      onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))"
+							                                      class="form-control form-control-sm text-end "
+							                                      placeholder="Amount (Rs.)" required>
+							                                  </td>
+							                                  
+							                                  <td>
+							                                  <div class="datepicker_con">
+							                                    <fmt:formatDate value="${instrument.instrumentDate}" pattern="dd/MM/yyyy" var="formattedDate" />
+							                                    <input class=" form-control form-control-sm require" type="text" value="${formattedDate}"
+							                                      name="instrumentDetails[${status.index}].instrumentDate" id="instrumentDate_${status.index}" readonly />
+							                                      </div>
+							                                  </td>
+							                                  
+							                                  <td>
+							                                    <select name="instrumentDetails[${status.index}].drawnBankId" id="drawnBankId_${status.index}" 
+							                                          class="form-control form-control-sm form-select" required>
+							                                         <option value="">-- Select --</option>
+							                                          <c:forEach items="${voucherDto.bankList}" var="bank">
+							                                             <option value="${bank.bankId}" ${instrument.bankMaster.bankId eq bank.bankId ? 'selected' : '' }>${bank.bankName}</option>
+							                                          </c:forEach>
+							                                    </select>
+							                                  </td>
+							                                  
+							                                    <td class="sorting_1 text-center">
+																    <div class="btn-group" aria-label="Basic mixed styles example">
+																        <button type="button" class="btn btn-danger btn-sm deleteRow ${status.index eq '0'? 'disabled':''}" data-toggle="tooltip" data-original-title="" title="" 
+																                 id="deleteMap_${index.index}"><i class="fas fa-trash"></i></button>
+																    </div>
+																</td>  
+																		
+							                                 <%--  <td class="sorting_1">
+							                                    <div class="btn-group" aria-label="Basic mixed styles example">
+							                                      <button type="button" class="btn btn-danger btn-sm deleteRow" onclick="removeRow(${status.index})" data-toggle="tooltip"
+							                                        data-original-title="" title="" id="deleteMap_0"> <i class="fas fa-trash"></i>
+							                                      </button>
+							                                    </div>
+							                                  </td> --%>
+							                                  
+							                                </tr>
+							                              </c:forEach>
+							                            </c:when>
+							                            <c:otherwise>
+							                              <tr>
+							                                <td>
+							                                  <select name="instrumentDetails[0].modeType"
+							                                    class="form-control form-control-sm form-select instTable" id="modeType_0"
+							                                    title="Select Mode" required>
+							                                    <option value="">-- Select --</option>
+							                                    <c:forEach items="${voucherDto.receiptList}" var="mode">
+							                                      <option value="${mode.receiptModeId}">${mode.receiptMode}</option>
+							                                    </c:forEach>
+							                                  </select>
+							                                </td>
+							                                <td>
+							                                  <input type="text" name="instrumentDetails[0].instrumentNumber"
+							                                    id="instrumentNumber_0" onblur="checkDuplicateInstrumentNumbers()"
+							                                    class="form-control form-control-sm instTable" required>
+							                                </td>
+							                                <td>
+							                                  <input type="text" name="instrumentDetails[0].amount"
+							                                    onblur="instTotalAmount();formatAmount(this)" id="instrumentAmount_0"
+							                                    class="form-control form-control-sm text-end  instTable"
+							                                    onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))"
+							                                    placeholder="Amount (Rs.)" required>
+							                                </td>
+							                                <td>
+							                                <div class="datepicker_con">
+							                                  <input class=" form-control form-control-sm require instTable"
+							                                    type="text" name="instrumentDetails[0].instrumentDate"
+							                                    id="instrumentDate_0" readonly />
+							                                    </div>
+							                                </td>
+							                                <td>
+							                                  <select name="instrumentDetails[0].drawnBankId" id="drawnBankId_0"
+							                                    class="form-control form-select form-control-sm instTable" required>
+							                                    <option value="">-- Select --</option>
+							                                    <c:forEach items="${voucherDto.bankList}" var="bank">
+							                                      <option value="${bank.bankId}">${bank.bankName}</option>
+							                                    </c:forEach>
+							                                  </select>
+							                                </td>
+							                               <!--  <td class="sorting_1">
+							                                  <div class="btn-group" aria-label="Basic mixed styles example">
+							                                    <button type="button" class="btn btn-danger btn-sm deleteRow"
+							                                      onclick="removeRow(0)" data-toggle="tooltip" data-original-title=""
+							                                      title="" id="deleteMap_0">
+							                                      <i class="fas fa-trash"></i>
+							                                    </button>
+							                                  </div>
+							                                </td> -->
+							                              </tr>
+							                            </c:otherwise>
+							                          </c:choose>
+							                        </tbody>
+							                      </table>
+							                    </div>
+							                  </div>
+											
+										     <h6 class="mt-3"><u>TRANSACTION DETAILS</u></h6>
+									        <div class="table-responsive">
+											    <table class="table table-bordered mb-none mt-3 table-hover">
+											        <thead>
+											            <tr>
+											                <th style="min-width: 175px;"><label>Account Name</label></th>
+											                <th style="min-width: 220px;"><label>Party Name</label></th>
+											                <th style="min-width: 150px;"><label>Project Name</label></th>
+											                <th style="min-width: 150px;"><label>Work Name</label></th>
+											                <th style="min-width: 120px;"><label>Cost Center</label></th>
+											                <th style="min-width: 65px;text-align: right;"><label>Debit (Rs.)</label></th>
+											                <th style="min-width: 65px;text-align: right;"><label>Credit (Rs.)</label></th>
+											                 <%-- <c:if test="${voucherMasterDto.voucherId eq null}"> --%>
+											                <th width="5%" style="text-align: center;">
+											                    <button type="button" id="addRow1" class="btn btn-primary btn-sm addRow1" title="Add New Row">
+											                        <i class="fa fa-plus" aria-hidden="true"></i>
+											                    </button>
+											                </th>
+											                <%-- </c:if> --%>
+											            </tr>
+											        </thead>
+											        <tbody id="tableBody">
+													 <c:choose> 
+							                            <c:when test="${not empty receiptVoucherDtls}">
+							                              <c:forEach items="${receiptVoucherDtls}" var="receiptDtl" varStatus="index">
+							                                     <tr>
+																	 <td align="center">
+																	 <input type="hidden" value="${receiptDtl.projectDetails.projectId}" id="hdnprojectDetailsId${index.index}"/>
+																		<input type="hidden" value="${receiptDtl.workDetails.workId}" id="hdnworkId${index.index}"/>
+																		<select name="voucherData[${index.index}].account" id="account${index.index}" onchange="accountNameValidate(${index.index},0)" class="form-control form-select single-select"  >
+																		<option value="" required>--select--</option><c:forEach items="${voucherDto.accountInfoDtoList}" var="account">
+																		<option value="${account.id}"${receiptDtl.dtlDrCrAcctid.accountId eq  account.id?'selected':''}>${account.code}|${account.name}</option></c:forEach></select></td>
+																		<td><input type="text" class="form-control form-control-sm"  name="voucherData[${index.index}].partyDetails" id="partyDetails${index.index}" value="${receiptDtl.partyDetails.partyCode}|${receiptDtl.partyDetails.partyName}" aria-describedby="helpId"  placeholder="Please Enter " onkeyup="" autocomplete="off" /> <input type="hidden" id="selectedPartyDetailsId${index.index}" value="${receiptDtl.partyDetails.partyId}"  name="voucherData[${index.index}].selectedPartyDetailsId"><div class="dropdown-container" id="dropdown-container${index.index}"></div></td>
+																		<td align="center"><select name="voucherData[${index.index}].projectDetailsId" id="projectDetailsId${index.index}" class="form-control form-select form-control-sm single-select" onchange="getWorkListByProjectId(${index.index},0)" ><option value="" required>--select--</option><c:forEach items="${voucherDto.projectInfoDtoList}" var="project"><option value="${project.id}"${receiptDtl.projectDetails.projectId eq project.id? 'selected':''}>${project.code}|${project.name}</option></c:forEach></select></td>
+																		<td align="center"><select name="voucherData[${index.index}].workDetailsId" id="workDetailsId${index.index}" class="form-control form-select form-control-sm single-select"><option value="" required>--select--</option></select></td>
+																		<td align="center"><select name="voucherData[${index.index}].costCenterId" id="costCenterId${index.index}"  class="form-control form-select form-control-sm single-select"  ><option value="" required>--select--</option><c:forEach items="${voucherDto.costCenterList}" var="cost"><option value="${cost.id}"${receiptDtl.costCenter.costCenterId eq cost.id? 'selected':''}>${cost.name}</option></c:forEach></select></td>
+																		<td><input type="text" class="form-control form-control-sm text-end  tbl_inputO"  name="voucherData[${index.index}].debit" id="debit${index.index}"  value="${receiptDtl.debitAmount}" aria-describedby="helpId"  onblur="formatAmount(this);enableDisableAmount(${index.index});calculateNetReceivable()"onkeypress="return validateInputDecimal(event,this);" placeholder="Please Enter " /></td>
+																		<td><input type="text" class="form-control form-control-sm text-end "  name="voucherData[${index.index}].credit" id="credit${index.index}"  value="${receiptDtl.creditAmount}" aria-describedby="helpId"  onblur="formatAmount(this);enableDisableAmount(${index.index});calculateNetReceivable()"  onkeypress="return validateInputDecimal(event,this);" placeholder="Please Enter " /></td>
+																		
+																		
+																		  <td class="sorting_1 text-center">
+																		    <div class="btn-group" aria-label="Basic mixed styles example">
+																		        <button type="button" class="btn btn-danger btn-sm deleteRow ${index.index eq '0'? 'disabled':''}" data-toggle="tooltip" data-original-title="" title="" id="deleteMap${index.index}"><i class="fas fa-trash"></i></button>
+																		    </div>
+																		</td>  
+																		<!-- <td class="sorting_1">
+																		    <div class="btn-group" aria-label="Basic mixed styles example">
+																		        <button type="button" class="btn btn-danger btn-sm deleteRow disabled" data-toggle="tooltip" data-original-title="" title="" id="deleteMap0"><i class="fas fa-trash"></i></button>
+																		    </div>
+																		</td> -->
+																	</tr>
+							                                   </c:forEach>
+															  </c:when>
+							                                 <c:otherwise> 
+							                                    <tr>
+																	<td align="center"><select name="voucherData[0].account" id="account0" onchange="accountNameValidate((0,0))"class="form-control form-select form-control-sm single-select require">
+																	<option value="" required>--select--</option>
+																	   <c:forEach items="${voucherDto.accountInfoDtoList}" var="account"><option value="${account.id}">${account.code}|${account.name}</option></c:forEach></select></td>
+																		<td><input type="text" class="form-control form-control-sm require"  name="voucherData[0].partyDetails" id="partyDetails0" value="" aria-describedby="helpId"  placeholder="Please Enter" onkeyup="" autocomplete="off" /> <input type="hidden" class="require"id="selectedPartyDetailsId0"  name="voucherData[0].selectedPartyDetailsId"><div class="dropdown-container"  id="dropdown-container0"></div></td>
+																		<td align="center"><select name="voucherData[0].projectDetailsId" id="projectDetailsId0" class="form-control form-select form-control-sm single-select" onchange="getWorkListByProjectId(0,0)" ><option value="" required>--select--</option><c:forEach items="${voucherDto.projectInfoDtoList}" var="project"><option value="${project.id}">${project.code}|${project.name}</option></c:forEach></select></td>
+																		<td align="center"><select name="voucherData[0].workDetailsId" id="workDetailsId0" class="form-control form-select form-control-sm single-select"><option value="" required>--select--</option></select></td>
+																		<td align="center"><select name="voucherData[0].costCenterId" id="costCenterId0" class="form-control form-select form-control-sm single-select" ><option value="" required>--select--</option><c:forEach items="${voucherDto.costCenterList}" var="cost"><option value="${cost.id}">${cost.name}</option></c:forEach></select></td>
+																		<td><input type="text" class="form-control form-control-sm text-end tbl_inputO"  name="voucherData[0].debit" id="debit0" value="0.00" aria-describedby="helpId"  onblur="formatAmount(this);enableDisableAmount(0);calculateNetReceivable()" onkeypress="return validateInputDecimal(event,this);" onkeypress="return validateInputDecimal(event,this);"   /></td>
+																		<td><input type="text" class="form-control form-control-sm  text-end"  name="voucherData[0].credit" id="credit0" value="0.00" aria-describedby="helpId"   onblur="formatAmount(this);enableDisableAmount(0);calculateNetReceivable()" onkeypress="return validateInputDecimal(event,this);"onkeypress="return validateInputDecimal(event,this);"  /></td>
+																	
+																	<!-- <td class="sorting_1">
+																	    <div class="btn-group" aria-label="Basic mixed styles example">
+																	        <button type="button" class="btn btn-danger btn-sm deleteRow disabled" data-toggle="tooltip" data-original-title="" title="" id="deleteMap0"><i class="fas fa-trash"></i></button>
+																	    </div>
+																	</td> -->
+																</tr>
+							                               </c:otherwise>
+							                             </c:choose> 
+								                    </tbody>
+											    </table>
+											</div>
+										
+							                  <div class="row mt-2">
+							                    <div class="col-md-6">
+							                      <label><b>Amount in Words :</b> <i><span id="amount-word"> </span></i></label>
+							                    </div>
+							                    <div class="col-md-6">
+							                      <div class="row align-items-center">
+							                        <div class="col" style="text-align: end;">
+							                          <label for="net-receivable"><b>Total(Rs.) :</b></label>
+							                        </div>
+							                        <div class="col">
+							                          <input type="text" name="totalDrAmount"
+							                            value="${not empty voucherMasterDto.totalDrAmount ? voucherMasterDto.totalDrAmount : 0.00}"
+							                            id="totalDebitHidden" class="form-control form-control-sm  text-end" readonly />
+							
+							                        </div>
+							                        <div class="col">
+							                          <input type="text" name="totalCrAmount"
+							                            value="${not empty voucherMasterDto.totalCrAmount ? voucherMasterDto.totalCrAmount : 0.00}"
+							                            id="totalCreditHidden" class="form-control form-control-sm text-end" readonly />
+							                        </div>
+							                      </div>
+							                      <div class="row align-items-center" style="padding-top:10px;">
+							                        <div class="col"  style="text-align: end;">
+							                          <label for="net-receivable "><b>Net Receivable (Rs.) :</b></label>
+							                        </div>
+							                        <div class="col">
+							                          <input type="text" name="netReceivable" id="net-receivable" value="0"
+							                            class="form-control form-control-sm text-end" readonly />
+							                        </div>
+							                        <div class="col">
+							                        </div>
+							                      </div>
+							                    </div>
+							                  </div>
+							
+							                  <div class="row">
+							                    <div class="col-md-6">
+							                      <label class="">Narration (Max 500 characters)</label>
+							                      <textarea rows="3" cols="5"
+							                        class="form-control" name="narration" id="narration" maxlength="500">${voucherMasterDto.narration}</textarea>
+							                    </div>
+						                      
+							                  </div>
+											   <c:set var="dynamicFromId" value="finalSubmit" scope="request" />
+												<c:set var="wonFunction" value="saveDetails()"/>
+						                        <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+						                        
+						                         <c:if test="${voucherMasterDto.voucherId ne null}">
+                                                    <%@ include file="/WEB-INF/views/FAMS/voucher/voucherHistory.jsp"%>
+                                                </c:if>
+									     </form>
+									  </div>
+								   </div>
+							</section>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+  <form action="${contextPath}/download/download" method="get" id="formDownLoad"  target="_blank">
+	    <input type="hidden" name="code" id="code"/>
+	    <input type="hidden" name="module" id="module"/>
+	    <input type="hidden" name="filename" id="filename"/>
+  </form>
+<!--"totalDebit","totalCredit"  -->
+
+<div class="tablemodal modal fade" id="openModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title" id="exampleModalLabel">PREVIEW (Receipt Voucher)</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+ 
+      <div id="formDataDisplay">
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-submit"onclick="confirmSubmitforPre()">Proceed</button>
+        <button type="button" class="btn btn-primary btn-exit" data-bs-dismiss="modal">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+//Document ready functions
+document.addEventListener('DOMContentLoaded', function() {
+    var today = new Date();
+    var year = today.getFullYear();
+    var month = String(today.getMonth() + 1).padStart(2, '0');
+    var day = String(today.getDate()).padStart(2, '0');
+    var formattedDate = day + '/' + month + '/' + year;
+    document.getElementById('voucherDateId').value = formattedDate;
+
+});
+
+  $( document ).ready(function() {
+	  debugger
+	   var selectedTxnMode = $('#txn-mode').val();
+	   var glid ="${voucherMasterDto.drCrAccount.accountId}"
+	  
+	   var voucherIdd="${voucherMasterDto.voucherId}"
+	   var voucherTypeId="${voucherMasterDto.voucherTypeId.voucherTypeId}"
+	  
+	   var finYearId="${voucherMasterDto.finanicalYear.finyearId}"
+// 	   var officeMasterId="${voucherMasterDto.offMaster.id}"
+// 	   var sectionId="${voucherMasterDto.section.sectionId}";
+// 	   var departmentId="${voucherMasterDto.department.departmentId}";
+// 	   if(departmentId!=""){
+// 		  gettingDepartmentList(officeMasterId,departmentId)
+// 	   }
+// 	   if(sectionId!=""){
+// 		   gettingSectionList(departmentId,sectionId)
+// 	   }
+	   if(glid != ""){
+		   getAccountListByTxnMode(selectedTxnMode,glid);
+	   }else{
+		   getAccountListByTxnMode(selectedTxnMode,0);
+	   } 
+	   var receiptVoucherDtls = '${not empty receiptVoucherDtls}';
+		if(receiptVoucherDtls=='true'){
+			var receiptVoucherDtlssSize = '${receiptVoucherDtls.size()}';
+			for(var i=0;i < receiptVoucherDtlssSize;i++){
+				var workId=$("#hdnworkId"+i).val();
+				var costId=$("#costCenterId"+i).val();
+				getWorkListByProjectId(i,workId);
+			}
+		}
+		debugger
+		toggleRequiredClassBYTxnMode();
+		 if(voucherIdd != ""){
+			 debugger
+			   calculateNetReceivable();   
+			   toggleInstrumentSection();
+// 			   document.getElementById('finalVoucherDateId').value = formattedDate;
+		   }
+	});
+	
+  function generateProvVoucherNoBasedOnParams() {
+	    debugger;
+	    var entityIdLevelCombo=$("#upperEntityId").val();
+	    var voucherTypeId = $("#voucherTypeId").val();
+	    var finYear = $("#finYearId").val();
+	    var moduleCode = "VOUCHER";
+	   
+      if(entityIdLevelCombo!='' && voucherTypeId!='' &&  finYear!='' ){
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/getProvinicialNumberbasedOnParams",
+	        data: {
+	            "entityIdLevelCombo":entityIdLevelCombo,
+	            "voucherTypeId": voucherTypeId,
+	            "finYearId": finYear,
+	            "moduleCode": moduleCode,
+	        },
+	        success: function(response) {
+	            if (response && response.length > 0) {
+	                var voucherNo = response; 
+	                if (voucherNo.indexOf("Not Configured") !== -1) {
+	                    $("#voucherNoId").css({ 
+	                        'color': 'red', 
+	                        'border': '1px solid red', 
+	                        'box-shadow': '0px 0px 3px red' 
+	                    });
+	                } else {
+	                	$("#voucherNoId").val(voucherNo);
+	                }
+	            }
+	        },
+	        error: function(errResponse) {
+	            console.error("Error fetching voucher number:", errResponse);
+	        }
+	    });
+   }
+	}
+
+	$(document).ready(function() {
+	    var inputFields = document.getElementsByClassName("tbl_inputO");
+	    for (var i = 0; i < inputFields.length; i++) {
+	        autocompletePartyDetails(i);
+	    }
+	    if($("#voucherId").val()!=""){
+			   const amountInWordsParagraph = document.getElementById("amountInWordsHeader");
+		    	amountInWordsParagraph.textContent = "Amounts in Words: " +  convertAmountToWords('${voucherMasterDto.totalDrAmount}');
+		    	
+		    	debugger
+			    if($("#voucherId").val()!=""){
+			    	var finalVoucherDate = $("#finalVoucherDateId").val();
+			    	
+			        if (finalVoucherDate) {
+			            var dateObj = new Date(finalVoucherDate);
+			          
+			            var month = dateObj.getMonth() + 1;  // getMonth() returns 0-11, so we add 1
+			            var day = dateObj.getDate();         // getDate() returns the day of the month (1-31)
+			            var year = dateObj.getFullYear();    // getFullYear() returns the full year (e.g., 2024)
+
+			          
+			            month = month < 10 ? '0' + month : month;  // Ensure two digits for month
+			            day = day < 10 ? '0' + day : day;          // Ensure two digits for day
+			            var formattedDate = day + '/' + month + '/' + year;
+			            document.getElementById('finalVoucherDateId').value = formattedDate;
+			        }
+			    }
+		   }
+	    
+	 // Autocomplete for party details
+		function autocompletePartyDetails(index) {
+		    $("input[id^='partyDetails" + index + "']").autocomplete({
+		        serviceUrl: "${contextPath}/partyMaster",
+		        paramName: "userInput",
+		        delimiter: ",",
+		        width: '550px',
+		        transformResult: function(response) {
+		            var responseData = JSON.parse(response).result;
+		            console.log(responseData);
+		            return {
+		                suggestions: $.map(responseData, function(item) {
+		                    return {
+		                        value: item.partyCode + " " + item.partyName,
+		                        data: item.partyId,
+		                        partyCode: item.partyCode,
+		                        partyName: item.partyName
+		                    };
+		                })
+		            };
+		        },
+		        onSelect: function(suggestion) {
+		            var selectedRow = parseInt(this.parentNode.parentNode.rowIndex) - 1;
+		            document.getElementById("selectedPartyDetailsId" + index).value = suggestion.data;
+		            $('#partyDetails' + index).val(suggestion.partyCode + ' | ' + suggestion.partyName);
+		            $('#selectedPartyDetailsId' + index).val(suggestion.data);
+		        }
+		    });
+		}
+
+	// Add row to the table
+		
+		    var count = 1;
+		    const addBtn = document.getElementById('addRow1');
+		    addBtn.addEventListener('click', function() {
+		        var fields = document.getElementsByClassName("tbl_inputO");
+		        count = fields.length;
+		        if (validateFormByFormID('finalSubmit')) {
+		      
+		        
+		        let html = ''; 
+		        html += '<tr>';
+		        html += '<td align="center">';
+		        html += '<select name="voucherData[' + count + '].account" id="account' + count + '" class="form-control form-control-sm form-select single-select require" onchange="accountNameValidate(' + count + ',0)">';
+		        html += '<option value="" required>--select--</option><c:forEach items="${voucherDto.accountInfoDtoList}" var="account"><option value="${account.id}">${account.code}|${account.name}</option></c:forEach>';
+		        html += '</select>';
+		        html += '</td>';
+		        html += '<td>';
+		        html += '<input type="text" class="form-control form-control-sm require" name="voucherData[' + count + '].partyDetails" id="partyDetails' + count + '" value="" aria-describedby="helpId" placeholder="Please Enter " onkeyup="" autocomplete="off" /><input type="hidden" class="require" id="selectedPartyDetailsId' + count + '" name="voucherData[' + count + '].selectedPartyDetailsId"><div class="dropdown-container" id="dropdown-container' + count + '"></div>';
+		        html += '</td>';
+		        html += '<td align="center">';
+		        html += '<select name="voucherData[' + count + '].projectDetailsId" id="projectDetailsId' + count + '" class="form-control form-control-sm form-select single-select" onchange="getWorkListByProjectId(' + count + ',0)">';
+		        html += '<option value="" required>--select--</option><c:forEach items="${voucherDto.projectInfoDtoList}" var="project"><option value="${project.id}">${project.code}|${project.name}</option></c:forEach>';
+		        html += '</select>';
+		        html += '</td>';
+		        html += '<td align="center">';
+		        html += '<select name="voucherData[' + count + '].workDetailsId" id="workDetailsId' + count + '" class="form-control form-control-sm form-select single-select">';
+		        html += '<option value="" required>--select--</option>';
+		        html += '</select>';
+		        html += '</td>';
+		        html += '<td align="center">';
+		        html += '<select name="voucherData[' + count + '].costCenterId" id="costCenterId' + count + '" class="form-control form-control-sm form-select single-select">';
+		        html += '<option value="" required>--select--</option><c:forEach items="${voucherDto.costCenterList}" var="cost"><option value="${cost.id}">${cost.name}</option></c:forEach>';
+		        html += '</select>';
+		        html += '</td>';
+		        html += '<td>';
+		        html += '<input type="text" class="form-control form-control-sm text-end tbl_inputO" name="voucherData[' + count + '].debit" id="debit' + count + '" value="0.00" aria-describedby="helpId" onblur="formatAmount(this);enableDisableAmount(' + count + ');calculateNetReceivable();" onkeypress="return validateInputDecimal(event,this);" />';
+		        html += '</td>';
+		        html += '<td>';
+		        html += '<input type="text" class="form-control form-control-sm text-end " name="voucherData[' + count + '].credit" id="credit' + count + '" value="0.00" aria-describedby="helpId" onblur="formatAmount(this);enableDisableAmount(' + count + ');calculateNetReceivable();" onkeypress="return validateInputDecimal(event,this);" />';
+		        html += '</td>';
+		        html += '<td class="sorting_1 text-center">';
+		        html += '<div class="btn-group" aria-label="Basic mixed styles example">';
+		        html += '<button type="button" class="btn btn-danger btn-sm deleteRow" data-toggle="tooltip" data-original-title="" title="" id="deleteMap' + count + '"><i class="fas fa-trash"></i></button>';
+		        html += '</div>';
+		        html += '</td>';
+		        html += '</tr>';
+		
+		        $(function () {
+		            $(".single-select").select2({
+		                placeholder: "Select",
+		                allowClear: true
+		            });
+		          });
+		       
+		        	$('#tableBody').append(html);
+		        autocompletePartyDetails(count);
+		        
+		        var entityIdLevelCombo=$("#upperEntityId").val();
+		        featchProjectListByEntity(entityIdLevelCombo,0,"projectDetailsId"+count);
+		        
+		        }
+		    });
+		});
+
+
+	function getWorkListByProjectId(index, workid) {
+	    var projectId = $('#projectDetailsId' + index).val();
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/workListMasterByProjectId",
+	        data: {
+	            "projectId": projectId
+	        },
+	        success: function(response) {
+	            var workIdObject = $('#workDetailsId' + index);
+	            workIdObject.empty();
+	            var html = '<option value="">--select--</option>';
+	            if (response.outcome) {
+	                var workList = response.result;
+	                $.each(workList, function(index, work) {
+	                    html += '<option value="' + work.workId + '">' + work.workCode + '|' + work.workName + '</option>';
+	                });
+	                workIdObject.append(html);
+	            } else {
+	                workIdObject.empty().append(html);
+	            }
+	            if (workid != 0) {
+	                workIdObject.val(workid);
+	            }
+	        },
+	        error: function(error) {
+	            console.log("Error:", error);
+	        }
+	    });
+	}
+
+	/* function gettingDepartmentList(officeMasterId,departmentId) {
+		$.ajax({
+			type : "GET",
+			url : "./gettingDepartmentListByDivision",
+			data : {
+				"officeId" : officeMasterId,
+			},
+			success : function(response) {
+				var html = "";
+				html= html+"<option value=''>- Select -</option>";
+				var obj = JSON.parse(response);
+				$.each(obj, function(index, value) {
+					html = html + '<option value='+value.departmentId+'>'
+							+ value.departmentName + '</option>';
+				});
+				$("#departmentId").empty().append(html);
+	 			$("#departmentId").val(departmentId);
+			},
+			error : function(error) {
+				bootbox.alert("Error found at gettingDepartmentList");
+			}
+		});
+	} */
+
+	/* function gettingSectionList(departmentId,sectionId) {
+		$.ajax({
+			type : "GET",
+			url : "./gettingSectionListByDepartment",
+			data : {
+				"departmentId" : departmentId,
+			},
+			success : function(response) {
+				var html = "";
+				html= html+"<option value=''>- Select -</option>";
+				var obj = JSON.parse(response);
+				$.each(obj, function(index, value) {
+					html = html + '<option value='+value.sectionId+'>'
+							+ value.sectionName + '</option>';
+				});
+				$("#sectionId").empty().append(html);
+	 			$("#sectionId").val(sectionId);
+			},
+			error : function(error) {
+				bootbox.alert("Error found at gettingSectionList");
+			}
+		});
+	} */
+
+	$(document).on('click', '.deleteRow', function () {
+	    $(this).closest('tr').remove();
+		 var fieldsCount = document.getElementsByClassName("deleteRow");
+		 fieldsCount = fieldsCount.length;
+	     updateRowAttributes();
+	     updateRowNames();
+	     count = $('#tableBody tr').length;
+	
+	});
+
+	function updateRowAttributes() {
+	    $('#tableBody tr').each(function (index) {
+	        const row = $(this);
+	
+	        row.find('select').each(function () {
+	            const oldId = $(this).attr('id');
+	            const newId = oldId.replace(/\d+/, index);
+	            $(this).attr('id', newId);
+	        });
+	
+	        row.find('input').each(function () {
+	            const oldId = $(this).attr('id');
+	            const newId = oldId.replace(/\d+/, index);
+	            $(this).attr('id', newId);
+	        });
+	        const divId = 'dropdown-container' + index;
+	        const dropdownContainer = row.find('.dropdown-container');
+	
+	        if (dropdownContainer.length > 0) {
+	            dropdownContainer.attr('id', divId);
+	        }
+	    });
+	}
+
+	function updateRowNames() {
+	    $('#tableBody tr').each(function (index) {
+	        const row = $(this);
+	
+	        row.find('select, input').each(function () {
+	            const oldName = $(this).attr('name');
+	
+	            if (typeof oldName !== 'undefined') {
+	                const newName = oldName.replace(/\[\d+\]/, '[' + index + ']');
+	                $(this).attr('name', newName);
+	            }
+	        });
+	    });
+	}
+
+
+  function validateInputDecimal(event, inputElement) {
+	  var inputValue = inputElement.value;
+	  var isDigitOrDecimal = (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46;
+	  var decimalIndex = inputValue.indexOf('.');
+	  if (decimalIndex !== -1) {
+	    if (event.charCode == 46) {
+	      event.preventDefault();
+	      return false;
+	    }
+	    var decimalPart = inputValue.substr(decimalIndex + 1);
+	  }
+	  return isDigitOrDecimal;
+	}
+
+	function accountNameValidate(index, accountId) {
+		 var accountId = $('#account' + index).val();
+	    $.ajax({
+	        type: "GET",
+	        url: "./validatingAgainstAccountId",
+	        data: {
+	            accountId: accountId
+	        },
+	        success: function(response)  {
+	            var jsonResponse = JSON.parse(response);
+	            
+	            if (jsonResponse.length > 0) {
+	                const { projectApplicable, worksApplicable, costCenterApplicable } = jsonResponse[0];
+	                $('#projectApplicable').text(projectApplicable);
+	                $('#worksApplicable').text(worksApplicable);
+	                $('#costCenterApplicable').text(costCenterApplicable);
+	                
+	                makeFieldsMandatoryByProject(projectApplicable, 'projectDetailsId' + index);
+	                makeFieldsMandatoryByProject(worksApplicable, 'workDetailsId' + index);
+	                makeFieldsMandatoryByProject(costCenterApplicable, 'costCenterId' + index);
+	            } else {
+	                bootbox.alert("No data found for the selected account.");
+	            }
+	        },
+	        error: function(error) {
+	            bootbox.alert("Error occurred while validating the account.");
+	        }
+	    });
+	}
+
+	function makeFieldsMandatoryByProject(isApplicable, fieldIdToMandet) {
+	    const element = document.getElementById(fieldIdToMandet);
+	    if (isApplicable) {
+	        if (!element.classList.contains("require")) {
+	            element.classList.add("require");
+	        }
+	    } else {
+	        if (element.classList.contains("require")) {
+	            element.classList.remove("require");
+	        }
+	    }
+	}
+	
+	   
+	function saveDetails() {
+		debugger
+	    if (validateForm()) {
+	            if (!checkNetReceivableAndTotalCreditAmountSameOrNot()) {
+	                return false;
+	            } else {
+	                var tableOrTbodyIDS = ['tableBody1','tableBody'];
+	        	    var tableOrTbodyKeys = ['instrumentDetails','voucherData'];
+	            	if (encryptFormData('finalSubmit', tableOrTbodyIDS, tableOrTbodyKeys)) {
+		                confirmation('finalSubmit');
+		            }
+	            }
+	        }
+	    }
+	
+	function conformationModal(){
+		 var formDataHtml = '';
+         formDataHtml += '<div class="row"> <div class="col">';
+         formDataHtml += '<div class="lftdata"><strong>Prov. No. :</strong> ' + $("#voucherNoId").val() + '</div>';
+	     formDataHtml += '<div class="rgtdata"><strong>Prov. Date :</strong> ' + $("#voucherDateId").val() + '</div>';
+	    // formDataHtml += '<div class="lftdata"><strong>Division :</strong> ' + $("#officeMasterId option:selected").text() + '</div>';
+	     formDataHtml += '<div class="rgtdata"><strong>Department :</strong> ' + $("#departmentId option:selected").text() + '</div>';
+	     formDataHtml += '<div class="rgtdata"><strong>Section :</strong> ' + $("#sectionId option:selected").text() + '</div>';
+         formDataHtml += '</div> <div class="col">';
+         formDataHtml += '<div ><strong>Mode :</strong> ' + $("#txn-mode option:selected").text() + '</div>';
+         formDataHtml += '</div>';
+         formDataHtml += '</div>';
+         if ($("#txn-mode").val() === 'Bank') {
+           formDataHtml += '<div class="modaltabledata mt-3"> Instrument Details';
+           formDataHtml += '<table class="table table-striped">';
+           formDataHtml += '<thead>';
+           formDataHtml += '<tr>';
+           formDataHtml += '<th scope="col">Instr. Type</th>';
+           formDataHtml += '<th scope="col">Instr. No.</th>';
+           formDataHtml += '<th scope="col">Amount</th>';
+           formDataHtml += '<th scope="col">Instr. Date </th>';
+           formDataHtml += '<th scope="col">Drawn On Bank</th>';
+           formDataHtml += '</tr>';
+           formDataHtml += '</thead>';
+           formDataHtml += '<tbody>';
+
+           var table = $("#tableBody1 tr");
+
+           for (var i = 0; i < table.length; i++) {
+             formDataHtml += '<tr>';
+             formDataHtml += '<td>' + $('#modeType_' + i + ' option:selected').text() + '</td>';
+             formDataHtml += '<td>' + $('#instrumentNumber_' + i).val() + '</td>';
+             formDataHtml += '<td>' + $('#instrumentAmount_' + i).val() + '</td>';
+             formDataHtml += '<td>' + $('#instrumentDate_' + i).val() + '</td>';
+             formDataHtml += '<td>' + $('#drawnBankId_' + i + ' option:selected').text() + '</td>';
+             formDataHtml += '</tr>';
+           }
+           formDataHtml += '</tbody>';
+           formDataHtml += '</table>';
+           formDataHtml += '</div><br><br>';
+         }
+
+
+         formDataHtml += '<div class="modaltabledata mt-3"> Transactional Details';
+         formDataHtml += '<table class="table table-striped">';
+         formDataHtml += '<thead>';
+         formDataHtml += '<tr>';
+         formDataHtml += '<th scope="col">Account Name</th>';
+         formDataHtml += '<th scope="col">Party Name</th>';
+         formDataHtml += '<th scope="col">Project</th>';
+         formDataHtml += '<th scope="col">Works</th>';
+         formDataHtml += '<th scope="col">Debit (Rs.)</th>';
+         formDataHtml += '<th scope="col">Credit (Rs.)</th>';
+         formDataHtml += '</tr>';
+         formDataHtml += '</thead>';
+         formDataHtml += '<tbody>';
+
+         var inputFields = document.getElementsByClassName("tbl_inputO");
+         debugger;
+         for (var i = 0; i < inputFields.length; i++) {
+           formDataHtml += '<tr>';
+           formDataHtml += '<td scope="row"><address>' + $('#account' + i + ' option:selected').text() + '</address></td>';
+           formDataHtml += '<td>' + $('#partyDetails' + i).val() + '</td>';
+
+           // Check and replace --select-- with an empty string for projectId
+           var projectIdText = $('#projectDetailsId' + i + ' option:selected').text();
+           formDataHtml += '<td>' + (projectIdText === '-- Select --' ? '' : projectIdText) + '</td>';
+
+           // Check and replace --select-- with an empty string for workId
+           var workIdText = $('#workDetailsId' + i + ' option:selected').text();
+           formDataHtml += '<td>' + (workIdText === '-Select-' || workIdText === '-- Select --' ? '' : workIdText) + '</td>';
+           
+           var costText = $('#costCenterId' + i + ' option:selected').text();
+           formDataHtml += '<td>' + (costText === '-Select-' || costText === '-- Select --' ? '' : costText) + '</td>';
+
+           formDataHtml += '<td>' + $('#debit' + i).val() + '</td>';
+           formDataHtml += '<td>' + $('#credit' + i).val() + '</td>';
+           formDataHtml += '</tr>';
+         }
+
+         formDataHtml += '<tr>';
+         formDataHtml += '<td scope="row" colspan="4" style="text-align:right">Total Amount (Rs.) :</td>';
+         formDataHtml += '<td>' + $("#totalDebitHidden").val() + '</td>';
+         formDataHtml += '<td>' + $("#totalCreditHidden").val() + '</td>';
+         formDataHtml += '</tr>';
+         formDataHtml += '<td scope="row" colspan="4" style="text-align:right">Net Receivable (Rs.) :</td>';
+         formDataHtml += '<td>' + $("#net-receivable").val() + '</td>';
+         formDataHtml += '<td> </td>';
+         formDataHtml += '</tr>';
+         formDataHtml += '</tbody>';
+         formDataHtml += '</table>';
+         formDataHtml += '</div>';
+         formDataHtml += '<div> Amount in Words: ' + $("#amount-word").text() + '</div><hr>';
+         formDataHtml += '<p>Narration : ' + $("#narration").val() + '</p>';
+         
+		   var headingElement = document.getElementById("amount-word");
+	       var amountInWords = headingElement.textContent;
+		   $("#formDataDisplay").html(formDataHtml);
+		   $('#openModal').modal('show');
+	}
+
+	function confirmSubmitforPre(){
+		var tableOrTbodyIDS = ['tableBody1','tableBody'];
+   	    var tableOrTbodyKeys = ['instrumentDetails','voucherData'];
+		if (encryptFormData('finalSubmit', tableOrTbodyIDS, tableOrTbodyKeys)) {
+	        confirmation('finalSubmit');
+	    }
+	}
+
+	  function getAccountListByTxnMode(txnMode,glid) {
+		    debugger; 
+		    $.ajax({
+		        type: "GET",
+		        url: "./gettingBankOrCashByTaxMode",
+		        data: {
+		            "txnMode": txnMode // Use the parameter here
+		        },
+		        success: function(response) {
+		            debugger; // Remove in production
+		            var html = "<option value=''>- Select -</option>";
+		            try {
+		                var obj = JSON.parse(response);
+		                $.each(obj, function(index, value) {
+		                	  html += '<option value="' + value.accountId + '">' + value.accountCode + '|' + value.accountName + '</option>';
+		                });
+		                $("#gl-id").empty().append(html);
+     	                $("#gl-id").val(glid); // Ensure awcId is defined in the scope
+		            } catch (e) {
+		                console.error("Parsing error:", e);
+		                bootbox.alert("Error parsing response data.");
+		            }
+		        },
+		        error: function(error) {
+		            bootbox.alert("Error found at getting account list.");
+		            console.error("AJAX error:", error);
+		        }
+		    });
+		}
+
+      function calculateNetReceivable() {
+    	  debugger
+        const rows = document.querySelectorAll("#tableBody tr");
+        var totalDebitAmount = 0;
+        var totalCreditAmount = 0;
+        debugger;
+        rows.forEach(function (row, index) {
+          var debitAmount = parseFloat($("#debit" + index).val()) || 0;
+          var creditAmount = parseFloat($("#credit" + index).val()) || 0;
+
+          totalDebitAmount += debitAmount;
+          totalCreditAmount += creditAmount;
+        });
+
+        $("#totalDebitHidden").val(parseFloat(totalDebitAmount).toFixed(2));
+        $("#totalCreditHidden").val(parseFloat(totalCreditAmount).toFixed(2));
+        var net = totalCreditAmount - totalDebitAmount;
+
+        if (net < 0) {
+          bootbox.alert('Net amount cannot be negative.');
+          $("#net-receivable").val(parseFloat(net).toFixed(2));
+        } else {
+          $("#net-receivable").val(parseFloat(net).toFixed(2));
+          var amountInWords = convertAmountToWords(net); // Assuming you have the convertAmountToWords function defined as shown in a previous response
+          var length = amountInWords.length;
+
+          // Add "only" if the length is 10 characters or less
+          if (length > 0) {
+
+            amountInWords = amountInWords;
+
+            $("#amount-word").text(amountInWords);
+          } else {
+            $("#amount-word").text(amountInWords);
+          }
+
+          console.log(amountInWords);
+        }
+      }
+
+      function enableDisableAmount(index) {
+          var debitAmount = $("#debit" + index);
+          var creditAmount = $("#credit" + index);
+
+          // Parse the input values as floats
+          var debitValue = parseFloat(debitAmount.val());
+          var creditValue = parseFloat(creditAmount.val());
+
+          if (debitValue > 0) {
+            creditAmount.val("0.00");
+            creditAmount.prop("disabled", true);
+          } else if (creditValue > 0) {
+            debitAmount.val("0.00");
+            debitAmount.prop("disabled", true);
+          } else {
+            debitAmount.prop("disabled", false);
+            creditAmount.prop("disabled", false);
+          }
+        }
+      
+      function formatAmount(input) {
+          // Remove any non-numeric characters and leading zeros
+          const numericValue = input.value.replace(/[^\d.]/g, '').replace(/^0+/, '');
+
+          // Convert the numeric value to a float (number) or set it to 0 if empty
+          const floatValue = numericValue === '' ? 0 : parseFloat(numericValue);
+
+          // Format the number as a string with two decimal places
+          const formattedValue = floatValue.toFixed(2);
+
+          // Update the input field with the formatted value
+          input.value = formattedValue;
+        }
+
+      function addRows() {
+          var tableBody = document.getElementById('tableBody1');
+          var newIndex = tableBody.children.length; // Get the current number of rows
+          var newRow = document.createElement('tr');
+
+          newRow.innerHTML = '<td>' +
+            ' <select name="instrumentDetails[' + newIndex + '].modeType" class="form-control form-select form-control-sm" id="modeType_' + newIndex + '"  title="Select Mode" required>' +
+            ' <option value="">-- Select --</option>' +
+            ' <c:forEach items="${voucherDto.receiptList}" var="mode">' +
+            ' <option value="${mode.receiptModeId}">${mode.receiptMode}</option> ' +
+            ' </c:forEach>' +
+            ' </select>' +
+            '</td>' +
+            '<td>' +
+            ' <input type="text" name="instrumentDetails[' + newIndex + '].instrumentNumber" id="instrumentNumber_' + newIndex + '" onblur="checkDuplicateInstrumentNumbers()" class="form-control form-control-sm" required>' +
+            '</td>' +
+            '<td>' +
+            ' <input type="text" name="instrumentDetails[' + newIndex + '].amount" id="instrumentAmount_' + newIndex + '" onblur="instTotalAmount();formatAmount(this)" id="instrumentAmount_' + newIndex + '" class="form-control form-control-sm text-end " onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))" placeholder="Amount (Rs.)" required>' +
+            '</td>' +
+            '<td><div class="datepicker_con">' +
+            ' <input class=" form-control form-control-sm require" type="text" name="instrumentDetails[' + newIndex + '].instrumentDate" id="instrumentDate_' + newIndex + '"  readonly/>' +
+            '</div></td>' +
+            '<td>' +
+            ' <select name="instrumentDetails[' + newIndex + '].drawnBankId" id="drawnBankId_' + newIndex + '" class="form-control form-select form-control-sm" required>' +
+            ' <option value="">-- Select --</option>' +
+            ' <c:forEach items="${voucherDto.bankList}" var="bank">' +
+            ' <option value="${bank.bankId}">${bank.bankName}</option> ' +
+            ' </c:forEach>' +
+            ' </select>' +
+            '</td>' +
+            '<td class="sorting_1 text-center">' +
+            ' <div class="btn-group" aria-label="Basic mixed styles example">' +
+            ' <button type="button" class="btn btn-danger btn-sm  deleteRow" ' +
+            ' onclick="removeRow(' + newIndex + ')" ' +
+            ' id="deleteMap_' + newIndex + '">' +
+            ' <i class="fas fa-trash"></i>' +
+            ' </button>' +
+            ' </div>' +
+            '</td>';
+          tableBody.appendChild(newRow);
+
+
+          
+          $('.datepicker_con>input').datepick({
+     		 dateFormat: 'dd/mm/yyyy', 
+              minDate: new Date(1900, 1 - 1, 1), // Set a minimum date far in the past
+               maxDate: new Date(), // Set maxDate to the current date
+              showOnFocus: true,
+     		 showTrigger: '<button type="button" class="trigger">' +
+     		 '<i class="fa fa-calendar"></i></button>',
+     	});
+          
+          toggleRequiredClassBYTxnMode();
+        }
+      
+      function instTotalAmount() {
+          if ($("#txn-mode").val() === 'Bank') {
+            const rows = document.querySelectorAll("#tableBody1 tr");
+            var totalSalary = 0;
+
+            rows.forEach(function (row, index) {
+              const amountField = $("#instrumentAmount_" + index); // Cache the selector
+              var amnt = amountField.val();
+              if (amnt === '') {
+                amnt = 0;
+              }
+              const amount = parseFloat(amnt);
+
+              // Add the salary to the total
+              totalSalary += amount;
+            });
+            $("#total-amount").val(parseFloat(totalSalary).toFixed(2));
+          }
+        }
+
+      
+      function removeRow(index) {
+          var tableBody = document.getElementById('tableBody1');
+          var rows = tableBody.getElementsByTagName('tr');
+
+          if (index > 0 && index < rows.length) {
+            tableBody.removeChild(rows[index]);
+
+            // After removing a row, update the index in the function parameter
+            for (var i = index; i < rows.length; i++) {
+              var inputs = rows[i].querySelectorAll('input, select');
+
+              for (var j = 0; j < inputs.length; j++) {
+                var input = inputs[j];
+                var nameAttribute = input.getAttribute('name');
+                var idAttribute = input.getAttribute('id');
+                var onKeyUpAttribute = input.getAttribute('onkeyup');
+                var onClickAttribute = input.getAttribute('onclick');
+
+                if (nameAttribute) {
+                  var updatedNameAttribute = nameAttribute.replace(/\[\d+\]/g, '[' + i + ']');
+                  input.setAttribute('name', updatedNameAttribute);
+                }
+
+                if (idAttribute) {
+                  var updatedIdAttribute = idAttribute.replace(/\d+/, i);
+                  input.setAttribute('id', updatedIdAttribute);
+                }
+
+                if (onKeyUpAttribute) {
+                  var updatedOnKeyUpAttribute = onKeyUpAttribute.replace(/\(\d+\)/g, '(' + i + ')');
+                  input.setAttribute('onkeyup', updatedOnKeyUpAttribute);
+                }
+
+                if (onClickAttribute) {
+                  var updatedOnClickAttribute = onClickAttribute.replace(/\(\d+\)/g, '(' + i + ')');
+                  input.setAttribute('onclick', updatedOnClickAttribute);
+                }
+              }
+            }
+
+            // Update the onclick attribute for the buttons after reindexing
+            var buttons = document.querySelectorAll('.deleteRow');
+            for (var i = 0; i < buttons.length; i++) {
+              buttons[i].setAttribute('onclick', 'removeRow(' + i + ')');
+            }
+          }
+          else {
+            bootbox.alert('At least one row should be there.');
+          }
+          calculateNetReceivable();
+          instTotalAmount();
+        }
+      
+      function checkNetReceivableAndTotalCreditAmountSameOrNot() {
+          debugger;
+          var netAmount = parseFloat($("#net-receivable").val());
+          var totalAmount = parseFloat($("#total-amount").val());
+          var taxMode = $("#txn-mode").val()
+          
+          if(taxMode == 'Bank'){
+        	  if (isNaN(netAmount) || isNaN(totalAmount)) {
+                  bootbox.alert('Please enter valid numeric values for Net Receivable and Total Amount.');
+                  return false;
+                }
+
+                if (netAmount !== totalAmount) {
+                  bootbox.alert('Net Receivable amount and amount received are not matching. Please check the entries again.');
+                  return false;
+                }
+          }else{
+        	  if (!totalAmount) {
+        		  bootbox.alert('Please enter total amount.');
+                  return false;
+        		}
+        	  if (netAmount !== totalAmount) {
+                  bootbox.alert('Net Receivable amount and amount received are not matching. Please check the entries again.');
+                  return false;
+                }
+          }
+
+          return true;
+        }
+      
+      function checkDuplicateInstrumentNumbers() {
+          // Create a Set to store instrument numbers
+          var instrumentNumbers = new Set();
+
+          // Flag to indicate whether there are duplicate instrument numbers
+          var hasDuplicates = false;
+
+          // Iterate through the table rows
+          $("#tableBody tr").each(function () {
+            // Get the instrument number input field within this row
+            var instrumentNumberInput = $(this).find("input[name^='instrumentDetails']:eq(1)");
+
+            // Get the value of the instrument number input field
+            var instrumentNumber = instrumentNumberInput.val();
+
+            // Check if the instrument number is already in the Set
+            if (instrumentNumbers.has(instrumentNumber)) {
+              // Set the flag to true if a duplicate is found
+              hasDuplicates = true;
+
+              // Optionally, you can add some visual indication to the row with a duplicate
+              $(this).addClass("has-duplicate");
+            } else {
+              // Add the instrument number to the Set
+              instrumentNumbers.add(instrumentNumber);
+            }
+          });
+
+          return !hasDuplicates;
+        }
+      
+      function toggleInstrumentSection() {
+    	    debugger;
+    	    var txnModeSelect = document.getElementById("txn-mode");
+    	    var instrumentSection = document.getElementById("instrument-section");
+    	    if (txnModeSelect.value === "Bank") {
+    	        if (confirmTxnMode()) {
+    	            $("#total-amount").prop("readonly", true);
+    	            instrumentSection.style.display = "block";
+    	           
+    	        } else {
+    	            txnModeSelect.value = "Cash"; // Reset to Cash
+    	            txnModeSelect.options[txnModeSelect.selectedIndex].text = "Cash";
+    	        }
+    	    } else if (txnModeSelect.value === "Cash") {
+    	        if (confirmTxnMode()) {
+    	            $("#total-amount").prop("readonly", false);
+    	            instrumentSection.style.display = "none";
+    	          
+    	        } else {
+    	            txnModeSelect.value = "Bank"; // Reset to Bank
+    	            txnModeSelect.options[txnModeSelect.selectedIndex].text = "Bank";
+    	        }
+    	    }
+    	    toggleRequiredClassBYTxnMode();
+     	    $(txnModeSelect).selectpicker("refresh");
+    	}
+      function confirmTxnMode(){
+    	  debugger
+    	  var result =false;
+    	 
+	        if($("#voucherId").val()==""){
+	        	 var confirmation = confirm("Confirm !!\nAre you sure you want to change the transaction Mode?"); 
+	        	if(confirmation){
+	        		result=true;
+	        	}
+	        	
+	        }
+	        if($("#voucherId").val()!=""){
+	        	result=true;
+	        }
+	        return result;
+    	  
+      }
+      
+
+      
+      function removeTransactionRow(index) {
+          var tableBody = document.getElementById('tableBody');
+          var rows = tableBody.getElementsByTagName('tr');
+
+          if (index > 0 && index < rows.length) {
+            tableBody.removeChild(rows[index]);
+
+            // After removing a row, update the index in the function parameter
+            for (var i = index; i < rows.length; i++) {
+              var inputs = rows[i].querySelectorAll('input, select');
+
+              for (var j = 0; j < inputs.length; j++) {
+                var input = inputs[j];
+                var nameAttribute = input.getAttribute('name');
+                var idAttribute = input.getAttribute('id');
+                var onKeyUpAttribute = input.getAttribute('onkeyup');
+                var onClickAttribute = input.getAttribute('onclick');
+
+                if (nameAttribute) {
+                  var updatedNameAttribute = nameAttribute.replace(/\[\d+\]/g, '[' + i + ']');
+                  input.setAttribute('name', updatedNameAttribute);
+                }
+
+                if (idAttribute) {
+                  var updatedIdAttribute = idAttribute.replace(/\d+/, i);
+                  input.setAttribute('id', updatedIdAttribute);
+                }
+
+                if (onKeyUpAttribute) {
+                  var updatedOnKeyUpAttribute = onKeyUpAttribute.replace(/\(\d+\)/g, '(' + i + ')');
+                  input.setAttribute('onkeyup', updatedOnKeyUpAttribute);
+                }
+
+                if (onClickAttribute) {
+                  var updatedOnClickAttribute = onClickAttribute.replace(/\(\d+\)/g, '(' + i + ')');
+                  input.setAttribute('onclick', updatedOnClickAttribute);
+                }
+              }
+            }
+
+            var buttons = document.querySelectorAll('.deleteTransactionRow');
+            for (var i = 0; i < buttons.length; i++) {
+              buttons[i].setAttribute('onclick', 'removeTransactionRow(' + i + ')');
+            }
+          }
+          else {
+            bootbox.alert('At least one row should be there.');
+          }
+
+          calculateNetReceivable();
+          instTotalAmount();
+        }
+      
+      function viewDocument(imageName,voucherTypeName) {
+	        $("#module").val(voucherTypeName);
+	        $("#filename").val(imageName);
+
+	        if (encryptFormData('formDownLoad', tableOrTbodyIDS, tableOrTbodyKeys)) {
+	            $('#formDownLoad').submit();
+	        }
+	}
+      
+  /*     function showHideInstrument() {
+  	    var txnMode = $('#txnModeId').val();
+
+  	    if (txnMode === 'Cash') {
+  	        $('#instrument-section').hide();
+  	        toggleRequiredClass('#instrumentTypeId', false);
+  	        toggleRequiredClass('#instrumentNoId', false);
+  	        toggleRequiredClass('#instrumentDateId', false);
+  	    } else if (txnMode === 'Bank') {
+  	        $('#instrument-section').show();
+  	        toggleRequiredClass('#instrumentTypeId', true);
+  	        toggleRequiredClass('#instrumentNoId', true);
+  	        toggleRequiredClass('#instrumentDateId', true);
+  	    } else {
+  	        $('#instrument-section').hide();
+  	        toggleRequiredClass('#instrumentTypeId', false);
+  	        toggleRequiredClass('#instrumentNoId', false);
+  	        toggleRequiredClass('#instrumentDateId', false);
+  	    }
+  	} */
+   
+
+  	function toggleRequiredClassBYTxnMode() {
+  		debugger
+  	    const txnMode = document.getElementById('txn-mode').value;
+  		
+  		const rows = document.querySelectorAll("#tableBody1 tr");
+  		const totalSize =rows.length;
+  	    const instrumentRows = document.querySelectorAll('#tableBody1 input, #tableBody1 select');
+
+  	  
+  	    for(var i=0 ; i<totalSize;i++ ){
+  	    	if(txnMode=='Bank'){
+  	    		
+  	    		toggleRequiredClass('#modeType_'+i, true)
+  	    		toggleRequiredClass('#instrumentNumber_'+i, true)
+  	    		toggleRequiredClass('#instrumentAmount_'+i, true)
+  	    		toggleRequiredClass('#instrumentDate_'+i, true)
+  	    		toggleRequiredClass('#drawnBankId_'+i, true)
+  	    	}
+  	    	else{
+  	    		toggleRequiredClass('#modeType_'+i, false)
+  	    		toggleRequiredClass('#instrumentNumber_'+i, false)
+  	    		toggleRequiredClass('#instrumentAmount_'+i, false)
+  	    		toggleRequiredClass('#instrumentDate_'+i, false)
+  	    		toggleRequiredClass('#drawnBankId_'+i, false)
+  	  		  
+  	  	  }
+  	    }
+  	  
+  	}
+  	
+  	 function toggleRequiredClass(field, shouldAddRequired) {
+  	     if (shouldAddRequired) {
+  	         $(field).addClass('require');
+  	     } else {
+  	         $(field).removeClass('require');
+  	     }
+  	 }
+
+  	 
+  	 
+  	function getProjectsByEntity(){
+		var inputFields = document.getElementsByClassName("tbl_inputO");
+		 var receiptVoucherDtls = '${empty receiptVoucherDtls}';
+		 
+		 if(receiptVoucherDtls=='true'){
+	    for (var i = 0; i < inputFields.length; i++) {
+	    	var selectedProjId=0;
+			 entityIdLevelCombo=$("#upperEntityId").val();
+			 featchProjectListByEntity(entityIdLevelCombo,selectedProjId,"projectDetailsId"+i);
+			}
+			
+	    }
+		 else{
+			 for (var i = 0; i < inputFields.length; i++) {
+			    entityIdLevelCombo="${currentCombineIdAndValue}";
+				var selectedProjId=$("#hdnprojectDetailsId"+i).val();
+				featchProjectListByEntity(entityIdLevelCombo,selectedProjId,"projectDetailsId"+i);
+			 }
+		 }
+		
+	}
+</script>
+
+
+	

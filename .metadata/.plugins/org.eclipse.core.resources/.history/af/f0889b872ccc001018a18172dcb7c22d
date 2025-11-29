@@ -1,0 +1,703 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<form action="${contextPath}/building/planning/save" id="planningForm" method="post" class="">
+	
+	<input type="hidden" id="cipherText1" name="cipherText1" value="">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	<input type="hidden" id="planningTabId" name="planningTabId" value="1" />
+  	<input type="hidden" id="planningId" name="planningId" value="${building.planningDTO.planningId}" />
+  	<input type="hidden" id="buildingIdTab1" name="buildingIdTab1" value="${building.buildingDTO.buildingId}" />
+  	<input type="hidden" id="currentStatus1" name="currentStatus1" value="${building.planningDTO.planningId ne null ? building.buildingDTO.currentStatus : 'Planning'}" />
+	
+	<!-- ======== Location Section ======== -->
+	<div class="card mb-3">
+		<div class="form-section-header">
+             <span>Agreement Details</span>
+        </div>
+		<div class="card-body">
+
+			<div class="row">
+			
+				 <%-- Financial Year --%>
+                 <div class="col-md-3 ml-auto">
+                     <div class="form-group">
+                         <label class="smallInput required" for="financialYearId">Financial Year :</label>
+                         <select class="form-control form-control-sm form-select" id="financialYearId" name="financialYearId">
+                             <option value="0" selected disabled>- Select -</option>
+                             <c:forEach items="${financialYearList}" var="fy">
+                                 <option value="${fy.financialYearId}" ${fy.financialYearId eq building.planningDTO.financialYearId ? 'selected' : ''}>
+                                     ${fy.financialYear}
+                                 </option>
+                             </c:forEach>
+                         </select>
+                     </div>
+                 </div>
+                        
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-12 required" for="districtId">District Name :</label>
+						<div class="col-md-12">
+							<select class="form-control form-control-sm form-select"
+								id="districtId" name="districtId" required
+								onchange="LoadBlockByDistrict(this.value)">
+								<option value="" selected disabled>- Select -</option>
+								<c:forEach var="district" items="${districtList}">
+									<option value="${district.districtId}"
+										${district.districtId eq building.planningDTO.districtId ? 'selected' : ''}>
+										${district.districtName}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<!-- ======== Area Type ======== -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-12 required" for="areaType">Area Type :</label>
+						<div class="col-md-12">
+							<select id="areaType" name="areaType"
+								class="form-control form-control-sm form-select" required
+								onchange="toggleAreaType(this.value)">
+								<option value="" selected disabled>- Select -</option>
+								<option value="RURAL"
+									${building.planningDTO.areaType eq 'RURAL' ? 'selected' : ''}>Rural</option>
+								<option value="URBAN"
+									${building.planningDTO.areaType eq 'URBAN' ? 'selected' : ''}>Urban</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<!-- ======== Rural Section ======== -->
+				<div class="col-md-3 ruralSection" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required" for="blockId">Block Name :</label>
+						<div class="col-md-12">
+							<select id="blockId" name="blockId"
+								class="form-control form-control-sm form-select"
+								onchange="LoadGrampanchayatByBlock(this.value)">
+								<option value="" selected disabled>- Select -</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3 ruralSection" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required" for="gpId">Gram Panchayat :</label>
+						<div class="col-md-12">
+							<select id="gpId" name="gpId"
+								class="form-control form-control-sm form-select"
+								onchange="LoadVillageByGrampanchayat(this.value)">
+								<option value="" selected disabled>- Select -</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3 ruralSection" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required" for="villageId">Village Name :</label>
+						<div class="col-md-12">
+							<select id="villageId" name="villageId"
+								class="form-control form-control-sm form-select" onchange="fetchRuralLocationCode()">
+								<option value="" selected disabled>- Select -</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<!-- ======== Urban Section ======== -->
+				<div class="col-md-3 urbanSection" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required" for="municipalityId">Municipality Name :</label>
+						<div class="col-md-12">
+							<select id="municipalityId" name="municipalityId"
+								class="form-control form-control-sm form-select"
+								onchange="LoadWardByMunicipality(this.value)">
+								<option value="" selected disabled>- Select -</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3 urbanSection" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required" for="wardId">Ward Name :</label>
+						<div class="col-md-12">
+							<select id="wardId" name="wardId"
+								class="form-control form-control-sm form-select">
+								<option value="" selected disabled>- Select -</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<!-- ======== Building Type ======== -->
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-12 required">Building Type :</label>
+						<div class="col-md-12">
+							<select
+								class="form-control form-control-sm form-select building-type-select"
+								id ="buildingType" name="buildingType" required
+								onchange="handleBuildingTypeChange($(this).val())">
+								<option value="" selected disabled>- Select -</option>
+								<c:forEach var="type" items="${buildingTypeList}">
+									<option value="${type.valueEn}"
+										${type.valueEn eq building.planningDTO.buildingType ? 'selected' : ''}>
+										${type.valueEn}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<!-- ======== Residential Sub Category ======== -->
+				<div class="col-md-3 sub-category-section" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required">Sub Category :</label>
+						<div class="col-md-12">
+							<select
+								class="form-control form-control-sm form-select sub-category-select"
+								id="subCategory" name="subCategory" onchange="handlesSubCategoryChange($(this).val())">
+								<option value="" selected disabled>- Select -</option>
+								<c:forEach var="subCat" items="${residentialSubCategoryList}">
+									<option value="${subCat.valueEn}"
+										${subCat.valueEn eq building.planningDTO.subCategory ? 'selected' : ''}>
+										${subCat.valueEn}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<!-- ======== School Category ======== -->
+				<div class="col-md-3 school-category-section" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required">School Category :</label>
+						<div class="col-md-12">
+							<select
+								class="form-control form-control-sm form-select school-category-select"
+								id="schoolCategory" name="schoolCategory" onchange="handleClassRangeChange($(this).val())">
+								<option value="" selected disabled>- Select -</option>
+								<c:forEach var="schoolCat" items="${schoolCategoryList}">
+									<option value="${schoolCat.valueEn}"
+										${schoolCat.valueEn eq building.planningDTO.schoolCategory ? 'selected' : ''}>
+										${schoolCat.valueEn}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+				
+				<!-- ======== Class Range ======== -->
+				<div class="col-md-3 class-range-section" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required">Class Range :</label>
+						<div class="col-md-12">
+							<select
+								class="form-control form-control-sm form-select class-range-select"
+								id="classRange" name="classRange">
+								<option value="" selected disabled>- Select -</option>
+								<c:forEach var="range" items="${classRangeList}">
+									<option value="${range.valueEn}"
+										${range.valueEn eq building.planningDTO.classRange ? 'selected' : ''}>
+										${range.valueEn}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+				
+				<!-- ======== Staff Category ======== -->
+				<div class="col-md-3 staff-type-section" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required"> Staff Type :</label>
+						<div class="col-md-12">
+							<select
+								class="form-control form-control-sm form-select staff-type-select"
+								id="staffType" name="staffType">
+								<option value="" selected disabled>- Select -</option>
+								<c:forEach var="staff" items="${staffTypeList}">
+									<option value="${staff.valueEn}"
+										${staff.valueEn eq building.planningDTO.staffType ? 'selected' : ''}>
+										${staff.valueEn}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<!-- ======== Hostel Fields (Visible when STANDALONE HOSTEL selected) ======== -->
+				<div class="col-md-3 hostel-section" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required">Hostel Type :</label>
+						<div class="col-md-12">
+							<select
+								class="form-control form-control-sm form-select hostel-type-select"
+								id="hostelType" name="hostelType">
+								<option value="" selected disabled>- Select -</option>
+								<c:forEach var="hostelType" items="${hostelTypeList}">
+									<option value="${hostelType.valueEn}"
+										${hostelType.valueEn eq building.planningDTO.hostelType ? 'selected' : ''}>
+										${hostelType.valueEn}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3 hostel-section" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required">Hostel Capacity :</label>
+						<div class="col-md-12">
+							<select
+								class="form-control form-control-sm form-select hostel-capacity-select"
+								id="hostelCapacity" name="hostelCapacity">
+								<option value="" selected disabled>- Select -</option>
+								<c:forEach var="hostelCapacity" items="${hostelCapacityList}">
+									<option value="${hostelCapacity.valueEn}"
+										${hostelCapacity.valueEn eq building.planningDTO.hostelCapacity ? 'selected' : ''}>
+										${hostelCapacity.valueEn}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3 hostel-section" style="display: none;">
+					<div class="form-group">
+						<label class="col-md-12 required">Hostel Category :</label>
+						<div class="col-md-12">
+							<select
+								class="form-control form-control-sm form-select hostel-category-select"
+								id="hostelCategory" name="hostelCategory">
+								<option value="" selected disabled>- Select -</option>
+								<c:forEach var="hostelCategory" items="${hostelCategoryList}">
+									<option value="${hostelCategory.valueEn}"
+										${hostelCategory.valueEn eq building.planningDTO.hostelCategory ? 'selected' : ''}>
+										${hostelCategory.valueEn}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required" for="buildingName">Building Name</label> <input
+							type="text" id="buildingName" name="buildingName"
+							class="form-control form-control-sm"
+							value="${building.planningDTO.buildingName}" required maxlength="60" />
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required" for="udiseCode">UDISE Code</label> <input
+							type="text" id="udiseCode" name="udiseCode"
+							class="form-control form-control-sm"
+							value="${building.planningDTO.udiseCode}" required maxlength=12/>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required" for="locationCode">Location Code</label> 
+						<input type="text" id="locationCode" name="locationCode"
+							class="form-control form-control-sm"
+							value="${building.planningDTO.locationCode}" readonly/>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="required" for="buildingCode">Building Code</label> <input
+							type="text" id="buildingCode" name="buildingCode"
+							class="form-control form-control-sm"
+							value="${building.planningDTO.buildingCode}" readonly />
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+
+	<!-- ======== Action Buttons ======== -->
+	 <div class="text-end mt-3">
+          <button type="button" class="btn btn-submit btn-sm" onclick="submitPlanningForm()">
+	        <i class="fa fa-save me-1"></i> Save And Next
+	      </button>
+    </div>
+</form>
+
+<script>
+
+	function toggleAreaType(type) {
+		const districtId = $('#districtId').val();
+
+		// Always hide both before showing relevant section
+		$('.ruralSection, .urbanSection').hide();
+
+		// Validation: ensure district is selected
+		if (!districtId) {
+			bootbox.alert('Please select a District first.');
+			$('#areaType').val(''); // reset area type
+			return;
+		}
+
+		// Logic for each type
+		if (type === 'RURAL') {
+			$('.ruralSection').slideDown();
+			LoadBlockByDistrict(districtId); // existing backend call
+		} else if (type === 'URBAN') {
+			$('.urbanSection').slideDown();
+			LoadMunicipalityByDistrict(districtId); // existing backend call
+		}
+	}
+
+	// for building type select
+	function handleBuildingTypeChange(selectedType, shouldReset = true) {
+		
+	    if (shouldReset) {
+	        // Hide and reset all dependent form sections
+	        $(".sub-category-section, .school-category-section,.class-range-section, .hostel-section, .staff-type-section")
+	            .hide() // Hide all dependent sections
+	            .find("input, select, textarea") // Find all form elements inside
+	            .each(function() {
+	                var field = $(this);
+	
+	                if (field.is(":checkbox") || field.is(":radio")) {
+	                    field.prop("checked", false); // Uncheck all checkboxes and radios
+	                } else if (field.is("select")) {
+	                    field.prop("selectedIndex", 0); // Reset dropdown to default option
+	                } else {
+	                    field.val(""); // Clear text, number, file, and textarea fields
+	                }
+	            });
+	    }
+
+		if (selectedType === "RESIDENTIAL COMPLEX") {
+			$(".sub-category-section").slideDown();
+		} else if (selectedType === "STANDALONE SCHOOL") {
+			$(".school-category-section").slideDown();
+		} else if (selectedType === "STANDALONE HOSTEL") {
+			$(".hostel-section").slideDown();
+		}
+	}
+	
+	// for sub category select
+	function handlesSubCategoryChange(selectedType, shouldReset = true) {
+		// Hide all conditional fields first
+	    if (shouldReset) {
+	        // Hide and reset all dependent form sections
+	        $(".school-category-section,.class-range-section, .hostel-section, .staff-type-section")
+	            .hide() // Hide all dependent sections
+	            .find("input, select, textarea") // Find all form elements inside
+	            .each(function() {
+	                var field = $(this);
+	
+	                if (field.is(":checkbox") || field.is(":radio")) {
+	                    field.prop("checked", false); // Uncheck all checkboxes and radios
+	                } else if (field.is("select")) {
+	                    field.prop("selectedIndex", 0); // Reset dropdown to default option
+	                } else {
+	                    field.val(""); // Clear text, number, file, and textarea fields
+	                }
+	            });
+    		}
+		
+		if (selectedType === "SCHOOL") {
+			$(".school-category-section").slideDown();
+		} else if (selectedType === "HOSTEL") {
+			$(".hostel-section").slideDown();
+		} else if (selectedType === "STAFF QUARTER") {
+			$(".staff-type-section").slideDown();
+		}
+	}
+	
+	function handleClassRangeChange(selectedType){
+		if (selectedType === "HIGH SCHOOL") {
+			$(".class-range-section").slideDown();
+		} 
+	}
+
+	// Auto show based on edit mode / preselected value
+	$(document).ready(function() {
+
+		// Initially hide all dependent sections
+		$('.ruralSection, .urbanSection').hide();
+
+		// If editing existing data (pre-selected areaType), handle it on load
+		const preSelectedType = $('#areaType').val();
+		if (preSelectedType) {
+			toggleAreaType(preSelectedType);
+		}
+
+		const selectedBuildingType = $("#buildingType").val();
+		handleBuildingTypeChange(selectedBuildingType, false);
+		
+		const selectedSubCategoryType = $("#subCategory").val();
+		handlesSubCategoryChange(selectedSubCategoryType, false);
+		
+		const selectedClassRange = $("#schoolCategory").val();
+		handleClassRangeChange(selectedClassRange);
+		
+		//for edit page
+		// Collect JSP data in one place
+	    const geo = {
+	    	areaType: '${building.planningDTO.areaType}',
+	        districtId: '${building.planningDTO.districtId}',
+	        blockId: '${building.planningDTO.blockId}',
+	        gpId: '${building.planningDTO.gpId}',
+	        villageId: '${building.planningDTO.villageId}',
+	        wardId: '${building.planningDTO.wardId}',
+	        municipalityId: '${building.planningDTO.municipalityId}'
+	    };
+	
+	    // COMMUNITY HALL geo FLOW
+	    if (geo.areaType === "RURAL") {
+	    	const districtId = $("#districtId").val();
+	
+	        if (districtId && districtId !== "") {
+	            LoadBlockByDistrict(geo.districtId);
+	            setTimeout(function () {
+	                $('#blockId').val(geo.blockId);
+	                LoadGrampanchayatByBlock(geo.blockId);
+	                setTimeout(function () {
+	                    $('#gpId').val(geo.gpId);
+	                    LoadVillageByGrampanchayat(geo.gpId);
+	                    setTimeout(function () {
+	                        $('#villageId').val(geo.villageId);
+	                    }, 500);
+	                }, 500);
+	            }, 500);
+	        }
+	    } else {
+	        const districtId = $("#districtId").val();
+	
+	        if (districtId && districtId !== "") {
+	        	LoadMunicipalityByDistrict(geo.districtId);
+	            setTimeout(function () {
+	                $('#municipalityId').val(geo.municipalityId);
+	                LoadWardByMunicipality(geo.municipalityId);
+	                setTimeout(function () {
+	                    $('#wardId').val(geo.wardId);
+	                }, 500);
+	            }, 500);
+	        }
+	    }
+	    
+	});
+
+	function submitFormData() {
+		
+		var financialYearId = $('#financialYearId').val();
+		var districtId = $("#districtId").val();
+		var areaType = $("#areaType").val();
+		var buildingType = $("#buildingType").val();
+		var subCategory = $("#subCategory").val();
+		var schoolCategory = $("#schoolCategory").val();
+		var classRange = $("#classRange").val();
+		var hostelType = $("#hostelType").val();
+		var hostelCapacity = $("#hostelCapacity").val();
+		var hostelCategory = $("#hostelCategory").val();
+		var staffType = $("#staffType").val();
+		var buildingName = $("#buildingName").val();
+		var udiseCode = $("#udiseCode").val();
+		var locationCode = $("#locationCode").val();
+		var buildingCode = $("#buildingCode").val();
+
+		// === BASIC FIELDS ===
+		if (financialYearId == "" || financialYearId == "0" || financialYearId == null) {
+	        bootbox.alert("Please select Financial Year.");
+	        return false;
+	    }
+		if (!districtId || districtId.trim() === "") {
+			bootbox.alert("Please select District Name");
+			return false;
+		} else if (!areaType || areaType.trim() === "") {
+			bootbox.alert("Please select Area Type");
+			return false;
+		}
+
+		// === AREA TYPE–BASED VALIDATION ===
+		if (areaType === "RURAL") {
+			var blockId = $("#blockId").val();
+			var gpId = $("#gpId").val();
+			var villageId = $("#villageId").val();
+
+			if (!blockId || blockId.trim() === "") {
+				bootbox.alert("Please select Block Name");
+				return false;
+			} else if (!gpId || gpId.trim() === "") {
+				bootbox.alert("Please select Gram Panchayat Name");
+				return false;
+			} else if (!villageId || villageId.trim() === "") {
+				bootbox.alert("Please select Village Name");
+				return false;
+			}
+		} else if (areaType === "URBAN") {
+			var municipalityId = $("#municipalityId").val();
+			var wardId = $("#wardId").val();
+
+			if (!municipalityId || municipalityId.trim() === "") {
+				bootbox.alert("Please select Municipality Name");
+				return false;
+			} else if (!wardId || wardId.trim() === "") {
+				bootbox.alert("Please select Ward Name");
+				return false;
+			}
+		}
+
+		// === BUILDING TYPE VALIDATION ===
+		if (!buildingType || buildingType.trim() === "") {
+			bootbox.alert("Please select Building Type");
+			return false;
+		}
+
+		if (buildingType === "RESIDENTIAL COMPLEX") {
+			if (!subCategory || subCategory.trim() === "") {
+				bootbox.alert("Please select Sub Category");
+				return false;
+			} else if(subCategory === "SCHOOL"){
+				if (!schoolCategory || schoolCategory.trim() === "") {
+					bootbox.alert("Please select School Category");
+					return false;
+				} else if(schoolCategory === "HIGH SCHOOL"){
+					if(!classRange || classRange.trim() === ""){
+						bootbox.alert("Please select Class Range");
+						return false;
+					}
+				}
+			} else if(subCategory === "HOSTEL"){
+				if (!hostelType || hostelType.trim() === "") {
+					bootbox.alert("Please select Hostel Type");
+					return false;
+				} else if (!hostelCapacity || hostelCapacity.trim() === "") {
+					bootbox.alert("Please select Hostel Capacity");
+					return false;
+				} else if (!hostelCategory || hostelCategory.trim() === "") {
+					bootbox.alert("Please select Hostel Category");
+					return false;
+				}
+			} else if(subCategory === "STAFF QUARTER"){
+				if (!staffType || staffType.trim() === "") {
+					bootbox.alert("Please select Staff Type");
+					return false;
+				}
+			}
+		}
+
+		if (buildingType === "STANDALONE SCHOOL") {
+			if (!schoolCategory || schoolCategory.trim() === "") {
+				bootbox.alert("Please select School Category");
+				return false;
+			} else if(schoolCategory === "HIGH SCHOOL"){
+				if(!classRange || classRange.trim() === ""){
+					bootbox.alert("Please select Class Range");
+					return false;
+				}
+			}
+		}
+
+		if (buildingType === "STANDALONE HOSTEL") {
+			if (!hostelType || hostelType.trim() === "") {
+				bootbox.alert("Please select Hostel Type");
+				return false;
+			} else if (!hostelCapacity || hostelCapacity.trim() === "") {
+				bootbox.alert("Please select Hostel Capacity");
+				return false;
+			} else if (!hostelCategory || hostelCategory.trim() === "") {
+				bootbox.alert("Please select Hostel Category");
+				return false;
+			}
+		}
+
+		// === COMMON BUILDING DETAILS ===
+		if (!buildingName || buildingName.trim() === "") {
+			bootbox.alert("Please enter Building Name");
+			return false;
+		} else if (!udiseCode || udiseCode.trim() === "") {
+			bootbox.alert("Please enter UDISE Code");
+			return false;
+		} else if (!buildingCode || buildingCode.trim() === "") {
+			bootbox.alert("Please enter Building Code");
+			return false;
+		} else if (!locationCode || locationCode.trim() === "") {
+			bootbox.alert("Please enter Location Code");
+			return false;
+		}
+
+		// === IF EVERYTHING IS VALID ===
+		return true;
+	}
+
+	function submitPlanningForm() {
+		if (!submitFormData())
+			return;
+		
+		var planningId = $("#planningId").val();
+		var buildingName = $("#buildingName").val();
+		var udiseCode = $("#udiseCode").val();
+		
+		if(buildingName.trim() !== "" && udiseCode.trim() !== "")  {
+	 		
+	    	$.ajax({
+		        type : "GET",
+		        url : "${contextPath}/building/validate-building-name",
+		        data: {
+		        	buildingName: buildingName,
+		        	planningId: planningId
+		        },
+		        success: function (isDuplicate) {
+	                if (isDuplicate === true) {
+	                	bootbox.alert('Building name already exists please provide another building name .');
+	                    $('#buildingName').val('').focus(); 
+	                    return false;
+	                }else{
+	                	$.ajax({
+	        		        type : "GET",
+	        		        url : "${contextPath}/building/validate-uidsce-code",
+	        		        data: {
+	        		        	udiseCode: udiseCode,
+	        		        	planningId: planningId
+	        		        },
+	        		        success: function (isDuplicate) {
+	        	                if (isDuplicate === true) {
+	        	                	bootbox.alert('UDISE Code already exists please provide another UDISE code .');
+	        	                    $('#udiseCode').val('').focus(); 
+	        	                    return false;
+	        	                }else{
+	        	                	//submit form
+	        	                	submitForm();
+	        	                }
+	        	            },
+	        		        error : function(error) {
+	        		        	bootbox.alert('Failed to validate UDISE Code please try after some times .');
+	        		        }
+	        		    });
+	                }
+	            },
+		        error : function(error) {
+		        	bootbox.alert('Failed to validate building name please try after some times .');
+		        }
+		    });	
+	    }
+	}
+	
+	function submitForm(){
+		var bizContent1 = $("#planningForm").serializeArray();
+		$("#cipherText1").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent1))));
+		bootbox.confirm("Do You Want To Continue?", function(result) {
+			if (result) {
+				showLoader();
+				$("#planningForm").submit();
+			}
+		});
+	}
+
+</script>

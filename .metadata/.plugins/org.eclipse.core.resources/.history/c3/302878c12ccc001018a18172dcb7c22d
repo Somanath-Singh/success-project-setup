@@ -1,0 +1,617 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet"
+	href="${contextPath}/assets/js/plugin/jquery_autocomplete/jquery.autocomplete.css" />
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+<script src="${contextPath}/assets/appJs/validation/invoice.js"></script>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	margin: 20px;
+}
+
+.product-list {
+	margin-bottom: 20px;
+}
+
+.form-control {
+	margin-right: 10px;
+	margin-bottom: 10px;
+}
+
+.btn-add-product {
+	margin-top: 10px;
+	padding: 10px 20px;
+	background-color: #007bff;
+	color: #fff;
+	border: none;
+	cursor: pointer;
+}
+
+.btn-add-product:hover {
+	background-color: #0056b3;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+}
+
+th, td {
+	border: 1px solid #ddd;
+	padding: 8px;
+}
+
+th {
+	background-color: #1c985f;
+	text-align: left;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f5f5f5;
+	margin: 0;
+	padding: 0;
+}
+
+.container {
+	max-width: 800px;
+	margin: 50px auto;
+	background: #fff;
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+header {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+h1 {
+	font-size: 24px;
+	margin: 0;
+}
+
+.form-group {
+	margin-bottom: 15px;
+}
+
+label {
+	display: block;
+	margin-bottom: 5px;
+}
+
+input[type="text"], input[type="date"], select {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+
+.product-list {
+	margin: 20px 0;
+}
+
+.product-item {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.product-item input {
+	flex: 1;
+}
+
+.totals {
+	background: #f9f9f9;
+	padding: 10px;
+	margin: 20px 0;
+}
+.error-border {
+	border: 2px solid red !important;
+}
+
+.total-item {
+	display: flex;
+	justify-content: space-between;
+	padding: 5px 0;
+}
+
+button[type="button"] {
+	background: #007bff;
+	color: #fff;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+button[type="submit"] {
+	background: #28a745;
+	color: #fff;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+	display: block;
+	width: 100%;
+	margin-top: 20px;
+}
+
+button:hover {
+	opacity: 0.9;
+}
+
+.remove-btn {
+    background-color: #dc3545 !important; 
+    border-color: #dc3545 !important; 
+    color: white !important; 
+}
+
+.remove-btn:hover {
+    background-color: #c82333; /* Darker red on hover */
+    border-color: #bd2130; /* Darker border on hover */
+}
+
+</style>
+
+<script>
+	$(function()
+	{
+		$('#datatable-default').dataTable({
+			"bSort": false,
+			"autoWidth": false
+		});
+	})
+</script>
+
+<div class="container-fluid">
+<!-- Start::row-1 -->
+<div class="row">
+	<div class="col-xl-12">
+		<div class="card custom-card">
+			<div class="top-left"></div>
+			<div class="top-right"></div>
+			<div class="bottom-left"></div>
+			<div class="bottom-right"></div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-md-12">
+						<section class="panel">
+							<header class="panel-heading">
+								<div>
+									<div id="c" tabindex="1"></div>
+								</div>
+								<h4 class="panel-title">
+									<span>Delivery Milestone</span>
+								</h4>
+								<!-- <jsp:include page="/WEB-INF/views/message.jsp" /> -->
+							</header>
+						<div class="panel-body" id="partyDtlsInRequest">
+							<div class="col-md-12">
+								<form class="form-horizontal form-bordered" id="milestoneForm" 
+									action="${contextPath}/deliveryMilestone/manage" method="post" >
+
+                                      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                      <input type="hidden" id="paymentId" name="paymentId" value="" />
+
+										<div class="row">
+											<div class="col-md-5">
+												<label class="col-md-12 required" for="inputDefault"><spring:message
+														code="LABEL.ACCOUNTS.INVOICE.PARTY.CODENAME" /></label>
+												<div class="col-md-12">
+													<input type="text" class="form-control"
+														name="billingFromPartyName" id="billingFromPartyName" value=""
+														value=""> <input type="hidden"
+														name="partyId" id="partyId" value="${invoiceMaster.fromParty1.partyId}">
+												</div>
+											</div>
+
+											<div class="col-md-2">
+												<div class="form-group">
+													<label for="invoice-id">Project</label> 
+													<select class="form-select required" name="projectId" id="projectId" data-plugin-selectTwo 
+										        		onchange="fetchPhaseDetailsByProjectId(this.value)">
+														<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-2">
+												<div class="form-group">
+													<label for="invoice-id">Project Base Value</label> 
+													<input type="text" class="form-control text-end amount-field"
+														name="baseAmount" id="baseAmount" value="" readonly>
+												</div>
+											</div>
+											<div class="col-md-2">
+												<div class="form-group">
+													<label for="invoice-id">Order Date (MM-DD-YYYY)</label> 
+													<input type="text" class="form-control text-end"
+														name="orderDate" id="orderDate" value="" readonly>
+												</div>
+											</div>
+
+											<div class="row">
+                                     			<h6 class="panel-title"><span>Delivery Details</span></h6>
+                                     		</div>
+										</div>
+
+										<div class="table-responsive">
+											<table id="product-table Data-table" >
+												<thead>
+													<tr>
+														<th width="80px">Sl No.</th>
+														<th width="400px">Phase Name</th>
+														<th>Estimation Type</th>
+														<th>Time</th>
+														<th>Expected Date</th>													
+													</tr>
+												</thead>
+                                                <tbody id="milestone-tbl-body">
+																								
+												</tbody>
+											</table>
+										</div>
+											
+								</form>
+							</div>
+								<div class="row">
+									<div class="col-sm-12" style="margin-top: 10px;">
+										<div class="form-group text-center">
+											<input type="button" class="btn btn-success"
+												onclick="formSubmit()" value="SAVE" />
+												<a href="${contextPath}/deliveryMilestone/add">
+													<input type="button" class="btn btn-danger" value="Reset">
+												</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</section>
+					</div>
+				<hr>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<script>
+var url='${contextPath}';
+
+// if(validateForm()){
+// 		if(encryptFormData('budgetFrm', tableOrTbodyIDS, tableOrTbodyKeys)){
+// 		confirmation('budgetFrm');
+// 	}
+// }
+
+
+$(document).ready(function() {
+
+	// amount format initializing when page loads for first 
+	$('.amount-format').on('blur', function () {
+        let value = parseFloat($(this).val());
+        if (!isNaN(value)) {
+            // Format the value to two decimal places
+            $(this).val(value.toFixed(2));
+        } else {
+            // If the input is not a valid number, clear the field
+            $(this).val('');
+        }
+    });
+
+
+	$("input[name^='billingFromPartyName']").autocomplete({
+	    serviceUrl: '${contextPath}/projectMilestone/findPartyDetailByPartyType',
+	    paramName: "clientcode",
+	    delimiter: ",",
+	    width: '150px',
+	    transformResult: function(response) {
+	        return {
+	            suggestions: $.map($.parseJSON(response), function(item) {
+	                return {
+	                    value: item.clientcode,
+	                    data: item.clientid
+	                };
+	            })
+	        };
+	    },
+	    onSelect: function (suggestion) {
+	        var selectedRow = parseInt(this.parentNode.parentNode.rowIndex) - 1;
+	        document.getElementById("partyId").value = suggestion.data;
+			console.log(suggestion.data);
+
+			// fetch invoice details by party 
+			fetchProjectListByClientId(suggestion.data);
+	    }
+	});
+});
+
+
+//  AJAX call to fetch project list by party id
+function fetchProjectListByClientId(partyId) {
+	debugger;
+    $.ajax({
+        url: url+ '/common/api/projectByParty',
+        type: 'GET',
+        data: { partyId: partyId },
+        success: function(response) {
+			debugger;
+
+			// empty table
+			$('#projectId').empty();
+			var htm = '<option value="0">--select--</option>';
+            if (response.outcome) {
+				 // Iterate directly over response.data (if it's already an array)
+				 response.result.forEach((project) => {
+						htm += '<option value="' + project.projectId + '">' + project.projectName + '</option>';
+					});		
+            }
+			$('#projectId').append(htm);
+        },
+        error: function() {
+            alert('Error fetching project details.');
+        }
+    });
+}
+
+
+
+// AJAX call to fetch phase list by project
+function fetchPhaseDetailsByProjectId(projectId) {
+    debugger;
+    if (projectId && projectId != '0') {
+        $.ajax({
+            url: url + '/projectMilestone/getPhaseDetailsByProject',
+            type: 'GET',
+            data: { projectId: projectId ,moduleCode: 'DELIVERY'},
+            success: function(response) {
+                debugger;
+                if (response.outcome) {
+                    populatePhaseDetailsTable(response.result);  // Populate the milestone table
+                } else {
+                    emptyTable();
+					$('#baseAmount').val('0.00');
+					$('#orderDate').val('');
+                    alert('Phase details not found');
+                }
+            },
+            error: function() {
+                alert('Error fetching phase details.');
+            }
+        });
+    }else{
+		emptyTable();
+		$('#totalAmount').val('0.00');
+	}
+}
+
+
+
+
+function populatePhaseDetailsTable(phaseDto) {
+    let tableBody = $('#milestone-tbl-body');
+    tableBody.empty();  // Clear any existing rows
+
+
+    if (phaseDto.phaseDtoList.length === 0) {
+        emptyTable();
+    } else {
+        $('#totalAmount').val(parseFloat(phaseDto.finalAmount).toFixed(2));
+		console.log(phaseDto.projectOrderDate);
+		// Extract only the date part (first 10 characters)
+		const orderDateRaw = phaseDto.projectOrderDate ? phaseDto.projectOrderDate.split(' ')[0] : 'NA';
+
+		if (orderDateRaw !== 'NA') {
+			// Split the date into year, month, and day
+
+			debugger;
+			const [year, day, month] = orderDateRaw.split('-');
+
+			// Rearrange the date into MM-DD-YYYY format
+			const formattedOrderDate = month +'-' + day + '-'+ year;
+
+			// Set the formatted date in the input field
+			$('#orderDate').val(formattedOrderDate);
+		} else {
+			$('#orderDate').val('NA');
+		}																						
+
+		$('#baseAmount').val(parseFloat(phaseDto.projectBaseCost).toFixed(2));
+
+		// Iterate and set phase details in table body
+        phaseDto.phaseDtoList.forEach((phase, index) => {
+
+			// Expected date must be after the order date or the same
+			let today = phase.orderDate ? phase.orderDate.split(' ')[0] : new Date().toISOString().split('T')[0];
+
+
+            // Check if the phase has existing milestone data (e.g., percentage, amount, expectedDate)
+            let timeInWeeks = phase.estimationValue ? phase.estimationValue : '';  // Set estimation in weeks if available
+            let phaseAmount = phase.phaseAmount ? parseFloat(phase.phaseAmount).toFixed(2) : '';  // Set phase amount if available
+
+			debugger;
+			let existingUnitId = phase.unitId ? phase.unitId : '';
+
+            // Convert the date from 'YYYY-MM-DD HH:MM:SS.sss' to 'YYYY-MM-DD'
+            let expectedDate = phase.expectedDate ? phase.expectedDate.split(' ')[0] : '';  
+
+            // Insert input fields for Phase Percentage, Phase Amount, Expected Date, and hidden fields for IDs
+            let row = '<tr>' +
+                        '<td>' + (index + 1) + '</td>' +
+                        '<td>' + phase.phaseName + '</td>' +
+						'<td>' +
+                           '<select class="form-select" name="phaseDtoList[' + index + '].unitId" id="unitId' + index + '" >'+
+								'<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>'+
+								'<c:forEach items="${unitOfMeasurement}" var="unit">'+
+									'<option value="${unit.unitId}" >${unit.unitName}</option>'+
+								'</c:forEach>'+
+							'</select>'+
+                        '</td>' +
+                        '<td>' +
+							'<input type="hidden" value="'+phase.projectPhaseMapId+'" name="phaseDtoList[' + index + '].projectPhaseMapId" />' +
+                            (phase.deliveryMilestoneId ? '<input type="hidden" value="'+phase.deliveryMilestoneId+'" name="phaseDtoList[' + index + '].deliveryMilestoneId" />' : '') +
+
+                            '<input type="text" class="form-control text-end" ' +
+                            'name="phaseDtoList[' + index + '].estimationValue" ' +
+                            'id="timeInWeeks' + index + '" ' +
+                            'value="' + timeInWeeks + '" ' +
+                            'oninput="calculateExpectedDateFromWeeks(' + index + ')">' +
+                        '</td>' +
+                        '<td>' +
+                            '<input type="date" class="form-control" ' +
+                            'name="phaseDtoList[' + index + '].expectedDate" ' +
+                            'id="expectedDate' + index + '" value="' + expectedDate + '">' +
+                        '</td>' +
+                    '</tr>';
+            tableBody.append(row);
+
+			$('#unitId'+index).val(existingUnitId);
+        });
+    }
+}
+
+
+// Function to calculate the expected date based on time input and estimation type
+function calculateExpectedDateFromWeeks(index) {
+    // Fetch the time entered by the user
+    let timeInput = parseInt($('#timeInWeeks' + index).val());
+    
+    // Get the estimation type (e.g., Week, Month, Year, Hour)
+    let estimationType = $('#unitId' + index).val();
+    
+    // Get the order date value (in 'dd-MM-yyyy' format)
+    let orderDate = $('#orderDate').val();
+
+    if (!isNaN(timeInput) && orderDate && estimationType) {
+        // Calculate the expected date based on the order date, estimation type, and time input
+        let expectedDate = calculateExpectedDate(orderDate, timeInput, estimationType);
+        $('#expectedDate' + index).val(expectedDate);  // Set the calculated expected date
+		// $('#expectedDate' + index).attr('readonly',true);
+    }
+}
+
+// Helper function to add time to the order date based on estimation type
+function calculateExpectedDate(orderDate, timeInput, estimationType) {
+    // Split the order date which is in 'dd-MM-yyyy' format
+    const [day, month, year] = orderDate.split('-');
+    
+    // Convert the date to 'MM/dd/yyyy' format for JavaScript Date object
+    const formattedOrderDate = month + '/'+ day + '/' + year;
+
+    // Create a Date object using the formatted order date
+    let orderDateObj = new Date(formattedOrderDate);
+
+    // Adjust the date based on the estimation type
+    switch(estimationType) {
+        case '1': // Month
+            orderDateObj.setMonth(orderDateObj.getMonth() + timeInput);
+            break;
+        case '2': // Year
+            orderDateObj.setFullYear(orderDateObj.getFullYear() + timeInput);
+            break;
+        case '3': // Hour
+            orderDateObj.setHours(orderDateObj.getHours() + (timeInput * 24)); // Convert hours to days	
+            break;
+        case '4': // Week
+        default:
+            orderDateObj.setDate(orderDateObj.getDate() + (timeInput * 7)); // Add weeks (7 days per week)
+            break;
+    }
+
+    // Format the expected date back to 'dd-MM-yyyy' format
+    let newDay = ('0' + orderDateObj.getDate()).slice(-2);
+    let newMonth = ('0' + (orderDateObj.getMonth() + 1)).slice(-2); // Month is zero-based
+    let newYear = orderDateObj.getFullYear();
+
+	return newYear+ '-'+ newMonth + '-' + newDay;
+}
+
+
+function emptyTable(){
+	let tableBody = $('#milestone-tbl-body');
+	tableBody.empty();
+	let noDataRow = '<tr>' +
+				'<td colspan="6" class="text-center">No data found</td>' +
+			'</tr>';
+	tableBody.append(noDataRow);
+}
+
+
+//  submitting form  
+function formSubmit() {
+    let isValid = true; // Initialize isValid to true
+    const rowCount = document.getElementById("milestone-tbl-body").rows.length; // Get the number of rows
+    const partyId = $('#partyId').val();
+    const projectId = $('#projectId').val();
+    const totalAmount = parseFloat($('#totalAmount').val()) || 0;  // Parse total project amount
+    let sumPhaseAmount = 0;  // Initialize phase amount sum
+
+    // Reset previous error styles
+    $('input, select').removeClass('error-border');
+
+    // Validate party selection
+    if (partyId === '') {
+        bootbox.alert("Please select a party");
+        $('#billingFromPartyName').addClass('error-border');
+        isValid = false;
+        return isValid;
+    }
+
+    // Validate project selection
+    if (projectId === '' || projectId === '0') {
+        bootbox.alert("Please select a project");
+        $('#projectId').addClass('error-border');
+        isValid = false;
+        return isValid;
+    }
+
+
+    // Validate each row in the milestone table
+    if (rowCount === 0) {
+        bootbox.alert('Phases not found for the selected project');
+        isValid = false;
+        return isValid;
+    }
+
+
+    for (let i = 0; i < rowCount; i++) {
+        const unitId = document.getElementById("unitId" + i);
+        const timeInWeeks = document.getElementById("timeInWeeks" + i);
+
+        // Remove previous error styles
+        $(unitId).removeClass('error-border');
+        $(timeInWeeks).removeClass('error-border');
+
+        // Check if mandatory fields are filled
+        if (unitId.value.trim() === "" || timeInWeeks.value.trim() === "") {
+            bootbox.alert("Please fill in all mandatory fields.");
+            $(unitId).addClass('error-border');
+            $(timeInWeeks).addClass('error-border');
+            isValid = false;
+            return isValid;
+        }
+    }
+
+    // If all validations pass, proceed with form submission
+    if (isValid) {
+		confirmation('milestoneForm');
+    }
+}
+
+
+</script>

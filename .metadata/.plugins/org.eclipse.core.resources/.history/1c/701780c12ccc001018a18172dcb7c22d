@@ -1,0 +1,385 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+
+		       <!-- #######################################################  STAFF : BASIC DETAILS TAB ####################################################### -->
+	            <form class="form-horizontal" action="${contextPath}/staff/saveStaffDetails" method="POST" id="basic" enctype="multipart/form-data">
+	               <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	               <input type="hidden" id="staffId" name="staffId" value="${staffDetails.staffId}" />
+	               <input type="hidden" name="pageCode" id="pageCode" value="basic"/>
+	               <div class="row">
+	                  <!-- <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label for="textBox" class="col-sm-12">Staff Level :</label>
+	                        <div class="col-sm-12">
+	                           <input type="text" name="staffPerfType" id="staffPerfType" class="form-control form-control-sm" value="" style="color: blue; font-weight: 500;" >
+	                        </div>
+	                     </div>
+	                  </div> -->
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12 required" for="">Staff Name</label>
+	                        <div class="col-sm-12">
+	                           <input type="text" class="AlphabetsOnly form-control form-control-sm require" id="staffName" name="staffName" value="${staffDetails.staffName}" maxlength="100" > <!-- onblur="validateNameAndCode(this)" -->
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <%-- <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12 " for="">Staff Type</label>
+	                        <div class="col-sm-12">
+	                           <select class="form-control form-control-sm  form-select" id="teaching" name="staffType" data-plugin-selectTwo>
+	                              <option value="">
+	                                 <spring:message code="label.common.select"></spring:message>
+	                              </option>
+	                              <option value="TEACHING" >TEACHING</OPTION>
+	                              <OPTION VALUE="NON-TEACHING">Non Teaching</option>
+	                           </select>
+	                        </div>
+	                     </div>
+	                  </div> --%>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12 required" for="employmentType">Employment Type</label>
+	                        <div class="col-sm-12">
+	                           <select class="form-control form-select require" name="employmentId" data-plugin-selectTwo id="employment">
+	                              <option value="">
+	                                 <spring:message code="label.common.select"></spring:message>
+	                              </option>
+	                              <c:forEach var="empType" items="${satffLoadData.empType}">
+	                                 <option value="${empType.employmentId}"
+	                                 ${empType.employmentId eq staffDetails.employment.employmentId ? 'selected' : ''}>
+	                                 ${empType.employmentName}</option>
+	                              </c:forEach>
+	                           </select>
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12 required" for="">Gender</label>
+	                        <div class="col-sm-12">
+	                           <select class="form-control require form-select" name="genderId" id="gender" data-plugin-selectTwo >
+	                              <option value="">
+	                                 <spring:message code="label.common.select"></spring:message>
+	                              </option>
+	                              <c:forEach var="gender" items="${satffLoadData.genderList}">
+	                                 <option value="${gender.genderId}" ${gender.genderId eq staffDetails.gender.genderId ? 'selected' : ''}>${gender.genderNameEN}</option>
+	                              </c:forEach>
+	                           </select>
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12  required" for="">D.O.B</label>
+	                           <div class="col-sm-12 datepicker_con">
+	                           <input type="text" class="form-control form-control-sm datepicker require" name="dateOfBirth" id="birthDate" onchange="validateDateJoinAndDob()" value="<fmt:formatDate pattern="dd/MM/yyyy" value="${staffDetails.dateOfBirth}"/>" readonly="readonly">
+
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12 required" for="">Email</label>
+	                        <div class="col-sm-12">
+	                           <input type="text" class="form-control form-control-sm validEmail require" name="email" value="${staffDetails.email}" id="email"
+	                               maxlength="100" ${ not empty staffDetails.staffId ? 'readonly':''}>
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12  required" for="">Contact No.</label>
+	                        <div class="col-sm-12">
+	                           <input type="text" class="form-control form-control-sm require NumbersOnly" name="mobileNo" value="${staffDetails.mobileNo}" id="mobileNo"
+	                              maxlength="10" onchange="validateMobileNo(this);">
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12  required" for="">D.O.J.</label>
+	                        <div class="col-sm-12 datepicker_con">
+	                           <input type="text" class="form-control datepicker form-control-sm require" name="dateOfJoining" id="joinDate" value="<fmt:formatDate value="${staffDetails.dateOfJoing}" pattern="dd/MM/yyyy" />" readonly="readonly" onchange="validateDateJoinAndDob()">
+
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12  required" for="">Blood Group</label>
+	                        <div class="col-sm-12">
+	                           <select class="form-control require form-select" name="bloodGroupId" id="bloodGroup"	data-plugin-selectTwo>
+	                              <option value="">
+	                                 <spring:message code="label.common.select"></spring:message>
+	                              </option>
+	                              <c:forEach var="blood" items="${satffLoadData.bloodGrList}">
+	                                 <option value="${blood.bloodGroupId}" ${blood.bloodGroupId eq staffDetails.bloodGroup.bloodGroupId ? 'selected' : ''}>${blood.bloodGroupName}</option>
+	                              </c:forEach>
+	                           </select>
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12" for="">Passport No.</label>
+	                        <div class="col-sm-12">
+	                           <input type="text" class="form-control form-control-sm " name="passportNo" id="passportNo" value="${staffDetails.passportNo}"  maxlength="20" onchange="checkPassportNo(this);"> <!-- onchange="AllowPASSPORT()" -->
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12" for="">Passport Expiry Date</label>
+	                        <div class="col-sm-12 datepicker_con">
+	                           <input type="text" class="form-control" name="passportExpiryDate" id="passportExpiryDate" value="<fmt:formatDate value="${staffDetails.passportExpiryDate}" pattern="dd/MM/yyyy" />" readonly="readonly" onchange="validateDate()">
+
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12" for="">Pan No.s</label>
+	                        <div class="col-sm-12">
+	                           <input type="text" class="form-control form-control-sm" id="panNo" value="${staffDetails.panNo}" name="panNo" maxlength="10" onchange="checkPanCard();"  onblur="validatePAN(this)">
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12" for="">Aadhaar No.</label>
+	                        <div class="col-sm-12">
+	                           <input type="text" class="form-control form-control-sm NumbersOnly" id="adharId" value="${staffDetails.aadharNo}" name="aadharNo" maxlength="12"  onchange="getValidCheckData('BNF_ADH',this.value)"> <!-- onkeyup="isNumericValue(this)" onblur="return checkWithExistingAadharNo()" -->
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12" for="">Driving Lic No.</label>
+	                        <div class="col-sm-12">
+	                           <input type="text" class="form-control form-control-sm" id="drivingLicNo" value="${staffDetails.drivingLicNo}" name="drivingLicNo" maxlength="20" onchange="checkDrivingLicNo(this);">
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12 required" for="">Category</label>
+	                        <div class="col-sm-12">
+	                           <select class="form-control require form-select" name="casteId" id="category" data-plugin-selectTwo>
+	                              <option value="">
+	                                 <spring:message code="label.common.select"></spring:message>
+	                              </option>
+	                              <c:forEach var="cat" items="${satffLoadData.CatList}">
+	                                 <option value="${cat.casteId}"${cat.casteId eq staffDetails.category.casteId ? 'selected' : ''}>${cat.casteName}</option>
+	                              </c:forEach>
+	                           </select>
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12 required" for="">Marital Status</label>
+	                        <div class="col-sm-12">
+	                           <select class="form-control require form-select" name="maritalStatusId" id="maritalStatus" data-plugin-selectTwo>
+	                              <option value="">
+	                                 <spring:message code="label.common.select"></spring:message>
+	                              </option>
+	                              <c:forEach var="marital" items="${satffLoadData.maritalList}">
+	                                 <option value="${marital.maritalStatusId}" ${marital.maritalStatusId eq staffDetails.maritalStatus.maritalStatusId ? 'selected' : ''}>${marital.maritalStatusName}</option>
+	                              </c:forEach>
+	                           </select>
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12 required" for="">Religion</label>
+	                        <div class="col-sm-12">
+	                           <select class="form-control require form-select" name="religionId" id="religion" data-plugin-selectTwo>
+	                              <option value="">
+	                                 <spring:message code="label.common.select"></spring:message>
+	                              </option>
+	                              <c:forEach var="religion" items="${satffLoadData.religionList}">
+	                                 <option value="${religion.religionId}" ${religion.religionId eq staffDetails.religion.religionId ? 'selected' : ''}>${religion.religionName}</option>
+	                              </c:forEach>
+	                           </select>
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="col-sm-12 required" for="">Nationality</label>
+	                        <div class="col-sm-12">
+	                           <select class="form-control require form-select" name="nationalityId" id="nationality" data-plugin-selectTwo>
+	                              <option value="">
+	                                 <spring:message code="label.common.select"></spring:message>
+	                              </option>
+	                              <c:forEach var="nationality" items="${satffLoadData.nationalityList}">
+	                                 <option value="${nationality.nationalityId}" ${nationality.nationalityId eq staffDetails.nationality.nationalityId ? 'selected' : ''}>${nationality.nationalityName}</option>
+	                              </c:forEach>
+	                           </select>
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+					    <div class="form-group">
+					        <label class="col-sm-12" for="">Is PwD ?</label>
+					        <div class="col-sm-12">
+					            <select class="form-control form-select" id="disabilityClass" name="isPwd" data-plugin-selectTwo>
+					                <option value="false" ${staffDetails.isPwd eq 'false'?'selected':''}>No</option>
+					                <option value="true" ${staffDetails.isPwd eq 'true'?'selected':''}>Yes</option>
+					            </select>
+				        	</div>
+				    	</div>
+					</div>
+					 <div class="col-md-4" id="uploadFileSection" style="display: none;">
+						<div class="form-group">
+							<label class="col-sm-12 " for="">PwD Type</label>
+							<div class="col-sm-12">
+							<select class="form-control form-select" id="pwdName" name="pwdId">
+								<option value="">- Select -</option>
+								<c:forEach items="${satffLoadData.pwdTypeMasterList}" var="pwd">
+									<option value="${pwd.pwdId}">${pwd.pwdName}</option>
+								</c:forEach>
+							</select>
+							</div>
+						</div>
+					</div> 
+	                 
+	                  <div class="row">
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="required">Bank A/C Number</label>
+	                        <div class="col-sm-12">
+	                           <input type="text" id="accNo" name="accNo" class="form-control form-control-sm NumbersOnly require" required minlength="10" maxlength="20" value="${staffDetails.accNo}" >
+	                        </div>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="required">Bank Name</label>
+	                        <select class="form-control selectpicker require" id="bankName" name="bankId" onchange="getBankBranchByBankId('bankName','branchName');" data-live-search="true">
+	                           <option value="">- Select -</option>
+	                           <c:forEach items="${satffLoadData.bankList}" var="bank">
+	                              <option value="${bank.bankId}"${bank.bankId eq staffDetails.bankId.bankId ? 'selected' : ''}>${bank.bankName}</option>
+	                           </c:forEach>
+	                        </select>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label class="">Branch Name</label>
+	                        <select class="form-control form-select require " id="branchName" name="bankBranchId" onchange="getIFSCByBranchId(this.value,'ifscCode')">
+	                           <option value="">- Select -</option>
+	                        </select>
+	                     </div>
+	                  </div>
+	                  <div class="col-md-2">
+	                     <div class="form-group">
+	                        <label>IFSC Code</label>
+	                        <input type="text" class="form-control form-control-sm" name="ifscCode" id="ifscCode" value="${staffDetails.ifscCode}" readonly >
+	                     </div>
+	                  </div>
+	               </div>
+	               </div>
+	               <div class="col-md-12 text-center" style="margin-top: 15px;">
+	                  <hr style="margin-top: 5px;" />
+	                  <div class="form-group">
+	                     <button type="button" onclick="submitForm('basic');" class="btn btn-success btn-sm">Save</button>
+	                    <a href="${contextPath}/staff/staffMemberList" class="btn btn-warning btn-sm">Back to List</a>
+	                  </div>
+	               </div>
+	            </form>
+	         
+	         <!-- #######################################################  STAFF : BASIC DETAILS TAB END ####################################################### -->
+
+
+<script type="text/javascript">
+
+$(function () {
+    $('.datepicker').datepick({
+        onShow: $.datepick.monthOnly,
+        dateFormat: 'dd/mm/yyyy',
+        yearRange: 'c-20:c+10',
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+        onSelect: function() {
+            validateDateJoinAndDob();
+        }
+    });
+});
+
+
+function validateDateJoinAndDob() {
+    var dob = $("#birthDate").val();
+    var doj = $("#joinDate").val();
+
+    if (dob === "") {
+      bootbox.alert("Please select Date of Birth.");
+      $("#birthDate").focus();
+      return;
+    }
+
+    var dobArray = dob.split("/");
+    var dojArray = doj.split("/");
+
+    var dobDate = new Date(dobArray[2], dobArray[1] - 1, dobArray[0]);
+    var dojDate = new Date(dojArray[2], dojArray[1] - 1, dojArray[0]);
+
+    // Check if DOJ is greater than DOB
+    if (dojDate <= dobDate) {
+      bootbox.alert("Date of Joining should be greater than Date of Birth.");
+      $("#joinDate").val("");
+      return;
+    }
+
+    // Calculate age difference in years
+    var age = dojDate.getFullYear() - dobDate.getFullYear();
+    var monthDiff = dojDate.getMonth() - dobDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && dojDate.getDate() < dobDate.getDate())) {
+      age--;
+    }
+
+    // Check if age is at least 18
+    if (age < 18) {
+      bootbox.alert("Minimum age should be 18 years.");
+      $("#joinDate").val("");
+      return;
+    }
+}
+
+function checkPanCard() {
+    var panNo = $("#panNo").val();
+
+    var responseContainer = $("#response-message");
+    var errorContainer = $("#error-message");
+
+    $.ajax({
+        url: "${contextPath}/staff/check-panCard",
+        method: "GET",
+        data: { panNo: panNo }, // Update parameter name to 'panNo'
+        success: function(response) {
+            if (response === "No") {
+                errorContainer.text(""); 
+            } else {
+                bootbox.alert("Pan card is already in staff Master. Please choose another pan card.");
+                responseContainer.text(""); 
+                $("#panNo").val("");
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log("AJAX request failed: " + errorThrown);
+            errorContainer.text("Error checking PAN card. Please try again."); // Display a generic error message
+        }
+    });
+}
+
+
+
+</script>

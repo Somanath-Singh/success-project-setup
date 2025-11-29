@@ -1,0 +1,674 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+<style>
+table.tableizer-table {
+	width: 100%;
+	font-size: 13px;
+	border: 1px solid #CCC;
+	letter-spacing: -0.75px;
+	font-family: "Open Sans", Arial, sans-serif;
+}
+
+.tableizer-table td {
+	padding: 1px 2px 1px 3px;
+	border: 1px dotted #CCC;
+}
+
+.tableizer-table th {
+	padding: 1px;
+	margin: 1px;
+	border: 1px dotted #CCC;
+	font-weight: bold;
+}
+
+.tableizerTitleRow {
+	text-align: left;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+.table>tbody>tr>td {
+	word-break: break-all;
+}
+
+
+
+.autocomplete-suggestions {
+	width: 345px !important;
+}
+
+.searchParamDiv1 {
+	width: 14%;
+}
+
+.searchParamDiv1 label {
+	font-weight: 600;
+}
+
+.searchParamDiv2 {
+	width: 04%;
+	text-align: center;
+	padding-top: 26px;
+}
+
+.searchParamDiv2 label {
+	font-weight: bold;
+	font-size: 15px !important;
+}
+
+#partyListTable>tbody>tr>td {
+	font-size: 13.5px;
+}
+
+#partyListTable>thead>tr>th {
+	background: #d8d8d8;
+}
+</style>
+
+<script>
+$(function()
+{
+	$('#datatable-default').dataTable({
+ 		"bSort": false,
+ 		"autoWidth": false
+	});
+})
+</script>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Work Master</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Work Master</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title" id="headingOne">Work Master</h5>
+            </div>
+            <div class="card-body" id="partyDtlsInRequest">
+                <div class="col-md-12">
+                    <form class="form-horizontal form-bordered" id="addWork" action="${contextPath}/mst/saveWorkMaster" method="POST" >
+                        <input type="hidden" name="${_csrf.parameterName}"value="${_csrf.token}" />
+                        <input type="hidden" name="workId" id="workId" value="${data.workId}">
+                        <div class="row">
+                        <%@ include file="/WEB-INF/views/entityIdAndUserLevelListDrp.jsp"%>
+                                <div class="col-md-3 col-sm-4">
+                                    <div class="form-group">
+                                        <label for="projectMaster" class="required">Select Project</label>
+                                        <div class="col-md-12" id="createtooltip1">
+                                            <select class="form-control form-select" name="projectMaster"
+                                                id="projectCode" data-plugin-selectTwo
+                                                onchange="getProjectDetails();">
+                                                <option value="0"><spring:message
+                                                        code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+                                                <c:choose>
+                                                    <c:when test="${not empty projectList}">
+                                                        <c:forEach items="${projectList}" var="projectList">
+                                                            <option value="${projectList.projectId}" ${data.projectMaster.projectId eq projectList.projectId ? 'selected' :'' }>
+                                                                ${projectList.projectCode}
+                                                                | ${projectList.projectName}</option>
+                                                        </c:forEach>
+                                                    </c:when>
+                                                </c:choose>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-md-12 " for="inputDefault"><spring:message
+                                                code="ACCOUNTS.WORK.PROJECTYPE" /></label>
+                                        <div class="col-md-12">
+                                            <input type="text" name="projectTypeName"
+                                                class="form-control" id="projectType"
+                                                value="${data.projectType.projectType}"
+                                                readonly="readonly" tabindex="-1">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="workName" class="required"><spring:message
+                                                code="ACCOUNTS.WORK.NAME" /></label>
+                                        <div class="col-md-12">
+                                            <textarea rows="2" cols="" class="form-control"
+                                                name="workName" id="workName" style=""
+                                                onchange="validate(this)" maxlength="200"
+                                                onblur="validateNameAndCode(this);workdetial(this)"
+                                                onkeyup="enterKeyValidation();">${data.workName}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="workScope" class="required"><spring:message
+                                                code="ACCOUNTS.WORK.SCOPE" /></label>
+                                        <div class="col-md-12">
+                                            <textarea rows="2" name="workScope" class="form-control"
+                                                maxlength="100" style="" id="workScope">${data.workScope}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-3">
+                                    <div class="form-group">
+                                        <label for="projectTypeId" class="required">
+                                            <spring:message code="ACCOUNTS.WORK.WORKTYPE" />
+                                        </label>
+                                        <div class="col-md-12">
+                                            <select class="form-control form-select" name="projectTypeId"
+                                                 id="projectTypeId"
+                                                onchange="getWorkCodeByWorkType(this)">
+
+                                                <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+                                                <c:forEach items="${projectTypeList}" var="projectType">
+                                                    <option value="${projectType.projectTypeId}" ${data.projectType.projectTypeId eq projectType.projectTypeId ? 'selected' : ''}>
+                                                        ${projectType.projectType}
+                                                    </option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-3">
+                                    <div class="form-group">
+                                        <label for="workCode" class="required">
+                                            <spring:message code="ACCOUNTS.WORK.WORKCODE" />
+                                        </label>
+                                        <div class="col-md-12">
+                                            <input type="text" readonly="readonly" name="workCode"
+                                                class="form-control" id="workCode1" maxlength="20"
+                                                required="required" value="${data.workCode}"
+                                                onblur="validateNameAndCode(this)" tabindex="-1">
+                                        </div>
+                                        <input type="hidden" readonly="readonly"
+                                            name="hdnWorkCode" class="form-control" id="hdnWorkCode"
+                                            value="">
+                                    </div>
+                                </div>
+
+
+
+
+                                <div class="col-md-3 col-sm-3">
+                                    <div class="form-group">
+                                        <label for="workLocation" class="required"><spring:message
+                                                code="ACCOUNTS.WORK.LOCATION" /></label>
+                                        <div class="col-md-12">
+                                            <input type="text" name="workLocation"
+                                                class="form-control" id="workLocation" maxlength="50"
+                                                value="${data.workLocation}"
+                                                onblur="//validateNameAndCode(this)">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <div class="form-group">
+                                        <label for="workPlace" class="required"><spring:message
+                                                code="ACCOUNTS.WORK.PLACE" /></label>
+                                        <div class="col-md-12">
+                                            <input type="text" name="workPlace" class="form-control"
+                                                id="workPlace" maxlength="50"
+                                                value="${data.workPlace}"
+                                                onblur="//validateNameAndCode(this)">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-2">
+                                    <div class="form-group">
+                                        <label for="workVillage" class="required"><spring:message
+                                                code="LAND.ALT.VILLAGE" /></label>
+                                        <div class="col-md-12">
+                                            <input type="text" name="workVillage"
+                                                class="form-control" id="workVillage" maxlength="50"
+                                                value="${data.workVillage}"
+                                                onblur="//validateNameAndCode(this)">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-2">
+                                    <div class="form-group">
+                                        <label for="startDate" class="required"><span><spring:message
+                                                    code="ACCOUNTS.WORK.STARTDATE" /></span></label>
+                                        <div class="col-md-12 datepicker_con">
+                                            <c:choose>
+                                                <c:when test="${not empty data.startDate}">
+                                                    <input type="text" class="form-control datepicker"
+                                                        pattern="dd/mm/yyyy" name="startDate" id="startDate"
+                                                        required="required"
+                                                        value="<fmt:formatDate pattern="dd/MM/yyyy" value="${data.startDate}"/>" readonly>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <input type="text" class="form-control datepicker"
+                                                        pattern="dd/mm/yyyy" name="startDate" id="startDate" readonly>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-2">
+                                    <div class="form-group">
+                                        <label class="col-md-12 required" for="inputDefault"><span><spring:message
+                                                    code="ACCOUNTS.WORK.COMPLETIONDATE" /></span></label>
+                                        <div class="col-md-12 datepicker_con">
+                                            <c:choose>
+                                                <c:when test="${not empty data.startDate}">
+                                                    <input type="text" class="form-control datepicker"
+                                                        pattern="dd/mm/yyyy" name="completionDate"
+                                                        id="completionDate" required="required"
+                                                        value="<fmt:formatDate pattern="dd/MM/yyyy" value="${data.completionDate}"/>"readonly>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <input type="text" class="form-control datepicker"
+                                                        pattern="dd/mm/yyyy" name="completionDate"
+                                                        id="completionDate"readonly>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-2">
+                                    <div class="form-group">
+                                        <label for="extendTime" class="required"><spring:message
+                                                code="ACCOUNTS.WORK.EXTENDTIME" /></label>
+                                        <div class="col-md-12">
+                                            <input type="text" name="extendTime"
+                                                class="form-control rightAlignedText" id="extendTime"
+                                                value="${data.extendTime}"
+                                                onkeypress="return isNumber(event);">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-2">
+                                    <div class="form-group">
+                                        <label for="letterNo" class="required" for="inputDefault"><spring:message
+                                                code="ACCOUNTS.WORK.LETTERNO" /></label>
+                                        <div class="col-md-12">
+                                            <input type="text" name="letterNo" class="form-control"
+                                                id="letterNo" value="${data.letterNo}"
+                                                onblur="//validateNameAndCode(this)">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-2">
+                                    <div class="form-group">
+                                        <label for="letterDate" class="required"
+                                            for="inputDefault"><span><spring:message
+                                                    code="ACCOUNTS.WORK.LETTERDATE" /></span></label>
+                                        <div class="col-md-12 datepicker_con ">
+                                            <c:choose>
+                                                <c:when test="${not empty data.letterDate}">
+                                                    <input type="text" class="form-control datepicker"
+                                                        pattern="dd/mm/yyyy" name="letterDate" id="letterDate"
+                                                        required="required"
+                                                        value="<fmt:formatDate pattern="dd/MM/yyyy" value="${data.letterDate}"/>"readonly>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <input type="text" class="form-control datepicker"
+                                                        pattern="dd/mm/yyyy" name="letterDate" id="letterDate" readonly>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-2">
+                                    <div class="form-group">
+                                        <label class="col-md-12" for="inputDefault"><spring:message
+                                                code="ACCOUNTS.WORK.TECHSANCTIONNO" /></label>
+                                        <div class="col-md-12">
+                                            <input type="text" name="techSanctionNo"
+                                                class="form-control" id="techSanctionNo" maxlength="30"
+                                                value="${data.techSanctionNo}"
+                                                onblur="//validateNameAndCode(this)">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-2">
+                                    <div class="form-group">
+                                        <label class="col-md-12 required" for="inputDefault"><span><spring:message
+                                                    code="ACCOUNTS.WORK.TECHSANCTIONDATE" /></span></label>
+                                        <div class="col-md-12 datepicker_con">
+                                            <c:choose>
+                                                <c:when test="${not empty data.techSanctionDate}">
+                                                    <input type="text" class="form-control datepicker"
+                                                        pattern="dd/mm/yyyy" name="techSanctionDate"
+                                                        id="techSanctionDate" required="required"
+                                                        value="<fmt:formatDate pattern="dd/MM/yyyy" value="${data.techSanctionDate}"/>" readonly>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <input type="text" class="form-control datepicker"
+                                                        pattern="dd/mm/yyyy" name="techSanctionDate"
+                                                        id="techSanctionDate" readonly>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-2">
+                                    <div class="form-group">
+                                        <label for="adminCharge" class="required">Administrative
+                                            Charges</label>
+                                        <div class="col-md-12">
+                                            <input type="text" name="adminCharge"
+                                                class="form-control rightAlignedText numberWithTwoDesimal" id="adminCharge"
+                                                maxlength="20" value="${data.adminCharge}"
+                                                onchange="validateDecimalField('adminCharge','2','20','admin charge');">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-2">
+                                    <div class="form-group">
+                                        <label for="totalCost" class="required"><spring:message
+                                                code="ACCOUNTS.WORK.TOTALCOST" /></label>
+                                        <div class="col-md-12">
+                                            <input type="text" name="totalCost"
+                                                class="form-control rightAlignedText numberWithTwoDesimal" id="totalCost"
+                                                value="<fmt:formatNumber pattern="#0.00" value="${data.totalCost}"/>"
+                                                maxlength="20"
+                                                onchange="validateDecimalField('totalCost','2','20','total cost');">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-2">
+                                    <div class="form-group">
+                                        <label for="totalSanction" class="required"><spring:message
+                                                code="ACCOUNTS.WORK.TOTALSANCTION" /></label>
+                                        <div class="col-md-12">
+                                            <input type="text" name="totalSanction"
+                                                class="form-control rightAlignedText numberWithTwoDesimal" id="totalSanction"
+                                                value="<fmt:formatNumber pattern="#0.00" value="${data.totalSanction}"/>"
+                                                maxlength="20"
+                                                onchange="validateDecimalField('totalSanction','2','20','total sanction');">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12" style="margin-top:10px;">
+                                <div class="form-group text-center">
+                                    <button type="button" class="btn btn-success" onclick="checkFormData_onSubmit('addWork');" ><spring:message code="COMMON.BUTTON.SAVE"></spring:message></button>
+			<button type="button" class="btn btn-warning no-print unfreezeField back" onclick="backToModule()">Back</button>
+                                </div>
+                            </div>
+                        </div>
+					</form>
+				</div>
+			</div>
+            <div class="col-lg-12 mt-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title" id="headingOne">Work List</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="datatable">
+                                <thead>
+
+                                    <tr>
+                                        <th class="text-center">Sl. No.</th>
+                                        <th><spring:message code="ACCOUNTS.WORK.WORKCODE" /></th>
+                                        <th><spring:message code="ACCOUNTS.WORK.NAME" /></th>
+                                        <th><spring:message code="ACCOUNTS.WORK.PROJECTCODE" /></th>
+                                        <th><spring:message code="ACCOUNTS.WORK.WORKTYPE" /></th>
+                                        <th><spring:message code="DEPT.DEPTSTATUS" /></th>
+                                        <th><spring:message code="COMMON.LABEL.ACTION" /></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach items="${workList}" var="work" varStatus="recCount">
+                                        <tr class="gradeX">
+                                            <td class="text-center">${recCount.index + 1}</td>
+                                            <td>${work.workCode}</td>
+                                            <td>${work.workName}</td>
+                                            <td>${work.projectMaster.projectCode}</td>
+                                            <td>${work.projectType.projectTypeCode}</td>
+                                            <td><c:choose>
+                                        <c:when test="${work.isActive}">Yes</c:when><c:otherwise>No</c:otherwise></c:choose></td>
+                                            <td style="">
+                                                <a class="btn btn-primary" onclick="editWorkMaster(${work.workId})">
+                                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                              </a>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--End::row-1 -->
+</div>
+
+<form action="${contextPath}/mst/saveWorkMaster" method="POST"
+	id="finalSubmit">
+	<input type="hidden" name="${_csrf.parameterName}"
+		value="${_csrf.token}" /> <input type="hidden" name="encData"
+		id="hdnData" />
+</form>
+
+<form id="editAccountGroup" action="${contextPath}/mst/updateWorkMaster" method="post">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="workId" id="hdnData1"/>
+</form>
+
+
+
+<script>
+
+
+	function getWorkCodeByWorkType(value)
+	{
+		debugger;
+		var projectTypeId = $("#projectTypeId").val();
+		
+		if($("#projectTypeId").val() != "")
+		{
+			$.ajax({
+				url : '${contextPath}/mst/getWorkCodeByWorkType.htm',
+				dataType: "json",
+				data : {
+					projectTypeId : projectTypeId,
+				},
+				success : function(response) 
+				{
+					$.each(response, function(index, value) 
+					{
+						$("#workCode1").val(value.nextWorkCodeGenerated);
+						$("#hdnWorkCode").val(value.nextWorkCodeGenerated);
+						
+					});
+				},
+				error : function(errRespponse)
+				{
+					//var data=errRespponse;
+				}
+			});
+		}
+		else
+		{
+			$("#workCode1").val("");
+			$("#hdnWorkCode").val("");
+		}
+	}
+
+
+
+
+
+function getData(pageNo){
+	debugger;
+	if (pageNo != -1) {
+	    var rowsPerPage = $('#rowsPerPage').val();
+	    var pageNoStr = pageNo.toString();
+	    var encryptedRowsPerPage = AES256.encrypt(rowsPerPage);
+	    var encryptedPageNo = AES256.encrypt(pageNoStr);
+
+	    $('#hdnPageSize').val(encryptedRowsPerPage);
+	    $('#hdnPage').val(encryptedPageNo);
+	    $('#partyDetail11').submit();
+	}
+
+
+}
+
+
+$('#partyName').bind('copy paste cut',function(e) {
+	  e.preventDefault();
+	  bootbox.alert('cut,copy & paste options are disabled !!');
+	});
+	
+function getprojectDetails(that) {
+	 var code=that.value;
+	$.ajax({
+				type : "GET",
+				url : 'get-projectDetails',
+				
+				data : {
+					"projectCode" : code,
+
+				},
+				success : function(response) {
+					var val = JSON.parse(response);
+					// alert("response :" + val[0].projectN); 
+					 $("#projectName").val(val[0].projectN);
+                 },
+				error : function(error) {
+					bootbox.alert("Project Not Found !");
+				}
+			});
+
+}
+
+const checkFormData_onSubmit = async (formId) => {
+    debugger
+    const requiredFields = document.querySelectorAll('.required');
+    let validationFailed = false;
+
+    for (const field of requiredFields) {
+        const inputId = field.getAttribute('for');
+        const inputField = document.getElementById(inputId);
+
+        // Check if the input field exists and if it's empty
+        if (inputField && (!inputField.value || inputField.value === "0")) {
+            inputField.style.borderColor = 'red';
+            await showNotification(true, field.textContent.replace(/:/g, "") + " is required.");
+            setTimeout(() => {
+                inputField.style.borderColor = '';
+            }, 3000);
+            validationFailed = true;
+            break;
+        }
+    }
+    
+    if (!validationFailed) {
+    	 
+        /* const encryptFormDataResult = await encryptHiddenFormData('addWork');
+        if (encryptFormDataResult) {
+            $('#hdnData').val(encryptFormDataResult);
+            $('#finalSubmit').submit();
+        } else {
+            showNotification(true, 'Unable to process your request. Please try after some time.');
+        } */
+        
+    	if(encryptFormData('addWork', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('addWork');
+		 }
+        
+        
+    }     
+    return false;
+}
+
+	
+	
+function getProjectDetails()
+{
+	var projectCode = $('#projectCode').val();
+
+	if( $('#projectCode').val() !="")
+	{
+		$.ajax({
+			url : '${contextPath}/mst/getProjectDetailsAsPerProjectId',
+	 	    type:'GET',
+	 	    data : ({
+	 	    	projectId : $('#projectCode').val()
+	 	    }),
+			cache:false,
+			asynch:false,
+			success : function(response) 
+			{
+				if(response !="")
+				{
+					var details=response.split("<###>");
+					//document.getElementById("projectName").value=details[0];
+					document.getElementById("projectType").value=details[1];
+					document.getElementById("workNature").value=details[2];
+					document.getElementById("workStatus").value=details[3];
+					document.getElementById("pstartDate").value=details[4];
+					document.getElementById("pcompletionDate").value=details[5];
+				}
+				else
+				{
+					alert("No Details Found");
+	 	    	}
+			},
+			error:function(transport)
+			{
+				alert("No Details Found");
+			}
+		});
+	}
+	else
+	{
+		alert("No Details Found");
+	}
+}
+
+function editWorkMaster(workId) {
+    debugger;
+//     var workIdata = workId.toString();
+//     $("#hdnData1").val(AES256.encrypt(workIdata));
+//     $("#editAccountGroup").submit();
+
+      $("#hdnData1").val(workId);
+    if(encryptFormData('editAccountGroup', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('editAccountGroup');
+		 }
+}
+
+	
+	
+</script>

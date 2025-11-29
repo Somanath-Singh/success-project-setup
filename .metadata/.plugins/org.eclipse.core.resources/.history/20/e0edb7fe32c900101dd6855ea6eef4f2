@@ -1,0 +1,123 @@
+package com.aashdit.prod.heads.hims.ipms.security;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.aashdit.prod.heads.common.service.CommonService;
+import com.aashdit.prod.heads.hims.ipms.dto.GenericMenuDTO;
+import com.aashdit.prod.heads.hims.ipms.dto.MenuDto;
+import com.aashdit.prod.heads.hims.ipms.dto.UserVO;
+import com.aashdit.prod.heads.hims.ipms.utils.SecurityHelper;
+import com.aashdit.prod.heads.hims.ipms.utils.ServiceOutcome;
+
+
+//@Component
+public class RoleMenuFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private CommonService commonService;
+
+    @Value("${app.code}")
+    private String appCode;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        // Get the current authenticated user
+        UserVO user = SecurityHelper.getCurrentUser();
+        
+        // If user is null, allow the filter chain to proceed
+        if (user == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Obtain the request URI
+        String contextPath = request.getContextPath();
+        String requestURI = request.getRequestURI();
+        String uriWithoutContext = requestURI.startsWith(contextPath) 
+            ? requestURI.substring(contextPath.length()) 
+            : requestURI;
+
+        String uriWithQuery = uriWithoutContext + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
+        if (!uriWithQuery.startsWith("/")) {
+            uriWithQuery = "/" + uriWithQuery;
+        }
+
+        final String finalUriWithQuery = uriWithQuery;  // Make final for use in lambdas
+
+
+        // Bypass login and SSO-related URLs
+        Pattern loginPattern = Pattern.compile("^/login$");
+        Pattern ssoPattern = Pattern.compile("^/sso/.*");
+
+        if (loginPattern.matcher(uriWithQuery).matches() || ssoPattern.matcher(uriWithQuery).matches()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Get the list of allowed URLs from the CommonService
+        ServiceOutcome<List<GenericMenuDTO>> outCome = commonService.findAllMenuListByAppCode(appCode);
+        if (outCome.getOutcome()) {
+            List<String> allowedUrls = outCome.getData().stream()
+                .map(GenericMenuDTO::getMenuUri)
+                .collect(Collectors.toList());
+
+            // Check if the request URL is allowed
+            boolean hasAccess = allowedUrls.stream().anyMatch(uriWithQuery::startsWith);
+            if (hasAccess) {
+                List<String> allowedUrl = getAllUrlsFromMenuList(user.getMenuList());
+                hasAccess = allowedUrl.stream().anyMatch(uri -> uri.equals(finalUriWithQuery));
+                
+                // If access is denied and the response is not committed, send a 403 error
+                if (!hasAccess && !response.isCommitted()) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have access to this resource");
+                    return;
+                }
+            }
+        }
+
+        // Proceed with the filter chain
+        filterChain.doFilter(request, response);
+    }
+
+
+    public static List<String> getAllUrlsFromMenuList(List<MenuDto> menuList) {
+        List<String> allUrls = new ArrayList<>();
+        if (menuList != null) {
+            for (MenuDto menu : menuList) {
+                allUrls.addAll(getAllUrls(menu));
+            }
+        }
+        return allUrls;
+    }
+    public static List<String> getAllUrls(MenuDto menuDto) {
+        List<String> urls = new ArrayList<>();
+        
+        // Add the current menu URL if it's valid
+        if (menuDto.getMenuURL() != null && !menuDto.getMenuURL().equals("#")) {
+            urls.add(menuDto.getMenuURL());
+        }
+        
+        // Recursively process children
+        if (menuDto.getChildren() != null) {
+            for (MenuDto child : menuDto.getChildren()) {
+                urls.addAll(getAllUrls(child));
+            }
+        }
+        return urls;
+    }
+}

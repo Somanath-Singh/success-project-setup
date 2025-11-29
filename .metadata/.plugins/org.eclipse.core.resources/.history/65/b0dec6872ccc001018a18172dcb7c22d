@@ -1,0 +1,211 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">${not empty inspection.inspectionId ? 'Edit Inspection' : 'Add Inspection'}</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa-solid fa-house"></i></a></li>
+                <li class="breadcrumb-item"><a href="${contextPath}/inspection">Work Inspection</a></li>
+                <li class="breadcrumb-item active" aria-current="page">${not empty inspection.inspectionId ? 'Edit Inspection' : 'Add Inspection'}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">${not empty inspection.inspectionId ? 'Edit Inspection' : 'Add Inspection'}</h5>
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal" action="${contextPath}/inspection/saveInspection" method="POST" id="inspectionForm" enctype="multipart/form-data">
+                    <input type="hidden" id="cipherText" name="cipherText" value="">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <input type="hidden" name="inspectionId" id="inspectionId" value="${inspection.inspectionId}">
+                    <input type="hidden" name="workOrderId" id="workOrderId" value="${inspection.workOrderId}">
+                    <input type="hidden" name="phaseId" id="phaseId" value="${inspection.phaseId}">
+                    <input type="hidden" name="inspectionBy" id="inspectionBy" value="${inspection.inspectionBy}">
+                    <input type="hidden" id="buttonCode" name="buttonCode">	
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="required">Work Order Name:</label>
+                                <input type="text" id="workOrderName" name="workOrderName" class="form-control form-control-sm"
+                                       value="${inspection.workOrderName}" required readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="required">Project Estimation No:</label>
+                                <input type="text" id="planEstimationNo" name="planEstimationNo" class="form-control form-control-sm"
+                                       value="${inspection.planEstimationNo}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="required">Project Name:</label>
+                                <input type="text" id="projectName" name="projectName" class="form-control form-control-sm"
+                                       value="${inspection.projectName}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="required">Phase Name:</label>
+                                <input type="text" id="phaseName" name="phaseName" class="form-control form-control-sm"
+                                       value="${inspection.phaseName}" required maxlength="100" readonly>
+                            </div>
+                        </div>
+                       </div>
+                       <div class="row">
+                        <div class="col-md-3">
+							<label class="required">Inspection Date:</label>
+							<div class="datepicker-box">
+								<input type="text" id="inspectionDate" name="inspectionDate" class="form-control form-control-sm datepicker " required 
+								value="${inspection.inspectionDate}" readonly>
+							</div>
+						</div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="required">Inspected By:</label>
+                                <input type="text" id="inspectionByName" name="inspectionByName" class="form-control form-control-sm"
+                                       value="${inspection.inspectionByName}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="required">MB From Page:</label>
+                                <input type="text" id="mbFromPage" name="mbFromPage" class="form-control form-control-sm"
+                                       value="${inspection.mbFromPage}" required maxlength="10" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="required">MB To Page:</label>
+                                <input type="text" id="mbToPage" name="mbToPage" class="form-control form-control-sm"
+                                       value="${inspection.mbToPage}" required maxlength="10" readonly>
+                            </div>
+                        </div>
+                       </div>
+                       <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Inspection Image:</label>
+                                <input type="file" id="inspectionImage" name="inspectionImage" class="form-control form-control-sm" readonly>
+                                <c:if test="${not empty inspection.inspectionImagePath}">
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="viewDocument('${inspection.inspectionImagePath}','inspection')" title="Download Document">
+						                <i class="fa fa-download"></i>
+						            </button>
+                                </c:if>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mt-2 text-center">
+                        <c:set var="dynamicFromId" value="inspectionForm" scope="request" />
+                        <c:set var="wonFunction" value="submitInspectionForm()" />
+                        <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form action="${contextPath}/document/viewDocuments" method="get" id="documentFormView" enctype="multipart/form-data" target="_blank">
+    <input type="hidden" name="moduleName" id="moduleName"/>
+    <input type="hidden" name="filePath" id="filePath"/>
+</form>
+
+<script>
+
+    function viewDocument(filePath, moduleName) {
+        $('#moduleName').val(moduleName);
+        $('#filePath').val(filePath);
+        $('#documentFormView').submit();
+    }
+
+    function submitInspectionForm() {
+        event.preventDefault();
+        const buttonCode = $("#hdnButtonCode").val();
+		$("#buttonCode").val(buttonCode);
+        var workOrderName = $('#workOrderName').val();
+        var phaseName = $('#phaseName').val();
+        var inspectionDate = $('#inspectionDate').val();
+        var inspectionByName = $('#inspectionByName').val();
+        var mbFromPage = $('#mbFromPage').val();
+        var mbToPage = $('#mbToPage').val();
+
+        if (!workOrderName) {
+            bootbox.alert("Please enter Work Order Name.");
+            return false;
+        }else if (!phaseName) {
+            bootbox.alert("Please enter Phase Name.");
+            return false;
+        }else if (!inspectionDate) {
+            bootbox.alert("Please enter Inspection Date.");
+            return false;
+        }else if (!inspectionByName) {
+            bootbox.alert("Please enter Inspected By.");
+            return false;
+        }else if (!mbFromPage) {
+            bootbox.alert("Please enter MB From Page.");
+            return false;
+        }else if (!mbToPage) {
+            bootbox.alert("Please enter MB To Page.");
+            return false;
+        }else{
+          //submit tha form
+    		var bizContent = $("#inspectionForm").serializeArray();
+    		$("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    		bootbox.confirm("Do you want to " + buttonCode + " Inspection Detials ?", function(result) {
+    			if (result) {
+    				showLoader();
+    				$("#inspectionForm").submit();
+    			}
+    		});
+        }
+    }
+
+    $(document).ready(function () {
+        $(".datepicker").datepick({
+            dateFormat: "dd-mm-yyyy",
+            yearRange: "c-20:c+10",
+            showOnFocus: true,
+            showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>'
+        });
+    });
+    function convertFormToJSONArray(form) {
+    	const array = form;
+    	const json = {};
+    	$.each(array, function() {
+    		var contentCheck = this.name;
+    		if (json[this.name]) {
+    			if (!json[this.name].push) {
+    				json[this.name] = [ json[this.name] ];
+    			}
+    			json[this.name].push(this.value || "");
+    		} else if (contentCheck.includes("Array")) {
+    			json[this.name] = [ this.value ];
+    		} else {
+    			json[this.name] = this.value || "";
+    		}
+    	});
+    	return json;
+    }
+      
+    function showLoader() {
+    	$(".loader-div").css("display", "flex");
+    }
+
+    function hideLoader() {
+    	$(".loader-div").css("display", "none");
+    }
+
+    </script>

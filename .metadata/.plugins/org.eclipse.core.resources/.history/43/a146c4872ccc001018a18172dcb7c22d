@@ -1,0 +1,229 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}" />
+
+
+
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Facility Buildings</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home">Home</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Add
+					Facilities</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+
+
+
+
+
+<div class="card">
+	
+
+	<div class="card-header">
+		<h5 class="card-title">Add Facilities</h5>
+	</div>
+	<div class="card-body">
+		<form action="${contextPath}/facilityManagement/saveFacilities"
+			method="post" id="saveFormId" class="row">
+			<input type="hidden" name="${_csrf.parameterName}"
+				value="${_csrf.token}" /> <input type="hidden" name="facilityId"
+				value="${facilityUpdate.facilityId}" id="facilityId" />
+
+			<div class="form-group col-md-2">
+				<label class="required">Facility Name</label> <input type="text"
+					class="form-control form-control-sm" id="facilityNameId"
+					name="facilityName" maxlength="30"
+					value="${facilityUpdate.facilityName}">
+			</div>
+
+			<div class="form-group col-md-2">
+				<label class="required">Facility Code</label> <input type="text"
+					class="form-control form-control-sm" id="facilityCodeId"
+					name="facilityCode" maxLength="30"
+					onchange="validateFacilityCode(this.value)"
+					value="${facilityUpdate.facilityCode}">
+			</div>
+
+			<div class="form-group col-md-2">
+				<label class="required">Seating capacity </label> <input type="text"
+					class="form-control form-control-sm" id="seatCapacityId"
+					name="seatingCapacity" maxlength="30"
+					value="${facilityUpdate.seatingCapacity}">
+			</div>
+
+			<div class="form-group col-md-2">
+				<label class="required">Description</label> <input type="text"
+					class="form-control form-control-sm" id="descriptionId"
+					name="description" maxLength="30"
+					value="${facilityUpdate.description}">
+			</div>
+
+			<div class="form-group col-md-2">
+				<label class="required">Furnished :</label> <select
+					class="form-select" id="furnishedId" name="furnished">
+					<option value=""><spring:message
+							code="label.common.select"></spring:message></option>
+					<option value="1"
+						${facilityUpdate.furnished eq true ? 'selected' : ''}>Yes</option>
+					<option value="0"
+						${facilityUpdate.furnished eq false ? 'selected' : ''}>No</option>
+				</select>
+			</div>
+
+			<div class="form-group col-md-2">
+				<label class="required">Facility category :</label> <select
+					class="form-select" id="facilityCatgId"
+					name="typesForFacilities.facTypeId">
+					<option value="0"><spring:message
+							code="label.common.select"></spring:message></option>
+					<c:forEach items="${facilityCategory}" var="facCatgList">
+						<option value="${facCatgList.facTypeId}"
+							${facCatgList.facTypeId eq facilityUpdate.typesForFacilities.facTypeId ? 'selected' : ''}>${facCatgList.facTypeName}</option>
+					</c:forEach>
+				</select>
+			</div>
+
+			<div class="form-group col-md-2">
+				<label class="required">Facility Type :</label> <select
+					class="form-select" id="facilityTypeId"
+					name="facilityTypeId.facilityTypeId"
+					onchange="getBlockListByBuildingId(this.value);">
+					<option value="0"><spring:message
+							code="label.common.select"></spring:message></option>
+					<c:forEach items="${facilityTypeList}" var="facTypeList">
+						<option value="${facTypeList.facilityTypeId}"
+							${facTypeList.facilityTypeId eq facilityUpdate.facilityType.facilityTypeId ? 'selected' : ''}>${facTypeList.facilityTypeName}</option>
+					</c:forEach>
+				</select>
+			</div>
+
+			<div class="form-group col-md-2">
+				<label class="required">Amenities </label> <select
+					class="selectpicker" id="facilityAmenitesId"
+					name="facilityAmenitiesIds" multiple data-live-search="true">
+					<option value="0">--select--</option>
+					<c:forEach items="${facAmenitiesList}" var="facAmentList">
+						<option value="${facAmentList.facilityAmenitesId}"
+							<c:forEach items="${facilityUpdate.facilityAmenitiesIds}" var="facAmenitiesUpdate">
+										${facAmentList.facilityAmenitesId eq facAmenitiesUpdate ? 'selected':''}
+								</c:forEach>>${facAmentList.amenitiesName}</option>
+					</c:forEach>
+				</select>
+			</div>
+
+			<div class="form-group col-md-4 text-left">
+				<button type="button" class="btn btn-submit searchdiv"
+					style="margin-left: 8px;"
+					onclick="submitForm('${empty facilityUpdate.facilityId ? 'SAVE' : 'UPDATE'}')">${empty facilityUpdate.facilityId ? 'Submit' : 'Update'}</button>
+				<button type="button" class="btn btn-back searchdiv"
+					style="margin-left: 8px;" onclick="history.back()">Back</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+
+<div class="card cardContainerNotFirst">
+	<div class="card-header">
+		<h5 class="card-title">Facilities List</h5>
+	</div>
+	<div class="card-body">
+
+		<table class="datatable table table-striped table-bordered exportbtn">
+			<thead>
+				<tr>
+					<th>Sl.No</th>
+					<th>Facility Name</th>
+					<th>Facility Code</th>
+					<th>Facility Type</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:forEach items="${facilitiesList}" var="facility"
+					varStatus="count">
+					<tr>
+						<td>${count.count}</td>
+						<td>${facility.facilityName}</td>
+						<td>${facility.facilityCode}</td>
+						<td>${facility.facilityType.facilityTypeName}</td>
+						<td><a
+							href="${contextPath}/facilityManagement/editFacilities?hdnId=${facility.facilityId}"
+							class="btn btn-primary" title="edit"> <i class=" fa fa-pen "
+								aria-hidden="true"></i></a></td>
+					</tr>
+				</c:forEach>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<script>
+function submitForm(status) {
+    if ($("#facilityNameId").val().trim() == "") {
+        bootbox.alert("Please provide facility name.");
+        $("#facilityNameId").val('');
+        return false;
+    } else if ($("#facilityCodeId").val().trim() == "") {
+        bootbox.alert("Please provide facility code.");
+        $("#facilityCodeId").val('');
+        return false;
+    } else if ($("#descriptionId").val().trim() == "") {
+        bootbox.alert("Please provide description.");
+        $("#descriptionId").val('');
+        return false;
+    } else if ($("#facilityTypeId").val() == "0" || $("#facilityTypeId").val() == null) {
+        bootbox.alert("Please select facility type.");
+        $("#facilityTypeId").val('');
+        return false;
+    } else { var message = status === 'SAVE' ? 'save' : 'update';
+	 bootbox.confirm("Do you want to "+message+" facility details ?", function (result) {
+            if (result) {
+                showLoader();
+                $("#saveFormId").submit();
+            }
+        });
+    }
+}
+
+function validateFacilityCode(facilityCode) {
+    var facilityId = $("#facilityId").val();
+    $.ajax({
+        type: "get",
+        url: "${contextPath}/facilityManagement/duplicateCheckForFacilityCode",
+        data: {
+            "facilityId": facilityId,
+            "facilityCode": facilityCode,
+        },
+        success: function (response) {
+            var data = response;
+            if (data === 'Yes') {
+                bootbox.alert("Duplicate facility codes are not allowed.");
+                $("#facilityCodeId").val('');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX request failed with status: " + status + "\nError: " + error);
+        }
+    });
+}
+</script>
+
+

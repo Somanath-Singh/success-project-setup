@@ -1,0 +1,519 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+<script src="${contextPath}/assets/js/moment.js"></script>
+
+
+<link href="${contextPath}/assets/full-calender/bootsrtap-icon.css">
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}"/>
+
+
+
+
+<div class="breadcrumb_conatiner">
+                <div class="col-md-6">
+	      <h4 class="change-color">New Facility Request</h4>
+	   </div>
+	   <div class="col-md-6">
+	      <nav aria-label="breadcrumb" style="float: right;">
+	         <ol class="breadcrumb">
+	            <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+	            <li class="breadcrumb-item active" aria-current="page">New Facility Request</li>
+	         </ol>
+	      </nav>
+	   </div>
+            </div>
+
+	   
+<div class="card">
+<div class="card-header"><h5 class="card-title">New Facility Request</h5></div>
+	<div class="card-body">		     			
+		 
+		<form action="${contextPath}/facility/manageRequest.htm" method="post" id="saveEventFormId">
+<!-- 			<input type="hidden" id="cipherText" name="cipherText"> -->
+		   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+		   <input type="hidden" name="status" id="status"/>
+		   <input type="hidden" name="requestId" id="requestId" value="${fac.facilityRequestId}"/>
+		   <input type="hidden" name="remark" id="remark"/>
+		   
+		    <input type="hidden" name="orgId" value="${fac.organization }" id="orgId"/>
+		    <input type="hidden" name="dowlLvlId" value="${fac.dowlLvl}" id="dowlLvlId"/>
+		    
+		   <div class="row">
+						<c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+						<c:set var="upperOrDown" value="down" />
+						<c:set var="functionList2" value="getRoleListByActualLevel(this.value,0);"/> <!-- getParentFacilities(this),getFacilities(this.value) -->
+						<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+
+				
+				  <div class="col-md-2">
+				        <div class="form-group">
+				            <label for="facilityId" class="col-sm-12 required">Facility:</label>
+<!-- 				            <select name="facilityId" id="facilityId"  class="form-control requiredField form-select" onchange="showHideFieldTypeWise(this.value);"> -->
+<!-- 				                <option value="">---select---</option> -->
+<!-- 				            </select> -->
+						<input type="text" class="form-control form-control-sm AlphaNumericAndSpecial" name="facilityName" id="facilityId" value="${fac.facilityName}" maxlength="100" onblur="checkDuplicate(this.value)"/>
+				        </div>
+				    </div>
+				    
+				    <div class="col-md-2">
+				        <div class="form-group">
+						 <label for="roleSelect" class="col-sm-12 required">Role:</label>
+							<select class="form-control form-select validId3 require requiredField" name="roleId" id="roleSelect" data-plugin-selectTwo >
+								<option value=""><spring:message code="label.common.select"></spring:message></option>
+								<c:forEach var="role" items="${departRole.roleList}">
+									<option value="${role.roleId}" ${role.roleId eq dto.roleId ? 'selected' : ''}>${role.displayName}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				
+				
+				<div class="form-group col-md-2" id="purposeDiv">
+					<label class="required" >Purpose :</label>
+					<div class="col-md-12">
+						<input type="text" class="form-control form-control-sm AlphaNumericAndSpecial" name="purpose" id="purposeId" value="${fac.purpose }" maxlength="200"/>
+					</div>
+				</div>
+
+				<div class="form-group col-md-2" id="purposeDiv">
+					<label class="required" >Justification :</label>
+					<div class="col-md-12">
+						<input type="text" class="form-control form-control-sm AlphaNumericAndSpecial"   name="justification" id="justification" value="${fac.purpose }" maxlength="200"/>
+					</div>
+				</div>
+
+
+				<div class="form-group col-md-2" id="purposeDiv">
+					<label class="required" >Estimated Amount :</label>
+					<div class="col-md-12">
+<%-- 						<input type="text" placeholder="0.00" class="form-control form-control-sm NumbersOnlyWithOneDotAndFirstNoNotZero text-end" maxlength="10"  name="provisionalAmount" id="provisionAmount" <fmt:formatNumber value="${fac.provisionalAmount}" type="number" maxFractionDigits="0"/> onblur="validateAmount(this)"/> --%>
+				     <fmt:formatNumber value="${fac.provisionalAmount}" type="number" maxFractionDigits="0" var="formattedAmount"/>
+
+					      <input type="text" placeholder="0.00" class="form-control form-control-sm NumbersOnlyWithOneDotAndFirstNoNotZero text-end" 
+					       maxlength="10" name="provisionalAmount" id="provisionAmount" 
+					       value="${formattedAmount}" onblur="validateAmount(this)"/>
+				     
+					</div>
+				</div>
+				
+				
+				
+			</div>
+			
+<!-- 		   <div class="col-md-12 text-center" style="margin-top: 10px;"> -->
+<%-- 			    <button type="button" onclick="submitForm()" class="btn btn-submit">${empty collgeMasterData ? 'Submit Request' : 'Update'}</button> --%>
+<!-- 			    <button type="button" onclick="history.back()" class="btn btn-back">Back</button> -->
+<!-- 			</div> -->
+								<c:set var="dynamicFromId" value="saveEventFormId" scope="request" />
+								 <c:set var="wonFunction" value="submitForm()"/>
+								 <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+		</form>
+	</div>
+</div>
+
+<!-- <div class="card cardContainerNotFirst"> -->
+
+<!-- <div class="card-header"><h5 class="card-title">Facility Requests</h5></div> -->
+<!-- 	<div class="card-body">		 -->
+<!-- 		<div class="col-md-12" id="tabs"> -->
+<!-- 			<ul class="nav nav-tabs mb-3" > -->
+<%-- 				<li class="nav-item"><a class="nav-link ${tabName eq 'Pending' ? 'active' : ''}" --%>
+<!-- 					data-bs-toggle="tab" href="#pending" onclick="fetchFilterData('Pending')">Pending</a></li> -->
+<%-- 				<li class="nav-item"><a class="nav-link ${tabName eq 'Approved' ? 'active' : ''}" data-bs-toggle="tab" --%>
+<!-- 					href="#approved" onclick="fetchFilterData('Approved')">Approved</a></li> -->
+<%-- 				<li class="nav-item"><a class="nav-link ${tabName eq 'Rejected' ? 'active' : ''}" data-bs-toggle="tab" --%>
+<!-- 					href="#reject" onclick="fetchFilterData('Rejected')">Rejected</a></li> -->
+<!-- 			</ul> -->
+<!-- 			<div class="tab-content"> -->
+<!-- 				<div class="tab-pane fade show active" id="pending"> -->
+<!-- 					<div class="col-md-12"> -->
+<!-- 						<table -->
+<!-- 							class="datatable table table-striped table-bordered exportbtn"> -->
+<!-- 							<thead> -->
+<!-- 								<tr> -->
+<!-- 									<th>Sl No</th> -->
+<!-- 									<th>Facility Name</th> -->
+<!-- 									<th>Purpose</th> -->
+<!-- 									<th>Justification</th> -->
+<!-- 									<th>Amount</th> -->
+<!-- 									<th>Status</th> -->
+<%-- 									<c:if test="${tabName eq 'Rejected'}"> --%>
+<!-- 										<th>Reject Remark</th> -->
+<%-- 									</c:if> --%>
+<!-- 									<th>Action</th> -->
+									
+<!-- 								</tr> -->
+<!-- 							</thead> -->
+<!-- 							<tbody> -->
+<%-- 							<c:set var="pendingCount" value="1" /> --%>
+<%-- 								<c:forEach items="${facilityRequest}" var="facility" --%>
+<%-- 									varStatus="count"> --%>
+									
+<!-- 										<tr> -->
+<%-- 											<td>${count.count}</td> --%>
+<%-- 											<td>${facility.facilityId.facilityName}</td> --%>
+<%-- 											<td>${facility.purpose}</td> --%>
+<%-- 											<td>${facility.justification}</td> --%>
+<%-- 											<td style="text-align: right;">${facility.provisionalAmount}</td> --%>
+<%-- 											<td>${facility.status}</td> --%>
+<%-- 											<c:if test="${tabName eq 'Rejected'}"> --%>
+<%-- 												<th>${facility.remark}</th> --%>
+<%-- 											</c:if> --%>
+<%-- 											<td><button title="Edit" type="button" onclick="editNewFacRequest('${facility.facilityRequestId}')" class="btn btn-xs btn-warning"> --%>
+<!-- 													<i class="fas fa-edit"></i> -->
+<!-- 											</button></td> -->
+<!-- 										</tr> -->
+										
+									
+<%-- 								</c:forEach> --%>
+<!-- 							</tbody> -->
+<!-- 						</table> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+<!-- 	</div> -->
+<!-- </div> -->
+
+
+<!-- Remark Modal -->
+<div class="modal fade" id="remark-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" style="color: black;" id="exampleModalLabel">Revert Remark</h5>
+				<button type="button" class="btn-close"  data-bs-dismiss="modal" aria-label="Close" onclick="dismisRemarkModal()"></button>
+			</div>
+			
+			<div class="modal-body">
+				<textarea class="form-control" id="modal-remarks" name="remarks"></textarea>
+				<span id="alert-message-id"></span>
+			</div>
+			
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="modalSubmit();">Save</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+<form action="${contextPath}/facility/createRequest" method="get" id="filterForm">
+   <input type="hidden" name="tabName" value="" id="tabName" />
+   <input type="hidden" name="action"  id="action" />
+</form>
+
+<form action="${contextPath}/facility/editNewFacRequest" method="get" id="editNewFacRequest">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+<input type="hidden" name="hdnNewRqstId"  id="hdnNewRqstId" value="">
+</form>
+
+<script type="text/javascript" src="${contextPath}/assets/full-calender/full-calender.js"></script>
+<script type="text/javascript" src="${contextPath}/assets/full-calender/global-full-calender.js"></script>
+<script>
+
+
+
+// fetch filter data on tab change
+function fetchFilterData(tab){
+	$('#tabName').val(tab);
+	$('#filterForm').submit();
+}
+
+
+//  submit form 
+function submitForm() {
+    if($("#facilityId").val() == "0"){
+       		bootbox.alert("Please select facility name.");
+       		return false;
+	}
+    if($("#roleSelect").val() == "0"){
+   		bootbox.alert("Please select role name.");
+   		return false;
+     }
+	if($("#purposeId").val().trim() == ""){
+   		bootbox.alert("Please provide purpose of request.");
+   		return false;
+   	}
+	if($("#justification").val().trim() == ""){
+   		bootbox.alert("Please provide justification.");
+   		return false;
+   	}
+	if($("#provisionAmount").val().trim() == ""){
+   		bootbox.alert("Please provide estimated amount.");
+   		return false;
+   	}
+   	
+	 $("#orgId").val($("#orgIdAndTypeId").val());
+	 $("#dowlLvlId").val($("#upperEntityId").val());
+	
+	 var bizContent = $("#saveEventFormId").serializeArray();
+	 $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+   		bootbox.confirm("Do you want to submit facility request ?" ,
+   			function(result){
+   				if(result){
+   					showLoader();
+   					$("#saveEventFormId").submit();
+   				}
+	   	});
+};
+
+
+function dismisRemarkModal(){
+	$('#alert-message-id').text('');
+	$('#modal-remarks').val('')
+	$('#remark-modal').modal('hide');
+}
+
+function modalSubmit(){
+	if($('#modal-remarks').val() === ''){
+		$('#alert-message-id').text('Please provide revert remark.');
+		return false;
+	}else{
+		$('#remark').val($('#modal-remarks').val());
+		finalActionSubmit($('#action').val());
+	}
+}
+
+// modal functionality
+function takeAction(id,status){
+	setRequestIdAndStatus(id,status);
+	if(status === 'REJECTED'){
+		$('#remark-modal').modal('show');
+		$('#action').val('reject');
+	}else if(status === 'APPROVED'){
+		$('#action').val('approve');
+		finalActionSubmit($('#action').val());
+	}	
+}
+
+
+function finalActionSubmit(action){
+	var bizContent = $("#saveEventFormId").serializeArray();
+	 $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+	 if(action === 'reject'){
+		$("#saveEventFormId").submit();
+	 }else{
+		bootbox.confirm("Do you want to "+action +" ?",
+   			function(result){
+   				if(result){
+   					showLoader();
+   					$("#saveEventFormId").submit();
+   				}
+	   	});
+	 }		
+}
+
+
+
+function setRequestIdAndStatus(id,status){
+		$('#requestId').val(id);
+		$('#status').val(status);
+}
+
+
+
+// ajax call section
+  function getFacilityListByFacilityType(typeId) {
+	 var encodedTypeId = btoa(typeId);
+	 $.ajax({
+			type : "GET",
+			url : '${contextPath}/facility/getUnmappedFacilityByFacilityType',
+			dataType: "json",
+			data : {
+				"typeId" : encodedTypeId,							
+			},
+			success: function (response) {
+	            try {
+	            	 var data = response;
+	                var html = "<option value='0'>--select--</option>";
+	                $.each(data, function (index, value) {
+	                    html += "<option value=" + value.facilityId + ">" + value.facilityName + "</option>";
+	                });
+	                $('#facilityId').empty().append(html);
+	                
+	             
+	            } catch (error) {
+	                bootbox.alert("Error parsing response.");
+	            }
+	        },
+	        error: function (error) {
+	            bootbox.alert("FacilityList Not Found.");
+	        }
+		});
+}
+
+
+
+
+	// validation functionality
+	function validateAmount(object) {
+		if (!isNaN(object.value)) { // Check if the input is a valid number
+			object.value = parseFloat(object.value).toFixed(2); // Convert and format the number
+		} else {
+			// Handle the case when input is not a valid number
+			alert("Please enter a valid number.");
+			object.value = ''; // Clear the input field
+		}
+	}
+
+	function getFacilities(selFacId) {  // Accept a callback function
+	    var orgId = $("#orgIdAndTypeId").val();
+	    var dowlLvlId = $("#upperEntityId").val();
+
+	    $.ajax({
+	        url: "${contextPath}/facility/getFacilityByOrgAndDownlvl",
+	        type: "GET",
+	        data: {
+	            "orgId": orgId,
+	            "dowlLvlId": dowlLvlId
+	        },
+	        success: function(response) {
+	            if (response.outcome) {
+	                var html = "<option value='' selected>--Select--</option>";
+	                var data = response.data;
+
+	                if (data && data.length > 0) {
+	                    $.each(data, function(index, value) {
+	                        html += '<option value="' + value.parentId + '">' + value.parentName + '</option>';
+	                    });
+	                }
+
+	                $('#facilityId').empty().append(html);
+	                var dowlLvlId=$("#upperEntityId").val();
+	                if (selFacId !== '') {
+	                    $('#facilityId').val(selFacId);
+	                    var selRole='${fac.roleId.roleId}';
+	                    if(selRole!=''){
+	                    	getRoleListByActualLevel(dowlLvlId,selRole);
+	                    }else{
+	                    	getRoleListByActualLevel(dowlLvlId,0);
+	                    }
+	                }else{
+	                	 getRoleListByActualLevel(dowlLvlId,0);
+	                }
+	               
+	                
+	               
+	            }
+	        },
+	        error: function(error) {
+	            console.error("Error fetching facilities:", error);
+	        }
+	    });
+	}
+
+
+// 	$(document).ready(function() {
+// 		var selFacId='${fac.facilityId.facilitiesMapId}'
+		
+// 		 setTimeout(function() {
+// 		        getFacilities(selFacId);
+// 		    }, 2000);
+// 	});
+	
+	$(document).ready(function() {
+		debugger
+		var selOrg='${fac.organization}';
+		var selDwnLvl='${fac.dowlLvl}';
+		var selRole='${fac.roleId.roleId}';
+		
+		if(selOrg!='' && selDwnLvl!=''){
+			$("#orgIdAndTypeId").val(selOrg);
+			$("#upperEntityId").val(selDwnLvl);
+		}
+
+// 		if(selDwnLvl!='' && selRole!=''){
+// 			getRoleListByActualLevel(selDwnLvl,selRole);
+// 		}		
+		   setTimeout(function() {
+			   var upperEntityId=$("#upperEntityId").val();
+			   var check ='${not empty fac}';
+			   if(check!='false'){
+				   $("#upperEntityId").val(selDwnLvl);
+			   }
+			   if(selDwnLvl=='' && selRole==''){
+				   getRoleListByActualLevel($("#upperEntityId").val(),0);
+				}else{
+					getRoleListByActualLevel(selDwnLvl,selRole);
+				}
+			  
+			}, 2000);
+		
+		
+		
+// 		else{
+// 			var dowlLvlId=$("#upperEntityId").val();
+// 			getRoleListByActualLevel(dowlLvlId,0);
+// 		}
+	});
+	
+	function editNewFacRequest(hdnNewRqstId){
+		debugger
+		 $("#hdnNewRqstId").val(hdnNewRqstId);
+		 $("#editNewFacRequest").submit();
+	}
+	
+	function getRoleListByActualLevel(dowlLvlId,selData){
+		debugger
+		 var setData;
+		    if (selData != 0) {
+		        setData = { actualLevelData: dowlLvlId }; 
+		    } else {
+		        setData = { actualLevelData: dowlLvlId };
+		    }
+	    $.ajax({
+	        url: "${contextPath}/api/allow/getRoleListByActualLevel",
+	        method: "GET",
+	        data:setData,
+	        success: function(response) {
+	        	var data = JSON.parse(response);
+	        	var html = '<option value="0">- Select -</option>';
+	            $.each(data, function(index, value){
+	            	html += '<option value="'+value.entityId+'">'+value.entityName+'</option>';
+	            });
+	            $('#roleSelect').empty().append(html);
+	            if(selData!=''){
+					$('#roleSelect').val(selData);
+				}
+	        },
+	        error: function(jqXHR, textStatus, errorThrown) {
+	            console.log("Something Went Wrong: " + errorThrown);
+	        }
+	    });
+	}
+	
+	
+	function checkDuplicate(facName) {
+	    debugger;
+
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/facility/checkFacilityduplicate", 
+	        data: { facName: facName},
+	        success: function (response) {
+	            if (response.exists) {
+	               bootbox.alert("Duplicate facility not allowed.");
+	               $("#facilityId").val("");
+	               return false;
+	            } else {
+	            }
+	        },
+	        error: function () {
+	            console.error("Error checking duplicate for " + fieldType);
+	        }
+	    });
+	}
+</script>
+

@@ -1,0 +1,539 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+ <jsp:useBean id="utils" class="com.aashdit.fams.utils.ApplicationStringUtilsFams"/> 
+<%@ taglib prefix="fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<link rel="stylesheet" href="resources/stylesheets/financialaccounting/fa-common-report-style.css" />
+<link rel="stylesheet" href="resources/stylesheets/financialaccounting/fa-common-styles.css" />
+
+<script src="../assets/javascripts/common.js"></script>
+<script src="../assets/javascripts/incomeAndExpenditure.js"></script>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">GST R-2 Summary (B2B)</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">GST R-2 Summary (B2B)</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">GST R-2 Summary (B2B)</h5>
+			</div>
+				<div class="card-body" id="partyDtlsInRequest">
+                                    <div class="row">
+		<form class="form-horizontal form-bordered" id="rptGSTR2" action="../gstRpt/GR2.htm" method="post">
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+					
+						<input type="hidden" name="company" id="officeId2" />
+					<c:set var="divCodeName" value="(00) Corporate"></c:set>
+							<div class="row" ><!-- style="margin-left: -25px; margin-right: -25px;" -->
+								<%-- <div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault">IDCO GSTIN</label>
+										<div class="col-md-12">
+											<select class="form-control form-select selectpicker" data-live-search="true" name="idcoGSTIN" id="idcoGSTIN" >
+												<c:forEach items="${GSTINList}" var="list">
+													<option value="${list.idcoGstNo}" ${list.idcoGstNo eq selIdcoGSTIN ? "selected" : ''}>
+  														${list.idcoGstNo} &nbsp;&nbsp;&nbsp;&nbsp; (${list.stateId.stateName})
+													</option>
+
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</div>  --%>
+								 <div class="col-md-1 col-sm-1">
+									<div class="form-group">
+									<label class="col-md-12 required" for="cboMonth"><spring:message code="LAND.ALT.LANDRENEWAL.YEAR" /></label>
+										<div class="col-md-12">
+											<select class="form-control "  name="reportYear" id="reportYear" onchange="getStartAndEndDateOfMonth();" >
+												<c:set var="startYear" value="2017"/>
+												<c:set var="sumOfYears" value="${startYear + currYear}"/>
+									            <c:forEach var="i" begin="${startYear}" end="${currYear}" step="1">
+													<c:set var="yearsDescending" value="${sumOfYears-i}"/>
+									                <option value="${yearsDescending}" ${yearsDescending eq selYear ? "selected" : ''}>${yearsDescending}</option>
+									            </c:forEach>
+											</select>
+										</div>
+									</div>
+								</div> 
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12 required" for="cboMonth">From Month</label>
+										<div class="col-md-12">
+											<select class="form-control  "  name="reportMonth" id="reportMonth" onchange="getStartAndEndDateOfMonth();" >
+												<c:forEach items="${monthList}" var="entry">
+													<option value="${entry.key}" ${entry.key eq selMonth ? "selected" :''} >${entry.value}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</div> 
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="cboMonth"> To Month</label>
+										<div class="col-md-12">
+											<select class="form-control "  name="toMonth" id="toMonth" onchange="changeEndDate();">
+												<c:forEach items="${monthList}" var="entry">
+													<option value="${entry.key}" ${entry.key eq toMonth ? "selected" :''}> ${entry.value}</option>
+												</c:forEach>
+											</select>
+											<!-- <input type="text" class="form-control" id="toMonth" name="toMonth" value="" readonly="readonly"> -->
+										</div>
+									</div>
+								</div> 
+								
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="fromDate"><spring:message code="HR.REIMBURSE.FORM.FROMDATE" /></label>
+										<div class="col-md-12">
+											<!-- <input type="text" name="startDate" id="startDate" class="form-control jqueryNDatePicker"  placeholder="dd/mm/yyyy" > -->
+											<input type="text" class="form-control" id="startDate" name="startDate" value="" readonly="readonly">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12 " for="fromDate"><spring:message code="HR.REIMBURSE.FORM.TODATE" /></label>
+										<div class="col-md-12">
+											<!-- <input type="text" name="endDate" id="endDate" class="form-control jqueryNDatePicker"  placeholder="dd/mm/yyyy" > -->
+											<input type="text" class="form-control" id="endDate" name="endDate" value="" readonly="readonly">
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<%-- <div class="row"><!-- style="margin-left: -25px; margin-right: -25px;" -->
+							<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.CONTRA.VOUCHER.COMPANY"/></label>
+										<div class="col-md-12">
+											<select class="form-control form-select selectpicker" data-live-search="true" name="company1" id="companyId1" >
+												<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.CORPORATE"/></option>
+												<c:forEach items="${officeList}" var="officeList">
+													<c:if test="${officeList.officeMasterId eq selOffice}">>
+														<c:set var="divCodeName" value="Division : &nbsp; (${officeList.officeCode})  ${officeList.officeName}"></c:set>
+													</c:if>
+													<option value="${officeList.officeMasterId}" ${officeList.officeMasterId eq selOffice ?  "selected" :''}>${officeList.officeCode} | ${officeList.officeName}</option>
+												</c:forEach>
+							 			 	</select>
+										</div>
+									</div>
+								</div> 
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault">Module Code</label>
+										<div class="col-md-12">
+											<select class="form-control form-select selectpicker" data-live-search="true" name="moduleCode" id="moduleCode" >
+					                                <option value="">--ALL--</option>
+												    <option value="WT" ${moduleCode eq 'WT' ? 'selected' : ''}>Water</option>
+													<option value="OC" ${moduleCode eq 'OC' ? 'selected' : ''}>Office Complex</option>
+													<option value="ID" ${moduleCode eq 'ID' ? 'selected' : ''}>ID</option>
+													<option value="FIN" ${moduleCode eq 'FIN' ? 'selected' : ''}>Finance</option>
+													<option value="APAAWT" ${moduleCode eq 'APAAWT' ? 'selected' : ''}>Apaa Water</option>
+
+											</select>
+										</div>
+									</div>
+								</div>
+							</div> --%>
+					
+
+					<div class="row">
+						<div class="col-md-12 col-sm-12" style="text-align:center; margin-top:20px;">
+							<input type="button" class="btn-submit" value="<spring:message code="COMMON.BUTTON.SEARCH"/>" onclick="showGR2List();" />
+<!-- 							<a href="../rpt/financeReportList.htm" class="btn btn-danger ">Back</a> -->
+						</div>
+					</div>
+					<div class="row"></div>
+				</form>
+			<c:if test="${empty gstRepList}">
+				<c:set var="report" value="none"></c:set>
+				<c:if test="${type eq 'Post'}">
+					<c:set var="list" value="block"></c:set>
+				</c:if>
+				<c:if test="${type eq 'Get'}">
+					<c:set var="list" value="none"></c:set>
+				</c:if>
+				<div id="lists" style="display:${list};">
+				<div class="row">
+					<div class="col-md-12 col-sm-12">
+						<div class="form-group">
+							<label class="acct-req-th noDataText"><spring:message code="COMMON.REPORT.NODATA"/></label>
+						</div>
+					</div>
+				</div>
+				</div>
+			</c:if>
+
+			<c:if test="${not empty gstRepList}">
+				<c:set var="report" value="block"></c:set>
+			</c:if>
+
+          	<div id="GSTR2Report" style="float:left; display:${report};">
+			<hr>
+				<div id="report" class="printDiv">
+					<div class="row">
+						<div class="col-md-12 col-sm-12" style="text-align:center">
+						
+						<h5>${organisationName}</h5>
+					          <%-- <img class="reportLogo" src="../assets/images/Idco-bw-image.jpg" />
+					                 <h3 style="font-weight: bold;">
+											<spring:message code="COMMON.LABEL.IDCO.TITLE"></spring:message>
+										</h3>
+										<h4>
+											<spring:message code="COMMON.LABEL.IDCO.ADDRESS.TITLE"></spring:message>
+										</h4> --%>
+										<b>GST R-2 Summary (B2B)</b><br>
+										<b>${divCodeName1}</b>
+					</div>
+					</div>
+					<div class="row">
+					<div class="col-md-6" style="text-align: left; padding-top: 22px;">For the Month : &nbsp; ${monthAsMMMinStartDate}&nbsp; ${yearInStartDate}</div>
+					       <div class="col-md-6" style="text-align: right;" >GSTIN : &nbsp; ${selIdcoGSTIN}<br>
+						               <c:choose>
+						 					<c:when test="${not empty totalTaxableAmt}">
+												Total Taxable Value (Rs.) :&nbsp; ${utils.convertAmountToINRFormat(totalTaxableAmt)}
+											</c:when>
+											<c:otherwise>
+												Total Taxable Value (Rs.) :&nbsp; 0.00
+											</c:otherwise>
+										</c:choose>
+					
+					       </div>
+						<div class="col-md-12 col-sm-12">
+							<table class="table printtable">
+								<thead>
+									<tr>
+										<th width="10%" class="leftSolidBorder bottomSolidBorder topSolidBorder rightDottedBorder">GSTIN/UIN of Recipient</th>
+										<th width="07%" class="topSolidBorder bottomSolidBorder rightDottedBorder">Invoice No.</th>
+										<th width="06%" class="topSolidBorder bottomSolidBorder rightDottedBorder">Invoice Date</th>
+										<th width="07%" style="text-align: right;" class="topSolidBorder bottomSolidBorder rightDottedBorder">Invoice Value (Rs.)</th>
+										<th width="07%" class="topSolidBorder bottomSolidBorder rightDottedBorder">Invoice Type</th>
+										<th width="04%" class="topSolidBorder bottomSolidBorder rightDottedBorder">Sl. No.</th>
+										<th width="05%" style="text-align: right;" class="topSolidBorder bottomSolidBorder rightDottedBorder">Rate (%)</th>
+										<th width="10%" style="text-align: right;" class="topSolidBorder bottomSolidBorder rightDottedBorder">Taxable Value (Rs.)</th>
+										<th width="07%" style="text-align: right;" class="topSolidBorder bottomSolidBorder rightDottedBorder">Integrated Tax (Rs.)</th>
+										<th width="07%" style="text-align: right;" class="topSolidBorder bottomSolidBorder rightDottedBorder">Central Tax (Rs.)</th>
+										<th width="07%" style="text-align: right;" class="topSolidBorder bottomSolidBorder rightDottedBorder">State/UT Tax (Rs.)</th>
+										<th width="07%" style="text-align: right;" class="topSolidBorder bottomSolidBorder rightDottedBorder">Cess Amt (Rs.)</th>
+										<th width="05%" class="topSolidBorder bottomSolidBorder rightDottedBorder">Reverse Charge</th>
+										<th width="11%" class="topSolidBorder bottomSolidBorder rightSolidBorder">Place of Supply</th>
+									</tr>
+								</thead>
+
+								<c:forEach items="${gstRepList}" var="gstr2List">
+									<tr>
+										<td class="leftSolidBorder bottomDottedBorder rightDottedBorder">${gstr2List.gst} </td>
+										<td class="bottomDottedBorder rightDottedBorder">
+											${gstr2List.invoiceNo}
+										</td>
+										<td class="bottomDottedBorder rightDottedBorder">
+											<c:choose>
+												<c:when test="${not empty gstr2List.invoiceDate}">
+													<fmt:formatDate value="${gstr2List.invoiceDate}" pattern="dd/MM/yyyy" />
+												</c:when>
+												<c:otherwise>${gstr2List.invoiceDate}</c:otherwise>
+											</c:choose>
+										</td>
+										<td style="text-align: right;" class="bottomDottedBorder rightDottedBorder">${utils.convertAmountToINRFormat(gstr2List.totalInvoiceAmount)}</td>
+										<td class="bottomDottedBorder rightDottedBorder">${gstr2List.regdType}</td>
+										<td class="bottomDottedBorder rightDottedBorder"></td>
+										<td style="text-align: right;" class="bottomDottedBorder rightDottedBorder">
+											<fmt:formatNumber pattern="#0" value="${gstr2List.ratePerc}" />
+										</td>
+										<td style="text-align: right;" class="bottomDottedBorder rightDottedBorder">${utils.convertAmountToINRFormat(gstr2List.taxableAmt)}</td>
+										<td style="text-align: right;" class="bottomDottedBorder rightDottedBorder"></td>
+										<td style="text-align: right;" class="bottomDottedBorder rightDottedBorder"></td>
+										<td style="text-align: right;" class="bottomDottedBorder rightDottedBorder"></td>
+										<td style="text-align: right;" class="bottomDottedBorder rightDottedBorder"></td>
+										<td class="bottomDottedBorder rightDottedBorder">N</td>
+										<c:choose>
+											<c:when test="${empty gstr2List.stateCodeForGST}">
+												<td class="bottomDottedBorder rightSolidBorder"></td>
+											</c:when>
+											<c:otherwise>
+												<td class="bottomDottedBorder rightSolidBorder">(${gstr2List.stateCodeForGST}) ${gstr2List.stateName}</td>
+											</c:otherwise>
+										</c:choose>
+									</tr>
+		 						</c:forEach>
+							</table>
+						</div>
+					</div>	
+				</div>
+				<div class="row" style="margin-top: 15px;">
+					<div class="col-md-12 col-sm-12" style="text-align: right; font-size: 15px; font-weight: bold;">
+						EXPORT REPORT TO : &nbsp;&nbsp;&nbsp;
+						<img class="exportToPdfLogo" src="../assets/images/ExportToPDF_JPG.jpg" style="width: 30px;" data-toggle="tooltip" data-placement="top" onclick="generateGR2Pdf()" title="Export to PDF"/>
+						&nbsp;&nbsp;&nbsp;
+						<img class="exportToExcelLogo" src="../assets/images/ExportToExcel_JPG.jpg" data-toggle="tooltip" style="width: 30px;" data-placement="top" onclick="generateGR2ExcelReconcile()" title="Export GST R-2 to Excel for Reconciliation"/>
+						&nbsp;&nbsp;&nbsp;
+						<!-- <img class="exportToExcelLogo" src="./resources/images/ExportToExcel_JPG.jpg" data-toggle="tooltip" data-placement="top" onclick="generateGR2Excel()" title="Export GST R-2 to Excel for Upload"/> -->
+					</div>
+				</div>				
+			</div>
+			  	</div>
+			  </div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+</section>
+
+			<form action="../gstRpt/GR2-PDF.htm" method="post" id="frmGR2Pdf" target="_blank">
+				<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+				<input type="hidden" name="startDate" id="startDate1"/>
+				<input type="hidden" name="endDate" id="endDate1"/>
+				<input type="hidden" name="company" id="officeId1"/>
+				<input type="hidden" name="reportFinYr" id="reportFinYr" value="${selFinYear}"/>
+				<input type="hidden" name="reportMonth" id="reportMonth" value="${monthAsMMMinStartDate}"/>
+				<input type="hidden" name="reportYear" id="reportYear" value="${yearInStartDate}"/>
+				<input type="hidden" name="selIdcoGstNo" id="selIdcoGstNo" value="${selIdcoGSTIN}"/>
+			</form>
+			<form action="../gstRpt/GR2-Excel.htm" method="post" id="generateExcelReconsile" target="_blank">	
+			   	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+			   	<input type="hidden" name="reportToMonth2" id="reportMonthEx2" value="" /> 
+				<input type="hidden" name="moduleCodeEx" id="moduleCodeEx2" value="" /> 
+			   	<input type="hidden" name="companyPdf" value="${selOffice}" />
+			    <input type="hidden" name="startDatePdf" value="${startDate}" />
+			    <input type="hidden" name="endDatePdf" value="${endDate}" />
+			    <input type="hidden" name="reportFinYr" id="reportFinYr" value="${selFinYear}"/>
+			    <input type="hidden" name="reportMonth" id="reportMonth" value="${monthAsMMMinStartDate}"/>
+				<input type="hidden" name="reportYear" id="reportYear" value="${yearInStartDate}"/>
+				<input type="hidden" name="selIdcoGstNo" id="selIdcoGstNo" value="${selIdcoGSTIN}"/>
+			    <input type="hidden" name="reportType" id="reportType" value="GST_R2_RECONSILE"/>
+			</form>
+			<form action="../gstRpt/GR2-Excel.htm" method="post" id="generateExcel" target="_blank">	
+			   	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+			   	<input type="hidden" name="companyPdf" value="${selOffice}" />
+			    <input type="hidden" name="startDatePdf" value="${startDate}" />
+			    <input type="hidden" name="endDatePdf" value="${endDate}" />
+			    <input type="hidden" name="reportFinYr" id="reportFinYr" value="${selFinYear}"/>
+			    <input type="hidden" name="reportMonth" id="reportMonth" value="${monthAsMMMinStartDate}"/>
+				<input type="hidden" name="reportYear" id="reportYear" value="${yearInStartDate}"/>
+				<input type="hidden" name="selIdcoGstNo" id="selIdcoGstNo" value="${selIdcoGSTIN}"/>
+			    <input type="hidden" name="reportType" id="reportType" value="GST_R2"/>
+			</form>
+
+<form action="../miscVouchersPDF.htm" method="POST" id="generatepdf" target="_blank">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	<input type="hidden" id="printVoucherId" name="printVoucherId" />
+	<input type="hidden" name="voucherType" value="FINANCE"/>	  
+</form>
+
+
+
+
+
+
+<!-- Button trigger modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="invoiceModalId" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Send Request</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+           <div class = "row">
+					<div class="col-md-12">
+					<input type="hidden" id="invoiceHdnId" name="invoiceHdnId" value="">
+			<input type="hidden" id="voucherHdnId" name="voucherHdnId" value="">
+						<label>Please select what to view..</label>
+					</div>
+				</div>
+      </div>
+      <div class="modal-footer">
+              <button type="button" class="btn btn-info" onclick="generateInvoicePDF();">
+					Tax Invoice
+				</button>
+				<button type="button" class="btn btn-primary" onclick="generateVoucherPDF();">
+					Voucher
+				</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+$(document).ready(function()
+{
+	getStartAndEndDateOfMonth();
+});
+
+
+function selectPdfViewType(invoiceId)
+{
+	bootbox.confirm({
+        title : "View Type",
+        message : "Please select what to view.",
+        buttons : {
+            confirm : {label : "Receipt Voucher", className: "btn-success"},
+            cancel : {label : "Tax Invoice", className: "btn-teal"}
+        },
+        callback: function(result) 
+        {
+        	
+        	if (result == true) 
+			{
+        		generateVoucherPDF();
+			}
+        	else
+        	{
+        		generateInvoicePDF();
+        	}
+        }
+	});
+}
+
+
+function showGR2List()
+{
+	$("#officeId2").val($("#companyId1").val());
+	$("#rptGSTR2").submit();
+}
+
+function generateGR2Pdf()
+{
+	debugger;
+	$("#startDate1").val($("#startDate").val());
+	$("#endDate1").val($("#endDate").val());
+	$("#officeId1").val($("#companyId1").val());
+	$('#frmGR2Pdf').submit();
+}
+function generateGR2ExcelReconcile()
+{
+	debugger;
+	var moduleCode = $("#moduleCode").val();
+	$("#moduleCodeEx2").val(moduleCode);
+	$("#reportMonthEx2").val($("#toMonth").val());
+	$('#generateExcelReconsile').submit();
+}
+function generateGR2Excel()
+{
+	var moduleCode = $("#moduleCode").val();
+	$("#moduleCodeEx1").val(moduleCode);
+	$("#reportMonthEx1").val($("#toMonth").val());
+	$('#generateExcel').submit();
+}
+
+function generateGR1Pdf()
+{
+	$("#startDate1").val($("#startDate").val());
+	$("#endDate1").val($("#endDate").val());
+	$("#officeId1").val($("#companyId1").val());
+	$("#frmGR1Pdf").submit();
+}
+
+function generateInvoicePDF(invoiceId)
+{
+	$("#invoiceId").val(invoiceId);
+	$("#frmInvoicePDF").submit();
+}
+
+function getStartAndEndDateOfMonth()
+{
+	var month = $("#reportMonth").val();
+	var year = $("#reportYear").val();
+	var toMonth = $("#toMonth").val();
+	var type = "${type}";
+	if($('#reportMonth').val() !="" && $('#reportYear').val())
+	{
+		$.ajax({
+			url : '../gstRpt/getStartAndEndDateOfMonth.htm',
+	 	    type:'GET',
+	 	    data : ({
+	 	    	month : month,
+	 	    	year : year,
+	 	    	type :type,
+	 	    	toMonth : toMonth,
+	 	    }),
+			cache:false,
+			asynch:false,
+			success : function(response) 
+			{
+				if(response!=null)
+				{
+					var value = [];
+					var value = response.split("#");
+					document.getElementById("startDate").value = value[0];
+					document.getElementById("endDate").value = value[1];
+					document.getElementById("toMonth").value = value[2];
+				} 
+			}
+		});
+	}
+	else
+	{
+		document.getElementById("startDate").value = "";
+		document.getElementById("endDate").value = "";
+	}
+}
+/* function generateGR1Excel()
+{
+	var moduleCode = $("#moduleCode").val();
+	$("#moduleCodeEx1").val(moduleCode);
+	$("#reportMonthEx1").val($("#toMonth").val());
+	$('#generateExcel').submit();
+}
+function generateGR1ExcelReconcile()
+{
+	var moduleCode = $("#moduleCode").val();
+	$("#moduleCodeEx2").val(moduleCode);
+	$("#reportMonthEx2").val($("#toMonth").val());
+	$('#generateExcelReconsile').submit();
+} */
+function changeEndDate(){
+	
+	var endMonth = $("#toMonth").val();
+	var year = $("#reportYear").val();
+	$.ajax({
+		url : '../gstRpt/getEndDateOfToMonth.htm',
+ 	    type:'GET',
+ 	    data : ({
+ 	    	month : endMonth,
+ 	    	year : year,
+ 	    }),
+		cache:false,
+		asynch:false,
+		success : function(response) 
+		{
+			if(response!=null)
+			{
+				$("#endDate").val(response);
+			} 
+		}
+	});
+	
+}
+
+function invoiceFunction(voucher, InvoiceId) {
+    debugger;
+    
+    // Set the voucher and InvoiceId values
+    $("#voucherHdnId").val(voucher);
+    $("#invoiceHdnId").val(InvoiceId);
+    
+    // Show the Bootstrap modal
+    $('#invoiceModalId').modal('show');
+}
+
+</script>
+

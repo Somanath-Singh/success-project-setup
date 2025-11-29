@@ -1,0 +1,337 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+<script src="${contextPath}/assets/js/moment.js"></script>
+
+
+<link href="${contextPath}/assets/full-calender/bootsrtap-icon.css">
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}"/>
+
+
+
+
+<div class="breadcrumb_conatiner">
+                <div class="col-md-6">
+	      <h4 class="change-color">View New Facility Request</h4>
+	   </div>
+	   <div class="col-md-6">
+	      <nav aria-label="breadcrumb" style="float: right;">
+	         <ol class="breadcrumb">
+	            <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+	            <li class="breadcrumb-item active" aria-current="page">View New Facility Request</li>
+	         </ol>
+	      </nav>
+	   </div>
+            </div>
+
+	   
+<div class="card">
+<div class="card-header"><h5 class="card-title">View New Facility Request</h5></div>
+	<div class="card-body">		     			
+		 <div class="tab-content"> 
+				<div class="tab-pane fade show active" id="pending">
+					<div class="col-md-12">
+						<table
+							class="datatable table table-striped table-bordered exportbtn">
+							<thead>
+								<tr>
+									<th style="text-align: center;width: 60px;">Sl. No</th>
+									<th style="">Requested By</th>
+									<th style="">Facility Name</th>
+									<th style="">Purpose</th>
+									<th style="">Justification</th>
+									<th style="text-align: right;">Amount</th>
+ 								    <th>Select All
+						              <input type="checkbox" id="selectAll" />
+				                    </th>
+								</tr>
+							</thead>
+							<tbody>
+							<c:set var="pendingCount" value="1" />
+								<c:forEach items="${newRqstdetails}" var="facility"	varStatus="count">
+										<tr>
+ 											<td style="text-align: center;">
+ 											<input type="hidden" id="" name="" value="${facility.organization}"/>
+ 											<input type="hidden" id="" name="" value="${facility.dowlLvl}"/>
+ 											${count.count}</td>
+ 											<td>${facility.createdBy.userName}</td> 
+											<td>${facility.facilityName}</td>
+ 											<td>${facility.purpose}</td> 
+											<td>${facility.justification}</td> 
+ 											<td style="text-align: right;">
+ 											  <fmt:formatNumber value="${facility.provisionalAmount}" type="number" maxFractionDigits="0" var="formattedAmount"/>
+ 												${formattedAmount}</td> 
+  											<td>
+  											   <c:if test="${empty facility.finalAprvlSts}">
+                                                 <input type="checkbox" class="x-check" id="empCheckBox${count.count}" value="${facility.facilityRequestId}" >
+                                               </c:if>
+                                                <c:if test="${not empty facility.finalAprvlSts}">
+                                                 ${facility.finalAprvlSts}
+                                               </c:if>
+                                            </td>
+										</tr> 
+										
+								</c:forEach> 
+							</tbody> 
+ 						</table> 
+ 					</div>
+				</div> 
+			</div>
+			<div class="col-md-12 text-center">
+				<div class="form-group">
+					<div class="col-md-12 mt-3">
+							<button type="button" class="btn btn-sm btn-primary" onclick="takeActions('APPROVE')">Approve</button>
+							<button type="button" class="btn btn-sm btn-danger" onclick="takeActions('REJECT')">Reject</button>
+					</div>
+				</div>
+			</div>
+	</div>
+</div>
+
+<!-- <div class="card cardContainerNotFirst"> -->
+
+<!-- <div class="card-header"><h5 class="card-title">Facility Requests</h5></div> -->
+<!-- 	<div class="card-body">		 -->
+<!-- 		<div class="col-md-12" id="tabs"> -->
+<!-- 			<ul class="nav nav-tabs mb-3" > -->
+<%-- 				<li class="nav-item"><a class="nav-link ${tabName eq 'Pending' ? 'active' : ''}" --%>
+<!-- 					data-bs-toggle="tab" href="#pending" onclick="fetchFilterData('Pending')">Pending</a></li> -->
+<%-- 				<li class="nav-item"><a class="nav-link ${tabName eq 'Approved' ? 'active' : ''}" data-bs-toggle="tab" --%>
+<!-- 					href="#approved" onclick="fetchFilterData('Approved')">Approved</a></li> -->
+<%-- 				<li class="nav-item"><a class="nav-link ${tabName eq 'Rejected' ? 'active' : ''}" data-bs-toggle="tab" --%>
+<!-- 					href="#reject" onclick="fetchFilterData('Rejected')">Rejected</a></li> -->
+<!-- 			</ul> -->
+<!-- 			<div class="tab-content"> -->
+<!-- 				<div class="tab-pane fade show active" id="pending"> -->
+<!-- 					<div class="col-md-12"> -->
+<!-- 						<table -->
+<!-- 							class="datatable table table-striped table-bordered exportbtn"> -->
+<!-- 							<thead> -->
+<!-- 								<tr> -->
+<!-- 									<th>Sl No</th> -->
+<!-- 									<th>Facility Name</th> -->
+<!-- 									<th>Purpose</th> -->
+<!-- 									<th>Justification</th> -->
+<!-- 									<th>Amount</th> -->
+<!-- 									<th>Status</th> -->
+<%-- 									<c:if test="${tabName eq 'Rejected'}"> --%>
+<!-- 										<th>Reject Remark</th> -->
+<%-- 									</c:if> --%>
+<!-- 									<th>Action</th> -->
+									
+<!-- 								</tr> -->
+<!-- 							</thead> -->
+<!-- 							<tbody> -->
+<%-- 							<c:set var="pendingCount" value="1" /> --%>
+<%-- 								<c:forEach items="${facilityRequest}" var="facility" --%>
+<%-- 									varStatus="count"> --%>
+									
+<!-- 										<tr> -->
+<%-- 											<td>${count.count}</td> --%>
+<%-- 											<td>${facility.facilityId.facilityName}</td> --%>
+<%-- 											<td>${facility.purpose}</td> --%>
+<%-- 											<td>${facility.justification}</td> --%>
+<%-- 											<td style="text-align: right;">${facility.provisionalAmount}</td> --%>
+<%-- 											<td>${facility.status}</td> --%>
+<%-- 											<c:if test="${tabName eq 'Rejected'}"> --%>
+<%-- 												<th>${facility.remark}</th> --%>
+<%-- 											</c:if> --%>
+<%-- 											<td><button title="Edit" type="button" onclick="editNewFacRequest('${facility.facilityRequestId}')" class="btn btn-xs btn-warning"> --%>
+<!-- 													<i class="fas fa-edit"></i> -->
+<!-- 											</button></td> -->
+<!-- 										</tr> -->
+										
+									
+<%-- 								</c:forEach> --%>
+<!-- 							</tbody> -->
+<!-- 						</table> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+<!-- 	</div> -->
+<!-- </div> -->
+
+
+<!-- Remark Modal -->
+<div class="modal fade" id="remark-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" style="color: black;" id="exampleModalLabel">Reject Remark</h5>
+				<button type="button" class="btn-close"  data-bs-dismiss="modal" aria-label="Close" onclick="dismisRemarkModal()"></button>
+			</div>
+			
+			<div class="modal-body">
+				<textarea class="form-control" id="modal-remarks" name="remarks"></textarea>
+				<span id="alert-message-id"></span>
+			</div>
+			
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="modalSubmit();">Save</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+<form action="${contextPath}/facility/createRequest" method="get" id="filterForm">
+   <input type="hidden" name="tabName" value="" id="tabName" />
+   <input type="hidden" name="action"  id="action" />
+</form>
+
+<form action="${contextPath}/facility/editNewFacRequest" method="get" id="editNewFacRequest">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+<input type="hidden" name="hdnNewRqstId"  id="hdnNewRqstId" value="">
+</form>
+
+<form action="${contextPath}/facility/takeActions" method="POST" id="takeActions">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	<input type="hidden" id="hdnRqstIds" name="hdnRqstIds">
+	<input type="hidden" id="hdnStageStatus" name="hdnStageStatus">
+	<input type="hidden" id="hdnRemark" name="remark" />
+	<input type="hidden" id="hdnOrgId" name="hdnOrgId" />
+	<input type="hidden" id="hdnDowlLvlId" name="hdnDowlLvlId" />
+</form>
+
+<script type="text/javascript" src="${contextPath}/assets/full-calender/full-calender.js"></script>
+<script type="text/javascript" src="${contextPath}/assets/full-calender/global-full-calender.js"></script>
+<script>
+
+
+
+function takeActions(stageStatus) {
+    debugger;
+    var checked = [];
+    var orgIds = [];
+    var dowlLvlIds = [];
+
+    // Check if at least one checkbox is selected
+    var checkboxes = $(".x-check:checked").length;
+    if (checkboxes == 0) {
+        bootbox.alert("Please select at least one record.");
+        return false;
+    }
+
+    // Loop through checked checkboxes
+    $(".x-check:checked").each(function () {
+        checked.push($(this).val()); // Collect selected record IDs
+
+        // Get corresponding organization and dowlLvl values
+        var row = $(this).closest("tr");
+        var orgId = row.find("input[type='hidden']").eq(0).val();
+        var dowlLvlId = row.find("input[type='hidden']").eq(1).val();
+
+        orgIds.push(orgId);
+        dowlLvlIds.push(dowlLvlId);
+    });
+
+    // Set collected values in hidden fields
+    $("#hdnRqstIds").val(checked.join(",")); // Set request IDs
+    $("#hdnOrgId").val(orgIds.join(",")); // Set organization IDs
+    $("#hdnDowlLvlId").val(dowlLvlIds.join(",")); // Set dowlLvl IDs
+    $("#hdnStageStatus").val(stageStatus.toString());
+
+    // Handle REJECT case
+    if (stageStatus === 'REJECT') {
+        $("#remark-modal").modal("show");
+        $("#remark-modal").data("stageStatus", stageStatus);
+    } else {
+        // Confirmation before submission
+        bootbox.confirm({
+            message: "Do you want to take action against these records?",
+            buttons: {
+                confirm: { label: 'Yes', className: 'btn-success' },
+                cancel: { label: 'No', className: 'btn-danger' }
+            },
+            callback: function (result) {
+                if (result == true) {
+                    $("#takeActions").submit();
+                }
+            }
+        });
+    }
+}
+
+
+
+function modalSubmit() {
+    var remark = $("#modal-remarks").val().trim();
+    if (remark === "") {
+        $("#alert-message-id").text("Please enter a remark.").css("color", "red");
+        return false;
+    }
+
+    // Store the remark value in a hidden input
+    $("#hdnRemark").val(remark);
+
+    // Get stageStatus from modal data
+    var stageStatus = $("#remark-modal").data("stageStatus");
+
+    // Collect checked records (same logic as takeActions)
+    var checked = [];
+    var myElements = document.getElementsByClassName("x-check");
+
+    for (var i = 1; i <= myElements.length; i++) {
+        if ($("#empCheckBox" + (i)).prop('checked') == true) {
+            checked.push(parseInt($("#empCheckBox" + (i)).val()));
+        }
+    }
+
+    if (checked.length === 0) {
+        bootbox.alert("Please select at least one record.");
+        return false;
+    }
+
+    // Store selected records in hidden input fields
+    $("#hdnRqstIds").val(checked.toString());
+    $("#hdnStageStatus").val(stageStatus.toString());
+
+    // Close the modal
+    $("#remark-modal").modal("hide");
+
+    // Proceed with confirmation and form submission
+    bootbox.confirm({
+        message: "Do you want to take action against these records?",
+        buttons: {
+            confirm: { label: 'Yes', className: 'btn-success' },
+            cancel: { label: 'No', className: 'btn-danger' }
+        },
+        callback: function (result) {
+            if (result == true) {
+                $("#takeActions").submit(); // Correct form ID
+            }
+        }
+    });
+}
+
+
+
+	$('.x-check').change(function() {
+	    handleCheckboxChange();
+	});
+
+	$('#selectAll').click(function(e) {
+	    var table = $(e.target).closest('table');
+	    $('td input:checkbox', table).prop('checked', this.checked);
+	    $('td input.isFreezed', table).prop('checked', false);
+	});
+
+	function handleCheckboxChange() {
+	    var allCheckboxes = $('.x-check');
+	    var selectAllCheckbox = $('#selectAll');
+	    selectAllCheckbox.prop('checked', allCheckboxes.length === allCheckboxes.filter(':checked').length);
+	}  
+
+</script>
+

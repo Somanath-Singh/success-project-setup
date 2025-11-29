@@ -1,0 +1,453 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+
+<%-- External Resources --%>
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+
+<%-- Inline CSS --%>
+<style>
+    .freeze {
+        pointer-events: none;
+    }
+    .card-title-add {
+        font-size: 14px;
+        margin: 0;
+        color: #000 !important;
+        font-weight: 500;
+    }
+    .btns {
+        border-radius: 0.2rem;
+        line-height: 14px;
+        padding: 6px 7px 6px 6px;
+        font-size: 13px;
+    }
+    .card iframe {
+        border-radius: 8px;
+        width: 100%;
+        height: 250px;
+    }
+    .card-body p {
+        margin-bottom: 8px;
+        font-size: 13px;
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        padding: 10px;
+    }
+    .card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+</style>
+
+<%-- Breadcrumb Navigation --%>
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Add BAMS Requisition</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa-solid fa-house"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Add Requisition</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<%-- Main Content --%>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <%-- Card Header --%>
+            <div class="card-header">
+                <c:choose>
+                    <c:when test="${not empty bamsRequisition.bamsRequisitionId}">
+                        <h5 class="card-title">Update Requisition</h5>
+                    </c:when>
+                    <c:otherwise>
+                        <h5 class="card-title">Add Requisition</h5>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
+            <%-- Card Body --%>
+            <div class="card-body">
+                <form class="form-horizontal" action="${contextPath}/BamsRequisition/saveBAMSRequisition" method="POST" id="bamsRequisitionForm" enctype="multipart/form-data">
+                    <%-- Hidden Inputs --%>
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <input type="hidden" id="cipherText" name="cipherText" value="">
+                    <input type="hidden" name="bamsRequisitionId" id="bamsRequisitionId" value="${bamsRequisition.bamsRequisitionId}">
+                    <input type="hidden" id="buttonCode" name="buttonCode">
+
+                    <%-- BAMSRequisition Details Form --%>
+                    <div class="row">
+                        <%-- Financial Year --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Financial Year:</label>
+                            <select class="form-control form-control-sm form-select" id="finyearId" name="finyearId" required>
+                                <option value="0" selected disabled>- Select -</option>
+                                <c:forEach var="finYear" items="${financialYearList}">
+                                    <option value="${finYear.finyearId}" ${finYear.finyearId eq bamsRequisition.finyearId ? 'selected' : ''}>
+                                        ${finYear.finYear}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        
+                        <%-- BAMSRequisition Name --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Requisition Name:</label>
+                            <input type="text" id="bamsRequisitionName" name="bamsRequisitionName" placeholder="Enter Requisition Name" class="form-control form-control-sm" required maxlength="100" value="${bamsRequisition.bamsRequisitionName}">
+                        </div>
+
+                        <%-- BAMSRequisition Type --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Requisition Type:</label>
+                            <select id="bamsRequisitionType" name="bamsRequisitionType" class="form-control form-control-sm form-select" required>
+                                <option value="" selected disabled>- Select -</option>
+                                <c:forEach var="reqType" items="${bamsRequisitionTypeList}">
+                                    <option value="${reqType.valueEn}" ${bamsRequisition.bamsRequisitionType == reqType.valueEn ? 'selected' : ''}>
+                                        ${reqType.valueEn}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+
+                        <%-- Estimated Cost --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Estimated Cost:</label>
+                            <input type="text" id="estimatedCost" name="estimatedCost" pattern="^\d*\.?\d{0,8}$" class="form-control form-control-sm NumbersOnlyForAmount" maxlength="12" value="${bamsRequisition.estimatedCost}" required>
+                        </div>
+
+                        <%-- Request Date --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Request Date:</label>
+                            <div class="datepicker-box">
+                                <input type="text" id="requestDate" name="requestDate" class="form-control form-control-sm datepicker" required value="${bamsRequisition.requestDate}" readonly>
+                            </div>
+                        </div>
+
+                        <%-- Department --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Department:</label>
+                            <select class="form-control form-control-sm form-select" id="deptId" name="deptId" required>
+                                <option value="0" selected disabled>- Select -</option>
+                                <c:forEach var="department" items="${departmentList}">
+                                    <option value="${department.deptId}" ${department.deptId eq bamsRequisition.deptId ? 'selected' : ''}>
+                                        ${department.deptName}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+
+                        <%-- District --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">District:</label>
+                            <select class="form-control form-control-sm form-select" id="distId" name="distId" required>
+                                <option value="0" selected disabled>- Select -</option>
+                                <c:forEach var="district" items="${districtList}">
+                                    <option value="${district.districtId}" ${district.districtId eq bamsRequisition.distId ? 'selected' : ''}>
+                                        ${district.districtName}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+
+                        <%-- Affiliation --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Affiliation Number:</label>
+                            <input type="text" id="affiliation" name="affiliation" placeholder="Enter Affiliation" class="form-control form-control-sm" required maxlength="15" value="${bamsRequisition.affiliation}">
+                        </div>
+
+                        <%-- Student Strength --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Student Strength:</label>
+                            <input type="number" id="studentStrength" name="studentStrength" placeholder="Enter Student Strength" class="form-control form-control-sm" required min="0" max="999999" value="${bamsRequisition.studentStrength}">
+                        </div>
+
+                        <%-- Land Record --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Land Record (acres):</label>
+                            <input type="text" id="landRecord" name="landRecord" pattern="^\d*\.?\d{0,2}$" placeholder="e.g., 12.55" class="form-control form-control-sm NumbersOnlyForAmount" required maxlength="10" value="${bamsRequisition.landRecord}">
+                        </div>
+
+                        <%-- Supporting Document --%>
+                        <div class="form-group col-md-3">
+                            <label>Supporting Requisition Document:</label>
+                            <div class="position-relative">
+                                <input type="file" id="supportingDocument" name="supportingDocument" class="form-control form-control-sm" onchange="uploadFileCheck(this)">
+                                <c:if test="${not empty bamsRequisition.supportingDocumentPath}">
+                                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${bamsRequisition.supportingDocumentPath}', 'BAMSREQUISITION_DOCUMENT')" title="View Document">
+                                        <i class="fa-regular fa-eye" title="View Document"></i>
+                                    </button>
+                                    <span style="font-size:12px;color:#7b3f00;font-weight:600;">${bamsRequisition.supportingDocumentPath}</span>
+                                </c:if>
+                                <div id="selectedFileName" class="mt-1 text-muted" style="font-size:0.9em;"></div>
+                            </div>
+                        </div>
+
+                        <%-- Legal Document Reference --%>
+                        <div class="form-group col-md-3">
+                            <label>Legal Document Reference:</label>
+                            <div class="position-relative">
+                                <input type="file" id="legalDocumentReference" name="legalDocumentReference" class="form-control form-control-sm" onchange="uploadFileCheck(this)">
+                                <c:if test="${not empty bamsRequisition.legalDocumentReferencepath}">
+                                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${bamsRequisition.legalDocumentReferencepath}', 'BAMSREQUISITION_LEGAL')" title="View Document">
+                                        <i class="fa-regular fa-eye" title="View Document"></i>
+                                    </button>
+                                    <span style="font-size:12px;color:#7b3f00;font-weight:600;">${bamsRequisition.legalDocumentReferencepath}</span>
+                                </c:if>
+                                <div id="selectedLegalFileName" class="mt-1 text-muted" style="font-size:0.9em;"></div>
+                            </div>
+                        </div>
+
+                        <%-- Structure Safety Certificate --%>
+                        <div class="form-group col-md-3">
+                            <label>Affiliation Document:</label>
+                            <div class="position-relative">
+                                <input type="file" id="structureSafetyCertificate" name="structureSafetyCertificate" class="form-control form-control-sm" onchange="uploadFileCheck(this)">
+                                <c:if test="${not empty bamsRequisition.structureSafetyCertificatePath}">
+                                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${bamsRequisition.structureSafetyCertificatePath}', 'BAMSREQUISITION_SAFETY')" title="View Document">
+                                        <i class="fa-regular fa-eye" title="View Document"></i>
+                                    </button>
+                                    <span style="font-size:12px;color:#7b3f00;font-weight:600;">${bamsRequisition.structureSafetyCertificatePath}</span>
+                                </c:if>
+                                <div id="selectedSafetyFileName" class="mt-1 text-muted" style="font-size:0.9em;"></div>
+                            </div>
+                        </div>
+
+                        <%-- Sketch Map --%>
+                        <div class="form-group col-md-3">
+                            <label>Sketch Map:</label>
+                            <div class="position-relative">
+                                <input type="file" id="sketchMap" name="sketchMap" class="form-control form-control-sm" onchange="uploadFileCheck(this)">
+                                <c:if test="${not empty bamsRequisition.sketchMapPath}">
+                                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${bamsRequisition.sketchMapPath}', 'BAMSREQUISITION_SKETCH')" title="View Document">
+                                        <i class="fa-regular fa-eye" title="View Document"></i>
+                                    </button>
+                                    <span style="font-size:12px;color:#7b3f00;font-weight:600;">${bamsRequisition.sketchMapPath}</span>
+                                </c:if>
+                                <div id="selectedSketchMapFileName" class="mt-1 text-muted" style="font-size:0.9em;"></div>
+                            </div>
+                        </div>
+
+                        <%-- Description --%>
+                        <div class="form-group col-md-6">
+                            <label class="required">Description:</label>
+                            <textarea id="description" name="description" rows="3" class="form-control form-control-sm" maxlength="500" required>${bamsRequisition.description}</textarea>
+                        </div>
+                    </div>
+
+                    <%-- Form Actions --%>
+                    <div class="col-md-12 mt-2 text-center">
+                        <c:set var="dynamicFromId" value="bamsRequisitionForm" scope="request" />
+                        <c:set var="wonFunction" value="submitForm()" />
+                        <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp" %>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%-- Project Location Cards --%>
+<div class="row mt-3">
+    <div class="col-md-12 col-lg-12">
+        <h4 class="card-title">Project Locations in Odisha</h4>
+        <div class="row">
+            <!-- Balasore Card -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title-add">Balasore Project</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>District:</strong> Balasore</p>
+                        <p><strong>Project:</strong> Hospital Construction</p>
+                        <p><strong>Scheme:</strong> OPTELP</p>
+                        <p><strong>Status:</strong> In Progress</p>
+                        <p><strong>Estimated Cost:</strong> Rs. 2,50,000</p>
+                        <iframe
+                            width="100%"
+                            height="250"
+                            style="border:0"
+                            loading="lazy"
+                            allowfullscreen
+                            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCWbHt9QraFjrNcBM8F8FtXVOSdprebieo&q=Balasore,Odisha,India">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+            <!-- Kendujhar Card -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title-add">Kendujhar Project</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>District:</strong> Kendujhar</p>
+                        <p><strong>Project:</strong> School Renovation</p>
+                        <p><strong>Scheme:</strong> OPTELP</p>
+                        <p><strong>Status:</strong> Completed</p>
+                        <p><strong>Estimated Cost:</strong> Rs. 1,80,000</p>
+                        <iframe
+                            width="100%"
+                            height="250"
+                            style="border:0"
+                            loading="lazy"
+                            allowfullscreen
+                            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCWbHt9QraFjrNcBM8F8FtXVOSdprebieo&q=Kendujhar,Odisha,India">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+            <!-- Angul Card -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title-add">Angul Project</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>District:</strong> Angul</p>
+                        <p><strong>Project:</strong> Community Center</p>
+                        <p><strong>Scheme:</strong> OPTELP</p>
+                        <p><strong>Status:</strong> Planned</p>
+                        <p><strong>Estimated Cost:</strong> Rs. 3,00,000</p>
+                        <iframe
+                            width="100%"
+                            height="250"
+                            style="border:0"
+                            loading="lazy"
+                            allowfullscreen
+                            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCWbHt9QraFjrNcBM8F8FtXVOSdprebieo&q=Angul,Odisha,India">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%-- Document View Form --%>
+<form action="${contextPath}/BamsRequisition/viewFile" method="get" id="documentFormView" target="_blank">
+    <input type="hidden" name="cipherText" id="cipherTextView">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="fileName" id="fileName" />
+    <input type="hidden" name="moduleName" id="moduleName" />
+</form>
+
+<%-- JavaScript Section --%>
+<script>
+function submitForm() {
+    event.preventDefault();
+    const buttonCode = $("#hdnButtonCode").val();
+    $("#buttonCode").val(buttonCode);
+    var bamsRequisitionName = $('#bamsRequisitionName').val();
+    var bamsRequisitionType = $('#bamsRequisitionType').val();
+    var estimatedCost = $('#estimatedCost').val();
+    var requestDate = $('#requestDate').val();
+    var deptId = $('#deptId').val();
+    var distId = $('#distId').val();
+    var finyearId = $('#finyearId').val();
+    var description = $('#description').val();
+    var affiliation = $('#affiliation').val();
+    var studentStrength = $('#studentStrength').val();
+    var landRecord = $('#landRecord').val();
+
+    // Validation Checks
+    if (bamsRequisitionName == "") {
+        bootbox.alert("Please enter BAMS Requisition Name.");
+        return false;
+    } else if (bamsRequisitionType == "") {
+        bootbox.alert("Please select BAMS Requisition Type.");
+        return false;
+    } else if (estimatedCost == "") {
+        bootbox.alert("Please enter Estimated Cost.");
+        return false;
+    } else if (requestDate == "") {
+        bootbox.alert("Please enter Request Date.");
+        return false;
+    } else if (deptId == "0" || deptId == null) {
+        bootbox.alert("Please select Department.");
+        return false;
+    } else if (distId == "0" || distId == null) {
+        bootbox.alert("Please select District.");
+        return false;
+    } else if (finyearId == "0" || finyearId == null) {
+        bootbox.alert("Please select Financial Year.");
+        return false;
+    } else if (description == "") {
+        bootbox.alert("Please enter Description.");
+        return false;
+    } else if (affiliation == "") {
+        bootbox.alert("Please enter Affiliation.");
+        return false;
+    } else if (studentStrength == "") {
+        bootbox.alert("Please enter Student Strength.");
+        return false;
+    } else if (landRecord == "") {
+        bootbox.alert("Please enter Land Record.");
+        return false;
+    }
+
+    var bizContent = $("#bamsRequisitionForm").serializeArray();
+    $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    bootbox.confirm("Do you want to continue?", function (result) {
+        if (result) {
+            $('#bamsRequisitionForm').submit();
+        }
+    });
+}
+
+function viewDocument(fileName, moduleName) {
+    $("#fileName").val(fileName);
+    $("#moduleName").val(moduleName);
+    var bizContent = $("#documentFormView").serializeArray();
+    $("#cipherTextView").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    $("#documentFormView").submit();
+}
+
+function uploadFileCheck(that) {
+    var ValidFileExtension = ['pdf', 'jpg', 'jpeg', 'png'];
+    if (that.files && that.files[0]) {
+        var fileName = that.files[0].name;
+        var extension = fileName.split('.').pop().toLowerCase();
+        if ($.inArray(extension, ValidFileExtension) == -1) {
+            bootbox.alert("Please upload only .pdf, .jpg, .jpeg, or .png files.");
+            $(that).val("");
+            return false;
+        }
+        if (that.files[0].size > 512000) { // 500KB
+            bootbox.alert("File size exceeds maximum file size of 500 KB!");
+            $(that).val("");
+            return false;
+        }
+        var targetId = that.id === 'supportingDocument' ? '#selectedFileName' :
+                       that.id === 'legalDocumentReference' ? '#selectedLegalFileName' :
+                       that.id === 'structureSafetyCertificate' ? '#selectedSafetyFileName' :
+                       '#selectedSketchMapFileName';
+        $(targetId).text(fileName);
+    } else {
+        bootbox.alert("Unsupported file format, please check your file extension.");
+        $(that).val("");
+    }
+}
+
+$(document).ready(function () {
+    $(".datepicker").datepick({
+        onShow: $.datepick.monthOnly,
+        dateFormat: "dd-mm-yyyy",
+        yearRange: "c-20:c+10",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>'
+    });
+});
+</script>

@@ -1,0 +1,431 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+	<c:set var="userDetails" value="${serviceOutcome.data}"/> 
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}" />
+
+<style>
+.mandotory::before {
+  content: '* '; /* Display an asterisk followed by a space before the header text */
+  color: red;    /* Optionally, set the color to red or any other desired color */
+}
+
+.required::before {
+  content: '* '; /* Display an asterisk followed by a space before the header text */
+  color: red;    /* Optionally, set the color to red or any other desired color */
+}
+.disabled-dropdown {
+    pointer-events: none;
+    background-color: #eee; /* Optional: Change the background color to visually indicate it's disabled */
+}
+
+.mandatory-field {
+    border: 1px solid #b3432f;
+/*     background-color: #ffb2a8; /* Adjust the background color as needed */ */
+}
+
+	.hidden {
+    display: none;
+}
+
+</style>
+<div class="breadcrumb_conatiner">
+        <div class="col-md-6">
+           <h4 class="change-color">Sourcing and Shortlisting</h4>
+        </div>
+        <div class="col-md-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Sourcing and Shortlisting</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-header">
+									<h5 class="card-title">Sourcing and Shortlisting</h5>
+								</div>
+								<div class="card-body">
+										<div class="col-lg-12 mt-3">
+										<!-- New Select Field -->
+									        <div class="row mb-3">
+									            <div class="col-md-4">
+									                <label for="statusFilter">Designation</label>
+									                <select class="form-control form-select validId3 require" name="roleId" id="roleSelect" data-plugin-selectTwo onchange="getVacDetails(this.value),getTabSelected(this.value)">
+													    <option value=""><spring:message code="label.common.select" /></option>
+													    <c:forEach var="role" items="${roleList}">
+													        <option value="${role[3]}" ${vacancyIdHdn eq role[3]?'selected':'' }>${role[1]} | ${role[2]}</option>
+													    </c:forEach>
+													</select>
+									            </div>
+<!-- 									            <div class="col-md-2" id="publicationDateContainer"> -->
+<!-- 												    <div class="form-group"> -->
+<!-- 												        <label for="publicationDate">Publication Date:</label> -->
+<!-- 												        <div class="form-group "> -->
+<%-- 												            <input type="text" name="publicationDate" id="publicationDate" value="${publicationDateHdn}" class="form-control" required readonly> --%>
+<!-- 												        </div> -->
+<!-- 												    </div> -->
+<!-- 												</div> -->
+<!-- 									            <div class="col-md-2" id="publicationDateContainer"> -->
+<!-- 											        <div class="form-group"> -->
+<!-- 											            <label for="applicationDeadline">Application Deadline:</label> -->
+<!-- 											            <div class="form-group "> -->
+<%-- 											            	<input type="text" name="applicationDeadline" id="applicationDeadline" class="form-control" value="${applicationDeadlineHdn}" readonly> --%>
+<!-- 											            </div> -->
+<!-- 											        </div> -->
+<!-- 											    </div> -->
+									        </div>
+										    <input type="hidden" id="tabId" value=""/>
+										    <ul class="nav nav-tabs " id="myTabs" role="tablist">
+										             <li class="nav-item">
+											            <a class="nav-link ${tabStatusId eq 'appliedCandidate' ? 'active':''}" id="appliedCandidate" data-toggle="tab" href="#appliedCandidate" onclick="filterData('appliedCandidate')">Applied Candidate</a>
+											        </li>
+										            <li class="nav-item">
+											            <a class="nav-link ${tabStatusId eq 'shortListed' || tabStatusId eq '' ? 'active':''}" id="draft" data-toggle="tab" href="#shortListed" onclick="filterData('shortListed')">ShortListed</a>
+											        </li>
+											        <li class="nav-item">
+											            <a class="nav-link ${tabStatusId eq 'rejected' || tabStatusId eq '' ? 'active':''}" id="draft" data-toggle="tab" href="#rejected" onclick="filterData('rejected')">Rejected</a>
+											        </li>
+										   	 </ul>
+										</div>
+								</div>
+								<div class="row">
+								    <div class="col-md-12 mb-5">
+								        <div class="table-responsive">
+								            <table class="table table-bordered" id="workplanrow">
+								                <thead>
+								                    <tr>
+								                        <th>Applicant Name</th>
+								                        <th>Registration code</th>
+								                        <th>Mobile No</th>
+								                        <th>Email</th>
+								                        <th>Aadhaar No</th>
+<!-- 								                        <th>DOB</th> -->
+								                        <th>Age</th>
+								                        <th>View Details</th>
+								                        <c:if test="${tabStatusId ne 'shortListed' && tabStatusId ne 'rejected'}">
+								                        <th>Action
+								                            <input type="checkbox" id="selectAll" />
+								                        </th>
+								                        </c:if>
+								                         <c:if test="${tabStatusId eq 'shortListed' || tabStatusId eq 'rejected'}">
+								                        <th>Status</th>
+								                        </c:if>
+								                    </tr>
+								                </thead>
+								                <tbody>
+								                    <c:forEach items="${details}" var="regd" varStatus="count">
+								                        <tr>
+								                            <td>${regd.name}</td>
+								                            <td>${regd.code}</td>
+								                            <td>${regd.mobileNo}</td>
+								                            <td>${regd.mailId}</td>
+								                            <td>${regd.aadhaarNo}</td>
+<!-- 								                            <td> -->
+<%-- 								                                <c:choose> --%>
+<%-- 								                                    <c:when test="${not empty vac.dob}"> --%>
+<%-- 								                                        <fmt:formatDate value="${vac.dob}" pattern="dd/MM/yyyy" /> --%>
+<%-- 								                                    </c:when> --%>
+<%-- 								                                    <c:otherwise> --%>
+<!-- 								                                        NA -->
+<%-- 								                                    </c:otherwise> --%>
+<%-- 								                                </c:choose> --%>
+<!-- 								                            </td> -->
+								                            <td>${regd.age}</td>
+								                            <td>
+								                                <button title="View" type="button" onclick="getApplicantAllDetails('${regd.regdId}','${vacancyIdHdn}')" class="btn btn-xs btn-primary">
+											                        <i class="fas fa-eye"></i>
+											                    </button>
+								                            </td>
+								                            <c:if test="${tabStatusId ne 'shortListed' && tabStatusId ne 'rejected'}">
+									                             <td>
+									                                <input type="checkbox" class="x-check" id="empCheckBox${count.count}" value="${regd.regdId}">
+									                            </td>
+								                            </c:if>
+								                            <c:if test="${tabStatusId eq 'shortListed'}">
+									                             <td>
+									                                Shortlisted
+									                            </td>
+								                            </c:if>
+								                             <c:if test="${tabStatusId eq 'rejected'}">
+									                             <td>
+									                                Rejected
+									                            </td>
+								                            </c:if>
+								                        </tr>
+								                    </c:forEach>
+								                </tbody>
+								            </table>
+								        </div>
+								    </div>
+								</div>
+
+									 <div class="col-md-12 text-center">
+										<div class="form-group">
+											<div class="col-md-12">
+												<c:if test="${tabStatusId eq 'appliedCandidate' && not empty details}">
+												 <button type="button" class="btn btn-danger" onclick="takeAction('reject')">Reject</button>
+											      <button type="button" class="btn btn-primary" onclick="takeAction('shortList')">ShortList</button>
+											     </c:if>
+											 <a href="${contextPath}/home" class="btn btn-warning" style="margin-top: 0px;">Back</a>
+										</div>
+									</div>
+							</div>
+						</div>
+					</div>
+				</div>	
+
+  </body>
+</html>
+<form action="${contextPath}/getApplicantList" method="POST" id="getApplicantList">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	<input type="hidden" id="tabStatusId" name="tabStatusId">
+	<input type="hidden" id="vacancyIdHdn" name="vacancyIdHdn">
+	<input type="hidden" id="publicationDateHdn" name="publicationDateHdn">
+	<input type="hidden" id="applicationDeadlineHdn" name="applicationDeadlineHdn">
+	<input type="hidden" id="interviewSchedule" name="interviewSchedule" value="scheduleIntrv">
+</form>
+
+
+<form action="${contextPath}/shortListCand" method="POST" id="shortListCand">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	<input type="hidden" id="hdnRegdIds" name="hdnRegdIds">
+	<input type="hidden" id="vacancyIdHdn2" name="vacancyIdHdn2">
+	<input type="hidden" id="hdnStageStatus" name="hdnStageStatus">
+</form>
+
+<form action="${contextPath}/vaccancy/editVacancyDetails" method="post" id="editVacancyDetails">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" name="hiddenVacId"  id="hiddenVacId" value="">
+</form>
+
+<form action="${contextPath}/vaccancy/publishVacancy" method="post" id="publishVacancy">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" name="hiddenVacIdP"  id="hiddenVacIdP" value="">
+	<input type="hidden" name="publishDate"  id="publishDate" value="">
+	<input type="hidden" name="deadLineDate"  id="deadLineDate" value="">
+</form>
+
+<form action="${contextPath}/getApplicantAllDetails" method="get" id="getApplicantAllDetails">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" name="regiId"  id="regiId" value="">
+	<input type="hidden" name="vacId"  id="vacId" value="">
+</form>
+
+
+<script>
+
+function filterData(tabStatus){
+debugger
+	if($("#roleSelect").val()==''){
+		bootbox.alert("Please select designation.");
+		return false;
+	}
+	else{
+		if(tabStatus!=null && tabStatus!=''){
+			$("#tabStatusId").val(tabStatus);
+			$("#vacancyIdHdn").val($("#roleSelect").val());
+			$("#publicationDateHdn").val($("#publicationDate").val());
+			$("#applicationDeadlineHdn").val($("#applicationDeadline").val());
+			$("#getApplicantList").submit();
+		   
+		}
+	}
+}
+
+function takeAction(stageStatus){
+	debugger
+	var confMsg='';
+	 var checked = [];
+	 var myElements = document.getElementsByClassName("x-check");
+	 var checkboxes =  $('input:checkbox:checked').length;
+	 if(checkboxes==0){
+		 bootbox.alert("Please select atleast one candidate."); 
+		return false;
+	 }else{
+		    for (var i = 1; i <= myElements.length; i++) {
+			    if ($("#empCheckBox" + (i)).prop('checked') == true) {
+			        checked.push(parseInt($("#empCheckBox" + (i)).val()));
+			    }
+			}
+	 }
+	 
+	 if(checked.length==0){
+    	 bootbox.alert("Please select atleast 1 record."); 
+ 		return false;
+     }else{
+    	 $("#hdnRegdIds").val(checked.toString());
+       	 $("#hdnStageStatus").val(stageStatus.toString());
+       	 $("#vacancyIdHdn2").val($("#roleSelect").val());
+       	 
+       	 if(stageStatus=='reject'){
+       		confMsg='reject';
+       	 }
+       	 if(stageStatus=='approve'){
+        		confMsg='approve';
+     	 }
+       	 
+ 		   bootbox.confirm({
+ 			    message: "Are you absolutely certain about taking this step? Your action will be irreversible!",
+ 			    buttons: {
+ 			        confirm: {
+ 			            label: 'Yes',
+ 			            className: 'btn-success'
+ 			        },
+ 			        cancel: {
+ 			            label: 'No',
+ 			            className: 'btn-danger'
+ 			        }
+ 			    },
+ 			    callback: function (result) {
+ 			    	if(result == true){
+ 			    	$("#shortListCand").submit();
+ 			    	}
+ 			    }
+ 			}); 
+        }
+}  
+
+$('.x-check').change(function() {
+    handleCheckboxChange();
+});
+
+$('#selectAll').click(function(e) {
+    var table = $(e.target).closest('table');
+    $('td input:checkbox', table).prop('checked', this.checked);
+    $('td input.isFreezed', table).prop('checked', false);
+});
+
+function handleCheckboxChange() {
+    var allCheckboxes = $('.x-check');
+    var selectAllCheckbox = $('#selectAll');
+    selectAllCheckbox.prop('checked', allCheckboxes.length === allCheckboxes.filter(':checked').length);
+}  
+
+function getVacancyById(vacId){
+	debugger
+	 $("#hiddenVacId").val(vacId);
+	 $("#editVacancyDetails").submit();
+}
+
+function publishModal(idforPub){
+	debugger
+	$("#publishModal").show();
+	$("#hiddenVacIdP").val(idforPub);
+}
+
+function publishVac(){
+	
+	 if ($("#publicationDate").val().trim()=='') {
+		 bootbox.alert("Publication Date is required when the job is published.");
+ 	     return false;
+     }
+	
+	if ($("#publicationDate").val().trim()!='' && $("#applicationDeadline").val().trim()=='') {
+		bootbox.alert("Application Deadline is required when Publication Date is set.");
+	     return false;
+	 }
+	 
+	//// Validate that publication date is less than or equal to application deadline
+	const publicationDateValue = $("#publicationDate").val().trim();
+	const applicationDeadlineValue = $("#applicationDeadline").val().trim();
+
+		   if (publicationDateValue !== '' && applicationDeadlineValue !== '') {
+		    const publicationDate = parseDate(publicationDateValue);
+		    const applicationDeadline = parseDate(applicationDeadlineValue);
+		
+		    if (publicationDate > applicationDeadline) {
+		    	bootbox.alert("Publication Date cannot be greater than the Application Deadline.");
+		        $("#publicationDate").focus();
+		        return false;
+		    }else{
+		    	$("#publishDate").val($("#publicationDate").val());
+		    	$("#deadLineDate").val($("#applicationDeadline").val());
+		    	$("#publishVacancy").submit();
+		    }
+		}
+}
+
+function parseDate(input) {
+    const parts = input.split('/'); // Split by "/"
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Months are 0-based in JavaScript
+    const year = parseInt(parts[2], 10);
+
+    return new Date(year, month, day);
+}
+
+
+function getVacDetails(vacHdnId){
+	debugger
+	 $.ajax({
+	        url: "${contextPath}/vaccancy/getVacDetails",
+	        type: "GET",
+	        data: {
+	            "vacHdnId": vacHdnId,
+	        },
+
+	        success: function (response) {
+	            if (response != '') {
+	                  $("#publicationDate").val(formatDateToDDMMYYYY(response.publicationDate));
+	                  $("#applicationDeadline").val(formatDateToDDMMYYYY(response.applicationDeadline));
+	            } 
+	        }
+	    });
+}
+
+
+function formatDateToDDMMYYYY(dateInput) {
+    if (!dateInput) return ''; // Handle null or undefined date
+
+    // Check if the input is a timestamp (number)
+    if (typeof dateInput === 'number') {
+        const date = new Date(dateInput); // Convert timestamp to Date object
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const year = date.getFullYear();
+        return day + '/' + month + '/' + year; ;
+    }
+
+    // If input is already a string, handle string-based dates (e.g., "YYYY-MM-DD")
+    if (typeof dateInput === 'string') {
+        const dateParts = dateInput.split(' ')[0].split('-'); // Split date and remove time
+        const year = dateParts[0];
+        const month = dateParts[1];
+        const day = dateParts[2];
+        return day + '/' + month + '/' + year;
+    }
+
+    // Fallback in case of unexpected input
+    return '';
+}
+
+function getApplicantAllDetails(regdId,vacId){
+	$("#regiId").val(regdId);
+	$("#vacId").val(vacId);
+	$("#getApplicantAllDetails").submit();
+}
+
+function getTabSelected(vacId){
+	debugger
+ let tabStatusId = "${tabStatusId}";  
+	if(vacId!=''){
+		 if (!tabStatusId || tabStatusId === "appliedCandidate") {
+			 $("#appliedCandidateTab").addClass("active");
+			 filterData('appliedCandidate');
+		 }
+	}
+}
+</script>

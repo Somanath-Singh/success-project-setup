@@ -1,0 +1,51 @@
+1760682623975	Delete elements
+1760682901785	Delete element
+1760682972742	Rename package 'annotation'
+1760682980477	Rename package 'application'
+1760682987128	Rename package 'batch'
+1760682995098	Rename package 'config'
+1760683001289	Rename package 'controller'
+1760683007695	Rename package 'dto'
+1760683016325	Rename package 'model'
+1760683023581	Rename package 'repository'
+1760683035296	Rename package 'security'
+1760683041424	Rename package 'service'
+1760683049646	Rename package 'utils'
+1760683715559	Delete elements
+1760683720351	Delete element
+1760683827223	Rename package 'core.util'
+1760683834974	Rename package 'core.model'
+1760683841406	Rename package 'core.exception'
+1760683846244	Rename package 'core.captcha'
+1760683852467	Rename package 'core.annotation'
+1760683867893	Rename package 'core'
+1760684361677	Rename package 'controller'
+1760684563089	Delete elements
+1760684615031	Delete element
+1760684647735	Delete elements
+1760684688825	Delete element
+1760684694221	Rename package 'controller'
+1760685061920	Delete elements
+1760685094159	Delete element
+1760685119176	Rename package 'com.aashdit.prod.heads.umt.dto'
+1760685138561	Rename package 'com.aashdit.prod.heads.umt.controller'
+1760685185972	Rename package 'com.aashdit.prod.heads.hims.umt.misc'
+1760685274041	Rename package 'utils'
+1760685343177	Rename package 'com.aashdit.prod.heads.umt.specs'
+1760685366198	Rename package 'com.aashdit.prod.heads.umt.model'
+1760685530380	Rename package 'com.aashdit.prod.heads.umt.repository'
+1760685752020	Rename package 'com.aashdit.prod.heads.umt.service'
+1760685775327	Rename package 'com.aashdit.prod.heads.umt.misc'
+1760685803389	Rename package 'com.aashdit.prod.heads.umt.utils'
+1760695017017	Delete elements
+1760695034743	Move compilation unit
+1760695038455	Move compilation unit
+1760695132375	Move compilation unit
+1760695136594	Move compilation unit
+1760695266027	Rename type 'MailService'
+1760695273891	Rename type 'MailServiceImpl'
+1760696036272	Delete elements
+1760696281523	Delete element
+1760696895537	Rename package 'com.example.demo'
+1760697657726	Rename type 'ApplicationDateUtils'
+1760699461581	Delete element

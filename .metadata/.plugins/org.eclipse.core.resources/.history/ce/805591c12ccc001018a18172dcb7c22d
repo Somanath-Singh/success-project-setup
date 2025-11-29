@@ -1,0 +1,281 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+<script type="text/javascript"
+	src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<div class="content">
+	<div class="breadcrumb_conatiner">
+		<div class="col-md-6">
+			<h4 class="change-color">Add & Manage Sub Fund Type</h4>
+		</div>
+		<div class="col-md-6">
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+					<li class="breadcrumb-item active" aria-current="page">Manage Sub Fund Type</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+	<div class="page-inner ">
+		<div class="row mt-2">
+			
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-header">
+					    <c:choose>
+                            <c:when test="${not empty subFundeditlist.subfundTypeId}">
+                                <h4 class="card-title">Update Sub Fund Type</h4>
+                            </c:when>
+                            <c:otherwise>
+                                <h4 class="card-title">Add Sub Fund Type</h4>
+                            </c:otherwise>
+                        </c:choose>
+
+					</div>
+					<div class="card-body">
+						<form class="form-horizontal" action="${contextPath}/admin/fundType/savesubfund" enctype="multipart/form-data" method="post" id="userForm">
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+							<input type="hidden" name="subfundTypeId" value="${subFundeditlist.subfundTypeId}"  />
+								<div class="row">
+									<div class="col-md-3">
+										<div class="form-group">
+											<label class="col-md-12 required" for="complaintName">Fund Type :</label>
+											<div class="col-md-12">
+												<select class="form-control form-select"
+													name="fundType.fundTypeId" id="fundTypeId"
+													onchange="enterSchemeId(this.value)">
+													<option value="">--Select--</option>
+													<c:forEach items="${fundtypelist}" var="fundtyprlist">
+														<option value="${fundtyprlist.fundTypeId}"
+															${fundtyprlist.fundTypeId eq subFundeditlist.fundType.fundTypeId? 'selected':''}>${fundtyprlist.fundTypeName}</option>
+													</c:forEach>
+												</select>
+											</div>
+										</div>
+									</div>
+								
+									<div class="col-md-3">
+										<div class="form-group">
+											<label class="col-md-12 required" for="complaintAge">Sub Fund Type name :</label>
+											<div class="col-md-12">
+												<input type="text"  id="subfundTypeName"
+												value="${subFundeditlist.subfundTypeName}"
+													name="subfundTypeName"
+													class="form-control form-control-sm" required
+													maxlength="20">
+											</div>
+										</div>
+									</div>
+									<div class="col-md-3">
+										<div class="form-group">
+											<label class="col-md-12 " for="mobile">Sub Fund Type Code :</label>
+											<div class="col-md-12">
+												<input type="text" name="subfundTypeCode"
+													id="subfundTypeCode"
+													value="${subFundeditlist.subfundTypeCode}"
+													readonly class="form-control form-control-sm" maxlength="10" required>
+											</div>
+										</div>
+									</div>
+							
+									<!-- <div class="col-md-3">
+										<div class="form-group">
+											<label class="col-md-10 required mb-2" for="isActive">Status</label>
+											<div class="col-md-10">
+												<input type="radio" value="true" id="isActive1" name="isActive" ${subFundeditlist.isActive eq true ?'checked':''} checked> Active &nbsp;&nbsp;
+												<input type="radio" value="false" id="isActive2"  name="isActive"  ${subFundeditlist.isActive eq false ?'checked':''}> Inactive 
+											</div> 
+										</div>
+									</div>  -->
+								</div>
+							<div class="col-md-12 mt-2 text-center">
+								<input type="button" class="btn btn-success btn-sm" value="${not empty subFundeditlist ? 'Update' : 'submit'}" onclick="saveSubFundtForm();">
+									<button type="button" value="Go back!" class="btn btn-warning btn-sm" onclick="backToModule()">Back</button>
+					
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+			<c:if test="${empty subComponent}">
+		<div class="row mt-3">
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-header">
+						<h4 class="card-title">Sub FundType List</h4>
+
+					</div>
+					<div class="card-body">
+					<div class="table-responsive">
+					    <table id="basic-datatables" class="display table table-bordered table-hover exportbtn" >
+							<thead>
+								<tr>
+									<th class="text-center">Sl.No.</th>
+									<th>Fund Type Name</th>
+									<th>Sub Fund Type Name</th>
+									<th>Sub Fund Type Code</th>
+									<th>Status</th>
+									<th >Action</th>
+								</tr>
+							</thead>
+							<tbody id="tbd">
+								<c:forEach items="${subfundlist}" var="subfundlist"
+									varStatus="count">
+									<tr>
+										<td class="text-center">${count.count}</td>
+										<td>${subfundlist.fundType.fundTypeName}</td>
+										<td>${subfundlist.subfundTypeName}</td>
+										<td>${subfundlist.subfundTypeCode}</td>
+										<td>${subfundlist.isActive eq true ? 'Active': 'InActive'}</td>
+										<td >
+											<c:if test="${subfundlist.isActive eq true}">
+												<a
+												href="${pageContext.request.contextPath}/admin/fundType/editsubfund/${subfundlist.subfundTypeId}" title="Edit Sub Fund Type "
+												class="btn btn-warning btn-sm"><i class="fa fa-edit"></i></a>
+												<button class="btn btn-danger btn-sm"
+														onclick="activeInactiveSubFundType('INACTIVE', '${subfundlist.subfundTypeId}')"
+														title="Deactivate Sub Fund Type ">
+														<i class="fa fa-lock" aria-hidden="true"></i>
+													</button>
+											</c:if>
+											 <c:if test="${subfundlist.isActive eq false}">
+													<button class="btn btn-success btn-sm"
+															onclick="activeInactiveSubFundType('ACTIVE', '${subfundlist.subfundTypeId}')"
+															title="Activate Sub Fund Type ">
+													<i class="fa fa-unlock-alt" aria-hidden="true"></i>
+																	</button>
+																</c:if>
+											
+											
+											
+											
+										</td>
+									</tr>
+								</c:forEach>
+							</tbody>
+
+						</table>
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</c:if>
+	</div>
+</div>
+
+<form action="${contextPath}/admin/fundType/subfundType/changesubfundTypeStatus.htm"
+	id="changefundTypeStatus" method="post">
+	<input type="hidden" name="${_csrf.parameterName}"
+		value="${_csrf.token}" /> <input type="hidden" name="actionType"
+		id="actionType" /> <input type="hidden" name="subfundId" id="fundId" />
+</form>
+<script type="text/javascript">
+	function saveSubFundtForm() {
+		if ($("#fundTypeId").val() == "") {
+			bootbox.alert("Please select Fund Type");
+			return false;
+		}  else if ($("#subfundTypeName").val() == "") {
+			bootbox.alert("Please enter Sub Fund Name");
+			return false;
+
+		} 
+		// else if ($("#subfundTypeCode").val() == "") {
+		// 	bootbox.alert("Please give input for subfund code");
+		// 	return false;
+
+		// } else if ($("#isActive1").val() == "" || $("#isActive2").val() == "") {
+		// 	bootbox.alert("Please give input for status");
+		// 	return false;
+
+		// }
+
+		else {
+			var flag = window.confirm("Do you want to submit ?");
+			if (flag == true)
+				$("#userForm").submit();
+		
+ 	}
+	}
+	
+</script>
+
+
+<script>
+	function duplicateCodeCheckFundType() {
+		var subfundData = $("#subfundTypeCode").val();
+		console.log(subfundData);
+		if (subfundData != "") {
+			$.ajax({
+				type :"GET",
+				url : "${contextPath}/admin/fundType/duplicateCodeCheckForFundType",
+				data : {
+					"subfundData" : subfundData,
+				},
+				success : function(response) {
+					if (response.isDuplicate == 'true') {
+						bootbox.alert("Duplicate code not allowed");
+						$("#subfundTypeCode").val("");
+						return false;
+					}
+
+				},
+				error : function(error) {
+					alert("failure");
+				}
+			});
+		}
+	}
+
+	function activeInactiveSubFundType(actionType, fundTypeId) {
+		$("#actionType").val(actionType); 
+		$("#fundId").val(fundTypeId); 
+		if(actionType == 'INACTIVE') {
+			bootbox.confirm({
+			    message: "Do you want to deactivate the Fund Type?",
+			    buttons: {
+			        confirm: {
+			            label: 'Yes',
+			            className: 'btn-success'
+			        },
+			        cancel: {
+			            label: 'No',
+			            className: 'btn-danger'
+			        }
+			    },
+			    callback: function (result) {
+			    	if(result == true) {
+			    		$("#changefundTypeStatus").submit();  
+			    	} 
+			    }
+			}); 
+		}
+		if(actionType == 'ACTIVE') {
+			bootbox.confirm({
+			    message: "Do you want to activate the Fund Type?",
+			    buttons: {
+			        confirm: {
+			            label: 'Yes',
+			            className: 'btn-success'
+			        },
+			        cancel: {
+			            label: 'No',
+			            className: 'btn-danger'
+			        }
+			    },
+			    callback: function (result) {
+			    	if(result == true) {
+			    		$("#changefundTypeStatus").submit();  
+			    	} 
+			    }
+			}); 
+		}
+	}
+</script>
+

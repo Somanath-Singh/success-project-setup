@@ -1,0 +1,538 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<link rel="stylesheet" href="${contextPath}/assets/css/dms.css">
+
+<c:if test="${not empty success_msg}">
+	<div class="col-md-12">
+		<div id="messageDiv" class="alert alert-success">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true" onclick="hide();"><i class='bx bx-wink-smile'></i></button>
+			<span>${success_msg}</span>
+		</div>
+	</div>
+</c:if>
+
+<c:if test="${not empty error_msg}">
+	<div class="col-md-12">
+		<div id="messageDiv" class="alert alert-danger">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true" onclick="hide();"><i class='bx bx-wink-smile'></i></button>
+			<span>${error_msg}</span>
+		</div>
+	</div>
+</c:if>
+
+<div class="mt-2">
+    <div class="card">
+            <div class="card-body">
+                <div class="card-header">
+                    <h4 class="card-title">${nameOfHeader}</h4>
+                </div>
+                <div class="col-md-12 ">
+                   
+
+                    <div class="row mt-3 mb-3">
+                        <div class="col-md-12">
+                            <c:if test="${folderAndFiles.size() < 1}">
+                                <div class="col-md-12">
+                                    <div class="alert alert-info" role="alert">
+                                        <i class='bx bx-info mr-2'></i> No Folder or File Found
+                                    </div>
+                                </div>
+                            </c:if>
+                            <input type="hidden" id="fromAction" value="${fromAction}" />
+                            <!-- Back Path -->
+                            <c:if test="${not empty folderOrFileLink}">
+                                <div class="root-div">${backFolderPaths}</div>
+                            </c:if>
+                            <div class="table-responsive">
+                            <table class="table table-hover table-bordered" id="gridViewTable">
+                                <thead class="bagGroundColorRvr text-center">
+                                    <tr>
+                                        <th>Sl No</th>
+                                        <th>File/Folder Name</th>
+                                        <th>Size</th>
+                                        <th>Modified Date</th>
+                                        <th>Actions</th>
+                                        <th>Owener</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach items="${folderAndFiles}" var="folderOrFile" varStatus="loop">
+                                        <tr class="grid-view-row" id="GRID_ROW_${folderOrFile.folderOrFileLink}" ondblclick="openFolderOrFile(this, '${folderOrFile.folderOrFileLink}', '${folderOrFile.folderOrFile}')" >
+                                            <td>${loop.index + 1}</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="${folderOrFile.folderOrFile == 'FILE' ? 'bx bx-file' : 'bx bx-folder'}" style="font-size: 20px;color: #125cbd;"></i>
+                                                    <span class="titl-text" title="${folderOrFile.folderFileName}" id="NAME_${folderOrFile.folderOrFileLink}">${folderOrFile.folderFileName}</span>
+                                                    <input type="hidden" id="ICON_${folderOrFile.folderOrFileLink}" value="${folderOrFile.folderOrFile == 'FILE' ? 'bx bx-file' : 'bx bx-folder'}" />
+                                                </div>
+                                            </td>
+                                            <td>${folderOrFile.sizeStr}</td>
+                                            <td>${folderOrFile.updatedTimeWithAmPm}</td>
+                                            <td>
+                                                <div class="d-flex">
+                                                <c:choose>
+                                                	<c:when test="${fromAction eq 'SHARE'}">
+                                                		 <button type="button" class="btn"><i class="fa-solid fa-download" style="font-size: 20px;color: #125cbd;" onclick="downLoadThisFile(this, '${folderOrFile.folderOrFileLink}')"></i></button>
+                                                        <!-- <i class="bx bx-bookmarks" style="font-size: 20px;color: #125cbd;" onclick="addFolderToFavorite(this, '${folderOrFile.folderOrFileLink}')"></i> -->
+                                                    	<button type="button" class="btn"><i class="fa-solid fa-share" style="font-size: 20px;color: #125cbd;" onclick="shareFolder(this, '${folderOrFile.folderOrFileLink}')"></i></button>
+                                                	</c:when>
+                                                	<c:when test="${fromAction eq 'TRASH'}">
+                                                		<i class="fa-solid fa-clock-rotate-left" style="font-size: 20px;color: #125cbd;" onclick="recoverThisFile(this, '${folderOrFile.folderOrFileLink}')"></i>
+                                                   		<!-- <i class="fa-solid fa-trash" style="font-size: 20px;color: #125cbd;" onclick="permanentDeleteThisFolder(this, '${folderOrFile.folderOrFileLink}')"></i> -->
+                                                	</c:when>
+                                                	<c:otherwise>
+                                                 		
+                                                	</c:otherwise>
+                                                </c:choose>
+                                                   
+                                                </div>
+                                            </td>
+                                            <td>${folderOrFile.owner}</td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                        </div>
+                    </div>
+                    <!-- Back Button -->
+                    <button type="button" class="btn btn-primary" onclick="window.history.back();">Back</button>
+                </div>
+	        </div>
+            </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" id="shareFolderModalId">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+            <input type="hidden" id="folderOrFileLinkForShare" name="folderOrFileLinkForShare" value="" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Share Folder/File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                    <!-- indivisualShareDivId -->
+                    <div class="row" id="indivisualShareDivId">
+                        <div class="col-md-4">
+                            <label>Share Entity</label>
+                            <select class="form-select" aria-label="Default select example" id="shareEntityCodeId" name="orgCode" onchange="getDataByShareEntityCode(this);">
+                            </select>
+                        </div>
+
+
+                        <div class="col-md-12 mt-3">
+                            <div class="">
+                                <table class="table" id="shareTableId">
+                                    <thead class="bagGroundColorRvr">
+                                        <tr>
+                                            <th>sl</th>
+                                            <th>Share-to</th>
+                                            <th>Type</th>
+                                            <th>Access Facilities</th>
+                                            <th><input type="checkbox" id="allCheck" name="checklist">Check-All</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id= "addTableDataDynamicalyId">
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="shareFileOrFolder()">Share</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <!-- Add your save or submit button here if needed -->
+                        </div>
+                    </div>
+				</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+  
+
+
+
+
+
+
+
+<form action="${contextPath}/dms/share/list" method="GET" id="insideFolderForm">
+    <input type="hidden" name="folderOrFileLink" id="insideFolderLink" value="" />
+</form>
+
+<form action="${contextPath}/dms/downloadFile-With-Link" method="GET" id="downloadFileForm">
+    <input type="hidden" name="fileLink" id="downloadFileLink" value="" />
+</form>
+
+<form action="${contextPath}/dms/deleteFolderOrFile" method="POST" id="deleteFolderForm">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="folderOrFileLink" id="deleteFolderLink" value="" />
+</form>
+
+<form action="${contextPath}/dms/markAsFavourite" method="POST" id="markAsFavouriteForm">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="folderOrFileLink" id="markAsFavouriteLink" value="" />
+</form>
+
+<form action="${contextPath}/dms/trash/recover" method="POST" id="recoverThisFileForm">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="folderOrFileLink" id="recoverThisFileLinkId" value="" />
+</form>
+
+<form action="${contextPath}/dms/trash/permanentDeleteThisFolder" method="POST" id="permanentDeleteThisFolderForm">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="folderOrFileLink" id="permanentDeleteThisFolderLinkId" value="" />
+</form>
+
+<form action="${contextPath}/dms/shareEntitiesModalData" method="POST" id="shareEntityModalFormId">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	<input type="hidden" name="shareEntityData" id="shareEntityDataId" value="" />
+    <input type="hidden" name="folderOrFileLink" value="${folderOrFileLink}" />
+    <input type="hidden" name="redirectUrl" value="shareList" />
+</form>
+
+
+<script src="${contextPath}/assets/js/charts/storage.js"></script>
+
+
+
+<script>
+
+    function openFolderOrFile(that, folderOrFileLink, folderOrFile){
+        if(folderOrFile == 'FOLDER'){
+            insideFolder(that, folderOrFileLink);
+        }else{
+            downLoadThisFile(that, folderOrFileLink);
+        }
+    }
+
+    function hide(){
+        $("#messageDiv").hide();
+    }
+    setTimeout(function() {
+        $('#messageDiv').fadeOut('slow');
+    }, 1000);
+
+    function openCreateModal(){
+        $('#createFolderModalId').modal('show');
+    }
+
+    function createFolder(){
+        // folder name and privacy is mandatory
+        var folderName = $('#folderName').val();
+        var privacy = $('input[name="Privacy"]:checked').val();
+        if(folderName == ''){
+            alert('Folder name is mandatory');
+            return false;
+        }
+        if(privacy == ''){
+            alert('Privacy is mandatory');
+            return false;
+        }
+
+        // submit the form
+        bootbox.confirm({
+            message: "Are you sure you want to create folder?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    $('#createFolderForm').submit();
+                }
+            }
+        });
+    }
+
+
+    function insideFolder(that, folderOrFileLink){
+        let fromAction = $('#fromAction').val();
+        if(fromAction == 'TRASH'){
+            return false;
+        }
+        $('#insideFolderLink').val(folderOrFileLink);
+        $('#insideFolderForm').submit();
+    }
+
+    function downLoadThisFile(that, folderOrFileLink){
+        $('#downloadFileLink').val(folderOrFileLink);
+        $('#downloadFileForm').submit();
+    }
+
+    function addFolderToFavorite(that, folderOrFileLink){
+        // ajax call to add folder to favorite
+        $.ajax({
+            url: "${contextPath}/dms/markAsFavourite",
+            type: "GET",
+            data: {
+                folderOrFileLink: folderOrFileLink
+            },
+            success: function(data){
+                if(data){
+                $(that).removeClass('bx bx-bookmarks').addClass('bx bxs-bookmarks');
+                    appendOrRemoveInFavFolderList(that, folderOrFileLink, true);
+                }else{
+                    $(that).removeClass('bx bxs-bookmarks').addClass('bx bx-bookmarks');
+                    appendOrRemoveInFavFolderList(that, folderOrFileLink, false);
+                }
+            }
+        });
+    }
+
+    function appendOrRemoveInFavFolderList(that, folderOrFileLink, isAppend){
+        var icon = $("#ICON_"+folderOrFileLink).attr('class');
+        var folderName = $("#NAME_"+folderOrFileLink).text();
+        var fileFolderType = $("#FILE_FOLDER_TYPE_"+folderOrFileLink).val();
+        var favFolderList = $('#favFolderList');
+        if(isAppend){
+            let appendFunction = fileFolderType == 'FILE' ? 'downLoadThisFile(this, \''+folderOrFileLink+'\')' : 'insideFolder(this, \''+folderOrFileLink+'\')';
+            var li = '<li class="d-flex justify-content-between align-items-center" id="'+folderOrFileLink+'"  ondblclick="'+appendFunction+'"><i class="'+icon+'" style="font-size: 20px;color: #125cbd;"></i><span class="titl-text" title="'+folderName+'">'+folderName+'</span><i class="bx bx-dots-vertical-rounded" ></i></li>';
+            favFolderList.append(li);
+        }else{
+            favFolderList.find('li[id="'+folderOrFileLink+'"]').remove();
+        }
+    }
+
+
+
+
+
+
+    function recoverThisFile(that, folderOrFileLink){
+    	bootbox.confirm({
+            message: "Are you sure you want to recover this folder or file?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    $('#recoverThisFileLinkId').val(folderOrFileLink);
+                    $('#recoverThisFileForm').submit();
+                }
+            }
+        });
+    }
+    
+    function permanentDeleteThisFolder(that, folderOrFileLink){
+    	bootbox.confirm({
+            message: "Are you sure you want to permanently delete this folder or file? You can't recover it after permanent delete.",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    $('#permanentDeleteThisFolderLinkId').val(folderOrFileLink);
+                    $('#permanentDeleteThisFolderForm').submit();
+                }
+            }
+        });
+    }
+
+
+    async function shareFolder(that, folderOrFileLink){
+        showLoader();
+        let url = "${contextPath}/DMSAjax/getShareActions";
+        let data = {
+            folderOrFileLink: folderOrFileLink,
+        };
+        let method = "GET";
+        let result = await asyncAjaxForData(url, data, method);
+        hideLoader();
+        if(result && result.outcome){
+            let res = result.data;
+            let shareEntities = res.shareEntities;
+            let shareEntityCodeId = $('#shareEntityCodeId');
+            $('#folderOrFileLinkForShare').val(folderOrFileLink);
+            // clear the previous data
+            shareEntityCodeId.empty();
+            shareEntityCodeId.append('<option value="">Select Share Entity</option>');
+            for(let i=0; i<shareEntities.length; i++){
+                let shareEntity = shareEntities[i];
+                shareEntityCodeId.append('<option value="'+shareEntity.shareEntityCode+'">'+shareEntity.shareEntityName+'</option>');
+            }
+            $('#shareFolderModalId').modal('show');
+        }
+        
+    }
+
+    async function getDataByShareEntityCode(that){
+        showLoader();
+        $('#addTableDataDynamicalyId').empty();
+        // allCheckbox unchecked
+        $('#allCheck').prop('checked', false);
+        let shareEntityCode = $(that).val();
+        let fileFolderLink = $('#folderOrFileLinkForShare').val();
+        if(shareEntityCode == ''){
+            bootbox.alert('Please select share entity');
+            return false;
+        }
+        let url = "${contextPath}/DMSAjax/getDataByShareEntityCode";
+        let data = {
+            shareEntityCode: shareEntityCode,
+            folderOrFileLink: fileFolderLink,
+            scope: false
+        };
+        let type = "GET";
+        
+        let result = await asyncAjaxForData(url, data, type);
+        hideLoader();
+        if(result && result.outcome){
+            let data = result.data;
+            let allActions = data.allActions;
+            let profiles = data.profiles;
+            let html = '';
+            if(profiles.length > 0){
+                profiles.forEach(profile => {
+                    let actions = profile.actions;
+                    // sl-> count, Share-to-> profileName, Type-> profileType, Access Facilities-> allActions but maked selected profile.actions, Check-All-> checkbox
+                    html += '<tr>';
+                    html += '<td>' + (profiles.indexOf(profile) + 1) + '</td>';
+                    html += '<td>' + profile.profileName + '</td>';
+                    html += '<td>' + profile.profileCode + '</td>';
+                    html += '<td>';
+                    html += '<select class="form-select selectpicker" multiple="multiple" data-live-search="true" aria-label="Default select example">';
+                    allActions.forEach(action => {
+                        html += '<option value="'+action.actionId+'"';
+                        if(actions.includes(action.actionId)){
+                            html += ' selected';
+                        }
+                        html += '>'+action.actionName+'</option>';
+                    });
+                    html += '</select>';
+                    html += '</td>';
+                    // profile.isAllReadyShared ? 'checked' : ''
+                    html += '<td><input type="checkbox" name="checklist" onclick="checkMark(this)" '+ (profile.isAllReadyShared ? 'checked' : '') +' value="'+profile.profileId+'"></td>';
+                    // id = CODE_ID -> COLG_1
+                    html += '<input type="hidden" value="'+profile.profileCode+'" id="code_'+profile.profileCode+'_'+profile.profileId+'">';
+                    html += '</tr>';
+                });
+                $('#addTableDataDynamicalyId').append(html);
+                // refresh selectpicker
+                $('.selectpicker').selectpicker('refresh');
+
+                // make addTableDataDynamicalyId min-height 200px
+                $('#addTableDataDynamicalyId').css('min-height', '200px');
+
+            }
+        }
+    }
+
+    function shareFileOrFolder(){
+        
+    	let fileFolderLink = $('#folderOrFileLinkForShare').val();
+        let profiles = [];
+        let bool = true;
+        $('#addTableDataDynamicalyId').find('input[type="checkbox"]').each(function(){
+            if($(this).is(':checked')){
+                let profileId = $(this).val();
+                let pCode = $(this).closest('tr').find('td').eq(2).text();
+                let actions = [];
+                $(this).closest('tr').find('select').find('option:selected').each(function(){
+                    actions.push($(this).val());
+                });
+
+                if(actions.length == 0){
+                    bootbox.alert('Please select atleast one action');
+                    bool = false;
+                    return false;
+                }
+                let profileCode = $('#code_'+pCode+'_'+profileId).val();
+                let profileObject = {
+                    profileId: profileId,
+                    actions: actions,
+                    profileCode: profileCode
+                };
+                profiles.push(profileObject);
+            }
+        });
+        if(!bool){
+            return false;
+        }
+
+        if(profiles.length == 0){
+            bootbox.alert('Please select atleast one profile');
+            return false;
+        }
+        let shareData = {
+            fileFolderLink: fileFolderLink,
+            profiles: profiles,
+            shareEntityCode: $('#shareEntityCodeId').val()
+        };
+        let shareDataStr = JSON.stringify(shareData);
+        let shareDataStrBase64 = btoa(shareDataStr);
+        bootbox.confirm({
+            message: "Are you sure you want to share file or folder?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    showLoader();
+                    $('#shareEntityDataId').val(shareDataStrBase64);
+                    $('#shareEntityModalFormId').submit();
+                }
+            }
+        });
+    }
+
+    function asyncAjaxForData(url, data, method){
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: url,
+                type: method,
+                data: data,
+                success: function(data){
+                    resolve(data);
+                },
+                error: function(err){
+                    reject(err);
+                }
+            });
+        });
+    }
+
+
+
+</script>

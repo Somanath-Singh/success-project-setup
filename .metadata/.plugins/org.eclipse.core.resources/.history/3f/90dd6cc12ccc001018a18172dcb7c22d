@@ -1,0 +1,511 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<style>
+.disable-row>td {
+	position: relative;
+}
+
+.disable-row>td:before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	height: 1px;
+	background: red;
+}
+
+.disable-row>td {
+	opacity: 0.7;
+	background: #ccc;
+	cursor: no-drop;
+}
+
+.disable-row>td>input {
+	cursor: no-drop;
+	pointer-events: none !important;
+}
+</style>
+
+
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Generate Purchase Order</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">
+				    <a href="${contextPath}/home"><i class="fa fa-home"></i></a>
+                </li>
+				<li class="breadcrumb-item active" aria-current="page">Generate
+					Purchase Order</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Generate Purchase Order</h5>
+			</div>
+			<div class="card-body">
+				<form
+					action="${contextPath}/procurement/purchaseOrder/generatePurchaseOrder"
+					method="post" id="poform" enctype="multipart/form-data">
+					<input type="hidden" name="${_csrf.parameterName}"
+						value="${_csrf.token}" /> <input type="hidden"
+						name="requisitionId" id="requisitionId"
+						value="${req.requisitionId}" /> <input type="hidden"
+						name="rfqQuoteId" value="${not empty quote ?quote.rfqQuoteId :''}" />
+					<input type="hidden" id="reqDate"
+						value="<fmt:formatDate value='${quote.rfqApprovedDate}' pattern='dd/MM/yyyy'/>" />
+					<input type="hidden" class="" id="encodedDatapoform"
+						name="encodedDatapoform" value="" />
+					<div class="row">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-12 table-responsive">
+									<caption class="table-cap form-label">Requisition Details :</caption>
+									<table class="table table-bordered">
+										<tr>
+											<td class="bgtr"><spring:message code="PROC.REQ.REQNO" /></td>
+											<td>${req.requisitionNo}</td>
+											<td class="bgtr"><spring:message code="PROC.REQ.FINYEAR" /></td>
+											<td>${req.finYear.finYear}</td>
+										</tr>
+
+										<tr>
+											<td class="bgtr"><spring:message code="PROC.REQ.TYPE" /></td>
+											<td>${req.requisitionType.requisitionTypeName}</td>
+											<td class="bgtr"><spring:message code="PROC.REQ.DATE" /></td>
+											<td><fmt:formatDate value='${req.requisitionDate }'
+													pattern='dd/MM/yyyy' /></td>
+										</tr>
+										<tr>
+											<td class="bgtr">Stock Type</td>
+											<td>${req.stockType.stockTypeName}</td>
+											<td class="bgtr">Cost Center</td>
+											<td>${req.costCenter.costCenterName}</td>
+										</tr>
+										<tr>
+											<td class="bgtr"><spring:message
+													code="PROC.REQ.PRIORITY" /></td>
+											<td>${req.priorityLevel.priorityLevelName}</td>
+											<td class="bgtr"><spring:message
+													code="PROC.REQ.BUDGET.GENERAL.PURPOSE" /></td>
+											<td>${req.purpose}</td>
+										</tr>
+									</table>
+								</div>
+
+							</div>
+							<caption class="table-cap">Purchase Order Details :</caption>
+							<div class="row mt-2">
+								<div class="col-md-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="text"><spring:message
+												code="PROC.QNNO" /></label>
+										<div class="col-md-12">
+											<select class="form-control requiredField" id="quoteId"
+												name="" onchange="getQuoteDetails(this.value)">
+												<option value=""><spring:message
+														code="COMMON.SELECT" /></option>
+												<c:forEach items="${lstRfqQuotes}" var="rfq">
+													<option value="${rfq.rfqQuoteId}"
+														${not empty quote && rfq.rfqQuoteId eq  quote.rfqQuoteId ? 'selected' : ''}>${rfq.quoteNo}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="text">Supplier
+											Name</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control requiredField"
+												id="supplierName" value="${quote.assetVendor.vendorName}"
+												readonly="readonly" />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="text"><spring:message
+												code="PROC.REQ.CURRENCY" /></label>
+										<div class="col-md-12">
+											<input type="text" class="form-control requiredField"
+												id="currrency" value="${quote.currency.currencyShortName}"
+												readonly="readonly" />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="text">Purchase Generate Date</label>
+										<div class="col-md-12">
+											<div class="datepicker-box date-generate">
+												<input type="text"
+													class="form-control form-control-sm requiredField generateDate"
+													id="poGenerateDate" value="" name="poCreatedDate" readonly /> <i
+													class='fa-solid fa-calendar-week'></i>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label class="col-md-12" for="text"><spring:message
+												code="COMMON.REMARKS" /></label>
+										<div class="col-md-12">
+											<textarea
+												class="form-control AlphaNumericForText textArea unfreezeField"
+												id="remarks" name="remarks" maxlength="100"
+												placeholder="Please give remarks"
+												${canTakeAction eq false ? 'readonly' : ''}></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12">
+									<table class="table table-striped table-bordered  mt-2">
+										<thead class="bagGroundColor">
+											<tr>
+												<th>Item Type</th>
+												<th>Item Name</th>
+												<th>Requisition Quantity</th>
+												<th>Vendor Quantity</th>
+												<th>Order Quantity</th>
+												<th>Unit Price</th>
+												<th>Discount(%)</th>
+												<th>Tax(%)</th>
+												<th>Total Price</th>
+												<th>Action</th>
+											</tr>
+										</thead>
+										<tbody id="itemBody">
+											<c:forEach items="${quote.rfqQuoteLines}" var="rfqQuote"
+												varStatus="count">
+												<tr id="rowId${count.index}"
+													${rfqQuote.unitPrice eq 0 ? 'class="disable-row"' : '' }>
+													<td>${rfqQuote.entityType}<input type="hidden"
+														name="rfqQuoteLines[${count.index}].quoteLineId"
+														value="${rfqQuote.quoteLineId}"></td>
+													<td>${rfqQuote.item.itemName}</td>
+													<td>${rfqQuote.reqLineId.requestQuantity}</td>
+													<td>${rfqQuote.supplierQuantity}<input type="hidden"
+														id="vndQty${count.index}"
+														value="${rfqQuote.supplierQuantity}"></td>
+													<td><input type="number"
+														class="quantity ${rfqQuote.unitPrice eq 0 ? '' : 'greaterThanZero' } ${rfqQuote.item.isFractional ? 'numberWithTwoDesimal' : 'numberWithTwoDesimalButOnlyAllowZero' } maximunLengthIs10WithDot onClickInput"
+														id="orderQty${count.index}"
+														name="rfqQuoteLines[${count.index}].supplierQuantity"
+														value="0"></td>
+													<td><input type="number"
+														class="unitPrice ${rfqQuote.unitPrice eq 0 ? '' : 'greaterThanZero' } numberWithTwoDesimal maximunLengthIs10WithDot onClickInput"
+														id="unitPrice${count.index}" value="${rfqQuote.unitPrice}"
+														name="rfqQuoteLines[${count.index}].unitPrice"
+														style="width: 85px"> <input type="hidden"
+														class="totsub" id="subTot${count.index}" value="0.00"></td>
+													<td><input type="number"
+														class="discnt numberWithTwoDesimal onClickInput percentageOnly"
+														id="dis${count.index}" value="${rfqQuote.discountRate}"
+														name="rfqQuoteLines[${count.index}].discountRate"
+														style="width: 85px"> <input type="hidden"
+														class="totdis" id="disAmt${count.index}" value="0.00"></td>
+													<td><input type="number"
+														class="taxx numberWithTwoDesimal onClickInput percentageOnly"
+														id="tax${count.index}" value="${rfqQuote.taxRate}"
+														name="rfqQuoteLines[${count.index}].taxRate"
+														style="width: 85px"> <input type="hidden"
+														class="tottax" id="taxAmt${count.index}" value="0.00"></td>
+													<td><input type="number" id="totPrc${count.index}"
+														value="0.00" style="width: 85px" readonly="readonly"></td>
+													<td>
+														<button type="button" class="btn btn-danger" style="border: none;"
+															onclick="removeRow(${count.index})">
+															<i class="fa fa-trash" style="">
+															</i>
+														</button>
+													</td>
+												</tr>
+											</c:forEach>
+										</tbody>
+										<tbody id="chargefoot">
+											<tr class="trowbrdr">
+												<td colspan="7"></td>
+												<td><label>Sub Total</label></td>
+												<td><input type="text" id="subTotal"
+													readonly="readonly" class="trowbrdr boldfnt"
+													style="text-align: right; padding-right: 8px; width: 80px; text-align: right"
+													value="0.00"></td>
+											</tr>
+											<tr class="trowbrdr ">
+												<td colspan="7" class="tdatabg"></td>
+												<td class="tdatabg"><label>Discount</label></td>
+												<td class="tdatabg"><input type="text"
+													id="totalDiscount" readonly="readonly"
+													class="trowbrdr boldfnt"
+													style="text-align: right; padding-right: 8px; width: 80px; text-align: right"
+													value="0.00"></td>
+											</tr>
+											<tr class="trowbrdr">
+												<td colspan="7"></td>
+												<td><label>Tax</label></td>
+												<td><input type="text" id="totalTax"
+													readonly="readonly" class="trowbrdr boldfnt"
+													style="text-align: right; padding-right: 8px; width: 80px; text-align: right"
+													value="0.00"></td>
+											</tr>
+											<c:if test="${not empty quote.lstAddCost}">
+												<c:forEach items="${quote.lstAddCost}" var="addCst"
+													varStatus="count">
+													<tr id="chargeRow${count.index}" class="trowbrdr">
+														<td class="tdatabg" colspan="7" style="text-align: right"><input
+															type="hidden" name="lstAddCost[${count.index}].addCostId"></td>
+														<td class="tdatabg"><label>${addCst.addCostName}</label><input
+															type="hidden"
+															name="lstAddCost[${count.index}].addCostName"
+															value="${addCst.addCostName}"></td>
+														<td class="tdatabg"><input type="number"
+															class="addCost trowbrdr boldfnt numberWithTwoDesimal greaterThanZero onClickInput"
+															id="charge${count.index}" value="${addCst.addCost}"
+															name="lstAddCost[${count.index}].addCost"
+															style="text-align: right; padding-right: 8px; width: 80px; text-align: right"></td>
+													</tr>
+												</c:forEach>
+												<tr id="totalAddCostRow" class="trowbrdr">
+													<td colspan="7"></td>
+													<td><label>Total AdditionalCost </label></td>
+													<td><input type="number" id="totalAddCost"
+														readonly="readonly" class="trowbrdr boldfnt"
+														style="text-align: right; padding-right: 8px; width: 80px; text-align: right"
+														value="${quote.totAddCost}"></td>
+												</tr>
+											</c:if>
+											<tr class="trowbrdr">
+
+												<td class="tdatabg" colspan="7"
+													style="font-weight: 600; font-size: 16px;">In words: <span
+													id="totalInWords"></span></td>
+												<td class="tdatabg"><label>Grand Total </label></td>
+												<td class="tdatabg"><input type="text" id="grandTotal"
+													readonly="readonly" class="trowbrdr boldfnt"
+													style="text-align: right; padding-right: 8px; width: 80px; text-align: right"
+													value="${quote.totAddCost}"></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<c:set var="dynamicFromId" value="poform" scope="request" />
+					<%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<form
+	action="${contextPath}/procurement/purchaseOrder/generatePurchaseOrder"
+	method="get" id="form">
+	<input class="noPass" type="hidden" id="reqId" name="requisitionId">
+	<input class="noPass" type="hidden" id="rfqId" name="quoteId">
+	<input type="hidden" class="" id="encodedDataform"
+		name="encodedDataform" value="" />
+</form>
+<script>
+    tableIds=['itemBody','chargefoot'];
+    jsonKeys=['rfqQuoteLines','lstAddCost'];
+	$(function() {
+		$('.generateDate').datepick({
+			dateFormat: 'dd/mm/yyyy',maxDate:0, showOnFocus: true,
+			 onSelect: function(selected) {
+				 var alltDate=$('#reqDate').val().split("/");
+				 var modAllotDate=new Date(alltDate[1]+"/"+alltDate[0]+"/"+alltDate[2]);
+				 if(modAllotDate > new Date(selected)){
+					bootbox.alert('PO Generate date sholud not be less than Requisition creation date.');
+					$('.generateDate').val("");
+				 }
+			 }
+		});
+	});
+	
+	function getQuoteDetails(quoteId) {
+		var reqId=$("#requisitionId").val();
+		if(quoteId!=0){
+			$("#reqId").val(reqId);
+			$("#rfqId").val(quoteId);
+			encryptFormData("form", tableOrTbodyIDS, tableOrTbodyKeys);
+			removeFieldsFromFormBYClass("form","noPass");
+			$("#form").submit();
+		}else{
+			$("#reqId").val(reqId);
+			encryptFormData("form", tableOrTbodyIDS, tableOrTbodyKeys);
+            removeFieldsFromFormBYClass("form","noPass");
+			$("#form").submit();
+		}
+	}
+	function convertToFloat(value){
+		if(value === "" || value === undefined){
+			value = 0;
+		}
+		return parseFloat(value);
+	}
+	function removeRow(id) {
+		if(!$("#rowId"+id).hasClass('disable-row')){
+			// one row should be there get thoes row which have id="rowId" and check length
+			var rowCount = $('#itemBody tr[id^="rowId"]').length;
+			var disablerow = $('#itemBody tr[class^="disable-row"]').length;
+			
+			var activerow=parseInt(rowCount)-parseInt(disablerow);
+			
+			if(activerow<=1){
+				bootbox.alert("Atleast one row should be there.");
+				return false;
+			}
+			$("#rowId"+id).remove();
+			totalCalculation();
+		}
+	}
+	
+	$(document).on('keyup', '.quantity', function(){
+		// get rowNo from id="rowNo"
+		var rowNo = $(this).attr('id').split('orderQty')[1];
+		var unitPrice=$("#unitPrice"+rowNo).val();
+		var taxRate=$("#tax"+rowNo).val();
+		var discountRate=$("#dis"+rowNo).val();
+		var qty=$("#orderQty"+rowNo).val();
+		calculateRow(unitPrice,taxRate,discountRate,qty,rowNo);
+	});
+	
+	$(document).on('keyup', '.unitPrice', function(){
+		// get rowNo from id="rowNo"
+		var rowNo = $(this).attr('id').split('unitPrice')[1];
+		var unitPrice=$("#unitPrice"+rowNo).val();
+		var taxRate=$("#tax"+rowNo).val();
+		var discountRate=$("#dis"+rowNo).val();
+		var qty=$("#orderQty"+rowNo).val();
+		calculateRow(unitPrice,taxRate,discountRate,qty,rowNo);
+	});
+	
+	$(document).on('keyup', '.discnt', function(){
+		// get rowNo from id="rowNo"
+		var rowNo = $(this).attr('id').split('dis')[1];
+		var unitPrice=$("#unitPrice"+rowNo).val();
+		var taxRate=$("#tax"+rowNo).val();
+		var discountRate=$("#dis"+rowNo).val();
+		var qty=$("#orderQty"+rowNo).val();
+		calculateRow(unitPrice,taxRate,discountRate,qty,rowNo);
+	});
+	
+	$(document).on('keyup', '.taxx', function(){
+		// get rowNo from id="rowNo"
+		var rowNo = $(this).attr('id').split('tax')[1];
+		var unitPrice=$("#unitPrice"+rowNo).val();
+		var taxRate=$("#tax"+rowNo).val();
+		var discountRate=$("#dis"+rowNo).val();
+		var qty=$("#orderQty"+rowNo).val();
+		calculateRow(unitPrice,taxRate,discountRate,qty,rowNo);
+	});
+	function calculateRow(unitPrice,taxRate,discountRate,qty,id){
+
+		unitPrice=convertToFloat(unitPrice);
+		taxRate=convertToFloat(taxRate);
+		discountRate=convertToFloat(discountRate);
+		qty=convertToFloat(qty);
+		if(discountRate>100){
+			discountRate=100;
+		}
+		if(taxRate>100){
+			taxRate=100;
+		}
+		var subtotal=qty*unitPrice;
+		var disAmt=(subtotal*discountRate)/100;
+		var taxAmt=((subtotal-disAmt)*taxRate)/100;
+		$('#subTot'+id).val(subtotal.toFixed(2));
+		$('#taxAmt'+id).val(taxAmt.toFixed(2));
+		$('#disAmt'+id).val(disAmt.toFixed(2));
+		
+		var tot=subtotal-disAmt+taxAmt;
+		tot=tot.toFixed(2);
+		$("#totPrc"+id).val(tot);
+		totalCalculation();
+	}
+	function totalCalculation() {
+		var subTotal=0.00;
+		var disAmt=0.00;
+		var taxAmt=0.00;
+		
+		$('.tottax').each(function(){
+			let val = $(this).val() == '' || $(this).val() == undefined ? 0 : $(this).val();
+			taxAmt += parseFloat(val);
+		});
+		
+		$('.totsub').each(function(){
+			let val = $(this).val() == '' || $(this).val() == undefined ? 0 : $(this).val();
+			subTotal += parseFloat(val);
+		});
+		
+		$('.totdis').each(function(){
+			let val = $(this).val() == '' || $(this).val() == undefined ? 0 : $(this).val();
+			disAmt += parseFloat(val);
+		});
+		
+		var grandtotal=subTotal-disAmt+taxAmt;
+		var totalAddCost=$('#totalAddCost').val() == '' || $('#totalAddCost').val() == undefined ? 0 : $('#totalAddCost').val();
+		totalAddCost=parseFloat(totalAddCost);
+		grandtotal=grandtotal+totalAddCost;
+		
+		$('#subTotal').val(subTotal.toFixed(2));
+		$('#totalDiscount').val(disAmt.toFixed(2));
+		$('#totalTax').val(taxAmt.toFixed(2));
+		$('#grandTotal').val(grandtotal.toFixed(2));
+		setAmountInWords();
+	}
+
+	// alson in page load
+	$(document).ready(function(){
+		setAmountInWords();
+	});
+
+	function setAmountInWords(){
+		var grandTotal = $("#grandTotal").val();
+		let fstVal = grandTotal.split(".")[0];
+		let secVal = grandTotal.split(".")[1];
+		let finalWord = '';
+		if(secVal == undefined || secVal == '' || secVal == '00' || secVal == '0'){
+			finalWord = NumInWords(fstVal) + " only";
+		}else{
+			finalWord = NumInWords(fstVal) + " and " + NumInWords(secVal) + " cents only";
+		}
+		$("#totalInWords").text(finalWord);
+	}
+	
+	$(document).on('keyup', '.addCost', function(){
+		var totAddCst=0.00;
+		$('.addCost').each(function(){
+			let val = $(this).val() == '' || $(this).val() == undefined ? 0 : $(this).val();
+			totAddCst += parseFloat(val);
+		});
+		$('#totalAddCost').val(totAddCst.toFixed(2));
+		totalCalculation();
+	});
+</script>

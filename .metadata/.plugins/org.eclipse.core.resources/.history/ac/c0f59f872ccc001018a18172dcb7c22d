@@ -1,0 +1,762 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet"
+	href="${contextPath}/assets/js/plugin/jquery_autocomplete/jquery.autocomplete.css" />
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="${contextPath}/assets/js/ipmsJs/ipms.js"></script>
+
+<%@ page import="com.aashdit.fams.utils.ApplicationStringUtilsFams" %>
+
+
+<style>
+.isEntityObjReadOnly {
+		pointer-events: none;
+		background-color: #f9f9f9;
+	}
+
+</style>
+
+<script>
+					$(function()
+					{
+						$('#datatable-default').dataTable({
+					 		"bSort": false,
+					 		"autoWidth": false
+						});
+					})
+					</script>
+
+
+<!-- Start::row-1 -->
+
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Measurement Book</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+	        <ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home" title="Home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Measurement Book</li>
+			</ol>
+        </nav>
+     </div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title">Measurement Book</h6>
+            </div>
+            <div class="card-body" id="partyDtlsInRequest">
+                                        <form class="form-horizontal form-bordered" id="finalSubmit" action="${contextPath}/boqMeasurement/save" method="POST">
+
+                                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                            <input type="hidden" value="true" id="labelmsg" name="labelmsg">
+
+                                            <input type="hidden" value="${measurementData ne null ? measurementData.msmntMstId:''}" id="msmntMstId" name="msmntMstId">
+                              <div class="row">
+										<div class="form-group col-md-2">
+												<label>Organization Name</label>
+												<div class="col-md-12">
+													<!-- if officeDetails.objectIdAndType is there then readonly -->
+													<select class="form-control form-control-sm " onchange="getDownEntityHierarchyList(this)" id="parentEntityIdAndTypeId" >
+														<option value="">Select Organization</option>
+														<c:forEach items="${entityIdAndUserLevelList}" var="organization">
+															<option value="${organization.combineTwo}" <c:if test="${organization.combineTwo eq currentCombineIdAndValue}">selected</c:if>>${organization.organizationName}</option>
+														</c:forEach>
+													</select>
+												</div>
+											</div>
+											
+											<div class="form-group col-md-3">
+												<label>Entity Name</label>
+												<div class="col-md-12">
+													<!-- if officeDetails.objectIdAndType is there then readonly -->
+													<select class="form-control form-control-sm selectpicker" onchange="filterDataFunc(this)" id="objectEntityIdAndTypeId" data-live-search="true">
+														<option value="" disabled>Select Entity</option>
+													</select>
+												</div>
+											</div>
+                                            <div class="col-md-2 col-sm-3">
+                                                    <div class="form-group">
+                                                        <label for="estimationNo" class="required ">Project</label>
+                                                        <div class="col-md-12">
+                                                            <select class="form-control require " name="projectId" id="projectId" onchange="featchWorkOrdersByProject(this.value,0,'workOrderId')">
+                                                                <option value="">
+                                                                    <spring:message code="COMMON.LABEL.DROPDOWN.SELECT" />
+                                                                </option>
+                                                                 <c:forEach items="${loadData.projectMasterList}" var="project">
+                                                                    <option value="${project.projectId}" ${measurementData.projectId eq project.projectId?'selected':''}  > ${project.projectCode} | ${project.projectName}</option>
+                                                                </c:forEach>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            
+                                            <div class="col-md-2 col-sm-3">
+                                                    <div class="form-group">
+                                                        <label for="estimationNo" class="required ">Work Order</label>
+                                                        <div class="col-md-12">
+                                                            <select class="form-control require " name="workOrderId" id="workOrderId" onchange="featchBoqListByWorkOrder(this.value,0,'boqMstId')">
+                                                                <option value="">
+                                                                    <spring:message code="COMMON.LABEL.DROPDOWN.SELECT" />
+                                                                </option>
+                                                                
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2 col-sm-3">
+                                                    <div class="form-group">
+                                                        <label for="estimationNo" class="required ">BOQ</label>
+                                                        <div class="col-md-12">
+                                                            <select class="form-control require" name="boqMstId" id="boqMstId" onchange="getBoqItems();">
+                                                                <option value="">
+                                                                    <spring:message code="COMMON.LABEL.DROPDOWN.SELECT" />
+                                                                </option>
+                                                                <%-- <c:forEach items="${loadData.boqList}" var="boq">
+                                                                    <option value="${boq.boqMstId}" ${boqMstId eq boq.boqMstId? 'selected': ''}>${boq.boqMstId}</option>
+                                                                </c:forEach> --%>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+
+                                            </div>
+
+
+                                            <div class="row">
+                                                <h6 class="panel-title"><span>Item Details</span></h6>
+                                            </div>
+                                             <div class="table-responsive">
+                                                <table id="product-table" class="table table-bordered ">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Sl No.</th>
+                                                            <th class="required">Work Item Details</th>
+                                                            <th>Attributes</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="msrmnt">
+
+
+                                                        <c:if test="${ not empty boqItemsList}">
+                                                            <c:forEach items="${boqItemsList}" var="boqItem" varStatus="index">
+                                                                <tr id="trItem${index.index}" data-calculation-formula="${boqItem.unitType.calculationFormula}">
+                                                                    <td>${index.count}
+                                                                        <input type="hidden" name="boqMeasurementItems[${index.index}].isChecked" id="isChecked${index.index}" class="ischeck notRequired" value="false">
+                                                                        <input type="checkbox" id="checkbox${index.index}" onclick="toggleCheck(${index.index})" class="checkbox notRequired">
+
+                                                                    </td>
+                                                                    <td style="width:750px">
+                                                                        <input type="hidden" class="form-control " id="itemId${index.index}" name="boqMeasurementItems[${index.index}].itemId" value="${boqItem.boqItemId}"> Boq Item :
+                                                                        <input type="text" class="form-control disabled " id="itemName${index.index}" name="boqMeasurementItems[${index.index}].itemName" value="${boqItem.itemName}">
+                                                                        <div class="d-flex align-items-center gap-1">
+                                                                           <div> Unit In:
+                                                                                <input type="text" class="form-control notRequired disabled " id="unitTypeName${index.index}" name="" value="${boqItem.unitType.unitTypeName}">
+                                                                            </div> 
+                                                                            <div>Rate Per Unit:
+                                                                                <input type="text" class="form-control text-end disabled " id="ratePerUnit${index.index}" name="boqMeasurementItems[${index.index}].ratePerUnit" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(boqItem.ratePerUnit)}">
+                                                                            </div>
+                                                                            <div> Boq Item Quantity:
+                                                                                <input type="text" class="form-control text-end disabled " id="quantity${index.index}" name="boqMeasurementItems[${index.index}].quantity" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(boqItem.quantity)}">
+                                                                            </div>
+                                                                            <div> Boq Item Total Amount:
+                                                                                <input type="text" class="form-control text-end disabled " id="totalAmt${index.index}" name="boqMeasurementItems[${index.index}].totalAmt" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(boqItem.totalAmt)}">
+                                                                            </div>
+                                                                            
+                                                                        </div>
+                                                                    </td>
+                                                                    <td id="tdAttr${index.index}">
+                                                                        <label class="pLabel${index.index}0">P-1
+                                                                            <input type="hidden" class="form-control  pLabel${index.index}0" id="label${index.index}0" name="boqMeasurementItems[${index.index}].perticular[0].label" value="P-1">
+                                                                         <br>  Perticular Item Quantity : <input type="text" class="form-control text-end disabled pLabel${index.index}0" id="perQuantity${index.index}0" name="boqMeasurementItems[${index.index}].perticular[0].quantity" value="" placeholder="0.00" readonly>
+                                                                           Perticular Item Total Amount : <input type="text" class="form-control text-end disabled pLabel${index.index}0 " id="perAmount${index.index}0" name="boqMeasurementItems[${index.index}].perticular[0].amount" value="" placeholder="0.00" readonly>
+                                                                        </label>
+
+
+																		<div class="attributesElmnt pLabel${index.index}0">
+                                                                        <c:forEach items="${boqItem.unitType.unitTypeAttribute}" var="attributes" varStatus="attrIndex">
+                                                                            ${attributes.attributeLableName} : <input type="text" class="form-control text-end pLabel${index.index}0  attribute-input${index.index}0" id="attributeValue${index.index}0${attrIndex.index}" name="boqMeasurementItems[${index.index}].perticular[0].attributes[${attrIndex.index}].attributeValue" data-attribute-name="${attributes.attributeName}"
+                                                                            onblur="calculateQuantityAndAmount(${index.index},0,${attrIndex.index})" onkeypress="return validateInputDecimal(event,this);"value="" placeholder="Enter ${attributes.attributeName}">
+                                                                            <input type="hidden" class="form-control notRequired pLabel${index.index}0 " id="attributeId${index.index}0${attrIndex.index}" name="boqMeasurementItems[${index.index}].perticular[0].attributes[${attrIndex.index}].attributeId" value="${attributes.attributeId}">
+
+
+                                                                        </c:forEach>
+                                                                        </div>
+                                                                        
+
+                                                                        <button type="button" class="btn btn-danger btn-sm enableRmv${index.index} remove-btn pLabel${index.index}0" onclick="removeFieldsByClass('pLabel${index.index}0') " style="margin-left: 10px;">-</button>
+                                                                    </td>
+                                                                    <td>
+                                                                        <button type="button" onclick="addParticular('tdAttr${index.index}', '${index.index}',  ${fn:escapeXml(boqItem.unitType.jsonArrayAttributes)})" class="btn btn-info btn-add-product">+</button>
+                                                                    </td>
+                                                                </tr>
+                                                            </c:forEach>
+                                                        </c:if>
+
+
+                                                        <c:if test="${measurementData ne null}">
+                                                            <c:forEach items="${measurementData.boqMeasurementItems}" var="boqItem" varStatus="index">
+                                                                <tr id="trItem${index.index}" data-calculation-formula="${boqItem.calculationFormula}">
+                                                                    <td>${index.count}
+                                                                        <input type="hidden" name="boqMeasurementItems[${index.index}].isChecked" id="isChecked${index.index}" class="ischeck notRequired" value="true">
+                                                                        <input type="checkbox" id="checkbox${index.index}" onclick="toggleCheck(${index.index})" checked class="checkbox notRequired">
+
+                                                                    </td>
+                                                                    <td style="width:750px">
+                                                                        <input type="hidden" class="form-control require  " id="itemId${index.index}" name="boqMeasurementItems[${index.index}].itemId" value="${boqItem.itemId}"> Boq Item :
+                                                                        <input type="text" class="form-control disabled  require " id="itemName${index.index}" name="boqMeasurementItems[${index.index}].itemName" value="${boqItem.itemName}">
+                                                                        <div class="d-flex align-items-center gap-1">
+                                                                             <div> Unit In:
+                                                                                <input type="text" class="form-control notRequired disabled " id="unitTypeName${index.index}" name="" value="${boqItem.unitTypeName}">
+                                                                            </div>
+                                                                            <div>Rate Per Unit:
+                                                                                <input type="text" class="form-control text-end require disabled " id="ratePerUnit${index.index}" name="boqMeasurementItems[${index.index}].ratePerUnit" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(boqItem.ratePerUnit)}">
+                                                                            </div>
+                                                                            <div> Boq Item Quantity:
+                                                                                <input type="text" class="form-control text-end require disabled " id="quantity${index.index}" name="boqMeasurementItems[${index.index}].quantity" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(boqItem.quantity)}">
+                                                                            </div>
+                                                                            <div> Boq Item Total Amount:
+                                                                                <input type="text" class="form-control text-end require disabled " id="totalAmt${index.index}" name="boqMeasurementItems[${index.index}].totalAmt" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(boqItem.totalAmt)}">
+                                                                            </div>
+                                                                            
+                                                                        </div>
+                                                                    </td>
+                                                                    <td id="tdAttr${index.index}">
+
+                                                                        <c:forEach items="${boqItem.perticular}" var="perticular" varStatus="prtclrindex">
+
+                                                                            <label class="pLabel${index.index}${prtclrindex.index}">${perticular.label}
+                                                                                <input type="hidden" class="form-control require   pLabel${index.index}${prtclrindex.index}" id="label${index.index}${prtclrindex.index}" name="boqMeasurementItems[${index.index}].perticular[${prtclrindex.index}].label" value="${perticular.label}">
+                                                                              <br> Perticular Item Quantity :  <input type="text" class="form-control disabled text-end require pLabel${index.index}${prtclrindex.index}" id="perQuantity${index.index}${prtclrindex.index}" name="boqMeasurementItems[${index.index}].perticular[${prtclrindex.index}].quantity" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(perticular.quantity)}" readonly
+                                                                                placeholder="0.00">
+                                                                              Perticular Item Total Amount  <input type="text" class="form-control disabled text-end require  pLabel${index.index}${prtclrindex.index} " id="perAmount${index.index}${prtclrindex.index}" name="boqMeasurementItems[${index.index}].perticular[${prtclrindex.index}].amount" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(perticular.amount)}" readonly
+                                                                                placeholder="0.00">
+                                                                            </label>
+
+																			<div class="attributesElmnt pLabel${index.index}${prtclrindex.index}">
+                                                                            <c:forEach items="${perticular.attributes}" var="attributes" varStatus="attrIndex">
+                                                                                ${not empty attributes.attributeLabelName?attributes.attributeLabelName:'Q'} : <input type="text" class="form-control require text-end  pLabel${index.index}${prtclrindex.index}  attribute-input${index.index}${prtclrindex.index}" id="attributeValue${index.index}${prtclrindex.index}${attrIndex.index}" name="boqMeasurementItems[${index.index}].perticular[${prtclrindex.index}].attributes[${attrIndex.index}].attributeValue"
+                                                                                data-attribute-name="${attributes.attributeName}" onblur="calculateQuantityAndAmount(${index.index},${prtclrindex.index},${attrIndex.index})" onkeypress="return validateInputDecimal(event,this);" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(attributes.attributeValue)}"
+                                                                                placeholder="Enter ${attributes.attributeName}">
+                                                                                <input type="hidden" class="form-control notRequired  pLabel${index.index}${prtclrindex.index} " id="attributeId${index.index}${prtclrindex.index}${attrIndex.index}" name="boqMeasurementItems[${index.index}].perticular[${prtclrindex.index}].attributes[${attrIndex.index}].attributeId"
+                                                                                value="${attributes.attributeId}">
+                                                                            </c:forEach>
+                                                                            </div>
+                                                                            <button type="button" class="btn btn-danger btn-sm enableRmv${index.index} remove-btn pLabel${index.index}${prtclrindex.index}" onclick="removeFieldsByClass('pLabel${index.index}${prtclrindex.index}') " style="margin-left: 10px;">-</button>
+                                                                        </c:forEach>
+                                                                        
+                                                                        
+                                                                    </td>
+                                                                    <td>
+                                                                        <button type="button" onclick="addParticular('tdAttr${index.index}', '${index.index}',  ${fn:escapeXml(boqItem.jsonArrayAttributes)})" class="btn btn-info btn-add-product notRequired">+</button>
+                                                                    </td>
+                                                                </tr>
+                                                            </c:forEach>
+                                                        </c:if>
+
+
+                                                    </tbody>
+                                                </table>
+                                            </div> 
+
+
+
+
+
+
+                                        </form>
+                                    </div>
+
+									<div class="row">
+										<div class="col-sm-12" style="margin-top: 30px;">
+											<div class="form-group text-center">
+												<c:set var="dynamicFromId" value="finalSubmit"
+													scope="request" />
+												<c:set var="wonFunction" value="submitFormData()" />
+												<%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+											</div>
+										</div>
+									</div>
+
+
+									<%--  <div class="row">
+										<div class="col-sm-12" style="margin-top: 10px;">
+											<div class="form-group text-center">
+												<button type="button" class="btn btn-success"
+													onclick="submitFormData();">
+													<spring:message code="COMMON.BUTTON.SAVE" />
+												</button>
+												<a href="${contextPath}/home"> <input type="button"
+													class="btn btn-danger"
+													value=<spring:message code="COMMON.BUTTON.BACK"></spring:message>>
+												</a>
+
+											</div>
+										</div>
+									</div> --%>
+                </div>
+            </div>
+            <hr>
+
+        </div>
+<!--End::row-1 -->
+
+
+
+<form id="boqItm" action="${contextPath}/boqMeasurement/featch_boq_items_by_boq_id" method="get">
+<input type="hidden"  name="boqMstId"  id="boqMstIdHd">
+</form>
+
+<form class="form-horizontal" action="" method="GET" id="dynamicEntityListForm">
+	<input type="hidden" name="filterData" value="" id="filterDataEncodeId"/>
+	<input type="hidden" name="parentEntityData" value="" id="parentEntityDataEncodeId"/>
+</form>
+<script>
+
+	
+	function asyncAjaxForData(url, data, method) {
+		return new Promise((resolve, reject) => {
+			$.ajax({
+				url: url,
+				type: method,
+				data: data,
+				success: function(data){
+					resolve(data);
+				},
+				error: function(err){
+					reject(err);
+				}
+			});
+		});
+	}
+
+	// document ready
+	$(document).ready(function(){
+		debugger
+		let currentClassObjectId = "${selectedFilterEntityDataCombo}";
+		getDownEntityHierarchyList($("#parentEntityIdAndTypeId"), currentClassObjectId);
+	});
+	let isMultipleChoose = "${isMultipleChoose}";
+	
+	if (typeof classObjectValue === "undefined") {
+		var classObjectValue = "${classObjectValue}";
+	}
+
+	async function getDownEntityHierarchyList(that, currentClassObjectId = ""){
+		debugger
+		let value = $(that).val();
+		if(value != ""){
+			let url = "${contextPath}/system/getChildListEntityHierarchyList";
+			let data = {
+				"entityId" : btoa(value),
+				"classObjectValue" : btoa(classObjectValue),
+				"currentClassObjectId" : btoa(currentClassObjectId)
+			};
+			let method = "GET";
+			let response = await asyncAjaxForData(url, data, method);
+			if(response.outcome){
+				let data = response.data;
+				let html = "<option value=''>Select Entity</option>";
+				$.each(data, function(index, value){
+					let selected = "";
+					if(value.levelIdAndType == currentClassObjectId){
+						selected = "selected";
+						onChangeTrigger = true;
+					}
+					html += '<option value="' + value.levelIdAndType+ '" '+selected+'>' + value.levelName + '</option>';
+				});
+
+				if(isMultipleChoose == "true"){
+					// add class to parentEntityIdAndTypeId as selectpicker and multiple attribute
+					$('#objectEntityIdAndTypeId').attr('multiple', 'multiple');
+				}
+
+
+				$('#objectEntityIdAndTypeId').html(html);
+				$('#objectEntityIdAndTypeId').selectpicker('refresh');
+				
+			}
+		}
+	}
+
+
+	function filterDataFunc(that){
+		debugger
+			var filter = that.value;
+			if (filter == 0) {
+				bootbox.alert("Please select organization");
+				return;
+			}
+			let filterEncodeData = btoa(filter);
+			let parentEntityIdAndTypeIdData = btoa($('#parentEntityIdAndTypeId').val());
+			// get the current url from the browser
+			let currentUrl = window.location.href;
+			// split the url by '?' to get the base url
+			let baseUrl = currentUrl.split('?')[0];
+			// set the filterData value to the hidden input field
+			$('#filterDataEncodeId').val(filterEncodeData);
+			$('#parentEntityDataEncodeId').val(parentEntityIdAndTypeIdData);
+			// submit the form
+			$('#dynamicEntityListForm').attr('action', baseUrl).submit();
+		}
+</script>
+
+<script>
+
+$( document ).ready(function() {
+	 toggleMinusButtonState('msrmnt');
+	 debugger
+		var projectId ='${measurementData.projectId}' || 0 ;
+		var workOrderId ='${measurementData.workOrderId}'||0;
+		var boqMstId ='${measurementData.boqMstId}'||0;
+		featchWorkOrdersByProject(projectId,workOrderId,'workOrderId');
+		featchBoqListByWorkOrder(workOrderId,boqMstId,'boqMstId');
+		
+});
+
+
+function getBoqItems(){
+	debugger
+	
+	var boqMstId =$('#boqMstId').val();
+	$('#boqMstIdHd').val(boqMstId);
+	if(validateForm()){
+		 if(encryptFormData('boqItm', tableOrTbodyIDS, tableOrTbodyKeys)){
+				 confirmation('boqItm');
+			 }
+		}
+}
+
+
+function addParticular(tdId, itemIndex, attributesJson) {
+	debugger
+    const targetTd = document.getElementById(tdId);
+    if (!targetTd) return;
+    
+    const unitRow = document.getElementById('trItem' + itemIndex);
+    const formula = unitRow.getAttribute('data-calculation-formula'); 
+
+    const particularsCount = targetTd.querySelectorAll('label').length;
+
+    const newLabel = document.createElement('label');
+    newLabel.textContent = 'P-' + (particularsCount + 1);
+    newLabel.className = 'pLabel' +itemIndex +particularsCount;
+    
+    
+    const ptrLable = document.createElement('input');
+    ptrLable.type = 'hidden';
+    ptrLable.className = 'form-control  '+'  pLabel'+itemIndex+particularsCount;
+    ptrLable.id = 'label' + itemIndex + particularsCount;
+    ptrLable.name = 'boqMeasurementItems[' + itemIndex + '].perticular[' + particularsCount + '].label';
+    ptrLable.value='P-' + (particularsCount + 1);
+    newLabel.appendChild(ptrLable);
+    
+    newLabel.appendChild(document.createElement('br'));
+    
+    const labelTextQnty = document.createTextNode('Perticular Item Quantity ');
+    newLabel.appendChild(labelTextQnty);
+    
+    const ptrQnty = document.createElement('input');
+    ptrQnty.type = 'text';
+    ptrQnty.className = 'form-control text-end disabled '+'  pLabel'+itemIndex+particularsCount;
+    ptrQnty.id = 'perQuantity' + itemIndex + particularsCount;
+    ptrQnty.name = 'boqMeasurementItems[' + itemIndex + '].perticular[' + particularsCount + '].quantity';
+    ptrQnty.placeholder = '0.00';
+    ptrQnty.readOnly = true;
+    newLabel.appendChild(ptrQnty);
+    
+    const labelTextTotalAmnt = document.createTextNode('Perticular Item Total Amount');
+    newLabel.appendChild(labelTextTotalAmnt);
+    
+    const ptrAmnt = document.createElement('input');
+    ptrAmnt.type = 'text';
+    ptrAmnt.className = 'form-control text-end disabled '+'  pLabel'+itemIndex+particularsCount;
+    ptrAmnt.id = 'perAmount' + itemIndex + particularsCount;
+    ptrAmnt.name = 'boqMeasurementItems[' + itemIndex + '].perticular[' + particularsCount + '].amount';
+    ptrAmnt.placeholder = '0.00';
+    ptrQnty.readOnly = true;
+    newLabel.appendChild(ptrAmnt);
+    
+    targetTd.appendChild(newLabel);
+    
+    const attrDiv = document.createElement('div');
+    attrDiv.className = 'attributesElmnt pLabel'+ itemIndex + particularsCount;
+
+    const attributes = typeof attributesJson === 'string' ? JSON.parse(attributesJson) : attributesJson;
+
+    attributes.forEach((attribute, attrIndex) => {
+    	 const labelText = document.createTextNode((attribute.attributeLableName || attribute.attributeName) + ': ');
+    	    attrDiv.appendChild(labelText);
+        
+        const attrValue = document.createElement('input');
+        attrValue.type = 'text';
+        attrValue.className = 'form-control text-end  ' +'attribute-input'+itemIndex+particularsCount+'  pLabel'+itemIndex+particularsCount;
+        attrValue.id = 'attributeValue' + itemIndex + particularsCount+attrIndex;
+        attrValue.name = 'boqMeasurementItems[' + itemIndex + '].perticular[' + particularsCount + '].attributes[' + attrIndex + '].attributeValue';
+        attrValue.placeholder = 'Enter ' + attribute.attributeName;
+        attrValue.setAttribute('data-attribute-name', attribute.attributeName); 
+        attrValue.setAttribute('onblur', 'calculateQuantityAndAmount('+itemIndex+', '+particularsCount+', '+attrIndex+')');
+        attrValue.setAttribute('onkeypress', 'return validateInputDecimal(event,this)');
+        
+        attrDiv.appendChild(attrValue);
+
+        const attrId = document.createElement('input');
+        attrId.type = 'hidden';
+        attrId.className = 'form-control notRequired '+'  pLabel'+itemIndex+particularsCount;
+        attrId.id = 'attributeId' + itemIndex + particularsCount + attrIndex;
+        attrId.name = 'boqMeasurementItems[' + itemIndex + '].perticular[' + particularsCount + '].attributes[' + attrIndex + '].attributeId';
+        attrId.value = attribute.attributeId;
+        attrDiv.appendChild(attrId);
+       
+    });
+    targetTd.appendChild(attrDiv);
+    
+    showFormulaMessage(targetTd, itemIndex, particularsCount, formula);
+    
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.textContent = '-';
+    removeButton.className = 'btn btn-danger btn-sm remove-btn '+newLabel.className+'  enableRmv'+itemIndex;
+    removeButton.style.marginLeft = '10px'; 
+    removeButton.onclick = function () {
+        removeFieldsByClass('pLabel' +itemIndex +particularsCount); 
+    };
+    targetTd.appendChild(removeButton);
+    
+    
+    toggleMinusButtonState('msrmnt')
+}
+
+
+function showFormulaMessage(targetTd, itemIndex, particularsCount, formula) {
+	if (formula) {
+	    const formulaMessage = document.createElement('div');
+	    formulaMessage.className ='calformula pLabel' + itemIndex + particularsCount;
+	    formulaMessage.textContent = 'Formula: ' + formula;
+	    
+	    targetTd.appendChild(formulaMessage);
+
+	    setTimeout(() => {
+	        formulaMessage.remove();
+	    }, 5000);
+	}
+
+}
+
+
+
+function submitFormData(){
+	
+	tableOrTbodyIDS=['msrmnt'];
+	tableOrTbodyKeys=['boqMeasurementItems'];
+	if(isAnyChecked()){
+	if(validateForm()){
+	 if(encryptFormData('finalSubmit', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('finalSubmit');
+		 }
+	}
+	}else{
+		
+		bootbox.alert("Atlest one item should be selected ")
+	}
+	
+}
+
+function calculateQuantityAndAmount(itemIndex, pertIndex, attrIndex) {
+    debugger;
+    const quantityField = document.getElementById('perQuantity' + itemIndex + pertIndex);
+    const amountField = document.getElementById('perAmount' + itemIndex + pertIndex);
+    const rateField = document.getElementById('ratePerUnit' + itemIndex);
+
+    const unitRow = document.getElementById('trItem' + itemIndex);
+    const formula = unitRow.getAttribute('data-calculation-formula'); // e.g., "Width * Length"
+    const attributeInputs = document.querySelectorAll('.attribute-input' + itemIndex + pertIndex);
+    const rate = parseFloat(rateField.value) || 0;
+
+    let quantity = 0;
+    let amount = 0;
+
+    if (formula) {
+        const attributes = {};
+
+        attributeInputs.forEach(input => {
+            const attributeName = input.getAttribute('data-attribute-name'); // e.g., "Width", "Length"
+            let value = parseFloat(input.value);
+            value = isNaN(value) ? 0 : value;
+            const formattedValue = value.toFixed(2);
+            input.value = formattedValue; 
+            attributes[attributeName] = formattedValue;
+        });
+
+        try {
+            let evalFormula = formula;
+            for (const [key, value] of Object.entries(attributes)) {
+                evalFormula = evalFormula.replace(new RegExp(key, 'g'), value);
+            }
+
+            quantity = eval(evalFormula);
+        } catch (error) {
+            console.error("Error evaluating formula:", error);
+            quantity = 0;
+        }
+    } else {
+        const attrQuantity = parseFloat(document.getElementById('attributeValue' + itemIndex + pertIndex + attrIndex).value) || 0;
+        quantity = attrQuantity;
+    }
+
+    amount = quantity * rate;
+
+    if (quantity < 0 || amount < 0) {
+        const alertMessage = 'Value should not be less than 0. Quantity:'+ quantity.toFixed(2) +', Amount: '+amount.toFixed(2);
+        bootbox.alert(alertMessage);
+
+        attributeInputs.forEach(input => {
+            input.value = '';
+        });
+
+        quantityField.value = '';
+        amountField.value = '';
+
+        return false;
+    }
+
+    quantityField.value = isNaN(quantity) ? '0.00' : quantity.toFixed(2);
+    amountField.value = isNaN(amount) ? '0.00' : amount.toFixed(2);
+}
+
+
+function toggleCheck(index) {
+    const checkbox = document.getElementById('checkbox' + index);
+    const isCheckInput = document.getElementById('isChecked' + index);
+
+    if (checkbox.checked) {
+        checkbox.checked = true;  
+        isCheckInput.value = true; 
+        makeFieldsMandatory(index, true)
+    } else {
+        checkbox.checked = false;  
+        isCheckInput.value = false;
+        makeFieldsMandatory(index, false)
+    }
+}
+
+function makeFieldsMandatory(index, isRequired) {
+    let trElement = document.getElementById('trItem' + index);
+    
+    if (trElement) {
+        let inputFields = trElement.querySelectorAll('input');
+        
+        inputFields.forEach(input => {
+            if (isRequired) {
+                if (!input.classList.contains('require')) {
+                    input.classList.add('require');
+                }
+            } else {
+                if (input.classList.contains('require')) {
+                    input.classList.remove('require');
+                }
+            }
+        });
+    } else {
+        console.error('Row with ID  trItem'+index+' not found.');
+    }
+}
+
+function isAnyChecked() {
+    const isCheckedInputs = document.querySelectorAll('.ischeck');
+    
+    for (let input of isCheckedInputs) {
+        if (input.value === "true") {
+            return true;
+        }
+    }
+    return false;
+}
+
+function removeFieldsByClass(className) {
+    const elements = document.querySelectorAll('.' + className);
+    elements.forEach(element => {
+        element.remove(); 
+    });
+    
+    toggleMinusButtonState('msrmnt')
+}
+
+function validateInputDecimal(event, inputElement) {
+	  var inputValue = inputElement.value;
+	  var isDigitOrDecimal = (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46;
+	  var decimalIndex = inputValue.indexOf('.');
+	  if (decimalIndex !== -1) {
+	    if (event.charCode == 46) {
+	      event.preventDefault();
+	      return false;
+	    }
+	    var decimalPart = inputValue.substr(decimalIndex + 1);
+	  }
+	  return isDigitOrDecimal;
+	}
+
+
+ function toggleMinusButtonState(tbodyId) {
+	    const tbody = document.getElementById(tbodyId);
+	
+	    if (!tbody) {
+	        console.error('No tbody found with ID: ' + tbodyId);
+	        return;
+	    }
+	
+	    const rows = tbody.getElementsByTagName("tr"); 
+	
+	    for (let i = 0; i < rows.length; i++) {
+	        const row = rows[i];
+	
+	        const buttons = row.getElementsByClassName('enableRmv'+i); 
+	
+	        if (buttons.length === 0) {
+	            console.warn(`No buttons found in row ${i + 1}`);
+	            continue; 
+	        }
+	
+	        for (let j = 0; j < buttons.length; j++) {
+	            const button = buttons[j];
+	
+	            if (j === 0) {
+	            	if(!button.classList.contains('disabled')){
+	                button.classList.add('disabled');
+	            	}
+	            } else {
+	            	if(!button.classList.contains('disabled')){
+	                button.classList.add('disabled');
+	            	}
+	
+	                if (j === buttons.length - 1) {
+	                	if(button.classList.contains('disabled')){
+	                    button.classList.remove('disabled');
+	                	}
+	                }
+	            }
+	        }
+	    }
+ }
+
+
+</script>
+
+

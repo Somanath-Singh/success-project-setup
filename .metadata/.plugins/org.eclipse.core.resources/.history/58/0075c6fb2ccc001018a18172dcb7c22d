@@ -1,0 +1,51 @@
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<style>
+	.isRoleObjReadOnly {
+		pointer-events: none;
+		background-color: #868181 !important;
+	}
+
+</style>
+
+<!-- Primary Role -->
+<div class="form-group col-md-2">
+	<label class="required" >Primary Role</label>
+	<div class="col-md-12">
+		<select class="form-control form-select form-control-sm  thisRequiredField" name="primaryRoleCode" onchange="removeThisRoleFromOtherRoles(this)" id="primaryRoleCodeForId" data-live-search="true">
+			<option value="" disabled selected>Select Role</option>
+			<c:forEach items="${roleList}" var="role">
+				<option value="${role.roleCode}" <c:if test="${role.roleCode eq roleDetails.primaryRoleCode}">selected</c:if>>${role.displayName}</option>
+			</c:forEach>
+		</select>
+	</div>
+</div>
+
+
+<script>
+
+	
+
+
+function removeThisRoleFromOtherRoles(that){
+	var selectedRole = $(that).val();
+	$('select[name="otherRoleCodes"] option').each(function(){
+		if($(this).val() == selectedRole){
+			$(this).remove();
+		}
+	});
+	// refresh selectpicker
+	$('select[name="otherRoleCodes"]').selectpicker('refresh');
+}
+
+
+// ready function
+$(document).ready(function(){
+	let primaryRoleCodeForValue = $("#primaryRoleCodeForId").val();
+	if(primaryRoleCodeForValue != '' && primaryRoleCodeForValue != null && primaryRoleCodeForValue != undefined){
+		// make primary role readonly by adding class by id
+		$("#primaryRoleCodeForId").addClass('isRoleObjReadOnly');
+	}
+});
+
+
+</script>

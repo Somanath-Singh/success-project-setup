@@ -1,0 +1,607 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+.freeze {
+    pointer-events: none;      /* Prevent clicking */
+    opacity: 0.6;              /* Dim the button */
+    cursor: not-allowed;       /* Change cursor */
+}
+
+  .rounded-box {
+    padding: 20px;
+   /*  margin: 20px 0; */
+ 
+  }
+  .rounded-box h5 {
+    margin-bottom: 20px;
+}
+
+</style>
+
+<%-- <div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Building Details</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i
+						class="fa-solid fa-house"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">View Building Details</li>
+			</ol>
+		</nav>
+	</div>
+</div> --%>
+
+<div class="card mt-3">
+	<div class="card-header">
+		<h5 class="card-title">View Building Details</h5>
+	</div>
+	<div class="card-body">
+		<div class="row">
+
+			<div class="col-md-3 ml-auto">
+				<div class="form-group">
+					<label class="smallInput required">Financial Year :</label> <select
+						class="form-control form-control-sm form-select"
+						id="financialYear" name="financialYearId"
+						onchange="getBuildingName(this.value)">
+						<option value="0" selected disabled>- Select -</option>
+						<c:forEach items="${financialYearList}" var="fy">
+							<option value="${fy.financialYearId}">${fy.financialYear}</option>
+						</c:forEach>
+					</select>
+				</div>
+			</div>
+
+			<div class="col-md-3 ml-auto">
+				<div class="form-group">
+					<label class="smallInput required">Building Name :</label> <select
+						class="form-control form-control-sm form-select" id="buildingId"
+						name="buildingId" onchange="getLocationCode(this.value)" >
+						<option value="0" selected disabled>- Select -</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group col-md-3">
+				<label class="required">Location Code :</label>
+				<div class="col-md-12">
+					<input type="text" name="locationCode" id="locationCode"
+						class="form-control form-control-sm" onchange="getBuildingDetails(this.value)"
+						 readonly>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="card  mt-3" id="buildingSection" style="display: none;">
+	<div class="card-header"><h5 class="card-title">Building Details</h5></div>
+</div>
+
+
+<div class="card  mt-3" id="panningDetailsSection" style="display: none;">
+	<h5 class="mb-5">Planning Details</h5>	
+</div>
+
+<div class="card  mt-3" id="workOrderDetailsSection" style="display: none;">
+	<h5 class="mb-5">Work Order Details</h5>	
+</div>
+
+<div class="card  mt-3" id="InspectionDetailsSection" style="display: none;">
+	<h5 class="mb-5">Inspection Details</h5>	
+</div>
+
+<div class="card  mt-3" id="MaintenanceDetailsSection" style="display: none;">
+	<h5 class="mb-5">Maintenance Details</h5>	
+</div>
+
+<script>
+		
+		
+function getBuildingName(financialYearId) {
+	debugger;
+	$.ajax({
+	    type: "GET",
+	    url: "${contextPath}/common/getBuildingNameByFinancialYear",
+	    data: {
+	    	financialYearId: financialYearId,
+	    },
+	    success: function (buildingData) {
+	        var buildingId = $('#buildingId'); 
+	        buildingId.empty();
+	        buildingId.append('<option value="0" selected>- Select -</option>');
+	        $.each(buildingData, function(index,building) {
+	        	buildingId.append('<option value="' + building.buildingId + '">' +  building.buildingName + '</option>');
+	        	
+	        });
+	    },
+	    error: function (error) {
+	        console.error("Error fetching building name:", error);
+	    }
+	});
+	}
+	
+
+ function getLocationCode(buildingId) {
+	 debugger;
+$.ajax({
+    type: "GET",
+    url: "${contextPath}/common/getLocationCodeByBuildingId",
+    data: { buildingId: buildingId },
+    success: function (location) {
+        if (location) {
+            $("#locationCode").val(location.locationCode);
+           $("#locationCode").trigger("change");
+
+        } else {
+            $("#locationCode").val("");
+            console.warn("No project code found for buildingId:", projectId);
+        }
+    },
+    error: function (error) {
+        console.error("Error fetching location code:", error);
+    }
+});
+}
+
+ 
+ 
+	
+ function getBuildingDetails(locationCode) {
+	    debugger;
+	    $.ajax({
+	        type: "GET",
+	        url: contextPath + "/report/getBuildingDetailsByLocationCode",
+	        data: { locationCode: locationCode },
+	        success: function (data) {
+	            const section = $('#buildingSection');
+	            section.empty();
+
+	            if (data) {
+
+	                let html = "<div class='card-header'>";
+	                html += "<h5 class='card-title'>Building Details</h5>";
+	                html += "</div>";
+	                html += "<div class='card-body'><div class='row'>";
+	                html += "<div class='form-group col-md-3'>";
+	                html += "<label class='required'>Building Name :</label>";
+	                html += "<div class='col-md-12'>";
+	                html += "<input type='text' name='' id='' class='form-control form-control-sm' value='" + (data.buildingName || "NA") + "' readonly>"
+                	html += "</div></div>"
+	                html += "<div class='form-group col-md-3'>";
+	                html += "<label class='required'>District Name :</label>";
+	                html += "<div class='col-md-12'>";
+	                html += "<input type='text' name='' id='' class='form-control form-control-sm' value='" + (data.districtName || "NA") + "' readonly>"
+                	html += "</div></div>"
+	                html += "<div class='form-group col-md-3'>";
+	                html += "<label class='required'>Block Name :</label>";
+	                html += "<div class='col-md-12'>";
+	                html += "<input type='text' name='' id='' class='form-control form-control-sm' value='" + (data.blockName || "NA") + "' readonly>"
+                	html += "</div></div>"
+	                html += "<div class='form-group col-md-3'>";
+	                html += "<label class='required'>GP Name :</label>";
+	                html += "<div class='col-md-12'>";
+	                html += "<input type='text' name='' id='' class='form-control form-control-sm' value='" + (data.gpName || "NA") + "' readonly>"
+                	html += "</div></div>"
+	                html += "<div class='form-group col-md-3'>";
+	                html += "<label class='required'>Village Name :</label>";
+	                html += "<div class='col-md-12'>";
+	                html += "<input type='text' name='' id='' class='form-control form-control-sm' value='" + (data.villageName || "NA") + "' readonly>"
+                	html += "</div></div>"
+	                html += "<div class='form-group col-md-3'>";
+	                html += "<label class='required'>Completion Date :</label>";
+	                html += "<div class='col-md-12'>";
+	                html += "<input type='text' name='' id='' class='form-control form-control-sm' value='" + (data.completionDate || "NA") + "' readonly>"
+                	html += "</div></div>"
+	                html += "<div class='form-group col-md-3'>";
+	                html += "<label class='required'>Sanction Amount :</label>";
+	                html += "<div class='col-md-12'>";
+	                html += "<input type='text' name='' id='' class='form-control form-control-sm' value='" + (data.sanctionAmount || "NA") + "' readonly>"
+                	html += "</div></div>"
+	                html += "<div class='form-group col-md-3'>";
+	                html += "<label class='required'>Work Order Value :</label>";
+	                html += "<div class='col-md-12'>";
+	                html += "<input type='text' name='' id='' class='form-control form-control-sm' value='" + (data.workOrderValue || "NA") + "' readonly>"
+                	html += "</div></div>"
+	                /* html += "<div class='detail-item'><strong>Building Name:</strong> " + (data.buildingName || 'NA') + "</div>";
+	                html += "<div class='detail-item'><strong>District:</strong> " + (data.districtName || 'NA') + "</div>";
+	                html += "<div class='detail-item'><strong>Block:</strong> " + (data.blockName || 'NA') + "</div>";
+	                html += "<div class='detail-item'><strong>GP:</strong> " + (data.gpName || 'NA') + "</div>";
+	                html += "<div class='detail-item'><strong>Village:</strong> " + (data.villageName || 'NA') + "</div>";
+	                html += "<div class='detail-item'><strong>Completion Date:</strong> " + (data.completionDate || 'NA') + "</div>";
+	                html += "<div class='detail-item'><strong>Sanction Amount:</strong> " + (data.sanctionAmount || 'NA') + "</div>";
+	                html += "<div class='detail-item'><strong>Work Order Value:</strong> " + (data.workOrderValue || 'NA') + "</div>"; */
+
+	                html += "</div>";
+
+	                section.append(html);
+	                section.show();
+
+	            } else {
+	                section.html('<div class="text-center text-muted">No data found</div>').show();
+	            }
+	        },
+	        error: function (err) {
+	            console.error("Error loading building details:", err);
+	            $('#buildingSection').html('<div class="text-center text-danger">Error loading data</div>').show();
+	        }
+	    });
+	    
+	    
+	    getPlanningDetails(locationCode);
+	    getWorkOrderDetails(locationCode);
+	    getInspectionDetails(locationCode);
+	    getMaintainanceDetails(locationCode);
+	    
+	}
+
+
+ function getPlanningDetails(locationCode) {
+	    debugger;
+	    $.ajax({
+	        type: "GET",
+	        url: contextPath + "/report/getPlanningDetailsByLocationCode",
+	        data: { locationCode: locationCode },
+
+	        success: function (data) {
+
+	            const section = $('#panningDetailsSection');
+	            section.show();
+	            section.empty();
+
+	            let html = "";
+	            html += "<h5 class='mb-4'>Planning Details</h5>";
+
+	            if (!data) {
+	                section.append("<div class='text-center text-muted'>No Planning Details Found</div>");
+	                return;
+	            }
+
+	            html += "<div class='accordion' id='planningAccordion'>";
+
+	            /* ---------------- SANCTION DETAILS ---------------- */
+	            html += "<div class='accordion-item'>";
+	            html += "<h2 class='accordion-header' id='sanctionHeading'>";
+	            html += "<button class='accordion-button' type='button' data-bs-toggle='collapse' data-bs-target='#sanctionCollapse' aria-expanded='true'>";
+	            html += "Sanction Details</button></h2>";
+
+	            html += "<div id='sanctionCollapse' class='accordion-collapse collapse show' aria-labelledby='sanctionHeading' data-bs-parent='#planningAccordion'>";
+	            html += "<div class='accordion-body'><div class='row'>";
+
+	            html += "<div class='col-md-6'><table class='table table-borderless'>";
+
+	            html += "<tr><th>Sanction Number</th><td>:</td><td>" + (data.sanctionNumber || 'NA') + "</td></tr>";
+	            html += "<tr><th>Sanction Date</th><td>:</td><td>" + (data.sanctionDate || 'NA') + "</td></tr>";
+	            html += "<tr><th>Sanction Amount</th><td>:</td><td>" + (data.sanctionAmount || 'NA') + "</td></tr>";
+	            html += "<tr><th>Assigned To</th><td>:</td><td>" + (data.sanctionAssignedTo || 'NA') + "</td></tr>";
+
+	            // Sanction Document
+	            html += "<tr><th>Sanction Document</th><td>:</td><td>";
+	            html += data.sanctionDocumentName
+	                ? "<button type='button' class='btn btn-sm btn-outline-primary' onclick=\"viewFile('" 
+	                    + data.sanctionDocumentName + "', 'SANCTION_WORK_DOCUMENT')\"><i class='bi bi-eye'></i></button>"
+	                : "NA";
+	            html += "</td></tr>";
+
+	            html += "</table></div>";
+	            html += "</div></div></div></div>";
+
+
+
+	            /* ---------------- DPR DETAILS ---------------- */
+	            html += "<div class='accordion-item'>";
+	            html += "<h2 class='accordion-header' id='dprHeading'>";
+	            html += "<button class='accordion-button collapsed' type='button' data-bs-toggle='collapse' data-bs-target='#dprCollapse'>";
+	            html += "DPR Details</button></h2>";
+
+	            html += "<div id='dprCollapse' class='accordion-collapse collapse' aria-labelledby='dprHeading' data-bs-parent='#planningAccordion'>";
+	            html += "<div class='accordion-body'><div class='row'>";
+
+	            html += "<div class='col-md-6'><table class='table table-borderless'>";
+
+	            html += "<tr><th>DPR Date</th><td>:</td><td>" + (data.dprDate || 'NA') + "</td></tr>";
+	            html += "<tr><th>DPR Amount</th><td>:</td><td>" + (data.dprAmount || 'NA') + "</td></tr>";
+
+	            // DPR Document
+	            html += "<tr><th>DPR Document</th><td>:</td><td>";
+	            html += data.dprDocumentName
+	                ? "<button type='button' class='btn btn-sm btn-outline-primary' onclick=\"viewFile('" 
+	                    + data.dprDocumentName + "', 'SANCTION_WORK_DOCUMENT')\"><i class='bi bi-eye'></i></button>"
+	                : "NA";
+	            html += "</td></tr>";
+
+	            html += "</table></div>";
+
+	            html += "</div></div></div></div>";
+
+	            html += "</div>";
+
+	            section.append(html);
+	        },
+
+	        error: function (err) {
+	            console.error("Error fetching planning details:", err);
+	            $('#panningDetailsSection').html('<div class="text-center text-danger">Error loading data</div>');
+	            $('#panningDetailsSection').show();
+	        }
+	    });
+	}
+
+
+ function getWorkOrderDetails(locationCode) {
+	    debugger;
+	    $.ajax({
+	        type: "GET",
+	        url: contextPath + "/report/getWorkingOrderDetailsByLocationCode",
+	        data: { locationCode: locationCode },
+	        success: function (data) {
+
+	            const section = $('#workOrderDetailsSection');
+	            section.show();
+	            section.empty();
+
+	            let html = "";
+	            html += "<h5 class='mb-4'>Work Order Details</h5>";
+
+	            if (!data) {
+	                section.append("<div class='text-center text-muted'>No Work Order Details Found</div>");
+	                return;
+	            }
+
+	            html += "<div class='accordion' id='workOrderAccordion'>";
+	            html += "<div class='accordion-item'>";
+	            html += "<h2 class='accordion-header' id='woHeading'>";
+	            html += "<button class='accordion-button' type='button' data-bs-toggle='collapse' data-bs-target='#woCollapse' aria-expanded='true'>";
+	            html += "Work Order Details";
+	            html += "</button></h2>";
+
+	            html += "<div id='woCollapse' class='accordion-collapse collapse show' aria-labelledby='woHeading' data-bs-parent='#workOrderAccordion'>";
+	            html += "<div class='accordion-body'><div class='row'>";
+
+	            html += "<div class='col-md-6'><table class='table table-borderless'>";
+
+	            html += "<tr><th>Work Order Number</th><td>:</td><td>" + (data.workOrderNumber || 'NA') + "</td></tr>";
+	            html += "<tr><th>Work Order Date</th><td>:</td><td>" + (data.workOrderDate || 'NA') + "</td></tr>";
+	            html += "<tr><th>Work Order Value</th><td>:</td><td>" + (data.workOrderValue || 'NA') + "</td></tr>";
+	            html += "<tr><th>Completion Due Months</th><td>:</td><td>" + (data.completionDueDate || 'NA') + "</td></tr>";
+	            html += "<tr><th>Completion Date</th><td>:</td><td>" + (data.completionDate || 'NA') + "</td></tr>";
+	            html += "<tr><th>Agency Contact Name</th><td>:</td><td>" + (data.agencyContName || 'NA') + "</td></tr>";
+	            html += "<tr><th>Contractor Phone</th><td>:</td><td>" + (data.contractorPhone || 'NA') + "</td></tr>";
+
+	           /*  if (data.workOrderDocumentName) {
+	                html += "<tr><th>Work Order Document</th><td>:</td>";
+	                html += "<td><a href='" + contextPath + "/documents/" + data.workOrderDocumentName + "' target='_blank'>View</a></td></tr>";
+	            }
+	           	           
+ */
+                //Work Order Document
+              html += "<tr><th>Work Order Document</th><td>:</td><td>";
+             if (data.workOrderDocumentName) {
+             html += "<button type='button' class='btn btn-sm btn-outline-primary' " +
+             "onclick=\"viewFile('" + data.workOrderDocumentName + "', 'SANCTION_WORK_DOCUMENT')\">" +
+             "<i class='bi bi-eye'></i></button>";
+            } else {
+             html += "NA";
+            }
+                 html += "</td></tr>";
+
+	            html += "</table></div>";
+
+	            html += "</div></div></div></div>"; 
+	            html += "</div>";
+	            section.append(html);
+	        },
+
+	        error: function (err) {
+	            console.error("Error fetching work order details:", err);
+	            $('#workOrderDetailsSection').html('<div class="text-center text-danger">Error loading data</div>');
+	            $('#workOrderDetailsSection').show();
+	        }
+	    });
+	}
+ 
+
+ function getMaintainanceDetails(locationCode) {
+	    $.ajax({
+	        type: "GET",
+	        url: contextPath + "/report/getMaintenanceDetailsByLocationCode",
+	        data: { locationCode: locationCode },
+	        success: function (data) {
+	            const section = $('#MaintenanceDetailsSection');
+	            section.show();
+	            section.empty();
+
+	            let html = "<h5 class='mb-4'>Maintenance Details</h5>";
+
+	            if (!data || data.length === 0) {
+	                section.append("<div class='text-center text-muted'>No Maintenance Details Found</div>");
+	                return;
+	            }
+
+	            html += "<div class='accordion' id='maintenanceAccordion'>";
+
+	            data.forEach((item, index) => {
+	                const collapseId = "maintCollapse" + index;
+	                const headingId  = "maintHeading" + index;
+	                html += "<div class='accordion-item'>";
+	                html += "<h2 class='accordion-header' id='" + headingId + "'>";
+	                html += "<button class='accordion-button " + (index === 0 ? "" : "collapsed") + "' type='button' data-bs-toggle='collapse' data-bs-target='#" + collapseId + "'>";
+	                html += "Maintenance Record #" + (index + 1);
+	                html += "</button></h2>";
+
+	                html += "<div id='" + collapseId + "' class='accordion-collapse collapse " + (index === 0 ? "show" : "") + "' data-bs-parent='#maintenanceAccordion'>";
+	                html += "<div class='accordion-body'><div class='row'>";
+
+	                html += "<div class='col-md-6'><table class='table table-borderless'>";
+	                html += "<tr><th>Maintenance Name</th><td>:</td><td>" + (item.mainName || 'NA') + "</td></tr>";
+	                html += "<tr><th>Location Name</th><td>:</td><td>" + (item.locationName || 'NA') + "</td></tr>";
+	                html += "<tr><th>Hostel Name</th><td>:</td><td>" + (item.hostelName || 'NA') + "</td></tr>";
+	                html += "<tr><th>Area Type</th><td>:</td><td>" + (item.areaType || 'NA') + "</td></tr>";
+	                html += "<tr><th>Building Type</th><td>:</td><td>" + (item.buildingType || 'NA') + "</td></tr>";
+	                html += "<tr><th>District</th><td>:</td><td>" + (item.districtName || 'NA') + "</td></tr>";
+	                html += "<tr><th>Block</th><td>:</td><td>" + (item.blockName || 'NA') + "</td></tr>";
+	                html += "<tr><th>Gram Panchayat</th><td>:</td><td>" + (item.gpName || 'NA') + "</td></tr>";
+	                html += "<tr><th>Village</th><td>:</td><td>" + (item.villageName || 'NA') + "</td></tr>";
+	                html += "<tr><th>Municipality</th><td>:</td><td>" + (item.MunicipalityName || 'NA') + "</td></tr>";
+	                html += "<tr><th>Ward</th><td>:</td><td>" + (item.wardName || 'NA') + "</td></tr>";
+
+	                html += "<tr><th>Project Start Date</th><td>:</td><td>" + (item.projectStartDate || 'NA') + "</td></tr>";
+	                html += "<tr><th>Project End Date</th><td>:</td><td>" + (item.projectEndDate || 'NA') + "</td></tr>";
+	                html += "<tr><th>Last Repaired Date</th><td>:</td><td>" + (item.lastRepairedDate || 'NA') + "</td></tr>";
+	                html += "<tr><th>Date Till Today</th><td>:</td><td>" + (item.dateTillToday || 'NA') + "</td></tr>";
+
+	                // Documents
+	                /* if (item.preWorkImagePath) {
+	                    html += "<tr><th>Pre-Work Image</th><td>:</td>";
+	                    html += "<td><a href='" + contextPath + "/documents/" + item.preWorkImagePath + "' target='_blank'>View</a></td></tr>";
+	                }
+
+	                if (item.ucDocumentPath) {
+	                    html += "<tr><th>UC Document</th><td>:</td>";
+	                    html += "<td><a href='" + contextPath + "/documents/" + item.ucDocumentPath + "' target='_blank'>View</a></td></tr>";
+	                } */
+	             // Pre-Work Image
+	                html += "<tr><th>Pre-Work Image</th><td>:</td><td>";
+	                if (item.preWorkImagePath) {
+	                    html += "<button type='button' class='btn btn-sm btn-outline-primary' " +
+	                            "onclick=\"viewFile('" + item.preWorkImagePath + "', 'BAMS_PRE_WORK_IMAGE')\">" +
+	                            "<i class='bi bi-eye'></i></button>";
+	                } else {
+	                    html += "NA";
+	                }
+	                html += "</td></tr>";
+
+	                // UC Document
+	                html += "<tr><th>UC Document</th><td>:</td><td>";
+	                if (item.ucDocumentPath) {
+	                    html += "<button type='button' class='btn btn-sm btn-outline-primary' " +
+	                            "onclick=\"viewFile('" + item.ucDocumentPath + "', 'BAMS_UC_DOCUMENT')\">" +
+	                            "<i class='bi bi-eye'></i></button>";
+	                } else {
+	                    html += "NA";
+	                }
+	                html += "</td></tr>";
+
+
+	                html += "</table></div>"; 
+
+	                html += "</div></div></div>"; 
+	                html += "</div>"; 
+	            });
+
+	            html += "</div>"; 
+	            section.append(html);
+	        },
+	        error: function (err) {
+	            console.error("Error fetching maintenance details:", err);
+	            $('#MaintenanceDetailsSection').html('<div class="text-center text-danger">Error loading data</div>');
+	            $('#MaintenanceDetailsSection').show();
+	        }
+	    });
+	}
+ 
+ 
+ 
+ function getInspectionDetails(locationCode) {
+	 debugger;
+	    $.ajax({
+	        type: "GET",
+	        url: contextPath + "/report/getInspectionDetailsByLocationCode",
+	        data: { locationCode: locationCode },
+	        success: function (data) {
+
+	            const section = $('#InspectionDetailsSection');
+	            section.show();
+	            section.empty();
+
+	            let html = "<h5 class='mb-4'>Inspection Details</h5>";
+
+	            if (!data || data.length === 0) {
+	                section.append("<div class='text-center text-muted'>No Inspection Details Found</div>");
+	                return;
+	            }
+
+	            html += "<div class='accordion' id='inspectionAccordion'>";
+
+	            data.forEach((item, index) => {
+
+	                const collapseId = "inspectionCollapse" + index;
+	                const headingId = "inspectionHeading" + index;
+
+	                html += "<div class='accordion-item'>";
+	                html += "<h2 class='accordion-header' id='" + headingId + "'>";
+	                html += "<button class='accordion-button " + (index === 0 ? "" : "collapsed") +
+	                        "' type='button' data-bs-toggle='collapse' data-bs-target='#" + collapseId + "'>";
+	                html += "Inspection Record #" + (index + 1);
+	                html += "</button></h2>";
+
+	                html += "<div id='" + collapseId + "' class='accordion-collapse collapse " +
+	                        (index === 0 ? "show" : "") +
+	                        "' data-bs-parent='#inspectionAccordion'>";
+
+	                html += "<div class='accordion-body'><div class='row'>";
+	                html += "<div class='col-md-6'><table class='table table-borderless'>";
+
+	                html += "<tr><th>District</th><td>:</td><td>" + (item.districtName || 'NA') + "</td></tr>";
+
+	                html += "<tr><th>Building Type</th><td>:</td><td>" + (item.buildingType || 'NA') + "</td></tr>";
+
+	                html += "<tr><th>Inspector Name</th><td>:</td><td>" + (item.weoName || 'NA') + "</td></tr>";
+
+	                html += "<tr><th>Date of Visit</th><td>:</td><td>" + (item.dateOfVisit || 'NA') + "</td></tr>";
+
+	                html += "<tr><th>Geo Tagged Image</th><td>:</td><td>";
+	                if (item.geoTaggedImage) {
+	                    html += "<button type='button' class='btn btn-sm btn-outline-primary' " +
+	                            "onclick=\"viewFile('" + item.geoTaggedImage + "', 'WEO_GEO_TAG_IMAGE')\">" +
+	                            "<i class='bi bi-eye'></i></button>";
+	                } else {
+	                    html += "NA";
+	                }
+	                html += "</td></tr>";
+
+	                html += "<tr><th>Remarks</th><td>:</td><td>" + (item.remarks || 'NA') + "</td></tr>";
+
+	                html += "</table></div>"; 
+	                html += "</div></div></div></div>"; 
+	            });
+
+	            html += "</div>";
+	            section.append(html);
+	        },
+
+	        error: function (err) {
+	            console.error("Error fetching inspection details:", err);
+	            $('#InspectionDetailsSection').html('<div class="text-center text-danger">Error loading data</div>');
+	            $('#InspectionDetailsSection').show();
+	        }
+	    });
+	}
+
+
+ 
+ 
+
+ function viewFile(fileName,moduleName){
+	  $("#fileName").val(fileName);
+	  $("#moduleName").val(moduleName);
+	  var bizContent = $("#viewFile").serializeArray();
+	  $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+	  $("#viewFile").submit();
+}
+	
+</script>
+<form action="${contextPath}/common/viewFile" method="GET" id="viewFile" target="_blank">
+ <input type="hidden" name="cipherText" id="cipherText">
+ <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+ <input type="hidden" name="fileName" id="fileName" />
+ <input type="hidden" name="moduleName" id="moduleName" />
+</form>

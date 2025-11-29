@@ -1,0 +1,538 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+<link rel="stylesheet" href="${contextPath}/assets/vendor/DataTablesNet/datatables.min.css" rel="stylesheet">
+<script src="${contextPath}/assets/vendor/DataTablesNet/datatables.min.js"></script>
+<style>
+.freeze {
+    pointer-events: none;
+}
+.rounded-box {
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #ced3d687;
+    margin: 20px 0;
+    box-shadow: 2px 2px 6px 0px #aa6b28;
+}
+</style>
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Audit Management View</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa-solid fa-house"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Audit Management View</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Audit Management View</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="form-group col-md-3">
+                        <label for="projectId">Building:</label>
+                        <div class="col-md-12">
+                            <select class="form-select form-select-sm select2" name="projectId" id="projectIId">
+                                <option value="">-- Select --</option>
+                                <c:forEach items="${projectList}" var="pro">
+                                    <option value="${pro.projectId}" ${pro.projectId eq projectId ? 'selected' : ''}>${pro.projectName}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="districtId">District:</label>
+                        <div class="col-md-12">
+                            <select class="form-select form-select-sm select2" name="districtId" id="districtId">
+                                <option value="">-- Select --</option>
+                                <c:forEach items="${districtList}" var="district">
+                                    <option value="${district.districtId}" ${district.districtId eq districtId ? 'selected' : ''}>${district.districtName}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="inspectionTypeId">Inspection Type:</label>
+                        <div class="col-md-12">
+                            <select class="form-select form-select-sm" name="inspectionTypeId" id="inspectionTypeId">
+                                <option value="">-- Select --</option>
+                                <c:forEach items="${inspectionTypeList}" var="inspection">
+                                    <option value="${inspection.inspectionTypeId}" ${inspection.inspectionTypeId eq inspectionTypeId ? 'selected' : ''}>${inspection.inspectionType}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="inspectorId">Inspector:</label>
+                        <div class="col-md-12">
+                            <select id="inspectorId" name="inspectorId" class="form-control form-control-sm form-select">
+                                <option value="">-- Select --</option>
+                                <c:forEach items="${inspectorList}" var="inspector">
+                                    <option value="${inspector.userId}" ${inspector.userId eq inspectorId ? 'selected' : ''}>${inspector.fullName}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label class="required">From Date:</label>
+                        <div class="date-box datepicker_con">
+                            <input class="form-control form-control-sm datepicker" type="text" name="fromDate" id="fDatee" value="${fromDate}" placeholder="dd/mm/yyyy" style="background: #fff !important;" />
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label class="required">To Date:</label>
+                        <div class="date-box datepicker_con">
+                            <input class="form-control form-control-sm datepicker" type="text" name="toDate" id="tDatee" value="${toDate}" placeholder="dd/mm/yyyy" style="background: #fff !important;" />
+                        </div>
+                    </div>
+                    <div class="col-md-12 mt-2 text-center">
+                        <input type="button" name="addManageApplicationScheme" id="addManageApplicationSchemes" class="btn btn-primary btn-sm" value="Filter" onclick="submitForm()">
+                        <a href="${contextPath}/moduleDirectory" type="button" class="btn btn-warning btn-sm">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+       <div class="col-md-12 mt-3">
+        <div class="card">
+    <div class="card-body">
+        <form method="get" action="${actionUrl}" id="formId">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <ul class="nav nav-pills navtab-btn gap-2" role="tablist" style="border-bottom:none;">
+                        <c:forEach items="${genericDataViewDto.viewStatusList}" var="sts">
+                            <li role="presentation" class="nav-item">
+                                <a class="nav-link ${sts.statusCode eq genericDataViewDto.status ? 'active' : ''}" href="#home" aria-controls="home" role="tab" data-toggle="tab" id="${sts.statusCode}TabId" onclick="getTableHeaderWithData('${sts.viewStatusId}')">${sts.displayName}</a>
+                            </li>
+                        </c:forEach>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-2">
+                <input type="hidden" name="cipherText" id="formCipherText" value="">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                <input type="hidden" name="status" id="statusId" value="${genericDataViewDto.statusId}" />
+                <input type="hidden" name="pageNo" id="pageNoId" value="${genericDataViewDto.pageNo != null ? genericDataViewDto.pageNo : 0}" />
+                <input type="hidden" name="pageSize" id="pageSizeId" value="${genericDataViewDto.pageSize != null ? genericDataViewDto.pageSize : 10}" />
+                <input type="hidden" name="districtId" id="districtIdForm" value="${districtId}" />
+                <input type="hidden" name="inspectionTypeId" id="inspectionTypeIdForm" value="${inspectionTypeId}" />
+                <input type="hidden" name="inspectorId" id="inspectorIdForm" value="${inspectorId}" />
+                <input type="hidden" name="fromDate" id="fromDateForm" value="${fromDate}" />
+                <input type="hidden" name="toDate" id="toDateForm" value="${toDate}" />
+                <input type="hidden" name="projectId" id="projectIdForm" value="${projectId}" />
+                <div class="row align-items-end">
+                    <div class="col-md-12">
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="home">
+                                <div class="row" id="dataSectionxx">
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered mt-3" id="tableId">
+                                                <thead class="text-center bagGroundColorRvr" style="color: var(--black);" id="tableHeaderId">
+                                                    <c:forEach items="${genericDataViewDto.theadList}" var="hd">
+                                                        <c:if test="${hd.isHidden eq false}">
+                                                            <th>${hd.thName}</th>
+                                                        </c:if>
+                                                    </c:forEach>
+                                                </thead>
+                                                <tbody id="tableBodyId">
+                                                    <c:forEach items="${genericDataViewDto.dataValueList}" var="data">
+                                                        <tr>
+                                                            <c:forEach items="${data}" var="value">
+                                                                <td>${value}</td>
+                                                            </c:forEach>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    </div>
+    </div>
+</div>
+
+<form class="form-horizontal" action="${contextPath}/audit-management/audit_management_list" method="get" id="myForm">
+    <input type="hidden" name="cipherText" id="myFormCipherText" value="">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="districtId" id="districtIdhdn">
+    <input type="hidden" name="inspectionTypeId" id="inspectionTypeIdhdn">
+    <input type="hidden" name="inspectorId" id="inspectorIdhdn">
+    <input type="hidden" name="fromDate" id="fromDatehn">
+    <input type="hidden" name="toDate" id="toDatehn">
+    <input type="hidden" name="status" id="statushn">
+    <input type="hidden" name="projectId" id="projectIdhn">
+    <input type="hidden" name="pageNo" id="pageNoData" value="0">
+    <input type="hidden" name="pageSize" id="pageSizeData" value="10">
+</form>
+
+<form action="${contextPath}/document/viewDocuments" method="get" id="documentFormView" enctype="multipart/form-data" target="_blank">
+    <input type="hidden" name="moduleName" id="moduleName"/>
+    <input type="hidden" name="filePath" id="filePath"/>
+</form>
+
+<form method="get" action="${actionUrl}" id="tabChangeFormId">
+    <input type="hidden" name="cipherText" id="tabCipherText" value="">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="status" id="tabChangeStatusId" value=""/>
+    <input type="hidden" name="pageSize" id="tabChangePageSizeId" value="10"/>
+    <input type="hidden" name="districtId" id="districtIdhdnn">
+    <input type="hidden" name="inspectionTypeId" id="inspectionTypeIdhdnn">
+    <input type="hidden" name="inspectorId" id="inspectorIdhdnn">
+    <input type="hidden" name="fromDate" id="fromDatehnn">
+    <input type="hidden" name="toDate" id="toDatehnn">
+    <input type="hidden" name="projectId" id="projectIdhnn">
+    <input type="hidden" name="pageNo" id="tabPageNoData" value="0">
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const table = document.getElementById("tableId");
+    const headerRow = table.querySelector("thead tr");
+
+    const lastHeader = headerRow.lastElementChild;
+    lastHeader.remove();
+    ["Action", "History", "View Image"].forEach(name => {
+        const th = document.createElement("th");
+        th.textContent = name;
+        th.style.textAlign = "center";
+        headerRow.appendChild(th);
+    });
+
+    table.querySelectorAll("tbody tr").forEach(row => {
+        const lastCell = row.lastElementChild;
+        const anchors = lastCell.querySelectorAll("a");
+        lastCell.remove();
+        anchors.forEach(a => {
+            const td = document.createElement("td");
+            td.style.textAlign = "center";
+            td.appendChild(a);
+            row.appendChild(td);
+        });
+        if (anchors.length < 3) {
+            while (anchors.length < 3) {
+                const td = document.createElement("td");
+                td.style.textAlign = "center";
+                td.textContent = "NA";
+                row.appendChild(td);
+            }
+        }
+    });
+});
+
+function submitForm() {
+    var pro = $("#projectIId").val() || '';
+    var dist = $("#districtId").val() || '';
+    var inspectionTypeId = $("#inspectionTypeId").val() || '';
+    var inspectorId = $("#inspectorId").val() || '';
+    var fDate = $("#fDatee").val() || '';
+    var tDate = $("#tDatee").val() || '';
+    var sts = $("#statusId").val() || '${status}' || '0';
+    var pageNo = $("#pageNoId").val() || '0';
+    var pageSize = $("#pageSizeId").val() || '10';
+
+    // Log projectId for debugging
+    console.log("Selected projectId:", pro);
+
+    // Date validation
+    if (fDate && tDate) {
+        var fromParts = fDate.split('/');
+        var toParts = tDate.split('/');
+        var fromDate = new Date(fromParts[2], fromParts[1] - 1, fromParts[0]);
+        var toDate = new Date(toParts[2], toParts[1] - 1, toParts[0]);
+        if (toDate < fromDate) {
+            bootbox.alert("Invalid date range. 'To Date' must be the same as or after 'From Date'.");
+            return false;
+        }
+    }
+
+    $("#districtIdhdn").val(dist);
+    $("#inspectionTypeIdhdn").val(inspectionTypeId);
+    $("#inspectorIdhdn").val(inspectorId);
+    $("#fromDatehn").val(fDate);
+    $("#toDatehn").val(tDate);
+    $("#statushn").val(sts);
+    $("#projectIdhn").val(pro);
+    $("#pageNoData").val(pageNo);
+    $("#pageSizeData").val(pageSize);
+
+    var bizContent = $("#myForm").serializeArray();
+    console.log("Form data before encryption:", bizContent);
+    $("#myFormCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    $("#myForm").submit();
+}
+
+function getTableHeaderWithData(status) {
+    var inspectorId = $("#inspectorId").val() || '';
+    var pro = $("#projectIId").val() || '';
+    var dist = $("#districtId").val() || '';
+    var inspectionTypeId = $("#inspectionTypeId").val() || '';
+    var fDate = $("#fDatee").val() || '';
+    var tDate = $("#tDatee").val() || '';
+    var pageSize = $("#tableId_length select").val() || "10";
+    var pageNo = $("#pageNoId").val() || "0";
+
+    // Log projectId for debugging
+    console.log("Selected projectId (tab change):", pro);
+
+    $("#tabChangeStatusId").val(status);
+    $("#tabChangePageSizeId").val(pageSize);
+    $("#districtIdhdnn").val(dist);
+    $("#inspectionTypeIdhdnn").val(inspectionTypeId);
+    $("#fromDatehnn").val(fDate);
+    $("#toDatehnn").val(tDate);
+    $("#projectIdhnn").val(pro);
+    $("#inspectorIdhdnn").val(inspectorId);
+    $("#tabPageNoData").val(pageNo);
+
+    var bizContent = $("#tabChangeFormId").serializeArray();
+    console.log("Tab change form data before encryption:", bizContent);
+    $("#tabCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    $("#tabChangeFormId").submit();
+}
+
+// Pagination click event
+$(document).on("click", ".paginate_button", function(e) {
+    e.preventDefault();
+    if ($(this).hasClass("disabled")) return;
+
+    let page = 1;
+    let currentPage = parseInt($("#pageNoId").val() || "1");
+    let totalRecords = parseInt('${genericDataViewDto.totalRecords}' || "0");
+    let pageSize = parseInt('${genericDataViewDto.pageSize}' || "10");
+    let totalPages = Math.ceil(totalRecords / pageSize);
+
+    if ($(this).hasClass("previous") && currentPage > 1) {
+        page = currentPage - 1;
+    } else if ($(this).hasClass("next") && currentPage < totalPages) {
+        page = currentPage + 1;
+    } else {
+        page = parseInt($(this).find("a").text() || "1");
+    }
+
+    $("#pageNoId").val(page);
+    $("#pageSizeId").val($("#tableId_length select").val() || "10");
+    $("#districtIdForm").val($("#districtId").val() || '');
+    $("#inspectionTypeIdForm").val($("#inspectionTypeId").val() || '');
+    $("#inspectorIdForm").val($("#inspectorId").val() || '');
+    $("#fromDateForm").val($("#fDatee").val() || '');
+    $("#toDateForm").val($("#tDatee").val() || '');
+    $("#projectIdForm").val($("#projectIId").val() || '');
+
+    // Log projectId for debugging
+    console.log("Selected projectId (pagination):", $("#projectIId").val());
+
+    var bizContent = $("#formId").serializeArray();
+    console.log("Pagination form data before encryption:", bizContent);
+    $("#formCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    $("#formId").submit();
+});
+
+// Page size change event
+$(document).on("change", "#tableId_length select", function(e) {
+    let status = $("#statusId").val() || "";
+    let pageSize = $(this).val() || "10";
+    let pageNo = $("#pageNoId").val() || "0";
+
+    $("#tabChangeStatusId").val(status);
+    $("#tabChangePageSizeId").val(pageSize);
+    $("#tabPageNoData").val(pageNo);
+    $("#districtIdhdnn").val($("#districtId").val() || '');
+    $("#inspectionTypeIdhdnn").val($("#inspectionTypeId").val() || '');
+    $("#inspectorIdhdnn").val($("#inspectorId").val() || '');
+    $("#fromDatehnn").val($("#fDatee").val() || '');
+    $("#toDatehnn").val($("#tDatee").val() || '');
+    $("#projectIdhnn").val($("#projectIId").val() || '');
+
+    // Log projectId for debugging
+    console.log("Selected projectId (page size change):", $("#projectIId").val());
+
+    var tabContent = $("#tabChangeFormId").serializeArray();
+    console.log("Page size change form data before encryption:", tabContent);
+    $("#tabCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(tabContent))));
+    $("#tabChangeFormId").submit();
+});
+
+function viewDocument(filePath, moduleName) {
+    $('#moduleName').val(moduleName);
+    $('#filePath').val(filePath);
+    $('#documentFormView').submit();
+}
+
+function callJavaScriptFunction(modelClassWithId) {
+    var modelClassWithIdArray = modelClassWithId.split("##");
+    var modelClass = modelClassWithIdArray[0];
+    var id = modelClassWithIdArray[1];
+
+    $.ajax({
+        url: "${pageContext.request.contextPath}/stageConfig/get-workFlow-history",
+        type: "GET",
+        data: {
+            "entityClassName": modelClass,
+            "entityId": parseInt(id)
+        },
+        success: function(response) {
+            var historyTableBody = $("#historyTableBodyId");
+            historyTableBody.empty();
+            if (response != null && response != undefined && response != "" && response.length > 0) {
+                let html = "";
+                $.each(response, function(index, value) {
+                    html += "<tr>";
+                    html += "<td>" + (index + 1) + "</td>";
+                    html += "<td>" + value.stageName + "</td>";
+                    html += "<td>" + value.actionTakenByName + "</td>";
+                    html += "<td>" + value.actionTakenOnRoleName + "</td>";
+                    html += "<td>" + value.remark + "</td>";
+                    html += "<td>" + value.actionTakenDate + "</td>";
+                    html += "</tr>";
+                });
+                historyTableBody.append(html);
+            }
+            $("#historyTableRemarksModal").modal("show");
+        },
+        error: function(response) {
+            console.log(response);
+        }
+    });
+}
+
+$(document).ready(function () {
+    var today = new Date();
+    var oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+
+    $(".datepicker").datepick({
+        dateFormat: "dd-mm-yyyy",
+        onShow: $.datepick.monthOnly,
+        yearRange: "c-20:c+10",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+    });
+
+    $('#fDatee').datepick('setDate', oneMonthAgo);
+    $('#tDatee').datepick('setDate', today);
+
+    let totalRecords = parseInt('${genericDataViewDto.totalRecords}' || "0");
+    let pageNo = parseInt('${genericDataViewDto.pageNo}' || "0");
+    let pageSize = parseInt('${genericDataViewDto.pageSize}' || "10");
+
+    let dataTable = new DataTable("#tableId", {
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "pageLength": pageSize,
+        "language": {},
+        "drawCallback": function(settings) {
+            let api = this.api();
+            let pageInfo = api.page.info();
+            $('.dataTables_info').html(
+                'Showing ' + (pageInfo.start + 1) + ' to ' + (pageInfo.end) + ' of ' + totalRecords + ' entries'
+            );
+
+            let pageSizes = parseInt($("#tableId_length select").val() || "10");
+            let totalPages = Math.ceil(totalRecords / pageSizes);
+
+            let paginationContainer = $('.dataTables_paginate');
+            paginationContainer.empty();
+            let paginationHtml = "";
+            paginationHtml += '<li class="paginate_button page-item previous" id="tableId_previous"><a href="#" aria-controls="tableId" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>';
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += '<li class="paginate_button page-item"><a href="#" aria-controls="tableId" data-dt-idx="' + i + '" tabindex="0" class="page-link">' + i + '</a></li>';
+            }
+            paginationHtml += '<li class="paginate_button page-item next" id="tableId_next"><a href="#" aria-controls="tableId" data-dt-idx="3" tabindex="0" class="page-link">Next</a></li>';
+            paginationContainer.append(paginationHtml);
+
+            let currentPage = parseInt(pageNo || "1");
+            if (currentPage <= 1) {
+                $(".previous").addClass("disabled");
+            } else {
+                $(".previous").removeClass("disabled");
+            }
+            if (currentPage >= totalPages) {
+                $(".next").addClass("disabled");
+            } else {
+                $(".next").removeClass("disabled");
+            }
+
+            $(".paginate_button").removeClass("current");
+            $(".paginate_button").each(function() {
+                let pageNum = parseInt($(this).find("a").text());
+                if (pageNum === currentPage) {
+                    $(this).addClass("current");
+                }
+            });
+        }
+    });
+});
+
+function fetchAuditImage(auditId) {
+    if (!auditId) {
+        bootbox.alert("Invalid Audit ID.");
+        return;
+    }
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/audit-management/fetchAuditImageByAuditManagementId",
+        data: { auditManagementId: auditId },
+        xhrFields: {
+            responseType: 'blob'
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+        },
+        success: function(blob) {
+            if (blob && blob.size > 0) {
+                const mimeType = blob.type || 'image/jpeg';
+                const imageBlob = new Blob([blob], { type: mimeType });
+                const url = URL.createObjectURL(imageBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                }, 2000);
+            } else {
+                bootbox.alert("Image is empty or not available.");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error fetching audit image:", error);
+            const errorMessage = xhr.responseText || "Image not found or could not be loaded.";
+            bootbox.alert(errorMessage);
+        }
+    });
+}
+
+document.addEventListener("click", function(event) {
+    if (event.target.closest("td a")) {
+        event.target.classList.add("visited-link");
+    }
+});
+</script>

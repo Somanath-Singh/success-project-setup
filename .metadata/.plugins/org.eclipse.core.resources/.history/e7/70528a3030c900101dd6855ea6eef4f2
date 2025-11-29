@@ -1,0 +1,53 @@
+package com.aashdit.prod.heads.hims.ipms.service;
+
+import java.util.List;
+
+import com.aashdit.prod.heads.hims.ipms.dto.*;
+import com.aashdit.prod.heads.hims.ipms.model.MasterType;
+import com.aashdit.prod.heads.hims.ipms.utils.ServiceOutcome;
+
+public interface CommonService {
+
+	ServiceOutcome<List<GenericMenuDTO>> findAllMenuListByAppCode(String appCode);
+	
+	ServiceOutcome<List<MasterType>> findAllGenderByIsActiveTrue();
+	
+	ServiceOutcome<List<GenericDTO>> getUniversityList();
+
+	ServiceOutcome<?> findAllStateByIsActiveTrue();
+
+	ServiceOutcome<?> findIdentityTypeListByIsActiveTrue();
+
+	ServiceOutcome<?> findAllReservationCategoryListByIsActiveTrue();
+
+	ServiceOutcome<?> findAllReligionByIsActiveTrue();
+
+	ServiceOutcome<?> findAllNationalityByIsActiveTrue();
+
+	ServiceOutcome<?> findAllMaritalStatusByIsActiveTrue();
+
+	ServiceOutcome<?> findAllActiveTongueList();
+
+	ServiceOutcome<?> getAttemptsList(boolean b);
+
+	ServiceOutcome<?> getGradingMasterList(boolean b);
+
+	ServiceOutcome<?> getLevelMasterList(boolean b);
+
+	ServiceOutcome<?> getDivisionMasterList(boolean b);
+
+	ServiceOutcome<?> getYearMasterList(boolean b);
+
+	ServiceOutcome<?> getFieldsSpecialisationList(boolean b);
+
+	ServiceOutcome<?> getResearchTypeList(boolean b);
+
+	ServiceOutcome<?> getResearchStatusList(boolean b);
+
+	ServiceOutcome<List<GenericDTO>> getRoleList();
+
+	ServiceOutcome<List<GenericDTO>>getSubjectList();
+
+
+
+}

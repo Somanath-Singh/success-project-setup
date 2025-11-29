@@ -1,0 +1,944 @@
+package com.aashdit.prod.heads.hims.umt.service;
+
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+
+import org.jboss.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.MessageSourceAware;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.aashdit.prod.heads.framework.core.ServiceOutcome;
+import com.aashdit.prod.heads.framework.core.util.ClientInfo;
+import com.aashdit.prod.heads.framework.core.util.UploadFile;
+import com.aashdit.prod.heads.hims.umt.dto.CurrentUserVo;
+import com.aashdit.prod.heads.hims.umt.dto.EntityIdAndUserLevel;
+import com.aashdit.prod.heads.hims.umt.misc.UserSpecification;
+import com.aashdit.prod.heads.hims.umt.model.ActivityLevelMap;
+import com.aashdit.prod.heads.hims.umt.model.OrganizationStructure;
+import com.aashdit.prod.heads.hims.umt.model.Role;
+import com.aashdit.prod.heads.hims.umt.model.UmtNativeQuery;
+import com.aashdit.prod.heads.hims.umt.model.User;
+import com.aashdit.prod.heads.hims.umt.model.UserLoginHistory;
+import com.aashdit.prod.heads.hims.umt.model.UserRoleMap;
+import com.aashdit.prod.heads.hims.umt.model.UserRoleRightLevel;
+import com.aashdit.prod.heads.hims.umt.repository.ActivityLevelMapRepository;
+import com.aashdit.prod.heads.hims.umt.repository.OrganizationStructureRepository;
+import com.aashdit.prod.heads.hims.umt.repository.RoleRepository;
+import com.aashdit.prod.heads.hims.umt.repository.UmtNativeQueryRepository;
+import com.aashdit.prod.heads.hims.umt.repository.UserLoginHistoryRepository;
+import com.aashdit.prod.heads.hims.umt.repository.UserRepository;
+import com.aashdit.prod.heads.hims.umt.repository.UserRoleMapRepository;
+import com.aashdit.prod.heads.hims.umt.repository.UserRoleRightLevelRepository;
+import com.aashdit.prod.heads.hims.umt.utils.CommonUMTConstants;
+import com.aashdit.prod.heads.hims.umt.utils.SecurityHelper;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+@Service
+public class UserServiceImpl implements UserService, MessageSourceAware {
+
+	private final Logger log = Logger.getLogger(this.getClass());
+
+	private MessageSource messageSource;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private RoleRepository roleRepository;
+
+
+
+	@Autowired
+	private UserRoleMapRepository userRoleMapRepository;
+
+	@Autowired
+	private OrganizationStructureRepository organizationStructureRepository;
+
+	@Autowired
+	private UserRoleRightLevelRepository userRoleRightLevelRepository;
+
+	@Autowired
+	private ActivityLevelMapRepository activityLevelMapRepository;
+
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@Autowired
+	private UserSpecification userSpecification;
+	
+	@Autowired
+	private UserLoginHistoryRepository ulHistoryReporsitory;
+
+
+	@Autowired
+	private UmtNativeQueryRepository umtNativeQueryRepository;
+
+	private final EntityManager entityManager;
+
+	@Autowired
+	public UserServiceImpl(EntityManager entityManager) {
+		this.entityManager = entityManager;
+	}
+
+	@Override
+	public ServiceOutcome<User> save(User user) {
+		ServiceOutcome<User> svcOutcome = new ServiceOutcome<User>();
+		try
+		{
+			user = userRepository.save(user);
+			svcOutcome.setData(user);
+		}
+		catch(Exception ex){
+			svcOutcome.setData(null);
+			svcOutcome.setOutcome(false);
+			svcOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+		}
+
+		return svcOutcome;
+	}
+
+	@Override
+	public ServiceOutcome<User> findByUsername(String userName) {
+		ServiceOutcome<User> svcOutcome = new ServiceOutcome<User>();
+		try {
+			User user = userRepository.findByUserName(userName);
+			svcOutcome.setData(user);
+			svcOutcome.setOutcome(true);
+		} catch (Exception ex) {
+			log.error(ex);
+
+			svcOutcome.setData(null);
+			svcOutcome.setOutcome(false);
+			svcOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+
+		}
+		return svcOutcome;
+	}
+
+	@Override
+	public void setMessageSource(MessageSource messageSource) {
+		this.messageSource = messageSource;
+
+	}
+
+	@Override
+	public ServiceOutcome<User> findByUserId(Long userId) {
+		ServiceOutcome<User> svcOutcome = new ServiceOutcome<User>();
+		try {
+			User user = userRepository.findByUserId(userId);
+			svcOutcome.setData(user);
+		} catch (Exception ex) {
+			log.error(ex);
+
+			svcOutcome.setData(null);
+			svcOutcome.setOutcome(false);
+			svcOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+
+		}
+		return svcOutcome;
+	}
+
+	@Override
+	public ServiceOutcome<Page<User>> findUserList(String searchTerm, PageRequest pageRequest) {
+		ServiceOutcome<Page<User>> serviceOutcome = new ServiceOutcome<Page<User>>();
+		try {
+			Page<User> userList = null;
+			if (searchTerm != null && !searchTerm.equals(""))
+			{
+				userList = userRepository.findAll(userSpecification.searchUser(searchTerm), pageRequest);
+			}
+			else
+			{
+				userList = userRepository.findAll(pageRequest);
+			}
+			
+			serviceOutcome.setData(userList);
+		} catch (Exception e) {
+			log.error(e);
+			serviceOutcome.setData(null);
+			serviceOutcome.setOutcome(false);
+			serviceOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+		}
+
+		return serviceOutcome;
+	}
+
+	@Override
+	public ServiceOutcome<User> lockNUnlockUserById(Long userId, Boolean isActive) {
+		ServiceOutcome<User> serviceOutcome = new ServiceOutcome<User>();
+		try {
+			if (userId != null) {
+				User user = userRepository.findByUserId(userId);
+				if (isActive == true) {
+					user.setActive(isActive);
+					serviceOutcome.setMessage(messageSource.getMessage("msg.success", null,
+							"User unlocked successfully", LocaleContextHolder.getLocale()));
+				}
+
+				if (isActive == false) {
+					user.setActive(isActive);
+					serviceOutcome.setMessage(messageSource.getMessage("msg.success", null, "User locked successfully",
+							LocaleContextHolder.getLocale()));
+				}
+
+				user.setIsLocked(!isActive);
+
+				user = userRepository.save(user);
+				serviceOutcome.setData(user);
+			} else {
+				serviceOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+				serviceOutcome.setData(null);
+				serviceOutcome.setOutcome(false);
+			}
+
+		} catch (Exception e) {
+			log.error(e);
+			serviceOutcome.setData(null);
+			serviceOutcome.setOutcome(false);
+			serviceOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+		}
+
+		return serviceOutcome;
+	}
+
+	@Override
+	public ServiceOutcome<List<User>> searchUser(String name) {
+		ServiceOutcome<List<User>> svcOutcome = new ServiceOutcome<List<User>>();
+		try {
+			List<User> lstUsers = userRepository.searchForAutocomplete(name.toLowerCase());
+			lstUsers.stream().forEach(u -> {
+				u.setCreatedBy(null);
+				u.setCreatedBy(null);
+
+				u.getPrimaryRole().setCreatedBy(null);
+				u.getPrimaryRole().setUpdateBy(null);
+			});
+			svcOutcome.setData(lstUsers);
+		} catch (Exception ex) {
+			log.error(ex);
+
+			svcOutcome.setData(null);
+			svcOutcome.setOutcome(false);
+			svcOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+
+		}
+		return svcOutcome;
+	}
+
+	@Override
+	public List<Role> findActiveRole() {
+		List<Role> rolelist = null;
+		try {
+			rolelist = roleRepository.findByIsActiveEqual(true);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
+		return rolelist;
+	}
+
+	@Override
+	public ServiceOutcome<User> updateUser(Long userId, String userName, String firstName, String lastName,
+			Date dateOfBirth, String mobile, String email, Long[] userRoleHcMapId, Long[] roleId, Long[] isPrimary,
+			String[] status, String designation) {
+		ServiceOutcome<User> outcome = new ServiceOutcome<User>();
+		try {
+			User curUser = SecurityHelper.getCurrentUser();
+			User prvUserDtls = userRepository.findById(userId).get();
+			prvUserDtls.setFirstName(firstName);
+			prvUserDtls.setLastName(lastName);
+			prvUserDtls.setDateOfBirth(dateOfBirth);
+			prvUserDtls.setUserName(userName);
+			prvUserDtls.setMobile(mobile);
+			prvUserDtls.setEmail(email);
+			prvUserDtls.setCreatedBy(curUser.getUserId());
+			prvUserDtls.setDesignation(designation);
+
+			prvUserDtls = userRepository.save(prvUserDtls);
+
+			for (int i = 0; i < roleId.length; i++) {
+				UserRoleMap userRoleMap;
+				if (userRoleHcMapId[i] != 0) {
+					userRoleMap = userRoleMapRepository.findById(userRoleHcMapId[i]).get();
+					userRoleMap.setRoleId(roleId[i]);
+					userRoleMap.setUserId(prvUserDtls.getUserId());
+					userRoleMap.setUpdateBy(curUser.getUserId());
+					userRoleMap.setUpdatedOn(new Date());
+                    userRoleMap.setIsActive(!status[i].equals("0"));
+					userRoleMapRepository.save(userRoleMap);
+				}else {
+					StringBuffer sb = new StringBuffer();
+					
+					// 1. Get List of all Roles that can be assigned from the screen. This will
+					// exclude SYSTEM_ADMIN and ADMIN Roles
+					// as these are set from the back end
+					List<Role> lstUIRoles = roleRepository.findByDisplayOnPage(true);
+					log.debug("Pass Step 1");
+					
+					final Long currRoleId = roleId[i];
+					log.debug("Current Role Id from UI is " + currRoleId);
+					Integer currentAllocations = userRoleMapRepository.findByRoleId(roleId[i]).size();
+					log.debug(currentAllocations);
+					log.debug("-- 2.1");
+					if (currentAllocations == null) {
+						currentAllocations = 0;
+					}
+					
+					Role theRole = lstUIRoles.stream().filter(p -> p.getRoleId().equals(currRoleId)).findAny().orElse(null);
+					if (theRole != null) {
+						log.debug("-- 2.2");
+						if (theRole.getMaxAssignments() == -1) {
+							log.debug("-- No limit on assignments");
+							userRoleMap = new UserRoleMap();
+							userRoleMap.setUserId(prvUserDtls.getUserId());
+							userRoleMap.setRoleId(roleId[i]);
+							userRoleMap.setIsActive(true);
+							log.debug("-- 2.4.a");
+							userRoleMapRepository.save(userRoleMap);
+							log.debug("-- 2.5.a");
+							// 3. If the Role has been marked as the primary Role. Set it for the user
+							if (isPrimary[i] == 1) {
+								log.debug("-- 2.6.a");
+								prvUserDtls.setPrimaryRole(theRole);
+								prvUserDtls = userRepository.save(prvUserDtls);
+								log.debug("-- 2.7.a");
+							}
+						} else {
+							log.debug("-- Limit on assignments : " + theRole.getMaxAssignments());
+							if (currentAllocations < theRole.getMaxAssignments()) {
+								log.debug("-- 2.3");
+								userRoleMap = new UserRoleMap();
+								userRoleMap.setUserId(prvUserDtls.getUserId());
+								userRoleMap.setRoleId(roleId[i]);
+								userRoleMap.setIsActive(true);
+								log.debug("-- 2.4");
+								userRoleMapRepository.save(userRoleMap);
+								log.debug("-- 2.5");
+								// 3. If the Role has been marked as the primary Role. Set it for the user
+								if (isPrimary[i] == 1) {
+									log.debug("-- 2.6");
+									prvUserDtls.setPrimaryRole(theRole);
+									prvUserDtls = userRepository.save(prvUserDtls);
+									log.debug("-- 2.7");
+								}
+							} else {
+								log.debug("-- 3.1");
+								sb.append("The Role ").append(theRole.getDisplayName())
+										.append(" could not be allocated as the maximum allocations for this role ")
+										.append(theRole.getMaxAssignments()).append(" have been met. <br/>");
+								log.error(sb.toString());
+							}
+						}
+					} else {
+						log.debug("-- 4.1");
+						sb.append("A Role could cannot be allocated from the UI. <br/> ");
+						log.error(sb.toString());
+					}
+					
+				}
+			}
+				
+			outcome.setData(prvUserDtls);
+			outcome.setMessage(messageSource.getMessage("msg.success", null, "User Data Updated Successfully",
+					LocaleContextHolder.getLocale()));
+		} catch (Exception e) {
+			log.error(e);
+			outcome.setData(null);
+			outcome.setOutcome(false);
+			outcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+		}
+		return outcome;
+	}
+
+	@Override
+	public List<UserRoleMap> findUserRoleMapByUserId(Long userId) {
+
+		return userRoleMapRepository.findByUserId(userId);
+	}
+
+	@Override
+	@Transactional
+	public ServiceOutcome<User> addUser(String username, String firstname, String lastname, Date dateOfbirth,
+			String userMobile, String userEmail, Long[] roleId, Long[] isPrimary, String designation,String userType,String level,Long userTypeId,Long[] objectTypeId, String staffCode) {
+
+		ServiceOutcome<User> outcome = new ServiceOutcome<User>();
+		try {
+			User currUser = SecurityHelper.getCurrentUser();
+			String password = CommonUMTConstants.DEFAULT_PASSWORD;
+
+			// 0. Save the user
+			User userDtls = new User();
+			User byUserName = userRepository.findByUserName(username);
+			if(byUserName != null) {
+				userDtls = byUserName;
+			}else {
+				userDtls.setPassword(bCryptPasswordEncoder.encode(password));
+			}
+			userDtls.setFirstName(firstname);
+			userDtls.setLastName(null);
+			userDtls.setUserName(username);
+			userDtls.setDateOfBirth(dateOfbirth);
+			userDtls.setMobile(userMobile);
+			userDtls.setEmail(userEmail);
+
+			userDtls.setDesignation(designation);
+			userDtls.setBeneficiaryCode(staffCode);
+
+			userDtls.setActive(true);
+			userDtls.setIsEnabled(true);
+			userDtls.setIsLocked(false);
+			userDtls.setIsLoggedIn(false);
+			userDtls.setWrongLoginCount(0);
+			userDtls.setAllowMultipleSession(true);
+
+			userDtls.setCreatedOn(new Date());
+			userDtls.setCreatedBy(currUser.getUserId());
+			userDtls.setUpdatedOn(new Date());
+			userDtls.setCreatedBy(currUser.getUserId());
+			
+			userDtls.setUserType(userType);
+			userDtls.setUserLevel(level);
+			userDtls.setUserTypeId(userTypeId);
+
+			userDtls = userRepository.save(userDtls);
+			log.debug("Saved User in DB");
+
+			StringBuffer sb = new StringBuffer();
+
+			// 1. Get List of all Roles that can be assigned from the screen. This will
+			// exclude SYSTEM_ADMIN and ADMIN Roles
+			// as these are set from the back end
+			List<Role> lstUIRoles = roleRepository.findByDisplayOnPage(true);
+			log.debug("Pass Step 1");
+
+			// 2. For each role in the Long[] roleId sent from the UI, filter out any roles
+			// that match or exceed the
+			// Maximum Allocations set against the Role
+			for (int i = 0; i < roleId.length; i++) {
+				final Long currRoleId = roleId[i];
+				log.debug("Current Role Id from UI is " + currRoleId);
+				Integer currentAllocations = userRoleMapRepository.findByRoleId(roleId[i]).size();
+				log.debug(currentAllocations);
+				log.debug("-- 2.1");
+				if (currentAllocations == null) {
+					currentAllocations = 0;
+				}
+				Role theRole = lstUIRoles.stream().filter(p -> Objects.equals(p.getRoleId(), currRoleId)).findAny().orElse(null);
+				if (theRole != null) {
+					log.debug("-- 2.2");
+					if (theRole.getMaxAssignments() == -1) {
+						log.debug("-- No limit on assignments");
+						UserRoleMap userRoleMap = new UserRoleMap();
+						UserRoleMap existingUserRoleMap = userRoleMapRepository.findByUserIdAndRoleId(userDtls.getUserId(), roleId[i]);
+						if(existingUserRoleMap != null) {
+							userRoleMap = existingUserRoleMap;
+						}
+						userRoleMap.setUserId(userDtls.getUserId());
+						userRoleMap.setRoleId(roleId[i]);
+						userRoleMap.setIsActive(true);
+						userRoleMap.setObjectType(level);
+						userRoleMap.setObjectTypeId(objectTypeId[i]);
+						log.debug("-- 2.4.a");
+						userRoleMapRepository.save(userRoleMap);
+						log.debug("-- 2.5.a");
+						// 3. If the Role has been marked as the primary Role. Set it for the user
+						if (isPrimary[i] == 1) {
+							log.debug("-- 2.6.a");
+							userDtls.setPrimaryRole(theRole);
+							userDtls = userRepository.save(userDtls);
+							log.debug("-- 2.7.a");
+						}
+					} else {
+						log.debug("-- Limit on assignments : " + theRole.getMaxAssignments());
+						if (currentAllocations < theRole.getMaxAssignments()) {
+							log.debug("-- 2.3");
+							UserRoleMap userRoleMap = new UserRoleMap();
+							UserRoleMap existingUserRoleMap = userRoleMapRepository.findByUserIdAndRoleId(userDtls.getUserId(), roleId[i]);
+							if(existingUserRoleMap != null) {
+								userRoleMap = existingUserRoleMap;
+							}
+							userRoleMap.setUserId(userDtls.getUserId());
+							userRoleMap.setRoleId(roleId[i]);
+							userRoleMap.setIsActive(true);
+							log.debug("-- 2.4");
+							userRoleMapRepository.save(userRoleMap);
+							log.debug("-- 2.5");
+							// 3. If the Role has been marked as the primary Role. Set it for the user
+							if (isPrimary[i] == 1) {
+								log.debug("-- 2.6");
+								userDtls.setPrimaryRole(theRole);
+								userDtls = userRepository.save(userDtls);
+								log.debug("-- 2.7");
+							}
+						} else {
+							log.debug("-- 3.1");
+							sb.append("The Role ").append(theRole.getDisplayName())
+									.append(" could not be allocated as the maximum allocations for this role ")
+									.append(theRole.getMaxAssignments()).append(" have been met. <br/>");
+							log.error(sb.toString());
+						}
+					}
+				} else {
+					log.debug("-- 4.1");
+					sb.append("A Role could cannot be allocated from the UI. <br/> ");
+					log.error(sb.toString());
+				}
+			}
+			log.debug("-- 5.1");
+			sb.append(messageSource.getMessage("msg.success", null, "User Data Saved Successfully",
+					LocaleContextHolder.getLocale()));
+			log.debug("-- 5.2");
+			outcome.setMessage(sb.toString());
+			outcome.setData(userDtls);
+
+		} catch (Exception e) {
+			log.error(e);
+			outcome.setData(null);
+			outcome.setOutcome(false);
+			outcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+		}
+		return outcome;
+	}
+
+	@Override
+	public ServiceOutcome<User> userRegistration(User user, String roleCode) {
+		ServiceOutcome<User> outcome = new ServiceOutcome<User>();
+
+		try {
+			User currUser = SecurityHelper.getCurrentUser();
+
+			User userDtls = new User();
+			userDtls.setFirstName(user.getFirstName());
+			userDtls.setLastName(user.getLastName());
+			userDtls.setUserName(user.getUserName());
+			userDtls.setMobile(user.getMobile());
+			userDtls.setEmail(user.getEmail());
+			userDtls.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+
+			userDtls.setCreatedOn(new Date());
+			userDtls.setCreatedBy(currUser.getUserId());
+			userDtls.setUpdatedOn(new Date());
+			userDtls.setCreatedBy(currUser.getUserId());
+
+			userDtls.setActive(true);
+			Role role;
+			if(roleCode != null && !roleCode.isEmpty()){
+				role = roleRepository.findByRoleCode(roleCode);
+			}else {
+				role = roleRepository.findByRoleCode("ROLE_PUBLIC");
+			}
+			userDtls.setPrimaryRole(role);
+			userDtls.setDesignation(user.getDesignation());
+
+			userDtls = userRepository.save(userDtls);
+			outcome.setData(userDtls);
+			outcome.setMessage(messageSource.getMessage("msg.success", null, LocaleContextHolder.getLocale()));
+		} catch (Exception e) {
+			log.error(e);
+			outcome.setData(null);
+			outcome.setOutcome(false);
+			outcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+		}
+		return outcome;
+	}
+
+	@Override
+	public ServiceOutcome<List<User>> getUsersByLevelAndId(Long roleLevelId, Long entityId) {
+		ServiceOutcome<List<User>> svcOutcome = new ServiceOutcome<List<User>>();
+		try {
+			List<User> lstUsers = userRepository.findUserByLevelAndId(roleLevelId, entityId);
+			// Remove this as this causes JSON error during deserialization due to circular
+			// reference
+			lstUsers.stream().forEach(u -> {
+				u.setCreatedBy(null);
+				u.setCreatedBy(null);
+
+				u.getPrimaryRole().setCreatedBy(null);
+				u.getPrimaryRole().setUpdateBy(null);
+			});
+			svcOutcome.setData(lstUsers);
+		} catch (Exception ex) {
+			log.error(ex);
+
+			svcOutcome.setData(null);
+			svcOutcome.setOutcome(false);
+			svcOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+
+		}
+		return svcOutcome;
+	}
+
+	public ServiceOutcome<List<User>> getAllUsers() {
+		ServiceOutcome<List<User>> svcOutcome = new ServiceOutcome<List<User>>();
+		try {
+			List<User> lstUsers = userRepository.findAll();
+			svcOutcome.setData(lstUsers);
+			svcOutcome.setOutcome(true);
+		} catch (Exception ex) {
+			log.error(ex);
+
+			svcOutcome.setData(null);
+			svcOutcome.setOutcome(false);
+			svcOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+
+		}
+		return svcOutcome;
+	}
+
+	@Override
+	public ServiceOutcome<User> updateProfile(User user, MultipartFile userProfileImage) {
+		ServiceOutcome<User> outcome = new ServiceOutcome<User>();
+		User curUser = SecurityHelper.getCurrentUser();
+		try {
+			User userDtls = userRepository.findById(curUser.getUserId()).get();
+			userDtls.setFirstName(user.getFirstName());
+			userDtls.setLastName(user.getLastName());
+			userDtls.setUserName(user.getUserName());
+			userDtls.setMobile(user.getMobile());
+			userDtls.setEmail(user.getEmail());
+			userDtls.setUpdatedOn(new Date());
+			userDtls.setDateOfBirth(user.getDateOfBirth());
+			userDtls.setDesignation(user.getDesignation());
+
+			if (!userProfileImage.isEmpty()) {
+				userDtls.setProfilePhoto(
+						UploadFile.upload(userProfileImage, "profile picture", userDtls.getUserName(), "umt"));
+			}
+
+			userDtls.setUpdatedOn(new Date());
+			userDtls.setCreatedBy(curUser.getUserId());
+
+			userDtls = userRepository.save(userDtls);
+			outcome.setData(userDtls);
+			outcome.setMessage(messageSource.getMessage("msg.success", null, LocaleContextHolder.getLocale()));
+		} catch (Exception e) {
+			log.error(e);
+			outcome.setData(null);
+			outcome.setOutcome(false);
+			outcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+		}
+		return outcome;
+	}
+
+	@Override
+	public Boolean saveResetPassword(Long userId, String txtRePass) {
+		Boolean status = false;
+		try {
+			User user = userRepository.findById(userId).get();
+			user.setPassword(bCryptPasswordEncoder.encode(txtRePass));
+			userRepository.save(user);
+			status = true;
+		} catch (Exception e) {
+			log.error(e);
+			status = false;
+		}
+		return status;
+	}
+
+	@Override
+	public ServiceOutcome<Boolean> createLoginHistory(User user, HttpServletRequest request) {
+		ServiceOutcome<Boolean> svcOutcome = new ServiceOutcome<>();
+		try
+		{
+			UserLoginHistory ulHistory = new UserLoginHistory();
+		
+			ulHistory.setBrowserDetails(ClientInfo.getClientBrowser(request));
+			ulHistory.setEmail(user.getEmail());
+			ulHistory.setFirstName(user.getFirstName());
+			ulHistory.setLastName(user.getLastName());
+			ulHistory.setLoggedInDate(new Date());
+			ulHistory.setLoggedOutDate(null);
+			ulHistory.setLoginStatus("LOGIN");
+			ulHistory.setLoginType(user.getPrimaryRole().getRoleCode());
+			ulHistory.setMobile(user.getMobile());
+			ulHistory.setOsDetails(ClientInfo.getClientOS(request));
+			ulHistory.setUserName(user.getUserName());
+			ulHistory.setUserId(user.getUserId());
+			ulHistory.setIpAddress(ClientInfo.getClientIpAddr(request));
+			
+			ulHistoryReporsitory.save(ulHistory);
+			
+			svcOutcome.setData(true);
+		}
+		catch(Exception ex)
+		{
+			svcOutcome.setOutcome(false);
+			svcOutcome.setData(false);
+			svcOutcome.setMessage(ex.getMessage());
+		}
+		
+		return svcOutcome;
+	}
+
+	@Override
+	public ServiceOutcome<Boolean> createLogoutHistory(User user, HttpServletRequest request) {
+		ServiceOutcome<Boolean> svcOutcome = new ServiceOutcome<>();
+		try
+		{
+			UserLoginHistory ulHistory = new UserLoginHistory();
+		
+			ulHistory.setBrowserDetails(ClientInfo.getClientBrowser(request));
+			ulHistory.setEmail(user.getEmail());
+			ulHistory.setFirstName(user.getFirstName());
+			ulHistory.setLastName(user.getLastName());
+			ulHistory.setLoggedInDate(new Date());
+			ulHistory.setLoggedOutDate(null);
+			ulHistory.setLoginStatus("LOGOUT");
+			ulHistory.setLoginType(user.getPrimaryRole().getRoleCode());
+			ulHistory.setMobile(user.getMobile());
+			ulHistory.setOsDetails(ClientInfo.getClientOS(request));
+			ulHistory.setUserName(user.getUserName());
+			ulHistory.setUserId(user.getUserId());
+			
+			ulHistoryReporsitory.save(ulHistory);
+			
+			svcOutcome.setData(true);
+		}
+		catch(Exception ex)
+		{
+			svcOutcome.setOutcome(false);
+			svcOutcome.setData(false);
+			svcOutcome.setMessage(ex.getMessage());
+		}
+		
+		return svcOutcome;
+	}
+
+
+
+	@Override
+	public CurrentUserVo getCurrentUserVoByUserId(Long userId) {
+		CurrentUserVo currentUserVo = new CurrentUserVo();
+		try {
+			User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+			currentUserVo.setUserId(user.getUserId());
+			currentUserVo.setUserName(user.getUserName());
+			currentUserVo.setPrimaryRole(user.getPrimaryRole());
+			currentUserVo.setRoles(user.getRoles());
+		}catch (Exception e){
+			log.error(e);
+		}
+		return currentUserVo;
+	}
+
+	@Override
+	public Optional<UserRoleMap> findUserRoleMapByUserIdAndRoleId(Long currentUserId, Long primaryRoleId) {
+		Optional<UserRoleMap> userRoleMap = Optional.empty();
+		try {
+			userRoleMap = userRoleMapRepository.findByUserIdAndRoleIdAndIsActiveTrue(currentUserId, primaryRoleId);
+		}catch (Exception e){
+			log.error("Error while fetching user role map by user id and role id UserServiceImpl::findUserRoleMapByUserIdAndRoleId() : ",e);
+		}
+		return userRoleMap;
+	}
+
+	@Override
+	public List<UserRoleRightLevel> findUserRoleLevelAccessByUserRoleMapId(Long userRoleMapId) {
+		List<UserRoleRightLevel> userRoleLevelAccessList = new ArrayList<>();
+		try {
+			userRoleLevelAccessList = userRoleRightLevelRepository.findByUserRoleMapId(userRoleMapId);
+		}catch (Exception e){
+			log.error("Error while fetching user role level access by user role map id UserServiceImpl::findUserRoleLevelAccessByUserRoleMapId() : ",e);
+		}
+		return userRoleLevelAccessList;
+	}
+
+	@Override
+	public List<EntityIdAndUserLevel> getEntityIdAndUserLevelByUserId(Class<?> entityClass) {
+		List<EntityIdAndUserLevel> entityIdAndUserLevelList = new ArrayList<>();
+		try {
+			String tableNameWithSchema = SecurityHelper.getTableNameWithSchema(entityClass);
+			Optional<ActivityLevelMap>  entityList = activityLevelMapRepository.findByTableModuleName(tableNameWithSchema);
+			if (entityList.isPresent()) {
+				ActivityLevelMap lvMap = entityList.get();
+				String queryJsonStr = lvMap.getTableModuleQueryCodes();
+				JsonObject jsonObject = new Gson().fromJson(queryJsonStr, JsonObject.class);
+				String asString = jsonObject.get(SecurityHelper.getCurrentUserEntityLevel()).getAsString();
+				String[] codes = asString.split(",");
+				entityIdAndUserLevelList = prepareEntityIdAndUserType(codes);
+			}
+		}catch (Exception e){
+			log.error("Error while fetching entity id and user level by user id UserServiceImpl::getEntityIdAndUserLevelByUserId() : ",e);
+		}
+		return entityIdAndUserLevelList;
+	}
+
+	@Override
+	public List<EntityIdAndUserLevel> getEntityIdAndUserLevelByUserIdAndLevel(Class<?> entityClass, String level) {
+		List<EntityIdAndUserLevel> entityIdAndUserLevelList = new ArrayList<>();
+		try {
+			String tableNameWithSchema = SecurityHelper.getTableNameWithSchema(entityClass);
+			Optional<ActivityLevelMap>  entityList = activityLevelMapRepository.findByTableModuleName(tableNameWithSchema);
+			if (entityList.isPresent()) {
+				ActivityLevelMap lvMap = entityList.get();
+				String queryJsonStr = lvMap.getTableModuleQueryCodes();
+				JsonObject jsonObject = new Gson().fromJson(queryJsonStr, JsonObject.class);
+				String asString = jsonObject.get(level).getAsString();
+				String[] codes = asString.split(",");
+				entityIdAndUserLevelList = prepareEntityIdAndUserType(codes);
+			}
+		}catch (Exception e){
+			log.error("Error while fetching entity id and user level by user id UserServiceImpl::getEntityIdAndUserLevelByUserId() : ",e);
+		}
+		return entityIdAndUserLevelList;
+	}
+
+	private List<EntityIdAndUserLevel> prepareEntityIdAndUserType(String[] codes) {
+		List<EntityIdAndUserLevel> entityIdAndUserLevelList = new ArrayList<>();
+		for (String code : codes) {
+			try {
+				Optional<UmtNativeQuery> nativeQuery = umtNativeQueryRepository.findByQueryCode(code.trim());
+				if (nativeQuery.isPresent()) {
+					UmtNativeQuery query = nativeQuery.get();
+					String sql = query.getQuery();
+					sql = sql.replace(":objectId", "'" + SecurityHelper.getCurrentUserEntityId() + "'");
+					String objectType = "'" + SecurityHelper.getCurrentUserEntityLevel() + "'";
+					sql = sql.replace(":objectType", objectType);
+					Query qr = entityManager.createNativeQuery(sql);
+					List<Object[]> resultList = qr.getResultList();
+					for (Object[] obj : resultList) {
+						EntityIdAndUserLevel map = new EntityIdAndUserLevel();
+						long entityId = obj[0] != null ? Long.parseLong(obj[0].toString()) : 0;
+						String name = obj[1] != null ? obj[1].toString() : "";
+						String userLevel = obj[2] != null ? obj[2].toString() : "";
+						map.setEntityId(entityId);
+						map.setOrganizationName(name);
+						map.setUserLevel(userLevel);
+						map.setCombineTwo(entityId + "##" + userLevel);
+						entityIdAndUserLevelList.add(map);
+					}
+				}
+			}catch (Exception e){
+				log.error("Error while preparing entity id and user type UserServiceImpl::prepareEntityIdAndUserType() : ",e);
+			}
+		}
+		return entityIdAndUserLevelList;
+	}
+
+
+
+
+
+
+	@Transactional
+	@Override
+	public boolean reConfigureOrganizationStructure(String objectIdAndTypeEncode) {
+		boolean isSaved = false;
+		try {
+			Base64.Decoder decoder = Base64.getDecoder();
+			String objectIdAndType = new String(decoder.decode(objectIdAndTypeEncode));
+			String[] split = objectIdAndType.split("##");
+			Long entityId = Long.parseLong(split[0]);
+			String userLevel = split[1];
+			List<OrganizationStructure> orgStcList = organizationStructureRepository.findByObjectIdAndObjectTypeAll(entityId, userLevel);
+			for (OrganizationStructure orgStc : orgStcList) {
+				orgStc.setActive(false);
+				organizationStructureRepository.save(orgStc);
+			}
+			isSaved = true;
+		}catch (Exception e){
+			log.error("Error while re-configuring organization structure UserServiceImpl::reConfigureOrganizationStructure() : ",e);
+		}
+		return isSaved;
+	}
+
+	@Override
+	public ServiceOutcome<Boolean> forgotPasswordSendOtp(String username) {
+		ServiceOutcome<Boolean> svcOutcome = new ServiceOutcome<>();
+		svcOutcome.setOutcome(false);
+		try {
+			// decode
+			Base64.Decoder decoder = Base64.getDecoder();
+			String usernameDecoded = new String(decoder.decode(username));
+			User user = userRepository.findByUserName(usernameDecoded);
+			if (user != null) {
+				String email = user.getEmail();
+				String phone = user.getMobile();
+				if ((email == null || email.isEmpty()) && (phone == null || phone.isEmpty())) {
+					svcOutcome.setData(false);
+					svcOutcome.setMessage("Email or Phone number not found");
+					return svcOutcome;
+				}
+
+				// 4 digit random number
+				Random random = new Random();
+				int otp = random.nextInt(9000) + 1000;
+				// send otp to user by email
+				String subject = "Forgot Password OTP";
+				String message = "Your OTP is " + otp;
+
+				if (email != null && !email.isEmpty()) {
+					// send email
+					//EmailUtil.sendEmail(email, subject, message);
+				}else if (phone != null && !phone.isEmpty()) {
+					// send sms
+					//SmsUtil.sendSms(phone, message);
+				}
+
+
+
+			}
+		}catch (Exception e){
+			log.error("Error while forgot password UserServiceImpl::forgotPassword() : ",e);
+			svcOutcome.setData(false);
+			svcOutcome.setMessage("Error while forgot password");
+		}
+		return svcOutcome;
+	}
+
+
+	@Override
+	public ServiceOutcome<Role> getRoleObjectByRoleCode(String roleCode) {
+		ServiceOutcome<Role> svcOutcome = new ServiceOutcome<>();
+		try
+		{
+			Role role = roleRepository.findByRoleCode(roleCode);
+			svcOutcome.setData(role);
+			svcOutcome.setMessage("Data Fetched Successfully");
+		}
+		catch(Exception ex)
+		{
+			svcOutcome.setOutcome(false);
+			svcOutcome.setData(null);
+			svcOutcome.setMessage(ex.getMessage());
+		}
+		return svcOutcome;
+	}
+
+
+	@Override
+	public ServiceOutcome<Role> getRoleObjectByRoleId(Long roleId) {
+		ServiceOutcome<Role> svcOutcome = new ServiceOutcome<>();
+		try
+		{
+			Role role = roleRepository.findById(roleId).get();
+			svcOutcome.setData(role);
+			svcOutcome.setMessage("Data Fetched Successfully");
+		}
+		catch(Exception ex)
+		{
+			svcOutcome.setOutcome(false);
+			svcOutcome.setData(null);
+			svcOutcome.setMessage(ex.getMessage());
+		}
+		return svcOutcome;
+	}
+
+}

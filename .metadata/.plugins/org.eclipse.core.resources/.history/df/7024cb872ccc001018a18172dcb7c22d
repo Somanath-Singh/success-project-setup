@@ -1,0 +1,392 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+
+<style>
+.freeze {
+    pointer-events: none;
+    opacity: 0.6; 
+    cursor: not-allowed;
+}
+</style>
+
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Add Legacy Building</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i
+						class="fa-solid fa-house"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Legacy
+					Building</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+
+	<div class="col-md-12">
+
+		<div class="card">
+			<div class="card-header">
+				<c:choose>
+					<c:when test="${not empty project.projectId}">
+						<h5 class="card-title">Update Building</h5>
+					</c:when>
+					<c:otherwise>
+						<h5 class="card-title">Add Legacy Building</h5>
+					</c:otherwise>
+				</c:choose>
+			</div>
+			<div class="card-body">
+				<form class="form-horizontal"
+					action="${contextPath}/legacy/saveLegacyProjectDetails" method="POST"
+					id="projectLegacyForm" enctype="multipart/form-data">
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+					<input type="hidden" id="cipherText" name="cipherText" /> 
+					<input type="hidden" name="projectId" id="projectId" value="${infraLegacyProject.projectId}" />
+					<input type="hidden" id="buttonCode" name="buttonCode">	
+
+					<div class="row">
+						<div class="col-md-3 ml-auto">
+							<div class="form-group">
+								<label class="smallInput required">Financial Year :</label> <select
+									class="form-control form-control-sm form-select freeze"
+									id="financialYear" name="financialYearId">
+									<option value="0" selected disabled>- Select -</option>
+									<c:forEach items="${finYearDropDownList}" var="fy">
+										<option value="${fy.financialYearId}"  ${fy.financialYearId eq infraLegacyProject.financialYearId ? 'selected' : ''} >${fy.financialYear}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label class="required">Building Name :</label>
+							<div class="col-md-12">
+								<input type="text" id="projectName" name="projectName"
+									placeholder=" " class="form-control form-control-sm freeze" required
+									maxlength="100" value="${infraLegacyProject.projectName}">
+							</div>
+						</div>
+						<div class="form-group col-md-3" id="ptype">
+							<label class="required">Building Type :</label>
+							<div class="col-md-12">
+								<input type="text" id="projectType" name="projectType"
+									class="form-control form-control-sm freeze" required value="${infraLegacyProject.projectType}" />
+							</div>
+						</div>
+
+						<div class="form-group col-md-3">
+							<label class="required">Building Status :</label>
+							<div class="col-md-12">
+								<select id="projectStatus" name="projectStatus" class="form-control form-control-sm form-select freeze" required>
+									<c:if test="${empty infraLegacyProject}">
+										<option value="" selected disabled>- Select -</option>
+										<option value="Completed">Completed</option>
+										<option value="Other" >Other</option>
+									</c:if>
+									<c:if test="${not empty infraLegacyProject}">
+										<option value="" selected disabled>- Select -</option>
+										<option value="${infraLegacyProject.projectStatus}" selected>${infraLegacyProject.projectStatus}</option>
+									</c:if>
+								</select>
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label class="required">Letter No. </label>
+							<div class="col-md-12">
+								<input type="text" id="orderNo" name="orderNo"
+									class="form-control form-control-sm freeze" required maxlength="12"
+									value="${infraLegacyProject.letterNo}" />
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label class="required">Letter Date </label>
+							<div class="datepicker-box">
+								<input type="text" id="orderDate" name="orderDate"
+									class="form-control form-control-sm datepicker freeze" required
+									value="${infraLegacyProject.letterDate}" readonly />
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label class="required">Confirm Letter Date </label>
+							<div class="datepicker-box">
+								<input type="text" id="confirmOrderDate" name="confirmOrderDate"
+									class="form-control form-control-sm datepicker freeze" required
+									value="${infraLegacyProject.confirmLetterDate}" readonly />
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label class="required"> Start Date </label>
+							<div class="datepicker-box">
+								<input type="text" id="startDate" name="startDate"
+									class="form-control form-control-sm datepicker freeze" required
+									value="${infraLegacyProject.startDate}" readonly />
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label class="required"> Completion date </label>
+							<div class="datepicker-box">
+								<input type="text" id="completionDate" name="completionDate"
+									class="form-control form-control-sm datepicker freeze" required
+									value="${infraLegacyProject.completionDate}" readonly />
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label class="required"> Estimated Cost :</label>
+							<div class="col-md-12">
+								<input type="text" id="estimatedCost" name="estimatedCost"
+									pattern="^\d*\.?\d{0,8}$"
+									class="form-control form-control-sm NumbersOnlyForAmount freeze"
+									maxlength="12" value="${infraLegacyProject.estimatedCost}" />
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label class="required">Final Cost : </label>
+							<div class="col-md-12">
+								<input type="text" id="finalCost" name="finalCost"
+									pattern="^\d*\.?\d{0,8}$"
+									class="form-control form-control-sm NumbersOnlyForAmount freeze"
+									maxlength="12" value="${infraLegacyProject.finalCost}" />
+							</div>
+						</div>
+
+						<div class="col-md-3">
+							<div class="form-group">
+								<label class="col-md-12 required" for="deptId">Department
+									Name:</label>
+								<div class="col-md-12">
+									<select class="form-control form-control-sm form-select freeze"
+										data-live-search="true" id="deptId" name="deptId">
+										<option value="0" selected disabled>- Select -</option>
+										<c:forEach var="department" items="${departmentDropDownList}">
+											<option value="${department.deptId}"  ${department.deptId eq infraLegacyProject.deptId ? 'selected' : ''} >${department.deptName}</option>
+										</c:forEach>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="form-group">
+								<label class="col-md-12 required" for="districtId">District
+									Name:</label>
+								<div class="col-md-12">
+									<select class="form-control form-control-sm form-select freeze"
+										data-live-search="true" id="districtId"
+										name="districtId">
+										<option value="0" disabled selected>- Select -</option>
+										<c:forEach var="district" items="${districtDropDownList}">
+											<option value="${district.districtId}"
+												${district.districtId eq infraLegacyProject.districtId ? 'selected' : ''}>${district.districtName}</option>
+										</c:forEach>
+									</select>
+								</div>
+							</div>							
+						</div>
+						<div class="form-group col-md-3">
+						    <label class="required">Latitude :</label>
+						    <div class="col-md-12">
+						        <input type="text" id="latitude" name="latitude" class="form-control form-control-sm freeze"  maxlength="250" value="${infraLegacyProject.latitude}" /> 
+						    </div>
+						</div>
+						
+						<div class="form-group col-md-3">
+						    <label class="required">Longitude :</label>
+						    <div class="col-md-12">
+						        <input type="text" id="longitude" name="longitude" class="form-control form-control-sm freeze" maxlength="250" value="${infraLegacyProject.longitude}" /> 
+						    </div>
+						</div>
+						<div class="form-group col-md-3">
+						    <label class="required">Remarks :</label>
+						    <div class="col-md-12">
+						        <input type="text" id="remark" name="remark" class="form-control form-control-sm freeze" maxlength="250" value="${infraLegacyProject.remark}" /> 
+						    </div>
+						</div>
+						<%-- <c:if test="${not empty infraLegacyProject.legacyImagePath}">
+							<div class="form-group col-md-3">
+							    <label class="required">Upload Document :</label>
+							    <div class="col-md-12 position-relative">
+							            <img 
+										  src="${pageContext.request.contextPath}/document/viewDocuments?moduleName=LEGACY_PROJECT_DOCUMENT&filePath=${infraLegacyProject.legacyImagePath}" 
+										  class="img-fluid rounded mb-2" 
+										  alt="Site Image" 
+										  style="max-height: 400px; object-fit: contain;" />
+							          	<span style="font-size: 12px;color: #7b3f00;font-weight: 600;">${infraLegacyProject.legacyImagePath}</span>
+							    </div>
+							</div>
+						</c:if> --%>
+						<div class="form-group col-md-3">
+						    <label class="required">Upload Document :</label>
+						    <div class="col-md-12 position-relative">
+						        <input type="file" id="document" name="uploadDocument" class="form-control form-control-sm freeze">
+						 	    <c:if test="${not empty infraLegacyProject.legacyImagePath}">
+						            <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top: 1px;" onclick="viewDocument('${infraLegacyProject.legacyImagePath}','LEGACY_PROJECT_DOCUMENT')" title="Download Document">
+						                <i class="fa fa-download"></i>
+						            </button> <span style="font-size: 12px;color: #7b3f00;font-weight: 600;">${infraLegacyProject.legacyImagePath}</span>
+						        </c:if>
+						        <div id="selectedFileName" class="mt-1 text-muted" style="font-size: 0.9em;"></div>
+						    </div>
+						</div>
+						
+						<%-- Add stage configuration buttons --%>
+						<div class="col-md-12 mt-2 text-center">
+						    <c:set var="dynamicFromId" value="projectLegacyForm" scope="request" />
+						    <c:set var="wonFunction" value="submitForm()" />
+						    <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp" %>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<form action = "${contextPath}/document/viewDocuments" method="get" id="documentFormView" enctype="multipart/form-data" target="_blank">
+	<input type="hidden" name="moduleName" id="moduleName"/>
+	<input type="hidden" name="filePath" id="filePath"/>
+</form>
+
+<script>
+
+	function submitForm() {
+		debugger;
+		event.preventDefault();
+		var financialYear = $('#financialYear').val();
+		var projectName = $('#projectName').val();
+		var projectType = $('#projectType').val();
+		var projectStatus = $('#projectStatus').val();
+		var orderNo = $('#orderNo').val();
+		var orderDate = $('#orderDate').val();
+		var confirmOrderDate = $('#confirmOrderDate').val();
+		var startDate = $('#startDate').val();
+		var completionDate = $('#completionDate').val();
+		var estimatedCost = $('#estimatedCost').val();
+		var finalCost = $('#finalCost').val();			
+		var deptId = $("#deptId").val();
+		var districtId = $("#districtId").val();
+		var latitude = $("#latitude").val();
+		var longitude = $("#longitude").val();
+		var remark = $("#remark").val();
+		const buttonCode = $("#hdnButtonCode").val();
+
+        if (financialYear == "" || financialYear == "0" || financialYear == null) {
+			bootbox.alert("Please enter Financial Year.");
+			return false;
+		}else if (projectName == "") {
+			bootbox.alert("Please enter project name.");
+			return false;
+		}else if (projectType == "") {
+			bootbox.alert("Please enter Project Type.");
+			return false;
+		}else if (projectStatus == "") {
+			bootbox.alert("Please enter project status.");
+			return false;
+		}else if (orderNo == "") {
+			bootbox.alert("Please enter order number.");
+			return false;
+		}else if (orderDate == "") {
+			bootbox.alert("Please enter order Date.");
+			return false;
+		}else if (confirmOrderDate == "") {
+			bootbox.alert("Please enter Confirm order Date.");
+			return false;
+		}else if (startDate == "") {
+			bootbox.alert("Please enter Start Date.");
+			return false;
+		}else if (completionDate == "") {
+			bootbox.alert("Please enter Completion Date.");
+			return false;
+		}else if (estimatedCost == "") {
+			bootbox.alert("Please enter Estimated Cost.");
+			return false;
+		}else if (finalCost == "") {
+			bootbox.alert("Please enter Final Cost.");
+			return false;
+		} else if (deptId === null) {
+	        bootbox.alert("Select Department Name");
+	        return false;
+	    }  else if (districtId == "" || districtId==="0") {
+			bootbox.alert("Please select District.");
+			return false;
+		}else if (latitude == "") {
+			bootbox.alert("Please select latitude.");
+			return false;
+		}else if (longitude == "") {
+			bootbox.alert("Please select longitude.");
+			return false;
+		}else if (remark == "") {
+			bootbox.alert("Please select remark.");
+			return false;
+		}else{	
+			 $("#buttonCode").val(buttonCode);
+			 
+	    	var bizContent = $("#projectLegacyForm").serializeArray();
+  	    	 $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+  	    	  bootbox.confirm("Do You Want To Continue?", function (result) {
+  		    	 if (result) {
+  		    		$('#projectLegacyForm').submit();
+  		    	 }
+  	    	 });    
+	    }
+	}
+	
+	
+	$(document).ready(function () {
+	    $(".datepicker").datepick({
+	        onShow: $.datepick.monthOnly,
+	        dateFormat: "dd-mm-yyyy",
+	        yearRange: "c-20:c+10",
+	        showOnFocus: true,
+	        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+	        onSelect: function () {
+	            applyDateLimits();
+	        }
+	    });
+
+	    function parseDate(str) {
+	        if (!str) return null;
+	        var parts = str.split("-");
+	        return new Date(parts[2], parts[1] - 1, parts[0]); 
+	    }
+
+	    function formatDate(date) {
+	        let dd = String(date.getDate()).padStart(2, '0');
+	        let mm = String(date.getMonth() + 1).padStart(2, '0');
+	        let yyyy = date.getFullYear();
+	        return dd + '-' + mm + '-' + yyyy;
+	    }
+
+	    function applyDateLimits() {
+	        const orderDate = parseDate($('#orderDate').val());
+	        const confirmDate = parseDate($('#confirmOrderDate').val());
+	        const startDate = parseDate($('#startDate').val());
+	        const completionDate = parseDate($('#completionDate').val());
+
+	        if (orderDate) {
+	            $('#confirmOrderDate').datepick('option', 'minDate', orderDate);
+	        }
+	        if (confirmDate) {
+	            $('#startDate').datepick('option', 'minDate', confirmDate);
+	        }
+	        if (startDate) {
+	            $('#completionDate').datepick('option', 'minDate', startDate);
+	        }
+	    }
+	    // Run initially if values are pre-filled
+	    applyDateLimits();
+	    // Re-apply limits on date change
+	    $('#orderDate, #confirmOrderDate, #startDate').on('change', function () {
+	        applyDateLimits();
+	    });
+	}); 
+	
+	
+
+</script>

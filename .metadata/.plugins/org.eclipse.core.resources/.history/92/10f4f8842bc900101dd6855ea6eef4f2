@@ -1,0 +1,25 @@
+package com.aashdit.construction.service;
+
+import com.aashdit.construction.dto.GoverningBodyVo;
+import com.aashdit.construction.model.GoverningBody;
+import com.aashdit.framework.core.ServiceOutcome;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Map;
+
+public interface GoverningBodyService {
+
+	Map<String, Object> getGoverningBodyLoadingData();
+
+	ServiceOutcome<GoverningBody> addOrUpdateGoverningBody(GoverningBodyVo governingBodyVo, MultipartFile icon);
+
+	GoverningBody getGoverningBodyById(Long governingBodyId);
+
+	ServiceOutcome<Boolean> updateActiveStatusGoverningBody(Long governingBodyId, Boolean status);
+
+	List<GoverningBody> getAllGoverningBodies(Boolean isActive);
+
+	Boolean checkDuplicateEmail(String email) throws Exception;
+	
+}

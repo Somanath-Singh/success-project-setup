@@ -1,0 +1,502 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<sec:authentication var="principal" property="principal" />
+<c:set var="chargeRow" value="0" />
+
+
+
+<style>
+.fa-calendar-week{
+	position: absolute; 
+	top: 12px;
+	right: 10px;
+	font-size: 16px;
+}
+@media print {
+body{
+        background: #fff !important;
+    }
+	.no-print {
+		display: none;
+	}
+	input {
+		border-color: transparent !important;
+	}
+	select {
+		border-color: transparent !important;
+	}
+	.datepicker-box .fa-calendar-week {
+		display: none;
+	}
+	td #mrnDate {
+    		border-color: transparent !important;
+    	}
+	 td textarea {
+		border-color: transparent !important;
+		resize: none;
+	}
+	.btn_Group{
+	    display: none;
+	}
+	td #doc{
+	display: none;
+	}
+	.invoice-form table thead th,.detailsheading {
+        background: transparent !important;
+        color: #000 !important;
+    }
+    .detailsheading{
+        font-weight: 700;
+        dest-decoration: underline !important;
+    }
+    tr{
+        background: transparent !important;
+    }
+    .borderNone{
+        height: 96vh !important;
+    }
+    .card-header{
+            padding-left: 0 !important;
+        }
+
+}
+.invoice-form table thead th{
+    color: #0f0e47
+}
+
+.print-div {
+	width: 750px;
+	padding: 19px;
+	background: #fff;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 10px;
+	height: 700px;
+}
+
+.print-div td input, .print-div td select {
+	width: 76px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+}
+
+.print-div td textarea {
+	border: 1px solid #ddd;
+}
+
+.print-div td textarea {
+	border: 1px solid #ddd;
+}
+table th {
+    font-size: 14px;
+    font-weight: 600 !important;
+}
+table td {
+	    font-size: 12px !important;
+        font-weight: 500 !important;
+        color: #312e2e !important;
+        line-height: 20px !important;
+        letter-spacing: 0.5px;
+	}
+   
+
+input:focus {
+	outline: none;
+}
+
+textarea:focus {
+	outline: none;
+}
+.t-inner-data thead tr th {
+    padding: 5px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+table td{
+    padding: 5px;
+}
+.dataSection tr{
+    vertical-align: baseline;
+}
+</style>
+
+
+
+ <section>
+	<div class="mt-2">
+		<form action="${contextPath}/procurement/purchaseOrder/saveMrn" method="post" class="invoice-form" id="form" enctype="multipart/form-data">
+			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+			<input type="hidden" class="" id="encodedDataform" name="encodedDataform" value="" />
+			<div class="borderNone" style="width: 900px; margin: auto; background: #fff; position: relative;padding: 10px;border: 1px solid #ddd;">
+				<div style="float:left; width:50%;">
+				<h3 style="margin-bottom: 5px; margin-top: 5px; color: #000;
+    font-weight: 600; padding:10px 0;">MRN</h3></div>
+
+				<div style="float: right; width: 50%; text-align: right;">
+					<c:choose>
+                        <c:when test="${!empty principal.currentUserVo.icon && principal.currentUserVo.icon.length() > 0}">
+                            <c:set var="appIcon" value="${principal.currentUserVo.icon}" />
+                            <img src="${contextPath}/document/view-documents?doc=${appIcon}&module=ICON" alt="logo" class="logo" style="width: 50px;" />
+                        </c:when>
+                        <c:otherwise>
+                            <img src="${contextPath}/assets/images/favicon.png" alt="logo" class="logo" style="width: 50px;" />
+                        </c:otherwise>
+                    </c:choose>
+				</div>
+				<div style="clear: both; margin-bottom: 0;"></div>
+                <div class="card-header" style="position: relative;background: #00ffff !important; ">
+                    <button type="button" class="no-print" style="float: right;position: absolute;top: -3px;right: 10px;border: none;background: none;font-size: 26px;color: #5f7dcb;" onclick="window.print()">
+                        <i class="fa-solid fa-print"></i>
+                    </button>
+
+                    <h4 class="detailsheading" style=" color: #0f0e47; font-size: 16px;padding-left: 2px; margin-bottom: 0px; margin-top: 0;font-weight: 600;">Contact details :</h4>
+				</div>
+				<div style="width: 50%; float: left;padding:10px 0;" class="dataSection">
+					<input type="hidden" value="${po.poId}" name="poId">
+					<input type="hidden" value="<fmt:formatDate value='${po.poReceiptGeneratedDate}' pattern='dd/MM/yyyy'/>" id="poDate">
+					<table style="font-size: 12px; line-height:20px; width: 100%">
+						<tr>
+							<th style="width: 40%; font-weight: 700">Vendor Name :</th>
+							<td style="width: 60%;">${po.assetVendor.vendorName}</td>
+						</tr>
+						<tr>
+							<th style="width: 40%; font-weight: 700">GSTIN :</th>
+							<td style="width: 60%;">${po.assetVendor.gstNo}</td>
+						</tr>
+						<tr>
+							<th style="width: 40%; font-weight: 700">Phone No :</th>
+							<td style="width: 60%;">${po.assetVendor.mobileNo}</td>
+						</tr>
+						<tr>
+							<th style="width: 40%; font-weight: 700">Email :</th>
+							<td style="width: 60%;">${po.assetVendor.email}</td>
+						</tr>
+						<tr style="vertical-align: top;">
+							<th style="width: 40%; font-weight: 700">Address :</th>
+							<td style="width: 60%;">${po.assetVendor.vendorAddress}</td>
+						</tr>
+						<tr>
+							<th style="width: 40%; font-weight: 700">POC :</th>
+							<td style="width: 60%;">${po.assetVendor.pointOfContact}</td>
+						</tr>
+						<tr>
+							<th style="width: 40%; font-weight: 700">Contact No :</th>
+							<td style="width: 60%;">${po.assetVendor.contactNumber}</td>
+						</tr>
+					</table>
+				</div>
+				<div style="width: 50%; float: right;  padding:10px 0;" class="dataSection">
+					<table style="font-size: 12px; line-height: 20px; width: 100%">
+						<tr>
+							<th style="width: 25%; font-weight: 700">MRN Ref :</th>
+							<td style="width: 75%">${not empty mrn ? mrn.mrnNo : "N/A"}</td>
+						</tr>
+						<tr>
+							<th style="width: 25%; font-weight: 700">MRN Date :</th>
+							<td style="width: 75%">
+							    <c:choose>
+                                    <c:when test="${not empty mrn}">
+                                        <fmt:formatDate value="${mrn.mrnDate}" pattern="dd/MM/yyyy" />
+                                    </c:when>
+                                    <c:otherwise>
+                                        N/A
+                                    </c:otherwise>
+                                </c:choose>
+
+							</td>
+						</tr>
+						<tr>
+							<th style="width: 25%; font-weight: 700">PO Ref :</th>
+							<td style="width: 75%">${po.poNo}</td>
+						</tr>
+						<tr>
+							<th style="width: 25%; font-weight: 700">PO Date :</th>
+							<td style="width: 75%"><fmt:formatDate
+									value='${po.poReceiptGeneratedDate}' pattern='dd/MM/yyyy' /></td>
+						</tr>
+						<tr>
+							<th style="width: 25%; font-weight: 700">Currency :</th>
+							<td style="width: 75%">${po.currency.currencyShortName}</td>
+						</tr>
+						</tr>
+					</table>
+				</div>
+				<div style="clear: both; margin-bottom: 30px;"></div>
+
+				<table class="t-inner-data" style="font-size: 12px;width: 100%;">
+					<thead>
+						<tr style="background: #00ffff !important;color: #0f0e47 !important;border-bottom: 1px solid #ebebeb;">
+							<th>Sub Category</th>
+							<th>Stock Type</th>
+							<th style="width: 260px">Item Name</th>
+							<th style="text-align: right;">Requested Qty</th>
+							<c:if test="${edit}">
+								<th style="text-align: right;">Po Remain Qty</th>
+							</c:if>
+							<th style="text-align: right;">Received Qty</th>
+						</tr>
+					</thead>
+					<tbody id="itemBody">
+						<c:choose>
+							<c:when test="${edit}">
+								<c:forEach items="${po.poLines}" var="line" varStatus="count">
+									<tr style="">
+										<td>${line.item.subCategoryName}
+											<input type="hidden" name="mrnLines[${count.index}].poLineId" value="${line.poLineId}">
+										</td>
+										<td>${line.item.stockType}</td>
+										<td>${line.item.itemName}</td>
+										<td class="text-end">${line.supplierQuantity}</td>
+										<td class="text-end">${line.poRmnQuantity}</td>
+										<td style="float: right;">
+											<input class="form-control receivedQtyMRN ${line.item.isFractional ? 'numberWithTwoDesimal' : 'numberWithTwoDesimalButOnlyAllowZero'}  maximunLengthIs10WithDot altleastOneGreaterThanZero onClickInput" type="number" style="text-align: end; width: 80px" id="receivedQuantity${count.index}" name="mrnLines[${count.index}].receivedQuantity" value="0" onkeyup="checkQty(${line.poRmnQuantity},this.value,${count.index})" ${line.mrnRmnQuantity <= 0 ? 'readonly' :line.mrnRmnQuantity}>
+										</td>
+									</tr>
+								</c:forEach>
+							</c:when>
+							<c:otherwise>
+								<c:forEach items="${mrn.mrnLines}" var="line" varStatus="count">
+									<tr>
+										<td>${line.poLine.item.subCategoryName}</td>
+										<td>${line.poLine.item.stockType}</td>
+										<td>${line.poLine.item.itemName}</td>
+										<td class="text-end">${line.poLine.supplierQuantity}</td>
+										<td class="text-end">${line.receivedQuantity}</td>
+									</tr>
+								</c:forEach>
+							</c:otherwise>
+						</c:choose>
+					</tbody>
+				</table>
+				<table class="mt-4" style="font-size: 12px;width: 100%;">
+					<thead style="">
+						<tr style="background: #00ffff !important;color: #0f0e47 !important;border-bottom: 1px solid #ebebeb;" >
+							<th style="width: 30%;">Remarks</th>
+							<th style="">Received Date<span style="color: red">*</span></th>
+							<th style="">MRN Document</th>
+							<th style="">Vehicle no.</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr style="vertical-align: baseline;">
+							<td style="width: 25%;">
+								<textarea class="form-control" style="outline: none;height: 60px;" maxlength="100" placeholder="" name="remarks" ${edit ? '' :'disabled="disabled"' }>${mrn.remarks}</textarea>
+							</td>
+							<td style="width: 25%;" class="position-relative datepicker-box">
+									<input type="text" style="margin-right: 5px;" class="form-control form-control-sm datepicker_mrn requiredField" id="mrnDate" name="mrdate" value="<fmt:formatDate value='${mrn.mrnDate}' pattern='dd/MM/yyyy'/>" ${edit ? '' :'disabled="disabled"' }  readonly/>
+									<i class='fa-solid fa-calendar-week requiredField' id='calIcon'></i>
+
+							</td>
+							<td style="width: 25%; ${edit ? '' :''}">
+								<c:choose>
+									<c:when test="${edit}">
+										<input type="file" id="doc" name="doc" class="form-control" style="padding-right: 5px;">
+									</c:when>
+									<c:otherwise>
+										<c:choose>
+											<c:when test="${not empty mrn.mrnDoc}">
+												<i class='fa-solid fa-file' class="form-control" style="font-size: 25px;" onclick="downloadDoc('${mrn.mrnDoc}')"></i>
+											</c:when>
+											<c:otherwise>
+				            					No Doc Uploaded
+				            				</c:otherwise>
+										</c:choose>
+									</c:otherwise>
+								</c:choose>
+
+							</td>
+							<td style="width: 25%;">
+								<input type="text" class="form-control" name="vehicleNo" value="${mrn.vehicleNo}" style="" maxlength="15" >
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<table class="footer-fix-table" style="width: 100%;">
+					<tfoot>
+						<tr>
+							<th colspan="2">
+								<ul style="list-style: none; padding: 0; display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px;    color: #000;">
+									<li style="margin-top: 45px;"><small style="display: block;">&nbsp; </small> Prepared By</li>
+									<li style="margin-top: 45px;">Approved By</li>
+									<li style="margin-top: 45px;">Authorized By</li>
+								</ul>
+							</th>
+						</tr>
+						<tr style="background: #8483c7 !important; font-size: 12px;color: #fff;">
+							<th colspan="2" style="text-align: center; padding: 8px 0; text-align: center; line-height: 16px;">
+								<p style="margin: 5px 0 0 0;">If you have any question about this price quote,please inform us at</p>
+								<p style="margin: 0 0 5px 0;">demo@gmail.com or call us at 2323432432</p>
+								<h4 style="margin: 0;">Thank You !!!</h4>
+							</th>
+						</tr>
+					</tfoot>
+				</table>
+				<div style="clear: both; margin-bottom: 40px;"></div>
+				<div class="row btn_Group">
+					<c:if test="${edit}">
+						<div class="col-md-12 text-center">
+							<button type="button"  onclick="validateForms()" class="btn btn-submit">Generate</button>
+							<button type="button"  onclick="backToModule()" class="btn btn-danger">Back</button>
+						</div>
+					</c:if>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>  
+
+
+
+
+<form method="post" action="${contextPath}/document/download" id="download" target="empty">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	<input type="hidden" id="docPath" name="docPath" value="">
+	<input type="hidden" id="module" name="module" value="Purchase/Mrn">
+</form>
+<script>
+    tableIds=['itemBody'];
+    jsonKeys=['mrnLines'];
+	$(function() {
+		$('.datepicker_mrn').datepick({
+			dateFormat: 'dd/mm/yyyy',maxDate:0, showOnFocus: true,
+			 onSelect: function(selected) {
+				 var alltDate=$('#poDate').val().split("/");
+				 var modAllotDate=new Date(alltDate[1]+"/"+alltDate[0]+"/"+alltDate[2]);
+				 if(modAllotDate > new Date(selected)){
+					alert('Mrn date sholud not be less than PO Approval date.');
+					$('.datepicker_mrn').val("");
+				 }
+			 }
+		});
+	});
+	function checkQty(supQty,curQty,id) {
+		supQty=parseFloat(supQty);
+		curQty=parseFloat(curQty);
+		if(curQty>supQty){
+			$("#receivedQuantity"+id).val(0);
+			alert("can't enter above po remain quantity");
+		}
+	}
+	function validateForms() {
+        // Received Qty Validation should be greater than 0
+        var isQtyValid = true;
+        var isDateValid = true;
+        var isDocValid = true;
+        var isVehicleValid = true;
+        var isRemarksValid = true;
+        let calIcon = document.getElementById("calIcon");
+        if (calIcon) {
+            calIcon.classList.add("d-none");
+        }
+		
+		let altleastOneGreaterThanZero = validationForAtleastOneGreaterThanZero("altleastOneGreaterThanZero");
+		if(!altleastOneGreaterThanZero){
+			return;
+		}
+		function validationForAtleastOneGreaterThanZero(className) {
+		let isValid = true;
+		let altleastOneGreaterThanZero = form.querySelectorAll("." + className);
+		let isAtleastOneGreaterThanZero = false;
+		if(altleastOneGreaterThanZero.length == 0){
+			isAtleastOneGreaterThanZero = true;
+		}else{
+			altleastOneGreaterThanZero.forEach(function(field){
+				let value = field.value;
+				parseFloat(value);
+				if(value > 0){
+					isAtleastOneGreaterThanZero = true;
+				}
+			});
+		}
+		if(!isAtleastOneGreaterThanZero){
+			isValid = false;
+			altleastOneGreaterThanZero.forEach(function(field){
+				field.classList.add("is-invalid");
+				displayErrorMsgByFieldOnTitel(field, "At least one field must be greater than zero");
+
+			});
+		}else{
+			altleastOneGreaterThanZero.forEach(function(field){
+				field.classList.remove("is-invalid");
+				clearErrorByFieldOnTitel(field);
+			});
+		}
+		return isValid;
+	}
+	var requreFieldValidation = validateRequiredFields("requiredField");
+		if(!requreFieldValidation){
+			return;
+		}
+		function validateRequiredFields(className) {
+		let isValid = true;
+		let requiredFields = form.querySelectorAll("." + className);
+		requiredFields.forEach(function(field){
+			let value = field.value;
+			if(value == ""){
+				isValid = false;
+				field.classList.add("is-invalid");
+				displayErrorMsgByFieldOnTitel(field, "This field is required");
+			}else{
+				field.classList.remove("is-invalid");
+				// remove the error message
+				clearErrorByFieldOnTitel(field);
+			}
+		});
+		return isValid;
+	}
+        bootbox.confirm({
+        			message: "Are you sure you want to generate MRN?",
+        			buttons: {
+        				confirm: {
+        					label: 'Yes',
+        					className: 'btn-success'
+        				},
+        				cancel: {
+        					label: 'No',
+        					className: 'btn-danger'
+        				}
+        			},
+        			callback: function (result) {
+        				if(result){
+        				    encryptFormData("form", tableIds, jsonKeys);
+                                        $("#form").submit();
+        				}
+        			}
+        		});
+
+		
+	}
+	function downloadDoc(path){
+		$("#docPath").val(path);
+		var a=$("#docPath").val();
+		$("#download").submit();
+	}
+	function displayErrorMsgByFieldOnTitel(field, message) {
+	clearErrorByFieldOnTitel(field);
+	if (field) {
+		// add the error message into the title of the field
+		field.title = message;
+		field.classList.add('is-invalid');
+	} else {
+		console.error('Element with id ' + id + ' not found.');
+	}
+}
+
+function clearErrorByFieldOnTitel(field) {
+	if (field) {
+		// remove the error message from the title of the field
+		field.title = "";
+		field.classList.remove('is-invalid');
+	} else {
+		console.error('Element with id ' + id + ' not found.');
+	}
+}
+</script>

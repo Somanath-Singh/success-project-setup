@@ -1,0 +1,482 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+    <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<style>
+th {
+    color: #0f0e47;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+}
+tr{
+    vertical-align: top;
+}
+tr td{
+    padding-bottom: 10px;
+}
+</style>
+<div class="container-fluid">
+    <div class="breadcrumb_conatiner">
+        <div class="col-md-6">
+            <h4  class="change-color">Job Apply</h4>
+        </div>
+        <div class="col-md-6">
+        <h3>${regd_message}</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Job Description</li>
+            </ol>
+        </nav>
+        </div>
+    </div>
+<div class="row">
+     <div class="col-md-12">
+         <div class="card">
+             <div class="card-header">
+                 <h5 class="card-title">Job Description</h5>
+             </div>
+             <div class="card-body">
+                 <div class="row align-items-stretch">
+                     <div class="col-md-12 text-center"></div>
+                         <div class="col-md-4">
+                            <table style="" class="">
+                                <tbody>
+                                    <tr>
+                                        <th  style="width: 50%">Designation</th>
+                                        <td  style="width: 1%">:</td>
+                                        <td  style="width: 49%">${vacancyDetails.roleId.displayName}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Vacancy Location</th>
+                                        <td>:</td>
+                                        <td>${vacancyDetails.jobLocation.jobLocationName}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Job Type</th>
+                                        <td>:</td>
+                                        <td>${vacancyDetails.jobType.jobTypeName}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Publish Date</th>
+                                        <td>:</td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${not empty vacancyDetails.publicationDate}">
+                                                    <fmt:formatDate value="${vacancyDetails.publicationDate}" pattern="dd/MM/yyyy" />
+                                                </c:when>
+                                                <c:otherwise>
+                                                    NA
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Application Deadline Date</th>
+                                        <td>:</td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${not empty vacancyDetails.applicationDeadline}">
+                                                    <fmt:formatDate value="${vacancyDetails.applicationDeadline}" pattern="dd/MM/yyyy" />
+                                                </c:when>
+                                                <c:otherwise>
+                                                    NA
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <tr>
+                                            <th>Job Summary</th>
+                                            <td>:</td>
+                                            <td><textarea title="${vacancyDetails.jobSummary}" class="form-control" style="height:80px;" readonly>${vacancyDetails.jobSummary}</textarea></td>
+                                        </tr>
+                                    </tr>
+
+                                <tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-4">
+                            <table style="" class="">
+
+                                <tbody>
+                                    <tr>
+                                        <th  style="width: 50%">Salary Range</th>
+                                        <td  style="width: 1%">:</td>
+                                        <td  style="width: 49%">${vacancyDetails.salaryRangeMin} - ${vacancyDetails.salaryRangeMax}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>No Of Vacancy</th>
+                                        <td>:</td>
+                                        <td>${vacancyDetails.noOfVacancy}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Preferred Qualifications</th>
+                                        <td>:</td>
+                                        <td><textarea title="${vacancyDetails.preferredQualifications}" class="form-control" style="height:80px;" readonly>${vacancyDetails.preferredQualifications}</textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Key Responsibilities</th>
+                                        <td>:</td>
+                                        <td><textarea title="${vacancyDetails.keyResponsibilities}" class="form-control" style="height:80px;" readonly>${vacancyDetails.keyResponsibilities}</textarea></td>
+                                    </tr>
+
+                                <tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-4">
+                            <table style="" class="">
+
+                                <tbody>
+                                    <tr>
+                                        <th style="width: 50%">Highest Qualification</th>
+                                        <td style="width: 1%">:</td>
+                                        <td style="width: 49%">${vacancyDetails.qualification.qualificationName}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Job Benefits</th>
+                                        <td>:</td>
+                                        <td>${not empty vacancyDetails.jobBenefits ? vacancyDetails.jobBenefits:'NA'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Travel Requirements</th>
+                                        <td>:</td>
+                                        <c:if test="${vacancyDetails.travelRequirements eq false}">
+                                         <td>No</td>
+                                        </c:if>
+                                         <c:if test="${vacancyDetails.travelRequirements eq true}">
+                                         <td>Yes</td>
+                                        </c:if>
+                                    </tr>
+                                    <tr>
+                                        <th>Skills Required</th>
+                                        <td>:</td>
+                                        <td><textarea title="${vacancyDetails.skillsRequired}" class="form-control" style="height:80px;" readonly>${vacancyDetails.skillsRequired}</textarea></td>
+                                    </tr>
+                                <tbody>
+                            </table>
+                        </div>
+                         <c:if test="${empty hiddenRegistrationNumber}">
+ 					<div class="row mt-3">
+                        <div class="col-md-12 text-center">
+                            <div class="form-group">
+                                <a href="${contextPath}/public/vacancyViewPage" class="btn btn-warning" style="margin-top: 0px;">Back</a>
+                            </div>
+                        </div>
+                    </div>
+                 </c:if>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+        <c:if test="${not empty hiddenRegistrationNumber}">
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <div class="card">
+                         <div class="card-header">
+                             <h5 class="card-title">Apply</h5>
+                         </div>
+                     <div class="card-body">
+                         <div class="row">
+                            <form action="${contextPath}/public/applyForVacancy" method="post" id="applyForVacancy" class="row" style="margin-left: 0px;" enctype="multipart/form-data">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                <input type="hidden" name="hiddenVacancyId" id="hiddenVacancyId" value="${vacancyDetails.vacancyId}" />
+                            <div class="row">
+                                 <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="col-md-12 required" for="organizationName">Registration number</label>
+                                        <div class="col-md-12">
+                                            <input type="text" class="form-control" id="hiddenRegistrationNumber" name="hiddenRegistrationNumber" value="${hiddenRegistrationNumber}" required readonly>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Employment Status -->
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="col-md-12 required" for="employmentStatus">Employment Status</label>
+                                            <div class="col-md-12">
+                                                <select class="form-control" id="employmentStatus" name="employmentStatus" required onchange="toggleFields()"  ${not empty map.employmentStatus ? 'disabled' : ''}>
+                                                    <option value="" disabled selected>Select Status</option>
+                                                    <option value="Employed" ${map.employmentStatus eq 'Employed' ?'selected':'' }>Employed</option>
+                                                    <option value="Unemployed" ${map.employmentStatus eq 'Unemployed' ?'selected':'' }>Unemployed</option>
+                                                    <option value="Fresher" ${map.employmentStatus eq 'Fresher' ?'selected':'' }>Fresher</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Current Organization Name -->
+                                    <div class="col-md-3" id="organizationNameContainer" style="display: none;">
+                                        <div class="form-group">
+                                            <label class="col-md-12 required" for="organizationName">Current Organization Name</label>
+                                            <div class="col-md-12">
+                                                <input type="text" class="form-control" id="organizationName" name="organizationName" required value="${map.organizationName}"  ${not empty map.organizationName ? 'readonly' : ''}>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Current Designation -->
+                                    <div class="col-md-3" id="designationContainer" style="display: none;">
+                                        <div class="form-group">
+                                            <label class="col-md-12 required" for="designation">Current Designation</label>
+                                            <div class="col-md-12">
+                                                <input type="text" class="form-control" id="designation" name="designation" required value="${map.currDesg}"  ${not empty map.currDesg ? 'readonly' : ''}>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Notice Period Duration -->
+                                    <div class="col-md-3" id="noticePeriodContainer" style="display: none;">
+                                        <div class="form-group">
+                                            <label class="col-md-12 required" for="noticePeriod">Notice Period Duration(In Days)</label>
+                                            <div class="col-md-12">
+                                                <input type="text" class="form-control NumbersOnly" id="noticePeriod" name="noticePeriod" required value="${map.noticePeriod}" maxlength="6"  ${not empty map.noticePeriod ? 'readonly' : ''}>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                <!-- Preferred Date -->
+                                    <div class="col-md-3"  id="preferredDateContainer" style="display: none;">
+                                        <div class="form-group">
+                                            <label class="col-md-12 required" for="preferredDate">Preferred Date</label>
+                                            <div class="col-md-12 ${empty map.preferredDate ? 'recdatepicker_con':''}">
+                                                <input type="text" class="form-control" id="preferredDate" name="preferredDate" readonly required  value="<fmt:formatDate value='${map.preferredDate}' pattern='dd/MM/yyyy' />"  ${not empty map.preferredDate ? 'readonly' : ''}>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                <!-- Upload Resume -->
+        <!-- 					        <div class="col-md-3"> -->
+        <!-- 					            <div class="form-group"> -->
+        <!-- 					                <label class="col-md-12 required" for="resume">Upload Your Resume (PDF only, Max 2MB)</label> -->
+        <!-- 					                <div class="col-md-12"> -->
+        <!-- 					                    <input type="file" class="form-control" id="resume" name="resume" required accept=".pdf"> -->
+        <!-- 					                </div> -->
+        <!-- 					            </div> -->
+        <!-- 					        </div> -->
+
+                            <!-- Dynamic Document Upload Fields -->
+                            <c:if test="${empty docList}">
+                                <c:if test="${not empty documentMapList}">
+                                    <c:forEach var="map" items="${documentMapList}" varStatus="status">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="col-md-12 " for="document${status.index}">
+                                                    ${map.document.name} (${map.docStatus}) <!-- Show status dynamically -->
+                                                </label>
+                                                <div class="col-md-12">
+                                                    <input type="hidden" name="documentNames[${status.index}]" value="${map.document.name}" />
+                                                    <input type="file" class="form-control" id="document${status.index}"
+                                                           name="documents[${status.index}]"
+                                                           data-docstatus="${map.docStatus}"
+                                                           data-docname="${map.document.name}"
+                                                           accept=".pdf">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </c:if>
+                            </c:if>
+                            <c:if test="${not empty docList}">
+                               <div class="col-md-12">
+                                  <div class="card">
+                                    <div class="card-header">
+                                      <h5 class="card-title">Uploaded Documents</h5>
+                                    </div>
+                                    <div class="card-body">
+                                            <table class="table table-bordered table-hover table-striped mb-none dataTable" id="datatable-svr" style="width:100%;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Sl. No</th>
+                                                                <th>Document Name</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <c:forEach items="${docList}" var="data" varStatus="status">
+                                                            <tr>
+                                                                <td>${status.count}</td>
+                                                                <td>${data.recruitmentDocument.name}</td>
+                                                                <td>
+                                                                    <button type="button" onclick="downloadDoc('${data.candidateVacancyMapping.candId.code}/${data.candidateVacancyMapping.candId.code}${data.recruitmentDocument.code }','${data.fileName}')"><i class="fa fa-download" style="font-size:20px"></i></button>
+                                                                </td>
+                                                            </tr>
+                                                        </c:forEach>
+                                                    </table>
+                                            </div>
+                                          </div>
+                                    </div>
+                            </c:if>
+
+
+
+                              </div>
+                                <!-- Submit and Cancel Buttons -->
+                                <div class="row mt-3">
+                                    <div class="col-md-12 text-center">
+                                        <div class="form-group">
+                                          <c:if test="${empty map}">
+                                            <button type="button" class="btn btn-success" onclick="submitForm()">Apply</button>
+                                          </c:if>
+                                           <c:if test="${not empty map}">
+                                             <button type="button" class="btn btn-info" disabled>Already Applied</button>
+                                          </c:if>
+                                            <a href="${contextPath}/public/vacancyViewPage" class="btn btn-danger" style="margin-top: 0px;">Back</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+        </c:if>
+<%--                  <c:if test="${empty hiddenRegistrationNumber}"> --%>
+<!--  					<div class="row mt-3"> -->
+<!--                         <div class="col-md-12 text-center"> -->
+<!--                             <div class="form-group"> -->
+<%--                                 <a href="${contextPath}/public/vacancyViewPage" class="btn btn-warning" style="margin-top: 0px;">Back</a> --%>
+<!--                             </div> -->
+<!--                         </div> -->
+<!--                     </div> -->
+<%--                  </c:if> --%>
+ <form action="${contextPath}/public/download-candidate-docs" method="POST" id="downloadDocument" target="_blank">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+    <input type="hidden" id="downFileName" name="fileName">
+    <input type="hidden" id="downCandidateCode" name="candidateCode">
+</form>
+ </div>
+</body>
+</html>
+
+
+<script>
+function submitForm() {
+    debugger;
+    const employmentStatus = document.getElementById("employmentStatus").value;
+    const orgName = document.getElementById("organizationName");
+    const designation = document.getElementById("designation");
+    const noticePeriod = document.getElementById("noticePeriod");
+    const preferredDate = document.getElementById("preferredDate");
+
+    // Validate Employment Status Fields
+    if (employmentStatus == '') {
+    	bootbox.alert("Employment status is mandatory.");
+        document.getElementById("employmentStatus").focus();
+        return false;
+    }
+
+    if (employmentStatus === "Employed") {
+        if (!orgName.value.trim()) {
+        	bootbox.alert("Current Organization Name is mandatory for employed status.");
+            orgName.focus();
+            return false;
+        }
+        if (!designation.value.trim()) {
+        	bootbox.alert("Current Designation is mandatory for employed status.");
+            designation.focus();
+            return false;
+        }
+        if (!noticePeriod.value.trim()) {
+        	bootbox.alert("Notice Period is mandatory for employed status.");
+            noticePeriod.focus();
+            return false;
+        }
+    } else if (employmentStatus === "Unemployed") {
+        if (!preferredDate.value.trim()) {
+        	bootbox.alert("Preferred Date is mandatory for unemployed status.");
+            preferredDate.focus();
+            return false;
+        }
+    }
+
+    // Validate Mandatory Documents and File Properties
+    let allDocumentsValid = true;
+    document.querySelectorAll("[data-docstatus='mandatory']").forEach(input => {
+        const file = input.files[0];
+
+        // Check if the file is uploaded (for mandatory docs)
+        if (!file) {
+            alert(`Please upload mandatory documents.`);
+            input.focus();
+            allDocumentsValid = false;
+            return false; // Stop iteration
+        }
+
+        // Validate file type (only PDF)
+        if (file.type !== "application/pdf") {
+            alert(`Only PDF files are allowed for ${input.dataset.docname}.`);
+            input.focus();
+            allDocumentsValid = false;
+            return false;
+        }
+
+        // Validate file size (max 1MB)
+        const fileSizeInMB = file.size / (1024 * 1024);
+        if (fileSizeInMB > 1) {
+            alert(`File size should not exceed 1MB for ${input.dataset.docname}.`);
+            input.focus();
+            allDocumentsValid = false;
+            return false;
+        }
+    });
+
+    if (!allDocumentsValid) return false; // Prevent form submission if any validation fails
+
+    const confirmMessage = "Are you sure you want to apply for this vacancy?";
+    if (confirm(confirmMessage)) {
+        document.getElementById("applyForVacancy").submit();
+    } else {
+        return false;
+    }
+}
+
+
+function toggleFields() {
+    const employmentStatus = document.getElementById("employmentStatus").value;
+    const orgContainer = document.getElementById("organizationNameContainer");
+    const desigContainer = document.getElementById("designationContainer");
+    const noticeContainer = document.getElementById("noticePeriodContainer");
+    const preferredDateContainer = document.getElementById("preferredDateContainer");
+
+    // Reset visibility
+    orgContainer.style.display = "none";
+    desigContainer.style.display = "none";
+    noticeContainer.style.display = "none";
+    preferredDateContainer.style.display = "none";
+
+    if (employmentStatus === "Employed") {
+        orgContainer.style.display = "block";
+        desigContainer.style.display = "block";
+        noticeContainer.style.display = "block";
+    } else if (employmentStatus === "Unemployed") {
+        preferredDateContainer.style.display = "block";
+    }
+}
+
+$(document).ready(function () {
+	debugger
+    $("#employmentStatus").trigger("change");
+});
+
+function downloadDoc(candidateCode,fileName){
+	$("#downCandidateCode").val(candidateCode);
+	$("#downFileName").val(fileName);
+	$("#downloadDocument").submit();
+	
+}
+</script>

@@ -1,0 +1,84 @@
+package com.aashdit.common.service;
+
+import java.util.List;
+
+import com.aashdit.common.dto.BankBranchMasterVo;
+import com.aashdit.common.dto.BankMasterVO;
+import com.aashdit.common.dto.VendorDocuments;
+import com.aashdit.common.model.AdditionalCost;
+import com.aashdit.common.model.AssetVendor;
+import com.aashdit.common.model.BankBranchMaster;
+import com.aashdit.common.model.BankMaster;
+import com.aashdit.common.model.Block;
+import com.aashdit.common.model.Category;
+import com.aashdit.common.model.District;
+import com.aashdit.common.model.FinancialYear;
+import com.aashdit.common.model.Gender;
+import com.aashdit.common.model.VendorType;
+import com.aashdit.framework.core.ServiceOutcome;
+import com.aashdit.umt3.dto.EntityIdAndUserLevel;
+import com.aashdit.umt3.model.OrganizationStructureHierarchy;
+import com.aashdit.umt3.model.Role;
+import com.aashdit.common.model.AdditionalCostMaster;
+
+public interface CommonService {
+
+	ServiceOutcome<List<District>> findDistrictListByStateId(Long stateId);
+
+
+	List<Block> getAllBlockList(Long distId);
+
+	List<District> getAllDistrictNameList();
+	
+	List<Gender> getAllGenderList();
+
+	ServiceOutcome<List<BankBranchMaster>> findByBankId(Long bankId);
+
+	ServiceOutcome<String> getIfscByBranchId(Long branchId);
+
+	ServiceOutcome<String> getConfigParameterValueFromParamCode(String paramCode);
+
+	List<FinancialYear> getAllFinancialYearList();
+
+	ServiceOutcome<List<BankMasterVO>> getAllBankList();
+
+	ServiceOutcome<List<BankBranchMasterVo>> getAllBranchByBankId(Long bankId);
+
+	BankBranchMaster getIfscCodeByBranchId(Long branchId);
+
+	ServiceOutcome<List<BankMaster>> getAllBankMasterList();
+
+
+	List<OrganizationStructureHierarchy> getLevelListByOrganization(String orgData);
+
+	List<EntityIdAndUserLevel> getActualLevelNameListByLevelCodeAndOrgId(String levelData);
+
+	List<Role> getRoleListByActualLevel(String actualLevelData);
+	
+	List<AdditionalCost> getAllActiveAdditionalCostList();
+	
+	List<VendorType> getAllActiveVendorType();
+
+	ServiceOutcome<AssetVendor> saveAndUpdateVendor(AssetVendor assetVendor, VendorDocuments vendorDoc);
+
+	AssetVendor getVendorById(Long vendorId);
+
+	List<AssetVendor> getAllActiveVendor();
+
+	AssetVendor deleteVendor(Long vendorId);
+	
+	ServiceOutcome<Category> saveAndUpdateCategory(Category category);
+
+	ServiceOutcome<List<Category>> getAllActiveCategory();
+
+	Category getCategoryById(Long categoryId);
+	
+	Category deleteCategory(Long categoryId);
+	
+	ServiceOutcome<List<Category>> getAllCategory();
+	
+	List<AssetVendor> getAllVendorNameAsc(Long id, String type);
+
+	List<AdditionalCostMaster> getAllActiveAdditionalCostMasterList();
+
+}

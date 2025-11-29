@@ -1,0 +1,66 @@
+package com.aashdit.prod.heads.hims.ipms.model;
+
+import javax.persistence.*;
+
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
+
+	@Data
+	@Entity
+	@Table(name = "t_history_candidate_life_cycle")
+	public class CandidateLifeCycleHistory implements Serializable {
+
+		
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7397836166788531917L;
+
+		@Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    @Column(name = "applicant_lyf_hst_id")
+	    private Long canLyfHstId;
+
+	    @Column(name = "action_taken")
+	    private String actionTaken;
+
+	    @Column(name = "life_cycle_id")
+	    private Long lifeCycleId;
+
+	    @Column(name = "action_taken_on")
+	    private Date actionTakenOn;
+
+	    @Column(name = "remark")
+	    private String remark;
+
+	    @Column(name = "tab_name")
+	    private String tabName;
+
+	    @Column(name = "document_name")
+	    private String documentName;
+
+	    @Column(name = "object_id")
+	    private Long objectId;
+
+	    @Column(name = "is_active")
+	    private Boolean isActive = true;
+
+		@Column(name ="apply_id")
+		private Long applyId;
+
+		@Column(name = "created_by")
+	    private Long createdBy;
+	    
+	    @Column(name = "last_updated_by")
+	    private Long lastUpdatedBy;
+	    
+	    @Column(name = "created_on")
+	    private Date createdOn;
+	    
+	    @Column(name = "last_updated_On")
+	    private Date lastUpdatedOn;
+		
+}

@@ -1,0 +1,75 @@
+package com.aashdit.prod.heads.hims.umt.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PostLoad;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import com.aashdit.prod.heads.hims.umt.specs.ParentObjectId;
+import com.aashdit.prod.heads.hims.umt.specs.ParentObjectLevel;
+import com.aashdit.prod.heads.hims.umt.utils.NewAuditable;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@DynamicInsert
+@DynamicUpdate
+@Entity
+@Table(name="t_umt_org_structure_hierarchy_entity_map_multi", schema = "public")
+public class HierarchyEntityMapMultiple extends NewAuditable<Long> implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4225796378784615689L;
+	
+	@Id 
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "org_structure_hierarchy_map_id")
+	private HierarchyEntityMap hierarchyEntityMap;
+
+
+	@ParentObjectId
+	@Column(name = "parent_object_id")
+	private Long parentObjectId;
+
+	@ParentObjectLevel
+	@Column(name = "parent_object_type")
+	private String parentObjectType;
+
+	@Column(name = "parent_object_name")
+	private String parentObjectName;
+
+	@Transient
+	private String parentObjectIdAndType;
+
+	@PostLoad
+	private void onLoad() {
+		if(parentObjectId!=null && parentObjectType!=null) {
+			parentObjectIdAndType = parentObjectId+"##"+parentObjectType;
+		}
+	}
+
+}

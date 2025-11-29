@@ -1,0 +1,23 @@
+var options = {
+          series: [44, 55, 13],
+          chart: {
+          width: 287,
+          type: 'pie',
+        },
+        colors: ['#FCC100', '#EE7D2F', '#EF5350'],
+        labels: ['mark 1', 'mark 2', 'mark 3'],
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+        };
+
+        var chart = new ApexCharts(document.querySelector("#mark"), options);
+        chart.render();

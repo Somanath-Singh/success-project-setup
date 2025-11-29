@@ -1,0 +1,613 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="blockIdd" value="${facilityDetailsUpdate.facFacilities.blockId.blockId}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}"/>
+ <style>
+.frezz{
+	pointer-events: none;
+}
+table .filter-option-inner-inner {
+white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 120px;
+    }
+
+</style>
+
+
+<div class="breadcrumb_conatiner">
+              <div class="col-md-6">
+                <h4 class="change-color">Facilities Detail</h4>
+              </div>
+              <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+               <ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="${contextPath}/home">Home</a></li>
+					<li class="breadcrumb-item active" aria-current="page">Add Facilities Details</li>
+				</ol>
+                </nav>
+              </div>
+            </div>
+            
+            
+
+<form action="${contextPath}/facilityManagement/saveFacilitiesDetails" method="post" id="saveFormId" class="row" enctype="multipart/form-data">
+		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+		<input type="hidden" name="facVoId" value="${facilityDetailsUpdate.facFacilities.facilitiesId}" id="facilitiesId" />
+<%-- 	<div class="row">
+		<div
+			class="col-md-12 d-flex align-items-center justify-content-between">
+			<h5>Facilities Details</h5>
+			<nav aria-label="breadcrumb" style="float: right;">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="${contextPath}/home">Home</a></li>
+					<li class="breadcrumb-item active" aria-current="page">Add Facilities Details</li>
+				</ol>
+			</nav>
+		</div>
+	</div> --%>
+	
+	
+	
+
+<div class="col-md-12">
+			<div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Add Facilities Details</h5>
+            </div>
+        <div class="card-body">
+          
+ <div class="row">
+	
+
+		<div class="form-group col-md-2" id="buildingDivId">
+			<label class="required">Building:</label>
+			<select class="form-select" id="buildingId" name="building" onchange="getBlockListByBuildingId(this.value);validatetheFields();">
+				<option value="0">- Select -</option>
+				<c:forEach items="${buildingList}" var="building">
+					<option value="${building.buildingId}" ${building.buildingId eq facilityDetailsUpdate.facFacilities.building ? 'selected' : '' }>${building.buildingName}</option>
+				</c:forEach>
+			</select>
+		</div>
+
+		<div class="form-group col-md-2" id="blockDivId">
+			<label class="col-md-12 smallInput required" for="block">Block:</label>
+				<select class="form-select" id="blockId" name="blockId.blockId" onchange="getFloorByBlockId(this.value);validatetheFields();">
+					<option value="0">- Select -</option>
+				</select>
+		</div>
+
+		<div class="form-group col-md-2" id="floorDivId">
+			<label class="">Floor Number:</label> <input type="text" class="form-control form-control-sm NumbersOnly WithOutZero" id="floorNoId" name="floorNo" maxLength="4"
+				onchange="validatetheFields(this.value);" value="${facilityDetailsUpdate.facFacilities.floorNo}" readonly>
+		</div>
+
+		<div class="form-group col-md-2" id="roomDivId">
+			<label class="">No of Rooms:</label> <input type="text" class="form-control form-control-sm" id="noOfRoomsId" name="noOfRooms" maxLength="4"
+				 value="${facilityDetailsUpdate.facFacilities.noOfRooms}">
+		</div>
+</div>
+
+			<div class="tableId1_con" style="padding-top: 15px;">
+				<div class="">
+					<table class="table table-bordered mb-none" id="tableId1">
+						<thead>
+							<tr>
+								<th>Facility</th>
+								<th>Facility Type</th>
+								<th>Room No</th>
+								<c:if test="${not empty facilityDetailsUpdate.facDetails}">
+								<th>GeoTag Document</th>
+								</c:if>
+								<c:if test="${not empty facilityDetailsUpdate.facDetails}">
+								<th>Longitude</th>
+								<th>Latitude</th>
+								</c:if>
+								<th style="width: 2%; text-align: center;">
+									<button type="button" class="add-button btn btn-xs btn-success addBtn">
+									<i class="fa fa-plus" aria-hidden="true"></i></button>
+								</th>
+							</tr>
+						</thead>
+
+				<tbody class="appendBox">
+					<c:if test="${empty facilityDetailsUpdate.facDetails}">
+			    	<tr class="append-box">
+						<td> 
+				            <div class="form-group col-md-12">
+								<select class="form-select form-control validIdIndex" id="facilityId0" name="facilitiesVo[0].facilityId" onchange="getIndoorOrOutdoorByFacilityId(this)">
+									<option value="0">- Select -</option>
+									<c:forEach items="${facilityList}" var="facility">
+				                		<option value="${facility.facilityId}">${facility.facilityName}</option>
+			                		</c:forEach>
+								</select>
+							</div>
+						</td>
+			          	<td>
+							<div class="col-md-12">
+								<div class="form-group">
+									<div class="col-md-12">
+										<input type="text" id="inOrOut0" class="form-control form-control-sm validAreaIndex" value="" name="facilitiesVo[0].indoorOrOutdoor" readonly>
+									</div>
+								</div>
+							</div>
+						</td>
+						
+						<td>
+							<div class="col-md-12">
+								<div class="form-group">
+									<div class="col-md-12">
+										<input type="text" name="facilitiesVo[0].remarks" class="form-control form-control-sm validMokIndex NumbersOnly WithOutZero" id="remarks0" readonly maxlength="4">
+									</div>
+								</div>
+							</div>
+						</td>
+						
+			          	<!-- <td>
+							<div class="col-md-12">
+								<div class="form-group">
+									<div class="col-md-12">
+										<input type="file" name="facilitiesVo[0].documentName" id="file0" class="form-control form-control-sm validFacIndex" value="" disabled>
+									</div>
+								</div>
+							</div>
+						</td> -->
+						
+			            <td style="text-align: center;">
+			               <button type="button" class="add-button btn btn-xs btn-danger removeDiv"><i class="fa fa-minus" aria-hidden="true"></i></button>
+			            </td>
+					</tr>
+					</c:if>
+					
+					<!-- ----------------------------------------------------------------------------------------------------------------------------------------- -->
+					
+					<c:if test="${facilityDetailsUpdate.facDetails.size() > 0}">
+						<c:forEach items="${facilityDetailsUpdate.facDetails}" var="fd" varStatus="count">
+										<tr class="append-box">
+										<input type="hidden" class="validMunIndex" name="facilitiesVo[${count.index}].facilityDtlId" id="facilityDtlId${count.index}" value="${fd.facilityDetailId}">
+									<td> 
+							            <div class="form-group col-md-12">
+											<select class="form-select form-control validIdIndex" id="facilityId${count.index}" name="facilitiesVo[${count.index}].facilityId" onchange="getIndoorOrOutdoorByFacilityId(this)">
+												<option value="0">- Select -</option>
+												<c:forEach items="${facilityList}" var="facility">
+							                		<option value="${facility.facilityId}" ${facility.facilityId eq fd.facilityId.facilityId ? 'selected' : ''}>${facility.facilityName}</option>
+						                		</c:forEach>
+											</select>
+										</div>
+									</td>
+						          	<td>
+										<div class="col-md-12">
+											<div class="form-group">
+												<div class="col-md-12">
+													<input type="text" id="inOrOut${count.index}" class="form-control form-control-sm validAreaIndex" value="${fd.facilityId.facilityType.facilityTypeName} (${fd.facilityId.facilityType.typesForFacilityId.facTypeName})" name="facilitiesVo[${count.index}].indoorOrOutdoor" readonly>
+												</div>
+											</div>
+										</div>
+									</td>
+									
+									<td>
+										<div class="col-md-12">
+											<div class="form-group">
+												<div class="col-md-12">
+													<input type="text" name="facilitiesVo[${count.index}].remarks" class="form-control form-control-sm validMokIndex NumbersOnly WithOutZero" id="remarks${count.index}" value="${fd.roomNo}" ${fd.facilityId.facilityType.typesForFacilityId.facTypeName eq 'OUTDOOR' ? 'readonly':''} maxlength="4">
+												</div>
+											</div>
+										</div>
+									</td>
+									
+						          	<td>
+										<div class="col-md-12">
+											<div class="form-group" style="position:relative">
+												<div class="col-md-12">
+												<c:if test="${empty fd.uploadDocumentPath}">
+												No GeoTaged yet.
+												</c:if>
+													<%-- <input type="file" name="facilitiesVo[${count.index}].documentName" id="file${count.index}" class="form-control form-control-sm validFacIndex" value="${fd.uploadDocumentName}"> --%>
+													<c:if test="${not empty fd.uploadDocumentPath}"><a href="${contextPath}/facilityManagement/viewImages/${fd.uploadDocumentPath}" target="_blank" class="fa fa-eye" aria-hidden="true"></a></c:if>
+												</div>
+											</div>
+										</div>
+									</td>
+									
+									<c:if test="${not empty facilityDetailsUpdate.facDetails}">
+									<td>
+										<div class="col-md-12">
+											<div class="form-group">
+												<div class="col-md-12">
+												<c:if test="${not empty fd.longitude}">
+												<input type="text" class="form-control form-control-sm" value="${fd.longitude}" readonly>
+												</c:if>
+												<c:if test="${empty fd.longitude}">
+												No GeoTaged yet.
+												</c:if>
+												</div>
+											</div>
+										</div>
+									</td>
+									
+									<td>
+										<div class="col-md-12">
+											<div class="form-group">
+												<div class="col-md-12">
+												<c:if test="${not empty fd.latitude}">
+												<input type="text" class="form-control form-control-sm" value="${fd.latitude}" readonly>
+												</c:if>
+												<c:if test="${empty fd.latitude}">
+												No GeoTaged yet.
+												</c:if>
+												</div>
+											</div>
+										</div>
+									</td>
+									</c:if>
+									
+						            <td style="text-align: center;">
+						               <button type="button" class="add-button btn btn-xs btn-danger removeDiv"><i class="fa fa-minus" aria-hidden="true"></i></button>
+						            </td>
+								</tr>
+						</c:forEach>
+					</c:if>
+				</tbody>
+			</table>
+				</div>
+			</div>
+		
+				<div class="col-md-12 text-center mb-3">
+			<button type="button" class="btn btn-submit searchdiv"
+				style="margin-left: 8px;"
+				onclick="submitForm('${empty facilityDetailsUpdate.facVoId ? 'SAVE' : 'UPDATE'}')"
+				class="btn btn-submit searchdiv">${empty facilityDetailsUpdate.facVoId ? 'Submit' : 'Update'}</button>
+			<button type="button" class="btn btn-back searchdiv" onclick="history.back()">Back</button>
+			
+		</div>
+			</div>			
+			</div>
+				</div>
+
+	
+
+	</form>
+
+
+<script>
+$( document ).ready(function() {
+	if($("#buildingId").val() != 0){
+		getBlockListByBuildingId($("#buildingId").val());
+	}
+	if('${facilityDetailsUpdate.facFacilities.building }' != ''){
+		$('#buildingId').addClass("frezz");
+	}if('${facilityDetailsUpdate.facFacilities.blockId.blockId}' != ''){
+		$('#blockId').addClass("frezz");
+	}if('${facilityDetailsUpdate.facFacilities.floorNo}' != ''){
+		$('#floorNoId').addClass("frezz");
+	}if('${facilityDetailsUpdate.facFacilities.noOfRooms}' != ''){
+		$('#noOfRoomsId').addClass("frezz");
+	}
+});
+
+
+function getBlockListByBuildingId(buildingId) {
+	  $.ajax({
+	    url: "${contextPath}/facilityManagement/validateBlockListByBuildingId",
+	    type: "GET",
+	    data: {
+	      "buildingId": buildingId
+	    },
+	    success: function(response) {
+	      var data = JSON.parse(response);
+	      var html = "<option value='0'>- Select -</option>";
+	      var curBlk = parseFloat("${facilityDetailsUpdate.facFacilities.blockId.blockId}");
+	      $.each(data, function(index, value) {
+	    	  var selected = curBlk == value.blockId ? 'selected' : '';
+	        html = html + '<option value="' + value.blockId + '"'+selected+'>' + value.blockName + '</option>';
+	      });
+	      $('#blockId').empty().append(html);
+	    },
+	    error: function(error) {
+	      bootbox.alert("Block List not found");
+	    }
+	  });
+	}
+
+function getFloorByBlockId(id) {
+	 $.ajax({
+		    url: "${contextPath}/facilityManagement/getFloorByBlockId",
+		    type: "GET",
+		    async: false,
+		    data: {
+		      "blockId": id
+		    },
+		    success: function(response) {
+		    	var data = JSON.parse(response);
+				      $('#floorNoId').val(data.floor);
+		    },
+		    error: function(error) {
+		      bootbox.alert("Floor not found.");
+		    }
+		  });
+// 	 validatetheFields();
+}
+
+function submitForm(status) {
+	if ($("#buildingId").val() == "0") {
+        bootbox.alert("Please select builing.");
+        return false;
+    } else if($("#blockId").val() == "0"){
+		bootbox.alert('Please select block.');
+	} else if (!validateUniqueValuesOfFacilityAndRoomNo()) {
+    	bootbox.alert('Room No cannot be duplicate');
+        event.preventDefault();
+        return false;
+    } else if(!validateExistingFields()){
+		bootbox.alert('Please fill in all the required fields.');
+	} else { var message = status === 'SAVE' ? 'save' : 'update';
+	 bootbox.confirm("Do you want to "+message+" facilities detials ?", function (result) {
+            if (result) {
+                showLoader();
+                $("#saveFormId").submit();
+            }
+        });
+    }
+}
+
+
+ function validatetheFields() {
+    var facilityId = $("#facilitiesId").val();
+    var buildingId = $("#buildingId").val();
+    var blockId = $("#blockId").val();
+    var floorNoId = $("#floorNoId").val();
+    var noOfRoomsId = $("#noOfRoomsId").val();
+	
+    if(buildingId != '' && buildingId != 0 && blockId != '' && blockId != 0 && floorNoId != '' && floorNoId != 0){
+    	$.ajax({
+            type: "get",
+            url: "${contextPath}/facilityManagement/duplicatesCheckForFields",
+            data: {
+                "facilitiesId": facilityId,
+                "building": buildingId,
+                "blockId": blockId,
+                "floorNo": floorNoId,
+                "noOfRooms": noOfRoomsId
+            },
+            success: function (response) {
+                var data = response;
+                if (data === 'Yes') {
+                    bootbox.alert("Already facilities have been Assigned.");
+
+                    $("#buildingId").val(0);
+                    $("#blockId").val(0);
+                    $("#floorNoId").val('');
+                    $("#noOfRoomsId").val('');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX request failed with status: " + status + "\nError: " + error);
+            }
+        });
+    }
+}
+
+
+function getIndoorOrOutdoorByFacilityId(value){
+	var rowNo = value.id.split('facilityId')[1];
+	showLoader();
+		if(value.value != 0){
+			$.get(window.ctxPath+'/facilityManagement/getIndoorOrOutdoorByFacilityId', {facilityId: value.value}, function(data) {
+				var resp = data;
+				if(resp.length > 0){
+					$("#inOrOut"+rowNo).val(resp);
+					if(resp.split('(')[1].split(')')[0] == 'OUTDOOR'){
+						$("#remarks"+rowNo).attr('readonly', true).val('');
+					} else {
+						$("#remarks"+rowNo).attr('readonly', false);
+					}
+				}
+			}).fail(function(xhr, status, error) {
+			    console.error("Something went wrong.");
+			});
+		} else {
+			$("#inOrOut"+rowNo).val('');
+			$("#remarks"+rowNo).attr('readonly', true).val('');
+		}
+		hideLoader();
+}
+
+
+var count = '${empty facilityDetailsUpdate.facDetails}' == 'true' ? 1 : parseFloat('${facilityDetailsUpdate.facDetails.size()}');
+$(function(){
+	$('.addBtn').click(function(){
+		
+		var html = '<tr class="append-box">'+
+			'<td> '+
+		'<div class="form-group col-md-12">'+
+			'<select class="form-select form-control validIdIndex" id="facilityId'+count+'" name="facilitiesVo['+count+'].facilityId" onchange="getIndoorOrOutdoorByFacilityId(this)">'+
+				'<option value="0">- Select -</option>'+
+				'<c:forEach items="${facilityList}" var="facility">'+
+        			'<option value="${facility.facilityId}">${facility.facilityName}</option>'+
+    			'</c:forEach>'+
+			'</select>'+
+  		'</div>'+
+  	'</td>'+
+  	'<td>'+
+		'<div class="col-md-12">'+
+			'<div class="form-group">'+
+				'<div class="col-md-12">'+
+					'<input type="text" id="inOrOut'+count+'" class="form-control form-control-sm validAreaIndex" value="" name="facilitiesVo['+count+'].indoorOrOutdoor" readonly>'+
+				'</div>'+
+			'</div>'+
+		'</div>'+
+	'</td>'+
+	'<td>'+
+	'<div class="col-md-12">'+
+		'<div class="form-group">'+
+			'<div class="col-md-12">'+
+				'<input type="text" name="facilitiesVo['+count+'].remarks" class="form-control form-control-sm validMokIndex NumbersOnly WithOutZero"  id="remarks'+count+'" readonly maxlength="4">'+
+			'</div>'+
+		'</div>'+
+	'</div>'+
+	'</td>'+
+  	'<td>'+
+		'<div class="col-md-12">'+
+			'<div class="form-group">'+
+				'<div class="col-md-12">'+
+					'<input type="file"  class="form-control form-control-sm" value="No GeoTaged yet." disabled>'+
+				'</div>'+
+			'</div>'+
+		'</div>'+
+	'</td>'+
+	'<td>'+
+	'<div class="col-md-12">'+
+		'<div class="form-group">'+
+			'<div class="col-md-12">'+
+				'<input type="text" class="form-control form-control-sm" value="No GeoTaged yet." readonly>'+
+			'</div>'+
+		'</div>'+
+	'</div>'+
+	'</td>'+
+	'<td>'+
+	'<div class="col-md-12">'+
+		'<div class="form-group">'+
+			'<div class="col-md-12">'+
+				'<input type="text" class="form-control form-control-sm" value="No GeoTaged yet." readonly>'+
+			'</div>'+
+		'</div>'+
+	'</div>'+
+	'</td>'+
+	'<c:if test="${empty mainData.mouDetails}">'+
+        '<td style="text-align: center;">'+
+           '<button type="button" class="add-button btn btn-xs btn-danger removeDiv"><i class="fa fa-minus" aria-hidden="true"></i></button>'+
+        '</td>'+
+	'</c:if>'+
+'</tr>';
+  
+
+$.getScript('${contextPath}/assets/appJs/validation/common-utils.js');
+
+		$(".appendBox").append(html);
+		count++;
+	});
+});
+
+$(document).on('click','.removeDiv',function(){
+	  if($('.removeDiv').length > 1){
+		  $(this).closest('.append-box').remove();
+		  count--;
+		  renumberRows();
+	  }
+});
+
+function renumberRows() {
+    var numIdInputs = $(".validIdIndex").length;
+    var numAreaInputs = $(".validAreaIndex").length;
+    var numFacInputs=  $(".validFacIndex").length;
+    var numMokInputs=  $(".validMokIndex").length;
+    var numMunInputs=  $(".validMunIndex").length;
+    
+    for (var i = 0; i < numIdInputs; i++) {
+        var input = $(".validIdIndex")[i];
+        $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+        $(input).attr("name", "facilitiesVo["+i+"].facilityId");
+    }
+    
+    for (var i = 0; i < numAreaInputs; i++) {
+        var input = $(".validAreaIndex")[i];
+         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+        $(input).attr("name", "facilitiesVo["+i+"].indoorOrOutdoor");
+    }
+
+    for (var i = 0; i < numFacInputs; i++) {
+        var input = $(".validFacIndex")[i];
+         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+        $(input).attr("name", "facilitiesVo["+i+"].documentName");
+    }
+
+    for (var i = 0; i < numMokInputs; i++) {
+        var input = $(".validMokIndex")[i];
+         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+        $(input).attr("name", "facilitiesVo["+i+"].remarks");
+    }
+    for (var i = 0; i < numMunInputs; i++) {
+        var input = $(".validMunIndex")[i];
+         $(input).attr("id", $(input).attr("id").replace(/\d+$/, i));
+        $(input).attr("name", "facilitiesVo["+i+"].facilityDtlId");
+    }
+
+}
+
+
+function chkDuplicateEntry(value){
+	var rowNo = value.id.split('facilityId')[1];
+	showLoader();
+		if(value.value != 0){
+			$.get(window.ctxPath+'/facilityManagement/getIndoorOrOutdoorByFacilityId', {facilityId: value.value}, function(data) {
+				var resp = data;
+				if(resp.length > 0){
+					$("#inOrOut"+rowNo).val(resp);
+					if(resp.includes('OUTDOOR')){
+						$("#remarks"+rowNo).attr('readonly', true).val('');
+					} else {
+						$("#remarks"+rowNo).attr('readonly', false);
+					}
+				}
+			}).fail(function(xhr, status, error) {
+			    console.error("Something went wrong.");
+			});
+		} else {
+			$("#inOrOut"+rowNo).val('');
+			$("#remarks"+rowNo).attr('readonly', true).val('');
+		}
+		hideLoader();
+}
+
+
+
+    function validateUniqueValuesOfFacilityAndRoomNo() {
+        var isValid = true;
+        var seenValues = {};
+        $('.append-box').each(function(index) {
+            var remarks = $(this).find('.validMokIndex').val();
+            if(remarks.trim() == ''){
+            	seenValues[remarks] = false;
+            }
+            if (seenValues[remarks]) {
+                isValid = false;
+                return false;
+            }
+            seenValues[remarks] = true;
+        });
+        return isValid;
+    }
+    
+    
+    function validateExistingFields() {
+        var isValid = true;
+        $('.append-box').each(function(index) {
+            if ($(this).find('.validIdIndex').val() == 0) {
+                isValid = false;
+                $(this).find('.validIdIndex').addClass("is-invalid");
+            } else if($(this).find('.validMokIndex').val() == '' && $(this).find('.validAreaIndex').val().includes('INDOOR')){
+            	isValid = false;
+            	$(this).find('.validMokIndex').addClass("is-invalid");
+            } else {
+            	$('.validIdIndex, .validMokIndex').each(function() {
+            		if($(this).val() != '' || $(this).val() != 0){
+            			$(this).removeClass("is-invalid");
+            		}
+            	});
+            }
+        });
+        return isValid;
+    }
+    
+</script>
+
+

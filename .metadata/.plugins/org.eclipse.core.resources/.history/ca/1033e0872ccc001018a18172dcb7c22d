@@ -1,0 +1,106 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+		
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/vendor/bootbox5/bootbox.js"></script>
+<script src="${contextPath}/assets/vendor/bootbox5/bootbox.min.js"></script>
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<style>
+.but-al {
+	margin-top: 27px !important;
+}
+
+table.dataTable tbody th, table.dataTable tbody td {
+	padding: 4px 10px !important;
+	text-align: left
+}
+</style>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Work Order List</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa-solid fa-house"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Work Order List</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+				<h4 class="card-title">Work Order List</h4>
+			</div>
+			<div class="card-body">
+	      		<div class="table-responsive">
+					<table class="table table-bordered exportbtn">
+						<thead>
+							<tr>
+								<th class="text-center" style="min-width: 60px;">Sl No</th>
+								<th>Work Order Name</th>
+								<th>Work Order Code</th>
+								<th>Amount</th>
+								<th>Agency Name</th>
+								<th>Start Date</th>
+								<th>End Date</th>
+								<th class="text-center" style="min-width: 100px;">Action</th>										
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach items="${workOrderList}" var="workOrder" varStatus="count">
+								<tr>
+									<td class="text-center">${count.count}</td>
+									<td>${workOrder.workOrderName}</td>
+									<td>${workOrder.workOrderCode}</td>
+									<td class="text-end">${workOrder.workOrderAmt}</td>
+									<td>${workOrder.agencyName}</td>
+									<td>
+										<fmt:formatDate value="${workOrder.startDate}" pattern="dd-MM-yyyy"/>
+									</td>
+									<td>
+										<fmt:formatDate value="${workOrder.endDate}" pattern="dd-MM-yyyy"/>
+									</td>
+									<td class="text-center">
+										<button type="button" class="btn btn-primary" onclick="editWorkOrder('${workOrder.workOrderId}')" title="Edit">
+											<i class='fa fa-pencil'></i>
+										</button>
+									</td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+	      	</div>
+		</div>
+  	 </div>
+  </div>
+
+
+<form action="${contextPath}/wrk/edit" method="Post" id="editForm">
+	<input type="hidden" id="editCipherText" name="cipherText">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" name="workOrderId" id="workOrderEditId" />
+</form>
+
+
+<script>
+
+function editWorkOrder(id) {
+	bootbox.confirm("Do You Want To edit the work order?", function (result) {
+	    	 if (result) {
+		    	$("#workOrderEditId").val(id);
+		   	  	showLoader();
+		   	  	var bizContent = $("#editForm").serializeArray();
+		   	  	$("#editCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+		   	  	$("#editForm").submit();
+	    	 }
+	   	 });
+}
+
+</script>

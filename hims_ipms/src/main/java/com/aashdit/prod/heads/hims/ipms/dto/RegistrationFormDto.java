@@ -1,0 +1,28 @@
+package com.aashdit.prod.heads.hims.ipms.dto;
+
+
+import lombok.Data;
+
+import java.util.List;
+
+import com.aashdit.prod.heads.hims.ipms.model.*;
+
+@Data
+public class RegistrationFormDto {
+	private Long registrationId;
+	private String registrationCode;
+	private String firstName;
+	private String lastName;
+	private String dob;
+	private Long gender;
+	private String fatherName;
+	private String motherName;
+	private String Status;
+
+	private String contact;
+	private String email;
+	private String password;
+	private List<RegistrationForm> regFormList;
+	private RegistrationForm regForm;
+
+}

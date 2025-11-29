@@ -1,0 +1,1017 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<%-- <script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script> --%>
+<!-- <script src="resources/javascripts/common.js"></script>  -->
+<%-- <script src="${contextPath}/assets/appJs/validation/party-master.js"></script> --%>
+  <style>
+
+    </style>
+
+<script>
+$(function()
+{
+	$('#datatable-default').dataTable({
+ 		"bSort": false,
+ 		"autoWidth": false
+	});
+})
+</script>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Party Details</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Party Details</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+
+			
+			<!-- ##############################################  END : PARTY LIST   ############################################ -->
+
+			<!-- ##############################################  START : PARTY DETAILS (UN-USED)   ############################################ -->
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0 card-title" id="headingOne"><spring:message code="LABEL.PARTYREQUISITION.REQUEST.DETAIL" /></h4>
+            </div>
+            <div class="card-body" id="partyDtlsInRequest">
+						<form class="form-horizontal form-bordered" id="partyDetails" action="${contextPath}/mst/partyDetails.htm" method="post">
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+							<input type="hidden" id="cipherTextList" name="cipherTextList" value="">
+							<input type="hidden" id="cipherText" name="cipherText" value=""> 
+							<input type="hidden" name="partyId" id="partyIdChk" value="${partyDetail.partyId}"/>
+							<div class="row">
+							
+								<div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.PARTYTYPE" />${partyDetail.partyType.partyTypeId} :</label>
+										<div class="col-md-12">
+										<select class="form-select required" name="partyTypeId" id="partyTypeNameEditParty" data-plugin-selectTwo 
+										        onchange="getPartyCodeBasedOnParamseditParty(),checkDuplicatePartyType(this.value);">
+										    <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+										   <c:forEach items="${partyTypeList}" var="partyType">
+											    <option value="${partyType.partyTypeId}" ${partyType.partyTypeId eq partyDetail.partyType.partyTypeId ? 'selected="selected"' : ''}>
+											        ${partyType.partyType} (${partyType.partyCodePrefix})
+											    </option>
+											</c:forEach>
+
+										</select>
+										
+											
+											
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-5">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.PARTYNAME"/> :</label>
+										<div class="col-md-12">
+											 <input type="text" class="form-control required" name="partyName" id="partyNameReq" value="${partyDetail.partyName}" maxlength="100" onchange="validateNameAndCode(this),checkDuplicatePartyType(this.value);">
+										</div>
+									</div>
+								</div>
+				
+								<div class="col-sm-4">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.PARTYCODE"/> :</label>
+										<div class="col-md-12">
+											 <input type="text" class="form-control" name="partyCode" id="partyCodeReq" value="${partyDetail.partyCode}" onchange="validateNameAndCode(this)" readonly="readonly"> 
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr>
+							<h5 class="card-title mb-2">Party Details :</h5>
+							<div class="row">
+								<div class="col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.PARTYPROMOTERNMAME"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control" name="promoterName" id="promoterNameReq" value="${partyDetail.promoterName}" maxlength="100" onblur="validateName(this)"> 
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault"><spring:message code="COMMON.LABEL.ADDRESS"/> :</label>
+										<div class="col-md-12">
+											<textarea rows="" cols="" class="form-control" name="address" id="addressReq" style="height: 28px;" onchange="validate(this)" maxlength="200" onblur="validateAddress(this)">${partyDetail.address}</textarea>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault">City :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control" name="cityName" id="cityIdReq" value="${partyDetail.cityName}" >
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault"><spring:message code="COMMON.LABEL.STATE"/> :</label>
+										<div class="col-md-12">
+											 <select class="form-control form-select"name="stateId" data-plugin-selectTwo id="stateIdReq" onchange="getCityList();">
+												<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+												<c:forEach items="${stateList}" var="state">
+													<option value="${state.stateId}" ${state.stateId eq partyDetail.stateMaster.stateId ? 'selected="selected"' : ''}>${state.stateName}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.PINCODE"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control numeric" name="pincode" id="pincodeReq" value="${partyDetail.pincode}" maxlength="6" onkeypress="return isNumber(event);">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 col-sm-3">
+								<div class="form-group">
+									<label class="col-md-12 required" for="inputDefault"><spring:message code="COMMON.LABEL.CONTACTNO"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control mobile-number" name="contactNo" id="contactNoReq" maxlength="12" value="${partyDetail.contactNo}" onkeypress="return isNumber(event);">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.CONTACTPERSON"/> :</label>
+											<div class="col-md-12">
+											<input type="text" class="form-control " name="contactPerson" id="contactPersonReq" value="${partyDetail.contactPerson}" maxlength="100" onblur="validateName(this)">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault"><spring:message code="COMMON.LABEL.FAXNO"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control" name="faxNo" id="faxNoReq" value="${partyDetail.faxNo}" maxlength="15" onkeypress="return isNumber(event);">
+										 </div>
+									 </div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault"><spring:message code="COMMON.LABEL.MOBNO"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control mobile-number" name="mobileNo" id="mobileNoReq" value="${partyDetail.mobileNo}" maxlength="10" onkeypress="return isNumber(event);" onchange="//validateMobileNo(this);">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.PARTYPROMOTEREMAILID"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control email" name="emailId" id="emailIdReq" value="${partyDetail.emailId}" onchange="validateEmail(this)">
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr>
+							<h5 class="card-title mb-2">Bank Details :</h5>
+							
+		        <table class="table table-bordered">
+					    <thead>
+					        <tr>
+					           <th class="required"><spring:message code="LABEL.PARTYDETAILS.BANKACNO"/></th>
+					            <th class="required"><spring:message code="LABEL.PARTYDETAILS.BANKNAME"/></th>
+					            <th class="required"><spring:message code="LABEL.PARTYDETAILS.BANKBRANCH"/></th>
+					            <th class="required"><spring:message code="LABEL.PARTYDETAILS.IFSC"/></th>
+					            <th style="width:5%; text-align: center;">
+					                <button type="button" class="add-button btn btn-xs btn-success" onclick="addRow()" style="padding: 6px 8px 6px 8px;"><i class="fa fa-plus" aria-hidden="true"></i></button>
+					            </th>
+					        </tr>
+					    </thead>
+					    
+					    <c:if test="${not empty partyBankDetailsdata }">
+					    <tbody id="tbd">
+					    <c:forEach items="${partyBankDetailsdata}" var="item" varStatus="status">
+					        <tr>
+					       
+					           <td>
+					                  <div class="col-md-12 col-sm-12">
+									<div class="form-group">
+										<div class="col-md-12">
+										<input type="hidden" class="form-control"  name="bankdetailsDto[${status.count - 1}].partyDetailsBankId" id="partyDetailsBankId${status.count - 1}"  value="${item.partyBankId }">
+											<input type="text" class="form-control numeric"  name="bankdetailsDto[${status.count - 1}].bankAcNo" id="bankAcNoReq${status.count - 1}" value="${item.bankAcNo}" onchange="validateAllDetails1(this.value,'BANKACNO');" >
+										</div>
+									</div>
+								</div>
+					           
+					           </td>
+					        	 <td>
+					               <div class="form-group">
+										<div class="col-md-12">
+											<select class="form-control form-select" name="bankdetailsDto[${status.count - 1}].bankId" id="bankNameReq${status.count - 1}" data-plugin-selectTwo onchange="getBankBranchList(${status.count - 1},'0');">
+												<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+												<c:forEach items="${bankList}" var="bank">
+													<option value="${bank.bankId}"  ${bank.bankId eq item.bankMaster.bankId ? 'selected="selected"' : ''}>${bank.bankName}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+					            </td>
+					            <td>
+									<div class="form-group">
+											<div class="col-md-12">
+											<select id="bankBranchIdReq${status.count - 1}" name="bankdetailsDto[${status.count - 1}].bankBranchId" class="form-control" data-plugin-selectTwo onchange="getIfscCodeList(this.value,${status.count - 1});">
+													<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+											</select>
+										</div>
+									</div>
+					            </td>
+					            <td>
+										<div class="form-group">
+												<div class="col-md-12">
+												<select id="ifscCodeReq${status.count - 1}" name="bankdetailsDto[${status.count - 1}].ifscCode" class="form-control disabled" data-plugin-selectTwo>
+														<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+												</select>
+											</div>
+										</div>
+									</td>	
+					            <td style="text-align: center;">
+					               <button type="button" class="add-button btn btn-xs btn-danger" onclick="deleteRow1(${item.partyBankId})"><i class="fa fa-trash" aria-hidden="true"></i></button>
+					            </td>
+					          
+					        </tr>
+					        </c:forEach>
+					    </tbody>
+					    
+					    
+					    </c:if>
+					    
+					      <c:if test="${empty partyBankDetailsdata }">
+					    <tbody id="tbd">
+					        <tr>
+					           <td>
+					                  <div class="col-md-12 col-sm-12">
+									<div class="form-group">
+										<div class="col-md-12">
+										<input type="hidden" class="form-control"  name="bankdetailsDto[0].partyDetailsBankId" id="partyDetailsBankId0"  >
+											<input type="text" class="form-control numeric"  name="bankdetailsDto[0].bankAcNo" id="bankAcNoReq0"  onchange="validateAllDetails1(this.value,'BANKACNO');" >
+										</div>
+									</div>
+								</div>
+					           
+					           </td>
+					        	 <td>
+					               <div class="form-group">
+										<div class="col-md-12">
+											<select class="form-control form-select" name="bankdetailsDto[0].bankId" id="bankNameReq0" data-plugin-selectTwo onchange="getBankBranchList('0','0');">
+												<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+												<c:forEach items="${bankList}" var="bank">
+													<option value="${bank.bankId}" <%-- ${bank.bankId eq partyDetail.bankMaster.bankId ? 'selected="selected"' : ''} --%>>${bank.bankName}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+					            </td>
+					            <td>
+									<div class="form-group">
+											<div class="col-md-12">
+											<select id="bankBranchIdReq0" name="bankdetailsDto[0].bankBranchId" class="form-control form-select" data-plugin-selectTwo onchange="getIfscCodeList(this.value,'0');">
+													<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+											</select>
+										</div>
+									</div>
+					            </td>
+					            <td>
+										<div class="form-group">
+												<div class="col-md-12">
+												<select id="ifscCodeReq0" name="bankdetailsDto[0].ifscCode" class="form-control disabled form-select" data-plugin-selectTwo>
+														<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+												</select>
+											</div>
+										</div>
+									</td>	
+					            <td style="text-align: center;">
+					               <button type="button" class="add-button btn btn-xs btn-danger" onclick="removeRow()"><i class="fa fa-trash" aria-hidden="true"></i></button>
+					            </td>
+					          
+					        </tr>
+					    </tbody>
+					    </c:if>
+					</table>
+							<hr>
+							<h5 class="card-title mb-2">Other Details :</h5>
+							<div class="row">
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.TINNO"/> :</label>
+											<div class="col-md-12">
+											<input type="text" class="form-control" name="tinNo" id="tinNoReq" value="${partyDetail.tinNo}" maxlength="15" onblur="validateNameAndCode(this)">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><spring:message code="COMMON.LABEL.PANNO"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control" name="panNo" id="panNoReq" value="${partyDetail.panNo}" onblur="validateAllDetails1(this.value,'PANNO');" maxlength="10" onchange="toUppercase(this);duplicateChcek(this.value,'PANNO')">
+										</div>
+									 </div>
+								</div>
+								<div class="col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><span><spring:message code="LABEL.PARTYDETAILS.PANDATE" /></span> :</label>
+										<div class="col-md-12 datepicker_con">
+											<c:choose>
+												<c:when test="${not empty partyDetail.cstAssessment1}">
+													<input type="text" class="form-control datepicker " pattern="dd/mm/yyyy" name="cstAssessment" id="cstAssessmentReq" value="<fmt:formatDate pattern="dd/MM/yyyy" value="${partyDetail.cstAssessment1}"/>">
+												</c:when>
+												<c:otherwise>
+													<input type="text" class="form-control datepicker" pattern="dd/mm/yyyy" name="cstAssessment" id="cstAssessmentReq">
+												</c:otherwise>
+											</c:choose>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.CSTNO"/> :</label>
+											<div class="col-md-12">
+											<input type="text" class="form-control" name="cstNo" id="cstNoReq" value="${partyDetail.cstNo}" maxlength="15" onblur="validateNameAndCode(this)">
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12 " for="inputDefault"><span><spring:message code="LABEL.PARTYDETAILS.CSTDATE" /> :</span></label>
+										<div class="col-md-12 datepicker_con ">
+											<c:choose>
+												<c:when test="${not empty partyDetail.panAssessment1}">
+													<input type="text" class="form-control datepicker" pattern="dd/mm/yyyy" name="panAssessment" id="panAssessmentReq" value="<fmt:formatDate pattern="dd/MM/yyyy" value="${partyDetail.panAssessment1}"/>">
+												</c:when>
+												<c:otherwise>
+													<input type="text" class="form-control datepicker" pattern="dd/mm/yyyy" name="panAssessment" id="panAssessmentReq">
+												</c:otherwise>
+											</c:choose>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.GSTNO" /> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control" name="gstNo" id="gstNoReq" maxlength="15" value="${partyDetail.gstNo}" onchange="validateAllDetails1(this.value,'GSTNO');">
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class = "row">
+								 <div class="col-md-2 col-sm-2">
+									<div class="form-group">
+									<label class="col-md-12 required" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.AADHARNO"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control numeric" name="aadharNo" id="aadharNoReq" maxlength="12" minlength="12" value="${partyDetail.aadharNo}" 
+											onchange="validateAllDetails(this.value,'AADHARNO');" >
+										</div>
+									</div>
+								</div>
+								<!-- onchange="validateAllDetails1(this.value,'AADHARNO');" -->
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.COMPANY"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control" name="companyRegdNo" id="idcoRegdNoReq" value="${partyDetail.companyRegdNo}" maxlength="15" onblur="validateNameAndCode(this)">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.REGDCATEGORY"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control" name="regdCategory" id="regdCategoryReq" value="${partyDetail.regdCategory}" maxlength="15" onblur="validateNameAndCode(this)">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.RPFCNO"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control" name="rpfcNo" id="rpfcNoReq" value="${partyDetail.rpfcNo}" maxlength="15" onblur="validateNameAndCode(this)">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.ESINO"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control" name="esiNo" id="esiNoReq" value="${partyDetail.esiNo}" maxlength="15" onblur="validateNameAndCode(this)">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.LABLICNO"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control" name="labourLicNo" id="labourLicNoReq" value="${partyDetail.labourLicNo}" maxlength="15" onblur="validateNameAndCode(this)">
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-2 col-sm-2">
+									<div class="form-group">
+										<label class="col-md-12" for="inputDefault"><spring:message code="LABEL.PARTYDETAILS.LICNO"/> :</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control" name="licNo" id="licNoReq" value="${partyDetail.licNo}" maxlength="15" onblur="validateNameAndCode(this)">
+										</div>
+									</div>
+								</div>
+							
+							</div>
+							<div class="row">
+								<div class="col-sm-12" style="margin-top:10px;">
+									<div class="form-group text-center">
+										<c:choose>
+											<c:when test="${not empty partyDetail.partyId}">
+												<input type="button" class="btn btn-success"  onclick="formSubmit(event)" value=<spring:message code="COMMON.BUTTON.UPDATE" /> />
+											</c:when>
+											<c:otherwise>
+												<input type="button" class="btn btn-success" onclick="formSubmit(event)"value=<spring:message code="COMMON.BUTTON.SAVE" /> />
+											</c:otherwise>
+										</c:choose>
+			                             <button type="button" class="btn btn-warning no-print unfreezeField back" onclick="backToModule()">Back</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			</section>
+			<!-- ##############################################  END : PARTY  DETAILS   ############################################ -->
+
+			<!-- ##############################################  START : PARTY DETAILS LIST   ############################################ -->
+
+			
+			
+				
+
+					
+					<!-- #####################################   SEARCH PARTIES BY PARAMETERS   ####################################### -->
+
+                        </div>
+				    <div class="col-md-12 mt-3">
+                        <div class="card">
+                            <div class="card-header">
+								<h5 class="card-title"><spring:message code="LABEL.PARTYDETAILS.PARTYLIST"/></h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row" style="margin-left: -6px; width: 101%;">
+                                    <div class="col-md-12 col-sm-12" id="">
+                                        <div class="form-group" id="showMessage">
+                                            <label class="col-md-12" for="inputDefault" style="color: #114fda; font-weight: bold; text-transform: uppercase;"># Total Parties Found (by Search Parameters) : <span id="TotalRecCountDiv" style="margin-left: 10px; font-size: 20px; color: #da1111;"></span></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <table class="table table-bordered" id="partyListTable" >
+                                    <thead>
+                                        <tr>
+                                            <th width="04%" class="text-center"><spring:message code="LAND.ALT.SLNO" /></th>
+                                            <th width="39%"><spring:message code="LABEL.PARTYDETAILS.PARTYNAME"/></th>
+                                            <th width="10%"><spring:message code="LABEL.PARTYDETAILS.PARTYCODE"/></th>
+                                            <th width="10%"><spring:message code="DOCS.CASE.MOBILENUMBER"/></th>
+                                            <th width="13%"><spring:message code="LABEL.PARTYDETAILS.GSTNO"/></th>
+                                            <th width="23%"><spring:message code="LABEL.PARTYDETAILS.PARTYPROMOTEREMAILID"/></th>
+                                            <th width="05%">Action</th>
+                                        </tr>
+                                    </thead>
+
+
+
+                                     <tbody id="hideAndShow">
+                                     <div class="col-sm-1 text-center d-flex align-items-center gap-2">
+                                        <label class="col-sm-18">Show </label>
+                                        <select
+                                                class="form-control form-control-sm rounded-0 col-12"
+                                                id="rowsPerPage" onchange="saveSubmit(this.value)">
+                                                <option value="10" ${10 eq pageSize? 'selected':''}>10</option>
+                                                <option value="20" ${20 eq pageSize? 'selected':''}>20</option>
+                                                <option value="30" ${30 eq pageSize? 'selected':''}>30</option>
+                                                <option value="50" ${50 eq pageSize? 'selected':''}>50</option>
+
+                                            </select>
+                                        </div>
+                                         <c:forEach var="partyDetails" items="${partyDetailsList}" varStatus="status">
+                                                <tr>
+                                                    <td class="text-center">${status.count + pageSize * (currentPage-1)}</td> <!-- Serial number starts from 1 -->
+                                                    <td>${partyDetails.partyName}</td>
+                                                    <td>${partyDetails.partyCode}</td>
+                                                    <td>${partyDetails.mobileNo}</td>
+                                                    <td>${partyDetails.panNo}</td>
+                                                    <td>${partyDetails.emailId}</td>
+                                                    <td>
+                                                        <a class="btn btn-primary" title="<spring:message code='COMMON.BUTTON.ICONEDIT'/>" onclick="editPartyDetails(${partyDetails.partyId})">
+                                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                            <div id="ukPagination">
+                                               <ul class="cust-pagi  uk-pagination d-flex gap-2" style="">
+
+                                                            <li>
+                                                                <c:if test="${currentPage==1}">
+                                                                    <a class="disable">Previous</a>
+                                                                </c:if>
+                                                                <c:if test="${currentPage!=1}">
+                                                                    <a href="javascript:getData(${currentPage-1})">Previous</a>
+                                                                </c:if>
+                                                            </li>
+                                                            <li>
+                                                                <c:if test="${not empty currentPage}">
+                                                                    <a href="javascript:getData(${currentPage+1})">Next</a>
+                                                                </c:if>
+                                                            </li>
+                                                        </ul>
+                                                </div>
+                                    </tbody>
+                                        <tbody id="partyListId">
+                                        </tbody>
+                                </table>
+                            </div>
+					</div>
+				</div>
+			</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!--End::row-1 -->
+      </div>
+
+<form action="deleteTempPartyMaster.htm" id="deleteTempPartyFormId" method="post">
+	<input type="hidden" name="partyDltId" id="partyDltId" value="" />
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+</form>
+<form class="form-horizontal form-bordered" id="editPartyDetails" action="${contextPath}/mst/editPartyDetails.htm" method="post">
+	<input type="hidden" name="partyId" id="partyIdForEdit2" value="" />
+	<input type="hidden" name="cipherText" id="cipherText1"  />
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+</form>
+
+<form action="${contextPath}/mst/partyDetail" method="get" id="partyDetail11">
+    <input type="hidden" name="size"  id="hdnPageSize" value="" />
+    <input type="hidden" name="page" id="hdnPage" value="" />	
+    </form>
+<script>
+
+
+function getData(pageNo){
+	debugger;
+	if (pageNo != -1) {
+	    var rowsPerPage = $('#rowsPerPage').val();
+// 	    var pageNoStr = pageNo.toString();
+// 	    var encryptedRowsPerPage = AES256.encrypt(rowsPerPage);
+// 	    var encryptedPageNo = AES256.encrypt(pageNoStr);
+
+	    $('#hdnPageSize').val(rowsPerPage);
+	    $('#hdnPage').val(pageNo);
+	    $('#partyDetail11').submit();
+	}
+
+
+}
+
+
+$('#partyName').bind('copy paste cut',function(e) {
+	  e.preventDefault();
+	  bootbox.alert('cut,copy & paste options are disabled !!');
+	});
+</script>		
+<script type="text/javascript">
+/* 	function deleteTempPartyMaster(that){
+		
+		$("#partyDltId").val(that);
+	   	bootbox	.confirm({
+		title : labelConfirm,
+		message : "Do you want to delete this temporary party..?",
+		buttons : {
+			confirm : {
+				label : labelYes,
+				className : "btn-success"
+			},
+			cancel : {
+				label : labelNo,
+				className : "btn-danger"
+			}
+		},
+		callback : function(result) {
+			if (result == true) {
+				 $("#deleteTempPartyFormId").submit();
+			}
+		}
+		})
+	} */
+	
+	
+	function getPartyCodeBasedOnParamseditParty()
+	{
+		var partyTypeNameEditParty = $("#partyTypeNameEditParty").val();
+		
+		if($("#partyTypeNameEditParty").val() != "")
+		{
+			$.ajax({
+				url : '${contextPath}/mst/partyCodeGenBasedOnParams.htm',
+				dataType: "json",
+				data : {
+					partyTypeNameEditParty : partyTypeNameEditParty,
+				},
+				success : function(response) 
+				{
+					$.each(response, function(index, value) 
+					{
+						if(value.nextPartyCodeGenerated.indexOf("Not Configured") != -1)
+						{
+							$("#partyCodeEditParty").css({ 'color': 'red'});
+							$("#partyCodeEditParty").css({ 'border': '1px solid red'});
+							$("#partyCodeEditParty").css({ 'box-shadow': '0px 0px 3px red;'});
+						}
+						else
+						{
+							$("#partyCodeEditParty").css({ 'color': '#676767'});
+							$("#partyCodeEditParty").css({ 'border': '1px solid #cccccc'});
+						}
+		
+						$("#partyCodeReq").val(value.nextPartyCodeGenerated);
+						//getPartyUniqCodeBasedOnParamseditParty();
+					});
+				},
+				error : function(errRespponse)
+				{
+					var data=errRespponse;
+				}
+			});
+		}
+		else
+		{
+			$("#partyCodeEditParty").val("");
+			$("#partyUniqueIdEditParty").val("");
+		}
+	} 
+	
+	
+
+	function editPartyDetails(partyID)
+	{
+		  $("#partyIdForEdit2").val(partyID);
+		  const bizContent = $("#editPartyDetails").serializeArray(); // Serialize form data
+          $("#editPartyDetails").append('<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />');
+          $("#cipherText1").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+          $("#editPartyDetails").submit();
+	   
+	}
+
+	function deleteRow1(bankid, button) {
+	    if (bankid != null) {
+	        $.ajax({
+	            url: `${contextPath}/mst/deleteRowList.htm`,
+	            type: 'GET',
+	            data: {
+	                partyBankId: bankid
+	            },
+	            cache: false,
+	            success: function (response) {
+	                let obj;
+	                try {
+	                    obj = JSON.parse(response); // Parse JSON response
+	                } catch (e) {
+	                    return;
+	                }
+
+	                if (obj.UPADTE === 'UPDATE') { // Check response status
+	                    bootbox.alert("Deleted Successfully.");
+	                    
+	                    // Ensure button is provided and is a valid DOM element
+	                    if (button && $(button).closest('tr').length) {
+	                        $(button).closest('tr').remove(); // Remove the row
+	                    } else {
+	                        console.error("Button is invalid or row not found.");
+	                    }
+	                } else {
+	                    console.error("Unexpected response format", obj);
+	                }
+	            },
+	            error: function () {
+	                alert("Failed to delete item.");
+	            }
+	        });
+	    } else {
+	        console.error("Invalid bankid.");
+	    }
+	}
+
+
+
+
+
+	function removeRow(button) {
+	    var row = button.closest('tr');
+	    row.remove();
+	}
+
+	function formSubmit(event) {
+	    event.preventDefault();  // Prevent default form submission
+
+	    const requiredFields = [
+	        'partyNameReq',
+	        'partyTypeNameEditParty',
+	        'promoterNameReq',
+	        'addressReq',
+	        'cityIdReq',
+	        'stateIdReq',
+	        'pincodeReq',
+	        'contactNoReq',
+	        'contactPersonReq',
+	        'faxNoReq',
+	        'mobileNoReq',
+	        'emailIdReq',
+	        'aadharNoReq'
+	    ];
+
+	    let isValid = true;
+	    let dataList = []; // Initialize the dataList
+	    let rowCount = document.getElementById("tbd").rows.length; // Row count for bank details
+
+	    requiredFields.forEach(id => {
+	        const element = document.getElementById(id);
+	        if (element && (element.value.trim() === '' || (element.tagName === 'SELECT' && element.value === ''))) {
+	            isValid = false;
+	            element.classList.add('is-invalid'); // Add an error class for styling (optional)
+	        } else {
+	            element.classList.remove('is-invalid');
+	        }
+	    });
+
+	    for (let i = 0; i < rowCount; i++) {
+	        let bankAcNo = document.getElementById("bankAcNoReq" + i).value;
+	        let bankName = document.getElementById("bankNameReq" + i).value;
+	        let bankBranch = document.getElementById("bankBranchIdReq" + i).value;
+	        let ifscCode = document.getElementById("ifscCodeReq" + i).value;
+	        let partyDetailsBankId =document.getElementById("partyDetailsBankId" + i).value
+	         if (bankAcNo === "" || bankName === "" || bankBranch === "" || ifscCode === "") {
+	            bootbox.alert("Please fill in all mandatory fields in bank details for row " + (i + 1) + ".");
+	            isValid = false;
+	            break;
+	        } else { 
+	            dataList.push({
+	                bankAcNo: bankAcNo,
+	                bankId: bankName,
+	                bankBranchId: bankBranch,
+	                ifscCode: ifscCode,
+	                partyDetailsBankId:partyDetailsBankId
+	            });
+	         } 
+	    }
+
+	    if (!isValid) {
+	        bootbox.alert('Please fill out all required fields.');
+	        return;  // Exit the function if the form is not valid
+	    } else {
+	        const flag = window.confirm("Do you want to save the data?");
+	        if (flag) {
+	            const bizContent = $("#partyDetails").serializeArray(); // Serialize form data
+	            let data = {
+	                bankdetailsDto: dataList
+	            };
+	            
+	            $("#cipherTextList").val(enc_password(JSON.stringify(data)));
+	            $("#partyDetails").append('<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />');
+	            $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+	            $("#partyDetails").submit();
+	        }
+	    }
+	}
+
+	function addRow() {
+	    var rowCount = document.getElementById("tbd").rows.length;
+	    var isValid = true;	
+
+	    // Check validation for existing rows
+	    for (var i = 0; i < rowCount; i++) {
+	        var bankAcNo = document.getElementById("bankAcNoReq" + i).value;
+	        var bankName = document.getElementById("bankNameReq" + i).value;
+	        var bankBranch = document.getElementById("bankBranchIdReq" + i).value;
+	        var ifscCode = document.getElementById("ifscCodeReq" + i).value;
+	        isValid = true;
+	           if (bankAcNo === "" || bankName === "" || bankBranch === "" || ifscCode === "") {
+	            bootbox.alert("Please fill in all mandatory fields for row " + (i + 1) + ".");
+	            isValid = false;
+	            break;
+	        }  
+	    }
+
+	    if (isValid) {
+	        var tableBody = document.getElementById("tbd");
+	        var countInst = tableBody.getElementsByTagName("tr").length;
+	        let newRow = document.createElement("tr");
+
+	        let html = '';
+
+	        html += '<tr>';
+	        html += '<td>';
+	        html += '<div class="col-md-12 col-sm-12">';
+	        html += '<div class="form-group">';
+	        html += '<div class="col-md-12">';
+	        html += '<input type="hidden" class="form-control"  name="bankdetailsDto['+ countInst +'].partyDetailsBankId" id="partyDetailsBankId'+ countInst +'"  >'
+	        html += '<input type="text" class="form-control numeric" name="bankAcNo" id="bankAcNoReq' + countInst + '" value="" onchange="validateAllDetails1(this.value, \'BANKACNO\');">';
+	        html += '</div>';
+	        html += '</div>';
+	        html += '</div>';
+	        html += '</td>';
+
+	        html += '<td>';
+	        html += '<div class="form-group">';
+	        html += '<div class="col-md-12">';
+	        html += '<select class="form-control form-select" name="bankId" id="bankNameReq' + countInst + '" data-plugin-selectTwo onchange="getBankBranchList('+ countInst +',0);">';
+	        html += '<option value="">Select</option>';
+	        html += '<c:forEach items="${bankList}" var="bank">';
+	        html += '<option value="${bank.bankId}">${bank.bankName}</option>';
+	        html += '</c:forEach>';
+	        html += '</select>';
+	        html += '</div>';
+	        html += '</div>';
+	        html += '</td>';
+
+	        html += '<td>';
+	        html += '<div class="form-group">';
+	        html += '<div class="col-md-12">';
+	        html += '<select id="bankBranchIdReq' + countInst + '" name="bankBranchId" class="form-control form-select" data-plugin-selectTwo onchange="getIfscCodeList(this.value,'+ countInst +');">';
+	        html += '<option value="">Select</option>';
+	        html += '</select>';
+	        html += '</div>';
+	        html += '</div>';
+	        html += '</td>';
+
+	        html += '<td>';
+	        html += '<div class="form-group">';
+	        html += '<div class="col-md-12">';
+	        html += '<select id="ifscCodeReq' + countInst + '" name="ifscCode" class="form-control disabled form-select" data-plugin-selectTwo>';
+	        html += '<option value="">Select</option>';
+	        html += '</select>';
+	        html += '</div>';
+	        html += '</div>';
+	        html += '</td>';
+
+	        html += '<td style="text-align: center;">';
+	        html += '<button type="button" class="add-button btn btn-xs btn-danger" onclick="removeRow(this)">';
+	        html += '<i class="fa fa-trash" aria-hidden="true"></i>';
+	        html += '</button>';
+	        html += '</td>';
+	        html += '</tr>';
+
+	        newRow.innerHTML = html;
+	        tableBody.appendChild(newRow);
+	    }
+	}
+	$( document ).ready(function() {
+		
+		$("#partyListTable").show();
+		$("#showMessage").hide();
+		<c:if test="${not empty partyBankDetailsdata}">
+		 <c:forEach items="${partyBankDetailsdata}" var="item" varStatus="status">
+		  getBankBranchList(${status.count - 1},${item.bankBranch.bankBranchId});
+		  //getIfscCodeList(${status.count - 1},${item.bankBranch.bankBranchId});
+		 </c:forEach>
+		 </c:if> 
+	});
+	
+   	function getBankBranchList(index,branchId) {
+	    debugger;
+	    var rowCount = document.getElementById("tbd").rows.length;
+	    var tableBody = document.getElementById("tbd");
+	    var countInst = tableBody.getElementsByTagName("tr").length;
+	    let newRow = document.createElement("tr");
+	    var bankId = $('#bankNameReq' + index).val();
+
+	    if (bankId != "") {
+	        var trHTML = '<option value="">' + '-SELECT-' + '</option>';
+	        $.ajax({
+	            url: '${contextPath}/mst/getBankBranchList.htm',
+	            type: 'GET',
+	            data: {
+	                bankId: bankId
+	            },
+	            cache: false,
+	            asynch: false,
+	            success: function (response) {
+	                if (response != "") {
+	                    var obj = jQuery.parseJSON(response);
+	                    $.each(obj, function (i, value) {
+	                        trHTML += '<option value="' + value.id + '">' + value.branchName + '</option>';
+	                    });
+	                    $('#bankBranchIdReq' + index).empty().append(trHTML);
+	                    if(branchId != 0){
+	                    	$('#bankBranchIdReq' + index).val(branchId).trigger('change');
+	                    }
+	                } 
+	            },
+	            error: function (transport) {
+	                alert("No branch Found");
+	            }
+	        });
+	    }
+	}
+
+	
+	function getIfscCodeList(branchId,index)
+	{
+		 debugger
+		var trHTML;
+		var bankBranchId = $('#bankBranchIdReq'+ index).val();
+		$.ajax({
+			url : '${contextPath}/mst/getIfscCodeList.htm',
+			type:'GET',
+			data : ({
+				bankBranchId : $('#bankBranchIdReq'+ index).val()
+			}),
+			cache:false,
+			asynch:false,
+			success : function(response) 
+			{
+				if(response !="")
+				{
+					var obj=jQuery.parseJSON(response);		
+					$.each(obj, function(i, value) 
+					{
+						trHTML +='<option value="'+value.id+'">'+value.ifscCode+'</option>';
+					}); 
+					$('#ifscCodeReq' + index).empty().append(trHTML);
+					if(branchId !=0){
+						//$('#ifscCodeReq' + index).val(branchId).trigger('change');
+						$('#ifscCodeReq' + index).val(branchId);
+					}
+				}
+				
+			},
+			error:function(transport)
+			{
+				//alert("No branch Found");
+			}
+		});
+	}
+	
+	function checkDuplicatePartyType() {
+	    debugger;
+	    
+	    var partyName = $('#partyNameReq').val();
+	    var partyType = $('#partyTypeNameEditParty').val();
+	    var partyTypeText = $("#partyTypeNameEditParty option:selected").text().trim();  // Get the text of the selected option
+	    var formattedPartyTypeText = partyTypeText.replace(/\s*\(.*\)\s*/, '').trim();
+
+	    var partyId = $('#partyIdChk').val();
+	    
+	    $.ajax({
+	        url: './checkDuplicatePartyTypeAndPartyName',
+	        type: 'GET',
+	        data: {
+	            "partyName": partyName,
+	            "partyType": formattedPartyTypeText,
+	            "partyId": partyId
+	        },
+	        cache: false,
+	        async: true, 
+	        success: function (response) {
+	            if (response) {
+	                if (response === 'FOUND') {
+	                    bootbox.alert("Party name is already present against party type.");
+	                    $('#partyName').val('');   // Clear the party name field
+	                    $('#partyType').val('');   // Clear the party type field
+	                    return false;  // Stop further processing
+	                } else {
+	                    return true;   // No duplicates found
+	                }
+	            }
+	        },
+	        error: function (xhr, status, error) {
+	            console.error("Error during AJAX request:", error);
+	            bootbox.alert("An error occurred while checking for duplicates. Please try again.");
+	        }
+	    });
+	}
+
+	
+</script>

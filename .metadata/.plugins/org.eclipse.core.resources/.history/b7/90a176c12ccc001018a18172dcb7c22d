@@ -1,0 +1,291 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<style>
+.modaltabledata th {
+	line-height: 16px;
+	font-size: 13px !important;
+	font-weight: 400;
+}
+
+.tablemodal .modal-footer {
+	padding: 0;
+}
+
+.tablemodal .modal-footer .btn-submit {
+	margin-top: 7px;
+}
+
+.tablemodal .modal-footer .btn-exit {
+	margin-top: 7px;
+}
+
+.modaltop-data {
+	font-size: 14px;
+}
+
+.tablemodal .modal-body {
+	padding-bottom: 0;
+}
+
+.lftdata {
+	width: 50%;
+	float: left;
+	font-size: 14px;
+}
+
+.rgtdata {
+	width: 50%;
+	float: right;
+	margin-bottom: 10px;
+	font-size: 14px;
+}
+</style>
+
+<div class="container-fluid">
+<!-- Start::row-1 -->
+ <div class="row">
+ <div class="col-xl-12">
+ <div class="card custom-card">
+ <div class="top-left"></div>
+ <div class="top-right"></div>
+ <div class="bottom-left"></div>
+ <div class="bottom-right"></div>
+ <div class="card-body">
+<h4 class="accordion-header" id="headingOne">
+
+	<span>Unit of measurement master</span>
+</h4>
+
+<div id="collapseOne" class="accordion-collapse collapse show"
+	aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+	<div class="accordion-body">
+		<div class="panel-body" style="display: block">
+			<div class="col-md-12">
+				<form class="form-horizontal form-bordered" id="createUnitMeasurement"
+				>
+					<input type="hidden" name="${_csrf.parameterName}"
+						value="${_csrf.token}" /> <input type="hidden"
+						name="unitId" id="unitId"
+						value="${data.unitId}" />
+
+					<div class="row">
+				<div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="unitName">unitName</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control " name="unitName" id="unitName" value="${data.unitName}" maxlength="6"">
+										</div>
+								</div>
+						</div>
+
+					<div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="unitCode">unitCode</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control " name="unitCode" id="unitCode" value="${data.unitCode}" maxlength="6" ">
+										</div>
+									</div>
+								</div>
+			        <div class="col-md-3 col-sm-3">
+									<div class="form-group">
+										<label class="col-md-12 required" for="unitType">unitType</label>
+										<div class="col-md-12">
+											<input type="text" class="form-control " name="unitType" id="unitType" value="${data.unitType}" maxlength="6" ">
+										</div>
+									</div>
+								</div>
+                                     <div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="unitDescription">unit Description:</label>
+												<div class="col-md-12">
+													<input type="text" name="unitDescription" class="form-control text-end" id="unitDescription" 
+													value="${data.unitDescription}" maxlength="10" minlength="3">
+												</div>
+											</div>
+										</div>
+										
+							<div class="col-md-3 col-sm-3">
+					<div class="form-group">
+						<label class="col-md-12 " for="isActive">Status:</label>
+						<div class="col-md-12">
+							<select class="form-control" name="status"
+								id="status" >
+								<option value="Y"
+									${data.status eq 'true' ? 'selected="selected"' : 'true'}>Active</option>
+								<option value="N"
+									${data.status eq 'false' ? 'selected="selected"' : 'false'}>InActive</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+              
+
+
+					<div class="row">
+						<div class="col-sm-12" style="margin-top: 10px;">
+							<div class="form-group text-center">
+								<button type="button" class="btn btn-sm btn-success"
+									onclick="checkFormDataOnSubmit('createUnitMeasurement');">
+									<c:choose>
+								    <c:when test="${empty data.unitId}">
+								        <spring:message code="COMMON.BUTTON.SUBMIT" />
+								    </c:when>
+								    <c:otherwise>
+								        <spring:message code="COMMON.BUTTON.UPDATE" />
+								    </c:otherwise>
+								</c:choose>
+
+								</button>
+								<a href="${contextPath}/home"><input type="button"
+									class="btn btn-sm btn-danger"
+									value="<spring:message code="COMMON.BUTTON.BACK"></spring:message>"></a>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<h4 class="accordion-header" id="headingOne">
+
+	<span>Unit of measurement master list</span>
+</h4>
+
+				<div class="col-md-12">
+					<table class="table table-bordered table-striped mb-none"
+						id="datatable-default">
+						<thead>
+							<tr>
+								<th>unitName</th>
+								<th>unitCode</th>
+								<th>unitType</th>
+								<th>unitDescription</th>
+								<th><spring:message code="COMMON.LABEL.OPTION" /></th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach items="${unitOfMeasurementList}" var="unitOfMeasurement">
+								<tr class="gradeX">
+									<td>${unitOfMeasurement.unitName}</td>
+									<td>${unitOfMeasurement.unitCode}</td>
+									<td>${unitOfMeasurement.unitType}</td>
+									<td>${unitOfMeasurement.unitDescription}</td>
+								<td><a class="btn btn-xs btn-circle btn-warning text-white btn-sm" onclick="edit('${unitOfMeasurement.unitId}')"> 
+							<i class="fa fa-pencil" aria-hidden="true" title=<spring:message code="COMMON.LABEL.EDIT"/>></i>
+							</a></td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+				
+				</div>
+                  </div>
+              </div>
+          </div>
+          <!--End::row-1 -->
+      </div>
+				
+				
+<form action="${contextPath}/mst/saveUnitMeasurement" method="POST" id="finalSubmit">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    <input type="hidden" name="encData" id="hdnData"/>
+</form>
+
+
+<form id="editUnitMeasureentMaster"
+	action="${contextPath}/mst/updatedUnitMeasureentMaster" method="post">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	   <input type="hidden" name="encDataa" id="hdnData1"/>
+<!-- 		<input type="hidden" name="accountGroupId"id="accountGroupId" value="" /> -->
+</form>
+
+
+<form action="${contextPath}/miscVouchersPDF.htm" method="POST"
+	id="generatepdf" target="_blank">
+	<input type="hidden" name="${_csrf.parameterName}"
+		value="${_csrf.token}" /> <input type="hidden" id="printVoucherId"
+		name="printVoucherId" /> <input type="hidden" name="voucherType"
+		value="FINANCE" />
+</form>
+
+
+
+<script>
+
+const checkFormDataOnSubmit=async(formId)=>
+{
+	  const requiredFields = document.querySelectorAll('.required');
+      let validationFailed = false;
+
+      for (const field of requiredFields) {
+          const inputId = field.getAttribute('for');
+          const inputField = document.getElementById(inputId);
+          if (!inputField.value) {
+              inputField.style.borderColor = 'red';
+              await showNotification(true, field.textContent.replace(/:/g, "") + " is required.");
+              setTimeout(() => {
+                  inputField.style.borderColor = '';
+              }, 3000);
+              validationFailed = true;
+              break;
+          }
+      }
+
+      if (!validationFailed) {
+    const encryptFormDataResult = await encryptHiddenFormData(formId);
+    	debugger
+    	if (encryptFormDataResult) {
+    	    $('#hdnData').val(encryptFormDataResult);
+    	    $('#finalSubmit').submit();
+    	} else {
+    	    showNotification(true, 'Unable to process your request. Please try after some time.');
+    	}
+      }
+}
+
+
+
+
+
+
+function getDisplayNameOfAcGroup()
+{
+	var isDisplayNameSame = $("#isDisplayStatus").val();
+	if(isDisplayNameSame=='N')
+	{
+		document.getElementById("displayName").readOnly = false;
+		$("#displayName").val("");
+		//$("#displayNameText").css("display","block");
+	}
+	else
+	{
+		document.getElementById("displayName").readOnly = true;
+		$("#displayName").val($("#accountGroupName").val());
+		//$("#displayNameText").css("display","none");
+	}
+}
+
+function validateNameAndCode(element)
+{
+	var result = element.value.replace(/[\u200B-\u200D\u201A-\u201E\u2013-\u2122\uFEFF\!@#$^&*+<>\\\/|\?~{}())(\:%]/g,'');
+	element.value =result;
+}
+
+
+ function edit (unitId){
+	    $("#hdnData1").val(AES256.encrypt(unitId));
+	    $("#editUnitMeasureentMaster").submit();
+ }
+
+ </script>

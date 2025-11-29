@@ -1,0 +1,455 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/AadharVaidator.js"></script>
+<%--<jsp:useBean id="strUtils" class="com.aashdit.demography.utils.ApplicationStringUtils"/> --%>
+          <div class="breadcrumb_conatiner">
+			<div class="col-md-6">
+				<h4 class="change-color">Manage Fund</h4>
+			</div>
+			<div class="col-md-6">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+						<li class="breadcrumb-item active" aria-current="page">Add Fund</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <div class="card full-height">
+                                <div class="card-header">
+                                    <h4 class="card-title">${not empty fund ? 'Update Fund Allocation' : 'Fund Allocation' }</h4>
+
+                                </div>
+                                <div class="card-body">
+
+                                  <form class="form-horizontal" action="${contextPath}/fnd/fund/add" method="post" enctype="multipart/form-data" id="form">
+								    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+								    <input type="hidden" id="fundId" name="fundId" value="${fund.fundId}"/>
+									<input type="hidden" id="fundAmount" value="${not empty fund ? fund.amount : 0}"/>
+									<input type="hidden" class="" id="encodedDataform" name="encodedDataform" value="" />
+									<input type="hidden" id="bdgDate" value=""/>
+                                    <div class="row">
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-md-12 smallInput required" for="">Financial Year :</label>
+												<div class="col-md-12">
+													<select class="form-control form-select requiredField ${not empty fund.finyear.finyearId ? 'frezz' : ''}" id="finyearId"  name="finyrId" onchange="getBudgetAmount();resetDate();">
+														<option value="">--Select--</option>
+														<c:forEach items="${lstFinyear}" var="finyear">
+															<option value="${finyear.finyearId}" ${finyear.finyearId eq fund.finyear.finyearId ?'selected':'' }>${finyear.finYear}</option>
+														</c:forEach>
+														
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="form-group col-md-3">
+											<label class="required" for="object">Organization :</label>
+											<c:choose>
+												<c:when test="${FundObjectList.size() > 1}">
+													<select class="form-control form-select requiredField" name="fromEntityId" id="object" onchange="getBudgetAmount(); departmentAgainstObject();">
+														<option value="">--select--</option>
+														<c:forEach items="${FundObjectList}" var="object">
+														<option value="${object.combineTwo}" ${object.entityId eq fund.fromObjectId && object.userLevel eq fund.fromObjectType ? 'selected' : ''}>${object.organizationName}</option> 
+														</c:forEach>
+													</select>
+												</c:when>
+												<c:otherwise>
+													<input type="hidden" name="fromEntityId" id="object" value="${FundObjectList[0].combineTwo}" />
+													<input type="text" class="form-control" value="${FundObjectList[0].organizationName}" readonly="readonly" />
+												</c:otherwise>
+											</c:choose>
+								      	</div>
+
+										<!-- Budget List -->
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-md-12 smallInput required" for="">Budget List : </label>
+												<div class="col-md-12">
+													<select class="form-control form-select" id="budgetId" name="bdgId" onchange="getBudgetAmount()">
+														<option value="">--Select--</option>
+													</select>
+													<span style="color: #0043ff;font-weight: 500;font-size: 11px;">( Budget : <strong id="totalBudgetAmt"></strong> , Allocation : <strong id="totalAllocationAmt"></strong> )</span>
+												</div>
+											</div>
+										</div>
+
+										<!-- Budget Cost -->
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-md-12 smallInput required" for="">Remaining Fund :<!-- <i class="fa fa-inr"></i> --></label>
+												<div class="col-md-12">
+													<input type="text" class="form-control form-control-sm x-turnover" id="remainingCost" readonly>
+												</div>
+											</div>
+										</div>
+
+
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-md-12 smallInput required" for="">Fund Type :</label>
+												<div class="col-md-12">
+													<select class="form-control form-select requiredField" id="fundTypeId"  name="fundTypeId"  onchange="getBudgetAmount();">
+														<option value="">--Select--</option>
+														<c:forEach items="${lstFundType}" var="fundType">
+															<option value="${fundType.fundTypeId}" ${fundType.fundTypeId eq fund.fundType.fundTypeId  ?'selected':'' }>${fundType.fundTypeName}</option>
+														</c:forEach>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-md-12 smallInput required " for="">Component Name :</label>
+												<div class="col-md-12">
+													<select class="form-control form-select requiredField"  id="schemeId"  name="schemeId" onchange="getBudgetAmount();">
+														<option value="">--Select--</option>
+														<c:forEach items="${mstSchemeList}" var="mstScheme">
+															<option value="${mstScheme.schemeId}" ${mstScheme.schemeId eq fund.mstScheme.schemeId ?'selected':'' }>${mstScheme.schemeName}</option>
+														</c:forEach>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-md-12 smallInput required " for=""> Account Head :</label>
+												<div class="col-md-12">
+													<select class="form-control form-select requiredField" id="headId" onchange="findSubHeadListByHeadId();getBudgetAmount();">
+														<option value="">--Select--</option>
+														<c:forEach items="${lstMstHead}" var="mstHead">
+															<option value="${mstHead.headId}" ${mstHead.headId eq fund.mstSubHead.head.headId  ?'selected':'' }>${mstHead.headName}</option>
+														</c:forEach>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-md-12 smallInput required " for=""> Account Sub Head :</label>
+												<div class="col-md-12">
+													<select class="form-control form-select requiredField" id="subHeadId"  name="subHeadId" onchange="getBudgetAmount();">
+														<option value="">--Select--</option>
+														<c:forEach items="${mstSubHeadList}" var="mstSubHead">
+															<option value="${mstSubHead.subHeadId}" ${mstSubHead.subHeadId eq fund.mstSubHead.subHeadId  ?'selected':'' }>${mstSubHead.subHeadName}</option>
+														</c:forEach>
+													</select>
+												</div>
+											</div>
+										</div>
+										<input type="hidden" value="${fund.toObjectId}">
+										<input type="hidden" value="${fund.toObjectType}">
+									  	<div class="form-group col-md-3">
+											<label class="required" for="department">To Entity :</label>
+											<select class="form-control form-select requiredField"name="toEntityId" id="department" onchange="">
+												<option value="">--select--</option>
+												<c:forEach items="${entityHierarchyList}" var="dept">
+													<option value="${dept.levelIdAndType}" ${dept.id eq fund.toObjectId && dept.levelType eq fund.toObjectType ? 'selected' : ''}>${dept.levelName}</option> 
+												</c:forEach>
+											</select>
+								  		</div>
+										
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="required">Fund allocation date :</label>
+												<div class="col-md-12 datepicker_con">
+													<input type="text" class="form-control form-control-sm disbursDate requiredField" name="transDateStr" id="transDate" readonly="readonly" required="required"  value="<fmt:formatDate pattern="dd/MM/yyyy" value='${fund.transDate}' />" >
+
+												</div>
+											</div>
+										</div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="required">Sanction No :</label>
+                                                <div class="col-md-12">
+                                                   <input type="hidden"  id="hdnSanctionNo" value="${fund.sanctionNo}"  >
+												   <input type="text" class="form-control form-control-sm requiredField" id="sanctionNo" name="sanctionNo" maxlength="15" onchange="checkDuplicateSanctionNo();" value="${fund.sanctionNo}"  >
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="required">Amount :</label>
+                                                <div class="col-md-12">
+                                                    	<input type="hidden" class="form-control form-control-sm x-turnover" id="turnover1"   value="${fund.amount}" maxlength="15">
+												<input type="text" class="form-control form-control-sm x-turnover greaterThanZero numberWithTwoDesimal requiredField onClickInput" name="amount" id="turnover1Converted" value="${not empty fund ? fund.amount : 0}" maxlength="15"  onkeyup="checkAmount(this.value)">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+									<c:set var="dynamicFromId" value="form" scope="request" />
+									<%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+									</form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+ <script>
+
+
+	$(document).ready(function(){
+		
+		var objRej='${empty fund && FundObjectList.size() < 2}';
+		if(objRej== 'true'){
+			departmentAgainstObject();
+		}
+		// var subHead='${empty fund && lstMstHead.size() < 2}';
+		// if(subHead== 'true'){
+		// 	findSubHeadListByHeadId();
+		// }
+		getBudgetAmount();
+	});
+ function findSubHeadListByHeadId(){
+	var headId=$("#headId").val();
+		$.ajax({
+			type : "GET",
+			url : '${contextPath}/ecashcommon/findSubHeadListByHeadId',
+			dataType : "json",
+			data : {
+				"headId" : headId,
+			},
+			success : function(response) {
+				var html = "<option value='' selected>-Select-</option>";
+				var data = response;
+				if (data != "" && data != null && data.length > 0) {
+					$.each(data, function(index, value) {
+						html = html + '<option value="'+value.subHeadId+'">'
+								+ value.subHeadName + "</option>";
+					});
+				}
+				$('#subHeadId').empty().append(html);
+			},
+			error : function(error) {
+				bootbox.alert("Something went wrong !!!");
+			}
+		});
+}
+ 
+ 
+ 
+ $('.NumbersOnlyForAmount').keypress(
+			function(event) {
+				var regex = new RegExp("^[0-9.]+$");
+				var key = String.fromCharCode(!event.charCode ? event.which
+						: event.charCode);
+				if (!regex.test(key)) {
+					event.preventDefault();
+					return false;
+				}
+});
+ 
+ $(function() {
+	 $('.disbursDate').datepick({
+				onShow : $.datepick.monthOnly,
+				dateFormat : 'dd/mm/yyyy',
+				yearRange : "-100:+20",
+				maxDate: '0',
+				showOnFocus : true,
+				showTrigger : '<button type="button" class="trigger ${canTakeAction eq false ? "frezz" : ""}">'
+						+ '<i class="fa fa-calendar"></i></button>',
+			   onSelect: function(selected) {
+			     var date = new Date(selected);
+					var fyear= $("#finyearId option:selected").text().split("-");
+				    var firstDate = 01 + "/" + 04 + "/" +fyear[0];
+				    var lastDate =  31 + "/" + 03 + "/" +fyear[1];	
+					var sDate = firstDate.replace(/(\d+[/])(\d+[/])/, '$2$1');
+					var tDate = lastDate.replace(/(\d+[/])(\d+[/])/, '$2$1');
+					var data1 = new Date(sDate);
+					var data2 = new Date(tDate);
+				    if((date <= data2 && date >= data1)) {
+				    //alert(this.id);
+				    }else{
+				    	 $("#"+this.id).val("");
+				    	 bootbox.alert("Please select date between the financial year .")
+				    }
+				    var alltDate=$('#bdgDate').val().split("-");
+                     var modAllotDate=new Date(alltDate[1]+"/"+alltDate[2]+"/"+alltDate[0]);
+                     if(modAllotDate > new Date(selected)){
+                        alert('Fund Creation Date sholud not be before than Budget Creation Date.');
+                        $('.disbursDate').val("");
+                     }
+			    }
+			}); 
+	 getEntityNameByEntityTypeOrDistrictId();
+}); 
+ 
+ 
+ 
+ function checkDuplicateSanctionNo(){
+	var sanctionNo=$("#sanctionNo").val();
+	 if($("#hdnSanctionNo").val()!=sanctionNo) {
+		 $.ajax({
+    			type : "GET",
+    			url : "${contextPath}/fnd/fund/checkDuplicateSanctionNo",
+    			data : {
+    				"sanctionNo" : sanctionNo,
+    			},
+    			success : function(response) {
+    				var val = JSON.parse(response);
+					var fundId=val.fundId;
+					var existFundId=$("#fundId").val();
+					if(existFundId== '' || existFundId != fundId){
+						if (val.duplicate == true) {
+							bootbox.alert("Duplicate Sanction Number Not Allowed");
+							$("#sanctionNo").val("");
+    					}
+					}
+    				
+    			},
+    			error : function(error) {
+    				bootbox.alert("Something Went wrong"); 
+    			}
+    		}); 
+	 }
+ }
+
+
+ function currencyConverter(that,fieldId){
+	    debugger;
+		if(that!=""){
+			var value = that.replaceAll(",","");
+			if(value.includes(".")){
+				var splitValues = value.split(".");
+				if(splitValues.length>=2){
+					if(splitValues[0]==""){
+						splitValues[0]="0";
+					}
+					value=splitValues[0]+"."+splitValues[1];
+					if(splitValues[1].length==1){
+						value=splitValues[0]+"."+splitValues[1]+"0";		
+					}
+					if(splitValues[1].length>2 || splitValues[1]==""){
+						value=splitValues[0]+".00";		
+					}
+				}else{
+					value=splitValues[0];
+				}
+			}else{
+				value=value+".00";
+			}
+			//var hiddenFieldId = fieldId.split("Conv")[0];
+			$("#"+fieldId+"Converted").val(value);
+			value = value.replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,');
+			$("#"+fieldId).val(value);
+		}
+	}
+ 
+	function departmentAgainstObject(){
+		var code=$("#object").val();
+		if(code!=""){
+		
+		$.ajax({
+			type : "GET",
+			url : "${contextPath}/fnd/fund/getDepartmentListByEntity",
+			data : {
+				"objectId" : code,
+			},
+			success : function(response) {
+				var html = "<option value=''>-Select-</option>";
+				debugger
+				if (response.outcome==true && response.data != "" && response.data != null && response.data.length > 0) {
+					$.each(response.data, function(index, value) {
+						html = html + "<option value="+value.levelIdAndType+">"+ value.levelName + "</option>";
+					});
+				}
+				$('#department').empty().append(html);
+			},
+			error : function(error) {
+				bootbox.alert("Something Went wrong"); 
+			}
+		}); 
+		
+		}else{
+			$('#department').empty();
+		}
+	}
+
+
+	function getBudgetAmount(){
+		var finyearId=$("#finyearId").val();
+		var object=$("#object").val();
+		var fundTypeId=$("#fundTypeId").val();
+		var schemeId=$("#schemeId").val();
+		var subHeadId=$("#subHeadId").val();
+		if(budgetId!="" && object!=''){
+			$.ajax({
+				type : "GET",
+				url : "${contextPath}/fnd/fund/getBudgetAmount",
+				data : {
+					"object" : object,
+					"finYearId" : finyearId,
+					"subHeadId" : subHeadId != undefined || subHeadId != '' ? subHeadId : 0,
+					"schemeId" : schemeId!= undefined || schemeId != '' ? schemeId : 0,
+					"fundTypeId" : fundTypeId!= undefined || fundTypeId != '' ? fundTypeId : 0,
+				},
+				success : function(response) {
+					if(response.outcome){
+						let data = response.data;
+						// stringarry to jsonArray
+						let allBudgets = JSON.parse(data.allBudgets);
+						let html = '';
+						if(allBudgets.length > 0){
+							allBudgets.forEach(budget => {
+								html += '<option value="'+budget.budgetId+'">'+budget.objectName+'</option>';
+							});
+							$('#budgetId').empty().append(html);
+							if(allBudgets.length<2){
+							    var bdgDate=allBudgets[0].creationDate;
+							    $('#bdgDate').val(bdgDate);
+							}
+						}else{
+							html="<option value=''>-Select-</option>";
+							$('#budgetId').empty().append(html);
+						}
+						//budgetAmount, budgetRemainAmt, fundAllocateAmount, fundRemainAmt
+						var remainAmt=parseFloat($("#fundAmount").val())+parseFloat(data.remainAmt);
+
+						$('#totalBudgetAmt').text(data.budgetAmount.toFixed(2));
+						$('#remainingCost').val(remainAmt.toFixed(2));
+						$('#totalAllocationAmt').text(data.fundAllocateAmount.toFixed(2));
+						
+					}
+				},
+				error : function(error) {
+					bootbox.alert("Something Went wrong"); 
+				}
+			}); 
+		
+		}
+	}
+
+	function checkAmount(amount){
+		var budgetAmt=isNaN(parseFloat($("#remainingCost").val())) ? 0 : parseFloat($("#remainingCost").val());
+		var amt=parseFloat(amount).toFixed(2);
+		if(budgetAmt=='' || isNaN(budgetAmt)){
+			var budgetId=$("#budgetId").val();
+			if(budgetId!=''|| budgetId>0){
+				bootbox.alert("Amount is not available for next allocation.");
+				$("#turnover1Converted").val(0);
+				return false;
+			}else{
+				bootbox.alert("First select budget.");
+				$("#turnover1Converted").val(0);
+				return false;
+			}
+			
+		}
+		if(amt>budgetAmt){
+			bootbox.alert("Fund amount should not greater than remaining budget amount.");
+			$("#turnover1Converted").val(0);
+			return false;
+		}
+	}
+
+	function resetDate(){
+		$("#transDate").val("");
+	}
+ </script>           
+    

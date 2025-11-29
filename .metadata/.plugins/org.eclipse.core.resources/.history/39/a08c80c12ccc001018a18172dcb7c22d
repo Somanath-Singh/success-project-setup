@@ -1,0 +1,238 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+
+<style>
+    .btn-danger {
+        border-bottom: 1px solid #dc3545;
+        padding: 7px 10px;
+    }
+</style>
+
+	 <!-- #######################################################  FAMILY DETAILS TAB  ####################################################### -->
+					
+						<form action="${contextPath}/staff/saveStaffDetails" id="family" method="post" > <!-- onsubmit="return CheckForm()" -->
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+							<input type="hidden" id="staffId" name="staffId" value="${staffDetails.staffId}" />
+	                         <input type="hidden" name="pageCode" id="pageCode" value="family"/>
+							<input type="hidden" name="currentEdit" id="currentEditds" value="${userstatus}"> 
+
+							<h6 class="headingbg mb-4" style="margin-top: 25px;">Family Details :
+								<button type="button" id="plus_family" class="btn btn-xs btn-success add-row-fa-plus" title="Add New Row" style="border:none !important;padding: 10px 12px;width: auto;">
+									<i class="fa fa-plus"></i>
+								</button>
+							</h6>
+
+							<%-- <c:set value="1" var="cntf"></c:set> --%>
+							<div style="width: 100%;" id="tbody2">
+							 <c:choose>
+								<c:when test="${not empty staffDetails.staffFamilyDetailsList}">
+									<c:forEach items="${staffDetails.staffFamilyDetailsList}" var="employeeflst" varStatus="status">
+<%-- 										<input type="hidden" name="" id="empFamiyId" value="${employeeflst.familyId}" /> --%>
+
+										<div class="row add-multi-row btn-color" id="row${status.index}">
+											<input type="hidden" class="validIdIndex" name="staffFamilyDetailsList[${status.index}].familyId" id="familyId${status.index}" value="${employeeflst.familyId}" />
+											<div class="col-md-3">
+												<div class="form-group">
+													<c:if test="${status.index eq 0}"><label class="col-sm-12 required" for="firstNameF${status.index}">Family Member Name</label></c:if>
+													<div class="col-sm-12">
+														<input class="form-control require form-control-sm fam validAreaIndex AlphabetsOnly" name="staffFamilyDetailsList[${status.index}].familyMemberName" id="firstNameF${status.index}" type="text" maxlength="100" onblur="validateNameAndCode(this)" value="${employeeflst.familyMemberName}">
+													</div>
+												</div>
+											</div>
+											<div class="col-md-3">
+												<div class="form-group">
+													<c:if test="${status.index eq 0}"><label class="col-sm-12 required" for="relationship${status.index}">Relationship with Staff</label></c:if>
+													<div class="col-sm-12">
+														<select class="form-control require form-select validFacIndex" name="staffFamilyDetailsList[${status.index}].relationshipId" id="relationship${status.index}" onchange="handleFamillySelection(this)">
+															<option value=""><spring:message code="label.common.select" /></option>
+														    <c:forEach items="${satffLoadData.relationships}" var="relationship">
+														        <option value="${relationship.relationshipId}" ${employeeflst.relationship.relationshipId eq relationship.relationshipId ? 'selected' : ''}>
+														            ${relationship.relationshipName}
+														        </option>
+														    </c:forEach>
+														</select>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-2">
+												<div class="form-group">
+													<c:if test="${status.index eq 0}"><label class="col-sm-12 " for="birthDate${status.index}">D.O.B</label></c:if>
+													<div class="col-sm-12 datepicker-box">
+														<input type="text" class="form-control datepicker form-control-sm validMokIndex" name="staffFamilyDetailsList[${status.index}].dob" id="birthDate${status.index}" readonly="readonly"  value="<fmt:formatDate value="${employeeflst.dob}" pattern="dd/MM/yyyy" />">
+													</div>
+												</div>
+											</div>
+											<div class="col-md-2">
+												<div class="form-group">
+													<c:if test="${status.index eq 0}"><label class="col-sm-12" for="">Contact Number</label></c:if>
+													<div class="col-sm-12">
+														<input  type="text" class="form-control form-control-sm validDumIndex" name="staffFamilyDetailsList[${status.index}].contactNumber" onchange="validateMobileNo(this);isNumeric()" id="contactNumber${status.index}" maxlength="10" value="${employeeflst.contactNumber}">
+													</div>
+												</div>
+											</div>
+											<c:if test="${status.index ne 0}">
+												<div class="col-md-1">
+													<button type="button" onclick="deleteFamily('${status.index}');" class=" btn btn-danger remove-row-fa-minus">
+														<i class="fa fa-trash"></i>
+													</button>
+												</div>
+											</c:if>
+											<c:set value="${cntf+1}" var="cntf"></c:set>
+										</div>
+									</c:forEach>
+								</c:when>
+								<c:otherwise> 
+									<div class="row add-multi-row" id="">
+										<input type="hidden" class="validIdIndex" name="empFamiyId" id="empFamiyId" value="" />
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-sm-12 required" for="">Family Member Name</label>
+												<div class="col-sm-12">
+													<input class="form-control require form-control-sm fam validAreaIndex" name="staffFamilyDetailsList[0].familyMemberName" id="firstNameF0" type="text" maxlength="100" >
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="col-sm-12 required" for="">Relationship with Staff</label>
+												<div class="col-sm-12">
+													<select class="form-control require form-select validFacIndex" name="staffFamilyDetailsList[0].relationshipId" id="relationship0" onchange="handleFamillySelection(this)">
+														<option value=""><spring:message code="label.common.select" /></option>
+													    <c:forEach items="${satffLoadData.relationships}" var="relationship">
+													        <option value="${relationship.relationshipId}" ${employeeflst.relationship.relationshipId eq relationship.relationshipId ? 'selected' : ''}>
+													            ${relationship.relationshipName}
+													        </option>
+													    </c:forEach>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-2">
+											<div class="form-group">
+												<label class="col-sm-12 " for="">D.O.B</label>
+												<div class="col-sm-12 datepicker_con">
+													<input type="text" class="form-control datepicker form-control-sm validMokIndex" name="staffFamilyDetailsList[0].dob" id="birthDate0" readonly="readonly">
+
+												</div>
+											</div>
+										</div>
+										<div class="col-md-2">
+											<div class="form-group">
+												<label class="col-sm-12" for="">Contact Number</label>
+												<div class="col-sm-12">
+													<input  type="text" class="form-control form-control-sm validDumIndex" name="staffFamilyDetailsList[0].contactNumber" onchange="validateMobileNo(this);" id="contactNumber0" maxlength="10">
+												</div>
+											</div>
+										</div>
+									</div>
+								 </c:otherwise>
+							</c:choose> 
+
+							</div>
+
+							<%-- <div class="col-md-12 text-center" style="margin-top: 15px;">
+								<hr style="margin-top: 5px;" />
+								<div class="form-group">
+									<c:if test="${_StaffDetails.serviceStatusCode eq 'ONSERVICE' || _StaffDetails.serviceStatusCode eq 'SUSPENDED'}">
+									<button type="button" class="btn-submit" onclick="validateForm();">Update</button>
+									</c:if>
+									<a href="" class="btn btn-cancel">Cancel</a>
+								</div>
+							</div> --%>
+							<div class="col-md-12 text-center" style="margin-top: 15px;">
+	                  <hr style="margin-top: 5px;" />
+	                  <div class="form-group">
+	                     <button type="button" onclick="submitForm('family');" class="btn btn-success btn-sm">Save</button>
+						 <a href="${contextPath}/staff/staffMemberList" class="btn btn-warning btn-sm">Back to List</a>
+	                  </div>
+	               </div>
+						</form>
+	<script>
+	var cnt = '0';
+
+	$("#plus_family").click(function() {
+		var fields = document.getElementsByClassName("fam");
+		cnt = fields.length;
+		
+	    var htmldata = '<div class="row add-multi-row btn-color" id="row' + cnt + '">' +
+			'<div class="col-md-3">' +
+			'   <div class="form-group">' +
+			'       <div class="col-sm-12">' +
+			'           <input class="form-control require form-control-sm fam validAreaIndex" name="staffFamilyDetailsList[' + cnt + '].familyMemberName" id="firstNameF' + cnt + '" type="text">' +
+			'       </div>' +
+			'   </div>' +
+			'</div>' +
+			'<div class="col-md-3">' +
+			'   <div class="form-group">' +
+			'       <div class="col-sm-12">' +
+			'           <select class="form-control require form-select validFacIndex" name="staffFamilyDetailsList[' + cnt + '].relationshipId" id="relationship' + cnt + '" onchange="handleFamillySelection(this)">' +
+			'               <option value=""><spring:message code="label.common.select" /></option>';
+
+			// Loop through the relationships and add options
+			<c:forEach items="${satffLoadData.relationships}" var="relationship">
+				htmldata += '<option value="${relationship.relationshipId}" ${employeeflst.relationship.relationshipId eq relationship.relationshipId ? 'selected' : ''}>${relationship.relationshipName}</option>';
+			</c:forEach>
+
+			htmldata += '</select>' +
+			'       </div>' +
+			'   </div>' +
+			'</div>' +
+
+			'<div class="col-md-2">' +
+			'   <div class="form-group">' +
+			'       <div class="col-sm-12 datepicker-box">' +
+			'           <input type="text" class="form-control datepicker form-control-sm validMokIndex" name="staffFamilyDetailsList[' + cnt + '].dob" readonly="readonly" id="birthDate' + cnt + '">' +
+			'       </div>' +
+			'   </div>' +
+			'</div>' +
+			
+			'<div class="col-md-2">' +
+			'   <div class="form-group">' +
+			'       <div class="col-sm-12">' +
+			'           <input type="text" class="form-control form-control-sm validDumIndex" name="staffFamilyDetailsList[' + cnt + '].contactNumber" maxlength="10" oblur="validateMobileNo(this);" id="contactNumber' + cnt + '" >' +
+			'       </div>' +
+			'   </div>' +
+			'</div>' +
+			
+			'<div class="col-md-1">' +
+			'   <button type="button" onclick="deleteFamily(' + cnt + ');" class="btn  btn-danger remove-row-fa-minus">' +
+			'       <i class="fa fa-trash"></i>' +
+			'   </button>' +
+			'</div>' +
+
+			'</div>';
+
+		
+			var firstNameF =  $("#firstNameF" + (cnt-1)).val();
+		    var relationship =  $("#relationship" + (cnt-1)).val();
+		    //var contactNumber =  $("#contactNumber" + (cnt-1)).val();
+			if ( firstNameF !== "" && relationship !== "") {
+			$("#tbody2").append(htmldata);
+			cnt++;
+	        
+	        $('.datepicker').datepick({
+	            onShow: $.datepick.monthOnly,
+	            dateFormat: 'dd/mm/yyyy',
+	            yearRange: 'c-100:c+5',
+	            showOnFocus: true,
+	            showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>'
+	        });
+	        
+	    } else {
+	        bootbox.alert("Can't add empty row");
+// 	        cnt = currRowCount;
+// 	        $("#tbody2").val(currRowCount);
+             return false;
+
+	    }
+
+	    
+	});
+
+	</script>

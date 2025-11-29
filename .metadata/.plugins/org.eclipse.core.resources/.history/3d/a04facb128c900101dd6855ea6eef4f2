@@ -1,0 +1,15 @@
+package com.aashdit.common.dto;
+
+import java.util.List;
+
+import com.aashdit.common.model.BankBranchMaster;
+
+import lombok.Data;
+@Data
+public class BankBranchDTO {
+
+	   private BankBranchMaster bankBranchMaster;
+	   
+	   private List<BankBranchMaster> bankBranchMasterList;
+
+}

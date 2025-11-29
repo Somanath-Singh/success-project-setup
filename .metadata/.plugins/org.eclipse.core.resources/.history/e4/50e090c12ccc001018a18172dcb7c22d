@@ -1,0 +1,1107 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/AadharVaidator.js"></script>
+<%--<jsp:useBean id="strUtils" class="com.aashdit.demography.utils.ApplicationStringUtils" />--%>
+<style>
+td {
+    text-align: right;
+}
+.alert-danger {
+	border-color: #f3acbb !important;
+	color: #730503;
+}
+.view-btn {
+padding: 10px 10px;
+    background: #fa6868;
+    color: #fff;
+    }
+.btm-lin {
+border-bottom: 1px dashed #333;
+    height: 22px;
+    padding: 0 10px;
+}
+.btm-lin2 {
+height: 22px;
+    font-weight: 400;
+}
+table th {
+    text-align: center;
+    }
+/*Profile Pic Start*/
+.picture-container {
+	position: relative;
+	cursor: pointer;
+	text-align: center;
+}
+
+.picture {
+    width: 125px;
+    height: 47px;
+	background-color: #999999;
+	border: 4px solid #CCCCCC;
+	color: #FFFFFF;
+	border-radius: 0px;
+	margin: 10px auto;
+	overflow: hidden;
+	transition: all 0.2s;
+	-webkit-transition: all 0.2s;
+}
+
+.picture:hover {
+	border-color: #2ca8ff;
+}
+
+.content.ct-wizard-green .picture:hover {
+	border-color: #05ae0e;
+}
+
+.content.ct-wizard-blue .picture:hover {
+	border-color: #3472f7;
+}
+
+.content.ct-wizard-orange .picture:hover {
+	border-color: #ff9500;
+}
+
+.content.ct-wizard-red .picture:hover {
+	border-color: #ff3b30;
+}
+
+.picture input[type="file"] {
+	cursor: pointer;
+	display: block;
+	height: 100%;
+	left: 0;
+	opacity: 0 !important;
+	position: absolute;
+	top: 0;
+	width: 100%;
+}
+
+.picture img {
+	width: 104%;
+    height: 39px;
+}
+
+.picture-src {
+	width: 100%;
+}
+</style>
+<style>
+.fan {
+	width: auto;
+	margin: 3px 0;
+	display: initial;
+}
+.border-bottom {
+  outline: 0;
+  border-width: 0 0 1.5px;
+  /* border-color: blue */
+     border-color:blue;
+}
+.border-bottom {
+  border-color: green
+}
+</style>
+	<style>
+.exercised li {
+	display: flex;
+	padding: 10px;
+}
+
+.exercised li span {
+	margin-left: 30px;
+}
+
+
+@media print{
+   .noprint{
+       display:none;
+       visibility: hidden;
+   }
+}
+
+</style>
+<div class="content">
+	<div class="panel-header bg-primary-gradient">
+		<div class="page-inner py-5">
+			<div
+				class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+				<div>
+					<h2 class="text-white pb-2 fw-bold">ANNEXURE</h2>
+				</div>
+				<div class="ml-md-auto py-2 py-md-0">
+				<button class="btn btn-primary btn-sm" onclick="printDiv('prnt')"><i class="fa fa-print"></i> Print</button>
+					<a href="${contextPath}"
+						class="btn btn-white btn-border btn-round mr-2"><i
+						class="fa fa-home"></i></a> <a href="#"
+						class="btn btn-secondary btn-round">/ ANNEXURE</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="page-inner mt--5">
+			<c:set var="totalCurSanAMt" value="${0}"/>
+			<c:set var="totalCurUTAMt" value="${0}"/>
+			<c:set var="totalCurBlAmt" value="${0}"/>
+			
+			<c:set var="totalPrvSanAMt" value="${0}"/>
+			<c:set var="totalPrvYrAmt" value="${0}"/>
+			<c:set var="totalPrvUtlAMt" value="${0}"/>
+			<c:set var="totalPrvBlAmt" value="${0}"/>
+		<div class=" row mt-5">
+			<div class="col-md-12">
+				<div class="card full-height" id="prnt">
+					<div class="card-header">
+						<h4 class="card-title text-center">ANNEXURE-VI</h4>
+					</div>
+					<div class="card-body">
+				<form class="form-horizontal" action="${contextPath}/fnd/uc/add" method="post" enctype="multipart/form-data" id="fundForm">
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+						<div class="col-md-12">
+							<h5 class="text-center">
+								<u>Form of Utilization Certificate</u>
+							</h5>
+							<p>Name of Department, <strong class="btm-lin">${utilisationCertfData.departName}</strong><span class="float-right">Mission Vatsalya</span>
+							</p>
+
+							<!-- List of annexure -->
+							<ol  style="padding: 0 0 0 15px;">
+								<li>
+									<p class="">
+										Certified that a sum of Rs. <strong class="btm-lin"> ${strUtils.convertAmountToINRFormat(utilisationCertfData.utilizedAmt)}</strong>(Rupees <strong class="btm-lin"> ${utilisationCertfData.utilizedAmtText}</strong> )only has been utilized under the
+										scheme <strong class="btm-lin">${utilisationCertfData1.fundType1.fundTypeName}</strong> by Odisha State
+										Child Protection Society out of Grant-in-aid/Loan of Rs. <strong class="btm-lin">${strUtils.convertAmountToINRFormat(utilisationCertfData.gidLoanAmt)}</strong>
+										(Rupees <strong class="btm-lin">${utilisationCertfData.gidLoanAmtText}</strong>)only sanctioned by OSCPS, DW&CD and MS
+										during the financial year <strong class="btm-lin">${utilisationCertfData.finyear.finYear}</strong> as indicated in Table-1.
+									</p>
+								</li>
+								<li>Out of Rs. <strong class="btm-lin">${strUtils.convertAmountToINRFormat(utilisationCertfData.remainingAmt)}</strong>
+									(Rupees<strong class="btm-lin">${utilisationCertfData.remainingAmtText}</strong>)only remaining unspent balance of the
+									previous years, a sum of Rs. <strong class="btm-lin">${strUtils.convertAmountToINRFormat(utilisationCertfData.sumUtilizedAmt)}</strong> 
+									(Rupees <strong class="btm-lin">${utilisationCertfData.sumUtilizedAmtText}</strong>)
+									only has been utilized as indicated below in Table-2.
+								</li>
+								<li>The utilization has been made for the purpose it was
+									sanctioned and that a balance of Rs. <strong class="btm-lin">${strUtils.convertAmountToINRFormat(utilisationCertfData.prvYearAmt)}</strong>
+									(Rupees <strong class="btm-lin">${utilisationCertfData.prvYearAmtText}</strong>)
+									only remaining unutilized at the end of the year has been
+									surrendered to the Government(vide Challan No. <strong class="btm-lin">${utilisationCertfData.challanNo}</strong>
+									date <!-- 	<div class="datepicker_con col-md-3"> --> 
+									<strong class="btm-lin">${utilisationCertfData.challanData}</strong> <!-- </div> --> ) will
+									be carried over to the next year <strong class="btm-lin">${utilisationCertfData.prvFinYear}</strong>
+									will be adjusted towards the Grant-in-aid/Loan payable in the
+									next year. <!-- <input type="text"
+									class="form-control form-control-sm border-bottom fan" maxlength="60"/> -->
+
+									<br />
+									<div class="col-md-12">
+										<h4 class="text-center mt-4">Details of Current Year</h4>
+										<div class="table-responsive">
+											<!-- dynamic table -->
+											<table class="table table-bordered">
+												<thead>
+													<tr>
+														<th scope="col">Sanction No.</th>
+														<th scope="col">Sanction Date</th>
+														<th scope="col">Sanctioned Amount</th>
+														<th scope="col">Utilization Amount</th>
+														<th scope="col">Balance Amount</th>
+														<th scope="col">Remarks</th>
+														<!-- <th scope="col">
+															<button type="button" class="btn btn-primary btn-sm"
+																onclick="addmoreRow1(1)">
+																<i class="fa fa-plus"></i>
+															</button>
+														</th> -->
+													</tr>
+												</thead>
+												<tbody id=insertrow>
+												 <c:choose>
+												  <c:when test="${not empty utilisationCertfData.ucCurrYears}">
+												  <c:forEach items="${utilisationCertfData.ucCurrYears}" var="ucCurrYears">
+												  
+												   <c:set var="totalCurSanAMt" value="${totalCurSanAMt + ucCurrYears.sanctionAmt}" />
+												    <c:set var="totalCurUTAMt" value="${totalCurUTAMt + ucCurrYears.utilizedAmt}" />
+												     <c:set var="totalCurBlAmt" value="${totalCurBlAmt + ucCurrYears.balanceAmt}" />
+												 <tr>
+													<td>
+														<strong class="btm-lin2">${ucCurrYears.sanctionNo}</strong>
+													</td>
+													
+														<td style="min-width: 200px; ">
+															<div class="col-md-12">
+																<strong class="btm-lin2"><fmt:formatDate value="${ucCurrYears.sanctionDate}" pattern='dd/MM/yyyy'/> </strong>
+															</div>
+														</td>
+														
+														<td>
+														<strong class="btm-lin2">${strUtils.convertAmountToINRFormat(ucCurrYears.sanctionAmt)}</strong>
+														</td>
+														<td>
+														<%-- <strong class="btm-lin2">${strUtils.convertAmountToINRFormat(ucCurrYears.utilizedAmt)}</strong> --%>
+														<strong class="btm-lin2">${strUtils.convertAmountToINRFormat(0)}</strong>
+														</td>
+														<td>
+														<%-- <strong class="btm-lin2">${strUtils.convertAmountToINRFormat(ucCurrYears.balanceAmt)}</strong> --%>
+														<strong class="btm-lin2">${strUtils.convertAmountToINRFormat(0)}
+														</td>
+														<td>
+														<strong class="btm-lin2">${ucCurrYears.remark}</strong>
+														</td>
+														<!-- <td>
+															<button type="button" class="btn btn-danger btn-sm">
+																<i class="fa fa-trash"></i>
+															</button>
+														</td> -->
+													</tr>
+													</c:forEach>
+												 </c:when>
+												 <c:otherwise>
+												 <tr>
+														<td>
+														<input type="text" name="ucCurrYears[1].sanctionNo" id="sanctionNo1" maxlength="20"
+																 onchange="checkedDuplicateSanctionNo(this.value,1);checkDuplicateSanctionNoArray(this);"	class="form-control form-control-sm border-bottom fan sanctNo" />
+														</td>
+														<td style="min-width: 200px;">
+															<div class="col-md-12  ">
+																<input type="text" name="ucCurrYears[1].sanctionDate" id="sanctionDate1"
+																	class="form-control form-control-sm border-bottom fan" readonly />
+															</div>
+														</td>
+														<td>
+														<strong class="btm-lin2">${exhibitionProductDtl.sanctionAmt}</strong>
+														</td>
+														<td>
+														<strong class="btm-lin2">${exhibitionProductDtl.pricePerUnit}</strong>
+														</td>
+														<td>
+														<strong class="btm-lin2">${exhibitionProductDtl.pricePerUnit}</strong>
+														</td>
+														<td>
+														<input type="text" class="form-control form-control-sm border-bottom"    
+														name="ucCurrYears[1].remark" id="remark1" value=""  maxlength="15">
+														</td>
+														<!-- <td>
+															<button type="button" class="btn btn-danger btn-sm">
+																<i class="fa fa-trash"></i>
+															</button>
+														</td> -->
+													</tr>
+												 </c:otherwise>
+												 </c:choose>
+												</tbody>
+
+												<tfoot>
+													<tr>
+														<td colspan="2" class="text-center"><b>Total</b></td>
+														<td><strong class="btm-lin2"><%-- ${strUtils.convertAmountToINRFormat(totalCurSanAMt)} + ${strUtils.convertAmountToINRFormat(utilisationCertfData.gidLoanAmt - totalCurSanAMt)} = --%> ${strUtils.convertAmountToINRFormat(utilisationCertfData.gidLoanAmt)}</strong>
+														</td>
+														<td><strong class="btm-lin2">${strUtils.convertAmountToINRFormat(totalCurUTAMt)}</strong>
+														</td>
+														<td><strong class="btm-lin2">${strUtils.convertAmountToINRFormat(totalCurBlAmt)}</strong>
+														</td>
+														<td></td>
+													</tr>
+												</tfoot>
+											</table>
+										</div>
+									</div>
+
+									<div class="col-md-12 ">
+										<h4 class="text-center mt-4">Details of Previous Years*</h4>
+										<div class="table-responsive">
+											<!-- dynamic table -->
+											<table class="table table-bordered">
+												<thead>
+													<tr>
+														<th scope="col">Sanction No</th>
+														<th scope="col">Sanction Date</th>
+														<th scope="col">Sanctioned Amount</th>
+														<th scope="col">Unspent balance at the close of
+															previous year</th>
+														<th scope="col">Utilization Amount</th>
+														<th scope="col">Balance Amount</th>
+														<!-- <th scope="col">
+															<button type="button" class="btn btn-primary btn-sm"
+																onclick="addmoreRow2(1)">
+																<i class="fa fa-plus"></i>
+															</button>
+														</th> -->
+													</tr>
+												</thead>
+												<tbody id="insertrow2">
+													<c:choose>
+												  <c:when test="${not empty utilisationCertfData.ucPrvYears}">
+												 <c:forEach items="${utilisationCertfData.ucPrvYears}" var="ucPrvYears" varStatus="count">
+												   <c:set var="totalPrvSanAMt" value="${totalPrvSanAMt + ucPrvYears.prvSanctionAmt}" />
+												   <c:if test="${count.count eq 1 }">
+												     <c:set var="totalPrvYrAmt" value="${totalPrvYrAmt + ucPrvYears.prvYearAmt}" />
+												       <c:set var="totalPrvUtlAMt" value="${totalPrvUtlAMt + ucPrvYears.prvUtilizedAmt}" />
+												         <c:set var="totalPrvBlAmt" value="${totalPrvBlAmt + ucPrvYears.prvBalanceAmt}" />
+												</c:if>
+												 <tr>
+													<td>
+														<strong class="btm-lin2">${ucPrvYears.prvSanctionNo}</strong>
+													</td>
+														<td style="min-width: 200px;">
+															<div class="col-md-12   ">
+																<strong class="btm-lin2"><fmt:formatDate value="${ucPrvYears.prvSanctionDate}" pattern='dd/MM/yyyy'/></strong>
+															</div>
+														</td>
+														<td>
+														<strong class="btm-lin2">${strUtils.convertAmountToINRFormat(ucPrvYears.prvSanctionAmt)}</strong>
+														</td>
+														<td>
+														<strong class="btm-lin2">${count.count eq 1 ?strUtils.convertAmountToINRFormat(ucPrvYears.prvYearAmt):'0.00'}</strong>
+														</td>
+														<td>
+														<strong class="btm-lin2">${count.count eq 1 ?strUtils.convertAmountToINRFormat(ucPrvYears.prvUtilizedAmt):'0.00'}</strong>
+														</td>
+														<td>
+														<strong class="btm-lin2">${count.count eq 1 ?strUtils.convertAmountToINRFormat(ucPrvYears.prvBalanceAmt):'0.00'}</strong>
+														</td>
+														<!-- <td>
+															<button type="button" class="btn btn-danger btn-sm">
+																<i class="fa fa-trash"></i>
+															</button>
+														</td> -->
+													</tr>
+													</c:forEach>
+												 </c:when>
+												 <c:otherwise>
+												<tr>
+													<td>
+														<strong class="btm-lin2">N/A</strong>
+													</td>
+														<td style="min-width: 200px;">
+															<div class="col-md-12   ">
+																<strong class="btm-lin2">N/A</strong>
+															</div>
+														</td>
+														<td>
+														<strong class="btm-lin2">${strUtils.convertAmountToINRFormat(ucPrvYears.prvSanctionAmt)}</strong>
+														</td>
+														<td>
+														<strong class="btm-lin2">${count.count eq 1 ?strUtils.convertAmountToINRFormat(ucPrvYears.prvYearAmt):'0.00'}</strong>
+														</td>
+														<td>
+														<strong class="btm-lin2">${count.count eq 1 ?strUtils.convertAmountToINRFormat(ucPrvYears.prvUtilizedAmt):'0.00'}</strong>
+														</td>
+														<td>
+														<strong class="btm-lin2">${count.count eq 1 ?strUtils.convertAmountToINRFormat(ucPrvYears.prvBalanceAmt):'0.00'}</strong>
+														</td>
+														<!-- <td>
+															<button type="button" class="btn btn-danger btn-sm">
+																<i class="fa fa-trash"></i>
+															</button>
+														</td> -->
+													</tr>
+												 </c:otherwise>
+												 </c:choose>
+												</tbody>
+
+												<tfoot>
+													<tr>
+														<td colspan="2" class="text-center"><b>Total</b></td>
+														<td><strong class="btm-lin2">${strUtils.convertAmountToINRFormat(totalPrvSanAMt)}</strong>
+														</td>
+														<td><strong class="btm-lin2">${strUtils.convertAmountToINRFormat(totalPrvYrAmt)}</strong>
+														</td>
+														<td><strong class="btm-lin2">${strUtils.convertAmountToINRFormat(totalPrvUtlAMt)}</strong>
+														</td>
+														<td><strong class="btm-lin2">${strUtils.convertAmountToINRFormat(totalPrvBlAmt)}</strong>
+														</td>
+														<td></td>
+													</tr>
+												</tfoot>
+											</table>
+											<p>
+												<b>*(The details of
+													the previous are now being given in the current year) </b>
+											</p>
+										</div>
+									</div>
+								</li>
+								<li>
+									<p>Certified that I have satisfied myself that the
+										conditions on which the grants-in-aid/ loan was sanctioned
+										have been duly fulfilled and that I have exercised the
+										following checks to see that the money was actually utilized
+										for the purpose for which it was sanctioned.</p>
+									<p>Kinds of checks exercised</p> <br />
+
+									<!-- <ol class="exercised">
+										<li>
+											<h5>Cash Book</h5> <span>Signature-
+											<div class="form-group">
+												<label class="col-md-12 smallInput required" for="">Attach Signature:</label>
+												 <div class="col-md-6">
+													<input type="file" name="signatureDocs" class="form-control form-control-sm border-bottom" id="reportType" />
+														<small id="emailHelp" class="form-text text-muted">
+														</small>
+												</div>
+											</div>
+										</span>
+										</li>
+										<li>
+									<h5>Passbook</h5>
+									 <span>Designation-
+										<input type="text" name="designation" id="designation" class="form-control form-control-sm border-bottom fan" />
+									</span>
+										</li>
+										<li>
+											<h5>All Register</h5> 
+										<span> Date-	<div class="col-md-12  datepicker_con fdate-d">
+																<input type="text" name="regDate" id="regDate"
+																	class="form-control form-control-sm border-bottom fan" readonly />
+															</div>
+										</span>
+										</li>
+										<li><h5>PFMS</h5></li>
+									</ol> -->
+								</li>
+							</ol>
+						</div>
+						<div class="col-md-12" >
+						<div class="col-md-3">
+                                 <div class="form-group">
+                                     <label class="">Cash Book :</label>
+                                     <div class="col-md-12">
+                                     <a class="view-btn btn-success" target="_blank" href ="${contextPath}/fnd/uc/cashBook/view/${utilisationCertfData.utilCertId}">${empty utilisationCertfData.cashBook?'Not Available':'View Document'}</a>
+	                                    <%-- <input type="file" class="form-control form-control-sm border-bottom x-turnover " id="cashBookDoc" name="cashBookDoc" value="${strUtils.convertAmountToINRFormat(budget.amount)}" maxlength="15"  > --%>
+                                     </div>
+                                 </div>
+                             </div>
+						<div class="col-md-3">
+                                 <div class="form-group">
+                                     <label class="">Audit Report :</label>
+                                     <div class="col-md-12">
+                                     <a class="view-btn btn-info" target="_blank" href ="${contextPath}/fnd/uc/auditReport/view/${utilisationCertfData.utilCertId}">${empty utilisationCertfData.auditReport?'Not Available':'View Document'}</a>
+	                                   <%--  <input type="file" class="form-control form-control-sm border-bottom x-turnover " id="auditReportDoc" name="auditReportDoc" value="${strUtils.convertAmountToINRFormat(budget.amount)}" maxlength="15"  > --%>
+                                     </div>
+                                 </div>
+                             </div>
+						<div class="col-md-3">
+                                 <div class="form-group">
+                                     <label class="">Bills & Vouchers :</label>
+                                     <div class="col-md-12">
+	                                    <a class="view-btn btn-danger" target="_blank" href ="${contextPath}/fnd/uc/billsVoucher/view/${utilisationCertfData.utilCertId}">${empty utilisationCertfData.billsVouchers?'Not Available':'View Document'}</a>
+                                     </div>
+                                 </div>
+                             </div>
+						<div class="col-md-3">
+                                 <div class="form-group">
+                                     <label class="">Physical verification :</label>
+                                     <div class="col-md-12">
+                                      <a class="view-btn btn-primary" target="_blank" href ="${contextPath}/fnd/uc/physicalVerfication/view/${utilisationCertfData.utilCertId}">${empty utilisationCertfData.physicalVerification?'Not Available':'View Document'}</a>
+	                                   <%--  <input type="file" class="form-control form-control-sm border-bottom x-turnover " id="physicalVerificationDoc" name="physicalVerificationDoc" value="${strUtils.convertAmountToINRFormat(budget.amount)}" maxlength="15"  > --%>
+                                     </div>
+                                 </div>
+                             </div>
+                             </div>
+                         <div class="col-md-12" >    
+						<div class="col-md-3">
+                                 <div class="form-group">
+                                     <label class="">Bank Passbook :</label>
+                                     <div class="col-md-12">
+                                      <a class="view-btn" target="_blank" href ="${contextPath}/fnd/uc/bankPassbook/view/${utilisationCertfData.utilCertId}">${empty utilisationCertfData.bankPassbook?'Not Available':'View Document'}</a>
+	                                    <%-- <input type="file" class="form-control form-control-sm border-bottom x-turnover " id="bankPassbookDoc" name="bankPassbookDoc" value="${strUtils.convertAmountToINRFormat(budget.amount)}" maxlength="15"  > --%>
+                                     </div>
+                                 </div>
+                             </div>
+						   <div class="col-md-3">
+						<!-- <div class="col-md-3"> -->
+                                 <div class="form-group">
+                                     <label class="">Stock Register :</label>
+                                     <div class="col-md-12">
+                                     <a class="view-btn btn-warning" target="_blank" href ="${contextPath}/fnd/uc/stockRegister/view/${utilisationCertfData.utilCertId}">${empty utilisationCertfData.stockRegister?'Not Available':'View Document'}</a>
+	                                    <%-- <input type="file" class="form-control form-control-sm border-bottom x-turnover " id="stockRegisterDoc" name="stockRegisterDoc" value="${strUtils.convertAmountToINRFormat(budget.amount)}" maxlength="15"  > --%>
+                                     </div>
+                                 </div>
+                             <!-- </div> -->
+                             </div>
+                             </div>
+                          <!--    <div class="col-md-6">
+                             </div> -->
+                              <div class="col-md-12">
+                             <div class="col-md-3">
+											<div class="row">
+												<div class="col-md-12">
+													<div class="container">
+														<div class="picture-container">
+															<div class="picture" style="margin-left: 20px;">
+																<c:choose>
+																	<c:when test="${not empty utilisationCertfData.signature}">
+																		<img id="uph" src="${contextPath}/fnd/uc/signature/view/${utilisationCertfData.utilCertId}"
+																			aria-hidden="true" alt="User Icon" />
+																	</c:when>
+																	<c:otherwise>
+																		<img id="uph"
+																			src="${contextPath}/assets/img/demo_sign.png"
+																			aria-hidden="true" alt="User Icon">
+																		<span class="ph-text">Photo</span>
+																		<input type="file"
+																	onchange="document.getElementById('uph').src = window.URL.createObjectURL(this.files[0]);validateImage();"
+																	name="signatureDocs" id="userProfileImage">
+																	</c:otherwise>
+																</c:choose>
+																
+															</div>
+														</div>
+													</div>
+
+												</div>
+											</div>
+										</div>
+										</div>
+										<div class="col-md-12">
+										<div class="col-md-3">
+			                                 <div class="form-group">
+			                                    <!--  <label class="required">Stock Register :</label> -->
+													<div class="col-md-12 ">
+														<input type="text" name="designation" id="designation" class="form-control form-control-sm border-bottom fan" value="${utilisationCertfData.designation}" placeholder="Designation" />
+											 </div>
+										</div>
+										</div>
+										</div>
+										<div class="col-md-12">
+										<div class="col-md-3">
+			                                 <div class="form-group">
+			                                    <!--  <label class="required">Stock Register :</label> -->
+													<div class="col-md-12">
+														<input type="text" name="regDate" id="regDate"  value='${utilisationCertfData.regDate}' class="form-control form-control-sm border-bottom fan"  />
+											 </div>
+										</div>
+										</div>
+										</div>
+										
+						</form>
+						</div>
+					</div>
+					
+					<div class="col-md-12 text-center">
+						      <%--  <button type="button" class="btn btn-sm btn-success" onclick="saveUCFormDetails();">${not empty fund ? 'Update' : 'Save'}</button> --%>
+                                <a href="${contextPath}/" style="text-align: center;
+    margin: 0 auto;
+    display: block;
+    width: 55px;
+    margin-bottom: 15px;
+    margin-top: 10px;" class="btn btn-sm btn-dark noprint">Back</a>
+						</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<form method="GET" id="formId">
+ <input type="hidden" name="finYearId" id="hdnFinYearId" >
+ <input type="hidden" name="fundTypeId" id="hdnFundTypeId">
+</form>
+<script>
+    
+    
+    
+    $('body').on('focus',".datepicker>input", function(){
+        $(this).datepick({
+			 dateFormat: 'dd/mm/yyyy',maxDate: new Date(), showOnFocus: true,
+			 onClose: function(selected) {
+			 	var birthday = +new Date(selected);
+					var age = ~~((Date.now() - birthday) / (31557600000));
+					var da = age | 0;
+					$('#farmerAge').val(da);
+					
+			 }
+		});
+    });
+    
+ /*  var count11 =  $('#insertrow tr').length;
+	function addmoreRow1(){
+		
+		if($("#sanctionNo"+count11).val()==""){
+			bootbox.alert("Please Enter Current Year Sanction No .");
+			return false;
+		}
+		else if($("#sanctionDate"+count11).val()==""){
+			bootbox.alert("Please Select Current Year Sanction Date.");
+			return false;
+		}
+		else if($("#sanctionAmt"+count11).val()==""){
+			bootbox.alert("Please Enter Current Year Sanction Amount");
+			return false;
+		}
+		else if($("#utilizedAmt"+count11).val()==""){
+			bootbox.alert("Please Enter Current Year utilized Amount");
+			return false;
+		}
+	
+		else if($("#balanceAmt"+count11).val()==""){
+			bootbox.alert("Please Enter Current Year Balance Amt .");
+			return false;
+		}else if($("#remark"+count11).val()==""){
+				bootbox.alert("Please Enter Current Year Remarks .");
+				return false;	
+		}else{ 
+			count11++;
+			var collectData11 = '';
+			collectData11 = collectData11
+							//+'<tr id="deleteRowDetails1'+count11+'"><td class="pgDiv pgDivId" > <select class="form-control form-control-sm border-bottom" id="pgId'+count11+'" name="exhibitionProductDtls1['+count11+'].pgProfile.pgProfileId" onchange="findProductByPgId('+count11+',this.value);"><option value="" >- Select -</option> </select></td><td> <select class="form-control form-control-sm product" id="productId'+count11+'" name="exhibitionProductDtls['+count11+'].product.productId" onchange="findProductPriceByProd(this.value,'+count11+'),checkDuplicateName(this)" ><option value="" >- Select -</option> </select></td><td> <input type="text" class="form-control form-control-sm" name="exhibitionProductDtls['+count11+'].fssiNo" id="fssiNo'+count11+'" maxlength="20" readonly></td><td> <input type="text" class="form-control form-control-sm" onchange="validateUnit(this);" name="exhibitionProductDtls['+count11+'].quantity" id="quantity'+count11+'"  maxlength="20"> </td><td> <select class="form-control form-control-sm" name="exhibitionProductDtls['+count11+'].mesurmentUnit.unitId" id="unitId'+count11+'"><option value="">Select</option> <c:forEach items="${mesurmentUnitList}" var="mesurmentUnit"><option value="${mesurmentUnit.unitId}" ${mesurmentUnit.unitId eq unitId ? 'selected':'' } >${mesurmentUnit.unitName}</option> </c:forEach> </select></td><td> <input type="text" class="form-control form-control-sm" onchange="validateAmount(this);" name="exhibitionProductDtls['+count11+'].pricePerUnit" id="pricePerUnit'+count11+'" maxlength="15"></td><td><div class="col-md-10"><input type="file" class="form-control form-control-sm" name="exhibitionProductDtls['+count11+'].uploadAttachement" onchange="imagePDFCheck(this)" id="uploadAttachement'+count11+'"></div><div class="col-md-1"><a href="#" data-toggle="tooltip" title="Document Not Available" class="btn btn-xs btn-primary"><i class="fas fa-eye-slash"></i></a></div></td><td><button id="removeButton'+count11+'" type="button" class="btn btn-danger btn-sm" onclick="deletethisRow1('+count11+')"><i class="fa fa-minus"></i></button></td></tr>';
+			+ '<tr id="deleteRowDetails1'+count11+'"><td><input type="text" name="ucCurrYears['+count11+'].sanctionNo" id="sanctionNo'+count11+'"   onchange="checkedDuplicateSanctionNo(this.value,'+count11+');checkDuplicateSanctionNoArray(this);" maxlength="20" class="form-control form-control-sm fan sanctNo "/></td><td style="min-width: 200px;"><div class="col-md-12 datepicker_con fdate-d"><input type="text" readonly name="ucCurrYears['+count11+'].sanctionDate" id="sanctionDate'+count11+'"class="form-control form-control-sm fan"/></div></td><td><input type="text" class="form-control form-control-sm sanAmt" value="0.0" onchange="validateAmount(this);" name="ucCurrYears['+count11+'].sanctionAmt" id="sanctionAmt'+count11+'" onkeyup="sumOfAmount(this.value);" value="<fmt:formatNumber type="number" groupingUsed="false" value="${exhibitionProductDtl.sanctionAmt}" pattern="#.00"/>" maxlength="15"></td><td><input type="text" class="form-control form-control-sm utlAmt" value="0.0" onkeyup="sumOfUtlAmount(this.value);" onchange="validateAmount(this);" name="ucCurrYears['+count11+'].utilizedAmt" id="utilizedAmt'+count11+'" value="<fmt:formatNumber type="number" groupingUsed="false" value="${exhibitionProductDtl.pricePerUnit}" pattern="#.00"/>" maxlength="15"></td><td><input type="text" class="form-control form-control-sm blAmt" value="0.0" onkeyup="sumOfBlAmount(this.value);" onchange="validateAmount(this);" name="ucCurrYears['+count11+'].balanceAmt" id="balanceAmt'+count11+'" value="<fmt:formatNumber type="number" groupingUsed="false" value="${exhibitionProductDtl.pricePerUnit}" pattern="#.00"/>" maxlength="15"></td><td><input type="text" class="form-control form-control-sm" name="ucCurrYears['+count11+'].remark" id="remark" value="" maxlength="15"></td><td><button type="button" class="btn btn-danger btn-sm" id="removeButton'+count11+'" onclick="deletethisRow1('+count11+')"><i class="fa fa-trash"></i></button></td></tr>';
+			$("#insertrow").append(collectData11);
+			var no = count11-1 ;
+			$("#removeButton"+no).prop('disabled', true);
+			
+		 }
+		
+		$('.fdate-d>input').datepick({onShow: $.datepick.monthOnly, dateFormat: 'dd/mm/yyyy',maxDate:0,yearRange: 'c-100:c+5', showOnFocus: true,
+			showTrigger: '<button type="button" class="trigger">' +
+			'<i class="fa fa-calendar"></i></button>'});
+	}
+	function deletethisRow1(val) {
+		var totSanAmt = parseFloat($("#totSanAmt").val().replaceAll(",","")-parseFloat($("#sanctionAmt"+val).val()))
+		var totUtlAmt = parseFloat($("#totUtlAmt").val().replaceAll(",","")-parseFloat($("#utilizedAmt"+val).val()))
+		var totBlAmt = parseFloat($("#totBlAmt").val().replaceAll(",","")-parseFloat($("#balanceAmt"+val).val()))
+		$("#totSanAmt").val(parseFloat(totSanAmt).toFixed(2));
+		$('#totUtlAmt').val(parseFloat(totUtlAmt).toFixed(2));
+		$('#totBlAmt').val(parseFloat(totBlAmt).toFixed(2));
+		$($("#deleteRowDetails1" + val).closest("tr")).remove();
+		count11--;
+		$("#removeButton"+count11).prop("disabled", false); 
+	} */
+    </script> 
+<script>
+    
+/* var count11 =  $('#insertrow2 tr').length;
+function addmoreRow2(){
+	
+	if($("#prvSanctionNo"+count11).val()==""){
+		bootbox.alert("Please Enter Sanction No .");
+		return false;
+	}
+	else if($("#prvSanctionDate"+count11).val()==""){
+		bootbox.alert("Please Select Sanction Date.");
+		return false;
+	}
+	else if($("#prvSanctionAmt"+count11).val()==""){
+		bootbox.alert("Please Enter Sanction Amount");
+		return false;
+	}
+	else if($("#prvYearAmt"+count11).val()==""){
+		bootbox.alert("Please Enter Unspent balance at the close of previous year");
+		return false;
+	}
+	else if($("#prvUtilizedAmt"+count11).val()==""){
+		bootbox.alert("Please Enter utilized Amt .");
+		return false;
+	}else if($("#prvBalanceAmt"+count11).val()==""){
+			bootbox.alert("Please Enter Balance Amt .");
+			return false;	
+	}else{  
+		count11++;
+		var collectData11 = '';
+		collectData11 = collectData11
+						//+'<tr id="deleteRowDetails1'+count11+'"><td class="pgDiv pgDivId" > <select class="form-control form-control-sm border-bottom" id="pgId'+count11+'" name="exhibitionProductDtls1['+count11+'].pgProfile.pgProfileId" onchange="findProductByPgId('+count11+',this.value);"><option value="" >- Select -</option> </select></td><td> <select class="form-control form-control-sm border-bottom product" id="productId'+count11+'" name="exhibitionProductDtls['+count11+'].product.productId" onchange="findProductPriceByProd(this.value,'+count11+'),checkDuplicateName(this)" ><option value="" >- Select -</option> </select></td><td> <input type="text" class="form-control form-control-sm border-bottom" name="exhibitionProductDtls['+count11+'].fssiNo" id="fssiNo'+count11+'" maxlength="20" readonly></td><td> <input type="text" class="form-control form-control-sm border-bottom" onchange="validateUnit(this);" name="exhibitionProductDtls['+count11+'].quantity" id="quantity'+count11+'"  maxlength="20"> </td><td> <select class="form-control form-control-sm border-bottom" name="exhibitionProductDtls['+count11+'].mesurmentUnit.unitId" id="unitId'+count11+'"><option value="">Select</option> <c:forEach items="${mesurmentUnitList}" var="mesurmentUnit"><option value="${mesurmentUnit.unitId}" ${mesurmentUnit.unitId eq unitId ? 'selected':'' } >${mesurmentUnit.unitName}</option> </c:forEach> </select></td><td> <input type="text" class="form-control form-control-sm border-bottom" onchange="validateAmount(this);" name="exhibitionProductDtls['+count11+'].pricePerUnit" id="pricePerUnit'+count11+'" maxlength="15"></td><td><div class="col-md-10"><input type="file" class="form-control form-control-sm border-bottom" name="exhibitionProductDtls['+count11+'].uploadAttachement" onchange="imagePDFCheck(this)" id="uploadAttachement'+count11+'"></div><div class="col-md-1"><a href="#" data-toggle="tooltip" title="Document Not Available" class="btn btn-xs btn-primary"><i class="fas fa-eye-slash"></i></a></div></td><td><button id="removeButton'+count11+'" type="button" class="btn btn-danger btn-sm" onclick="deletethisRow1('+count11+')"><i class="fa fa-minus"></i></button></td></tr>';
+		+ '<tr id="deleteRowDetails2'+count11+'"><td><input type="text" name="ucPrvYears['+count11+'].prvSanctionNo" id="prvSanctionNo'+count11+'" onchange="checkedDuplicateSanctionNoPrvYear(this.value,'+count11+');checkDuplicateSanctionNoPrvYearArray(this)" maxlength="20"class="form-control form-control-sm border-bottom fan sanctNoPrvYr"/></td><td style="min-width: 200px;"><div class="col-md-12 datepicker_con"><input type="text" name="ucPrvYears['+count11+'].prvSanctionDate" id="prvSanctionDate'+count11+'"class="form-control form-control-sm border-bottom fan"/></div></td><td><input type="text" class="form-control form-control-sm border-bottom prvSanAmt" onchange="validateAmount(this);" onkeyup="sumOfSanPrvAmount(this.value);" name="ucPrvYears['+count11+'].prvSanctionAmt" id="prvSanctionAmt'+count11+'" value="<fmt:formatNumber type="number" groupingUsed="false" value="${exhibitionProductDtl.sanctionAmt}" pattern="#.00"/>" maxlength="15"></td><td><input type="text" class="form-control form-control-sm border-bottom prvAmt" onkeyup="sumOfPrvAmount(this.value);" onchange="validateAmount(this);" name="ucPrvYears['+count11+'].prvYearAmt" id="prvYearAmt'+count11+'" value="<fmt:formatNumber type="number" groupingUsed="false" value="${exhibitionProductDtl.pricePerUnit}" pattern="#.00"/>" maxlength="15"></td><td><input type="text" class="form-control form-control-sm border-bottom prvUtlAmt" onkeyup="sumOfUtlPrvAmount(this.value)" onchange="validateAmount(this);" name="ucPrvYears['+count11+'].prvUtilizedAmt" id="prvUtilizedAmt'+count11+'" value="<fmt:formatNumber type="number" groupingUsed="false" value="${exhibitionProductDtl.pricePerUnit}" pattern="#.00"/>" maxlength="15"></td><td><input type="text" class="form-control form-control-sm border-bottom prvBlAmt" onkeyup="sumOfBlPrvAmount(this.value);" onchange="validateAmount(this);" name="ucPrvYears['+count11+'].prvBalanceAmt" id="prvBalanceAmt'+count11+'" value="<fmt:formatNumber type="number" groupingUsed="false" value="${exhibitionProductDtl.pricePerUnit}" pattern="#.00"/>" maxlength="15"></td><td><button type="button" class="btn btn-danger btn-sm" id="removeButton1'+count11+'" onclick="deletethisRow2('+count11+')"><i class="fa fa-trash"></i></button></td></tr>';
+		$("#insertrow2").append(collectData11);
+		var no = count11-1 ;
+		$("#removeButton1"+no).prop('disabled', true);
+		
+	 } 
+	
+		$('.fdate-d>input').datepick({onShow: $.datepick.monthOnly, dateFormat: 'dd/mm/yyyy',yearRange: 'c-100:c+5', showOnFocus: true,
+			showTrigger: '<button type="button" class="trigger">' +
+			'<i class="fa fa-calendar"></i></button>'});
+}
+function deletethisRow2(val) {
+	var totPrvSanAmt = parseFloat($("#totPrvSanAmt").val().replaceAll(",","")-parseFloat($("#prvSanctionAmt"+val).val()))
+	var totPrvAmt = parseFloat($("#totPrvAmt").val().replaceAll(",","")-parseFloat($("#prvYearAmt"+val).val()))
+	var totPrvUtlAmt = parseFloat($("#totPrvUtlAmt").val().replaceAll(",","")-parseFloat($("#prvUtilizedAmt"+val).val()))
+	var totPrvBlAmt = parseFloat($("#totPrvBlAmt").val().replaceAll(",","")-parseFloat($("#prvBalanceAmt"+val).val()))
+	$("#totPrvSanAmt").val(parseFloat(totPrvSanAmt).toFixed(2));
+	$('#totPrvAmt').val(parseFloat(totPrvAmt).toFixed(2));
+	$('#totPrvUtlAmt').val(parseFloat(totPrvUtlAmt).toFixed(2));
+	$('#totPrvBlAmt').val(parseFloat(totPrvBlAmt).toFixed(2));
+	$($("#deleteRowDetails2" + val).closest("tr")).remove();
+	count11--;
+	$("#removeButton1"+count11).prop("disabled", false); 
+	
+} */
+      
+      
+      $('.NumbersOnlyForAmount').keypress(
+  			function(event) {
+  				var regex = new RegExp("^[0-9.]+$");
+  				var key = String.fromCharCode(!event.charCode ? event.which
+  						: event.charCode);
+  				if (!regex.test(key)) {
+  					event.preventDefault();
+  					return false;
+  				}
+  });
+      
+      function validateAmount(value){
+  		var val = $(value).val();
+  	    if(isNaN(val)){
+  	         val = val.replace(/[^0-9\.]/g,'');
+  	         if(val.split('.').length>2){
+  	        	 val =val.replace(/\.+$/,"");	 
+  	         } 
+  	    }
+  	    if(val != ""){
+  	    val=parseFloat(val).toFixed(2)
+  	    }
+  	    $(value).val(val); 
+  	}
+      
+   function saveUCFormDetails(){
+	   
+	    /* if($("#departName").val()==""){
+		   bootbox.alert("Please Enter Department Name.");
+		   $("#departName").focus();
+		   return false;   
+	   }
+// 	   alert("ddd"+$("#turnover1Converted").val());
+	   if($("#turnover1Converted").val()=="0.00"){
+		   bootbox.alert("Please Enter Utilization amount.");
+		   $("#turnover1Converted").focus();
+		   return false;   
+	   }
+	   if($("#utilizedAmtText").val()==""){
+		   bootbox.alert("Please Enter Utilization amount in Text.");
+		   $("#utilizedAmtText").focus();
+		   return false;   
+	   }
+	   if($("#turnover2Converted").val()=="0.00"){
+		   bootbox.alert("Please Enter  Grant-in-aid/Loan amount.");
+		   $("#turnover2Converted").focus();
+		   return false;   
+	   }
+	   if($("#gidLoanAmtText").val()==""){
+		   bootbox.alert("Please Enter Grant-in-aid/Loan amount in Text.");
+		   $("#gidLoanAmtText").focus();
+		   return false;   
+	   }
+	   if($("#turnover3Converted").val()=="0.00"){
+		   bootbox.alert("Please Enter Remaining amount.");
+		   $("#turnover3Converted").focus();
+		   return false;   
+	   }
+	   if($("#remainingAmtText").val()==""){
+		   bootbox.alert("Please Enter Remaining amount in Text.");
+		   $("#remainingAmtText").focus();
+		   return false;   
+	   }
+	   if($("#turnover4Converted").val()=="0.00"){
+		   bootbox.alert("Please Enter Sum Utilization amount.");
+		   $("#turnover4Converted").focus();
+		   return false;   
+	   }
+	   if($("#sumUtilizedAmtText").val()==""){
+		   bootbox.alert("Please Enter Sum Utilization amount in Text.");
+		   $("#sumUtilizedAmtText").focus();
+		   return false;   
+	   }
+	   if($("#turnover5Converted").val()=="0.00"){
+		   bootbox.alert("Please Enter Sanction amount.");
+		   $("#turnover5Converted").focus();
+		   return false;   
+	   }
+	   if($("#prvYearAmtText").val()==""){
+		   bootbox.alert("Please Enter Remaining unutilization amount in Text.");
+		   $("#prvYearAmtText").focus();
+		   return false;   
+	   }
+	   
+	   if($("#challanNo").val()==""){
+		   bootbox.alert("Please Enter Challan Number.");
+		   $("#challanNo").focus();
+		   return false;   
+	   }
+	   
+	   if($("#challanData").val()==""){
+		   bootbox.alert("Please Enter Challan data.");
+		   $("#challanData").focus();
+		   return false; 
+	   }
+	   if($("#nextYear").val()==""){
+		   bootbox.alert("Please Enter next year data.");
+		   $("#nextYear").focus();
+		   return false; 
+	   }
+	   for (var i = 1; i < $('#insertrow tr').length + 1; i++) {
+		   if($("#sanctionNo"+count11).val()==""){
+				bootbox.alert("Please Enter Current Year Sanction No .");
+				return false;
+			}
+			else if($("#sanctionDate"+i).val()==""){
+				bootbox.alert("Please Select Current Year Sanction Date.");
+				return false;
+			}
+			else if($("#sanctionAmt"+i).val()==""){
+				bootbox.alert("Please Enter Current Year Sanction Amount");
+				return false;
+			}
+			else if($("#utilizedAmt"+i).val()==""){
+				bootbox.alert("Please Enter Current Year utilized Amount");
+				return false;
+			}
+			
+			else if($("#balanceAmt"+i).val()==""){
+				bootbox.alert("Please Enter  Current Year Balance Amt");
+				return false;
+			}else if($("#remark"+i).val()==""){
+					bootbox.alert("Please  Enter Current Year Remarks .");
+					return false;	
+			}
+	   }
+	   for (var i = 1; i < $('#insertrow2 tr').length + 1; i++) {
+
+		   if($("#prvSanctionNo"+i).val()==""){
+				bootbox.alert("Please Enter Previous Year Sanction No .");
+				return false;
+			}
+			else if($("#prvSanctionDate"+i).val()==""){
+				bootbox.alert("Please Select Previous Year Sanction Date.");
+				return false;
+			}
+			else if($("#prvSanctionAmt"+i).val()==""){
+				bootbox.alert("Please Enter Previous Year Sanction Amount");
+				return false;
+			}
+			else if($("#prvYearAmt"+i).val()==""){
+				bootbox.alert("Please Enter Previous Year Unspent balance at the close of previous year");
+				return false;
+			}
+			else if($("#prvUtilizedAmt"+i).val()==""){
+				bootbox.alert("Please Enter Previous Year utilized Amt .");
+				return false;
+			}else if($("#prvBalanceAmt"+i).val()==""){
+					bootbox.alert("Please Enter Previous Year Balance Amt .");
+					return false;	
+			}
+	   }
+	   
+	   if($("#reportType").val()==""){
+			   bootbox.alert("Please Insert signature");
+			   $("#reportType").focus();
+			   return false;
+	   }
+
+ 		   if($("#designation").val()==""){
+ 			   bootbox.alert("Please Enter Designation.");
+ 			   $("#designation").focus();
+ 			   return false;
+		   }
+ 		   if($("#regDate").val()==""){
+ 			   bootbox.alert("Please Select Registered Date.");
+ 			   $("#regDate").focus();
+ 			   return false;
+ 		   }
+ 	   else{
+ 		   $("#fundForm").submit();
+	   }  */ 
+	    $("#fundForm").submit();
+   } 
+   function checkedExpenditureAmount
+   $.ajax({
+		type : "GET",
+		url : '${contextPath}/fnd/uc/amount',
+		dataType : "json",
+		data : {
+			"schemeId" : $("#schemeId").val(),
+			"entityBeneficiaryId" :$("#entityTypeId").val(),
+			"amount" : $("#turnover1").val(),
+			"finyearId" : $("#finyearId").val(),
+		},
+		success : function(response) {
+			console.log(response)
+			var html = "<option value='' selected></option>";
+			var data = response;
+			if (data != "" && data != null && data.length > 0) {
+				$.each(data, function(index, value) {
+					html = html + "<option value="+value.sanctionAmt+">"
+							+ value.utilizationAmt + "</option>";
+				});
+			}
+			$('#sanctionAmt').empty().append(html);
+		},
+		error : function(error) {
+			bootbox.alert("Something went wrong !!!");
+		}
+	});
+				
+
+	   function checkedDuplicateSanctionNo(sanctionNo,count){
+	    		if(sanctionNo != ""){
+	    			$.ajax({
+	        			type : "GET",
+	        			url : "${contextPath}/fnd/uc/checkedDuplicateSanctionNo",
+	        			data : {
+	        				"sanctionNo" : sanctionNo,
+	        			},
+	        			success : function(response) {
+	        				var val = JSON.parse(response);
+	        				if (val.duplicate == true) {
+	        					bootbox.alert("Duplicate Sanction Number Not Allowed");
+	        					$("#sanctionNo"+count).val("");
+	        				}
+	        			},
+	        			error : function(error) {
+	        				bootbox.alert("Something Went wrong"); 
+	        			}
+	        		});
+	    	}
+	    }
+	   function checkedDuplicateSanctionNoPrvYear(prvSanctionNo,count){
+   		if(prvSanctionNo != ""){
+   			$.ajax({
+       			type : "GET",
+       			url : "${contextPath}/fnd/uc/checkedDuplicateSanctionNoPrvYear",
+       			data : {
+       				"prvSanctionNo" : prvSanctionNo,
+       			},
+       			success : function(response) {
+       				var val = JSON.parse(response);
+       				if (val.duplicate == true) {
+       					bootbox.alert("Duplicate Sanction Number Not Allowed");
+       					$("#prvSanctionNo"+count).val("");
+       				}
+       			},
+       			error : function(error) {
+       				bootbox.alert("Something Went wrong"); 
+       			}
+       		});
+   	}
+   }
+	   function checkDuplicateSanctionNoArray(that){
+		   var currentText = $(that).val();
+			var currentId = that.id;
+			if(currentText !=""){
+				var existingValues = $('.sanctNo');
+				$.each(existingValues, function(idx,elem){
+					if ($(elem).val().toLowerCase() == currentText.toLowerCase() && elem.id != currentId && ($(elem).val()!= "" && currentText != ""))
+					{
+						bootbox.alert("Sanction Number cannot be duplicate.");
+						$("#"+currentId).val("");
+						
+						return false;
+					}
+				});
+			}
+			
+			return true;	
+	  }
+	   function checkDuplicateSanctionNoPrvYearArray(that){
+		   var currentText = $(that).val();
+			var currentId = that.id;
+			if(currentText !=""){
+				var existingValues = $('.sanctNoPrvYr');
+				$.each(existingValues, function(idx,elem){
+					if ($(elem).val().toLowerCase() == currentText.toLowerCase() && elem.id != currentId && ($(elem).val()!= "" && currentText != ""))
+					{
+						bootbox.alert("Sanction Number cannot be duplicate.");
+						$("#"+currentId).val("");
+						
+						return false;
+					}
+				});
+			}
+			
+			return true;
+	  }
+	   
+	  function sumOfAmount(sanctionAmt){
+		  var total =0;
+		  $(".sanAmt").each(function(){
+			  var value = $(this).val();
+			  total = parseFloat(total)+ parseFloat(value);
+			  total = total.toFixed(2);
+		  });
+		  $("#totSanAmt").val(total);
+	  }
+	  
+	  function sumOfUtlAmount(utilizedAmt){
+		  var total =0;
+		  $(".utlAmt").each(function(){
+			  var value = $(this).val();
+			  total = parseFloat(total)+ parseFloat(value);
+			  total = total.toFixed(2);
+		  });
+		  $("#totUtlAmt").val(total);
+	  }
+	  
+	  function sumOfBlAmount(balanceAmt){
+		  var total =0;
+		  $(".blAmt").each(function(){
+			  var value = $(this).val();
+			  total = parseFloat(total)+ parseFloat(value);
+			  total = total.toFixed(2);
+		  });
+		  $("#totBlAmt").val(total);
+	  }
+	  function sumOfSanPrvAmount(prvSanctionAmt){
+		  var total =0;
+		  $(".prvSanAmt").each(function(){
+			  var value = $(this).val();
+			  total = parseFloat(total)+ parseFloat(value);
+			  total = total.toFixed(2);
+		  });
+		  $("#totPrvSanAmt").val(total);
+	  }
+	  function sumOfPrvAmount(prvYearAmt){
+		  var total =0;
+		  $(".prvAmt").each(function(){
+			  var value = $(this).val();
+			  total = parseFloat(total)+ parseFloat(value);
+			  total = total.toFixed(2);
+		  });
+		  $("#totPrvAmt").val(total);
+	  }
+	  function sumOfUtlPrvAmount(prvUtilizedAmt){
+		  var total =0;
+		  $(".prvUtlAmt").each(function(){
+			  var value = $(this).val();
+			  total = parseFloat(total)+ parseFloat(value);
+			  total = total.toFixed(2);
+		  });
+		  $("#totPrvUtlAmt").val(total);
+	  }
+	  function sumOfBlPrvAmount(prvBalanceAmt){
+		  var total =0;
+		  $(".prvBlAmt").each(function(){
+			  var value = $(this).val();
+			  total = parseFloat(total)+ parseFloat(value);
+			  total = total.toFixed(2);
+		  });
+		  $("#totPrvBlAmt").val(total);
+	  }
+	  
+function proceedUCFormDetails(){
+	$("#hdnFinYearId").val($("#filFinYearId").val());
+	$("#hdnFundTypeId").val($("#filFundTypeId").val());
+	$("#formId").attr('action','${contextPath}/fnd/uc/add');
+    $("#formId").submit();
+}
+
+$(document).ready(function() {
+	$("#fundForm input").prop("disabled", true);
+	$('#fundForm select').prop('disabled', true);
+	$(".datepick-trigger").prop('disabled', true);
+	getEntityNameByEntityTypeOrDistrictId();
+});
+    
+    </script>
+    <script>
+    function printDiv(divName) {
+        var printContents = document.getElementById(divName).innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+
+        window.print();
+
+        document.body.innerHTML = originalContents;
+   }
+    </script>

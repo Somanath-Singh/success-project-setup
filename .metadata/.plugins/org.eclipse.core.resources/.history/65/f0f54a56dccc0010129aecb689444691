@@ -1,0 +1,42 @@
+<style>
+	.isEntityObjReadOnly {
+		pointer-events: none;
+		background-color: #bebdbd !important;
+	}
+</style>
+
+<div class="form-group col-md-3" id="objectIdAndTypeIdDiv">
+	<label>Organization Name :<span class="requiredStarMark">${isMandatory ? '*' : ''}</span></label>
+	<div class="col-md-12">
+		<!-- if officeDetails.objectIdAndType is there then readonly -->
+		<select name="objectIdAndType"   class="form-control  thisisRequiredField form-select ${isReadOnly ? 'isEntityObjReadOnly' : ''}  ${isMandatory ? 'thisRequiredField' : ''}" id="objectIdAndTypeId" onchange='${functionList}' data-live-search="true">
+			<option value="" disabled>Select Organization</option>
+			<c:forEach items="${organizationList}" var="organization">
+				<option value="${organization.combineTwo}" <c:if test="${organization.combineTwo eq selectedEntityObjectIdAndValue}">selected</c:if>>${organization.organizationName}</option>
+			</c:forEach>
+		</select>
+	</div>
+</div>
+
+<script>
+
+	function asyncAjaxForData(url, data, method) {
+		return new Promise((resolve, reject) => {
+			$.ajax({
+				url: url,
+				type: method,
+				data: data,
+				success: function(data){
+					resolve(data);
+				},
+				error: function(err){
+					reject(err);
+				}
+			});
+		});
+	}
+
+
+
+
+</script>

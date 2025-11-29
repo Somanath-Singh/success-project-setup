@@ -1,0 +1,2027 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+    .btn {
+        line-height: 1 !important;
+    }
+.dataTables_wrapper{
+    overflow: visible;
+}
+
+
+    .content {
+        position: relative;
+        height: 100%;
+        width: calc(100vh-70px);
+        transition: all 0.5s ease;
+        padding: 0px 5px 10px !important;
+        overflow-y: hidden !important;
+        overflow-x: hidden;
+    }
+
+    .card {
+        background: #fff !important;
+    }
+
+    .card:before {
+        display: none !important;
+
+    }
+
+    .nonClick {
+        pointer-events: none;
+        background: #8e8c8c !important;
+    }
+
+    .freezTheFild {
+        pointer-events: none;
+        background: #8e8c8c !important;
+    }
+
+    .hidden-div {
+        display: none;
+    }
+
+    .blog-box .folder-box {
+        border: 1px solid #54bfeb52;
+        padding: 10px;
+        background: #e0eef7;
+        margin-top: 5px;
+        border-radius: 0px;
+        position: relative;
+        text-decoration: none;
+        height: 60px;
+}
+/*     .folder-box {
+        border: 1px solid #54bfeb;
+        padding: 10px;
+        background: #cdecf9;
+        margin-top: 15px;
+        border-radius: 10px;
+        position: relative;
+        text-decoration: none;
+        height: 161px;
+    } */
+    
+    .folder-box {
+    border: 1px solid #54bfeb;
+    padding: 10px;
+    background:#6ac0fb2e;
+    margin-top: 15px;
+    border-radius: 10px;
+    position: relative;
+    text-decoration: none;
+    height: 161px;
+}
+
+    .cccc {
+        background: #bddaff;
+        border: 1px solid #9abce7;
+    }
+
+    .folder-sec .col-md-4:nth-child(even) .folder-box {
+        background: #6ac0fb69;
+        border: 1px solid #9abce7;
+        
+    }
+
+    .folder-name {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-decoration: none;
+    }
+
+    .folder-box div>i {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        font-size: 20px;
+        border-radius: 3px;
+        padding: 3px 5px;
+        z-index: 9;
+        width: 15px;
+    }
+
+    .tag {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        font-size: 16px;
+        color: #d77159d1;
+    }
+    .blog-box .tag{
+        bottom: 5px !important;
+        cursor: pointer;
+    }
+    .search-box {
+        position: relative;
+    }
+
+    .search-box i {
+        position: absolute;
+        right: 5px;
+        top: 0;
+        line-height: 30px;
+        font-size: 18px;
+    }
+
+    .folder-details {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .folder-details li {
+        line-height: 24px;
+    }
+
+    .folder-details li span {
+        width: 90px;
+        float: left;
+    }
+
+    .folder-box img {
+        width: 50px;
+        transition: 0.3s ease all;
+    }
+
+    .folder-box img.two {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .folder-box img.two {
+        opacity: 0;
+    }
+
+    .folder-box:hover img.two {
+        opacity: 1;
+    }
+
+    .folder-box:hover img.one {
+        opacity: 0;
+    }
+
+    .left-side-folder {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .left-side-folder li {
+        line-height: 24px;
+    }
+
+    .left-side-folder a {
+    float: left;
+    width: 100%;
+    padding: 5px 5px;
+    background: #ccced140;
+    margin-top: 7px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    border: 1px solid #95b0bb;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #333;
+}
+
+    .left-side-folder a i {
+        margin-right: 5px;
+        color: #fff;
+        font-size: 16px;
+        width: 24px;
+        height: 24px;
+          background: #29a8ffad;
+        border-radius: 3px;
+        text-align: center;
+        line-height: 24px;
+    }
+
+    .after-login {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        padding: 12px 10px;
+        border-radius: 10px;
+        margin-left: -20px;
+        position: relative;
+        margin-right: -20px;
+    }
+
+    .after-login p {
+        color: #3b5eda;
+        position: absolute;
+        top: 40px;
+        font-size: 10px;
+        /*  margin-left: 60px; */ 
+        line-height: 11px;
+    }
+
+
+
+    li i {
+        margin-right: 2px;
+    }
+
+    .bread-c {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .bread-c nav {
+        border: 1px solid #5d9ff7;
+        margin: 10px 0 0 0;
+        background: #b2cdf1;
+        padding: 5px 10px;
+        border-radius: 3px;
+    }
+
+    .bread-c nav ol {
+        margin: 0;
+    }
+
+    .inner-cardbox {
+        background-color: #fff;
+        padding: 10px 10px 25px 10px;
+        font-size: 12px;
+    }
+    .inner-cardbox strong{
+        font-weight: 600;
+    }
+
+    /*.nav-tabs .nav-item.show .nav-link,
+    .nav-tabs .nav-link.active {
+        color: #f9fcff !important;
+        background-color: #5a236c !important;
+        border-color: #233882 #233882 #233882 !important;
+    }*/
+
+    .nav-tabs.nav-link:hover {
+
+        background: #233882 !important;
+        color: #fff !important;
+    }
+
+    .folder-box h4 {
+        font-size: 14px;
+        color: #111010;
+        line-height: 20px;
+        margin: 0 0 0 25px;
+        font-weight: 600;
+    }
+
+    .blog-box .folder-box a h4 {
+        font-size: 12px;
+        width: 149px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .blog-box .folder-box {
+        padding: 3px 8px;
+    }
+    .blog-box .folder-box div>i{
+        top: 0px;
+        right: 10px;
+    }
+
+    .folder-card {
+    display: flex;
+    font-size: 12px;
+    margin-bottom: 2px;
+    list-style: none;
+    background: #ffd19c !important;
+    margin-top: 15px;
+    padding: 5px 0;
+    color: #0f0e47;
+}
+
+.folder-card li.name {
+    margin-left: 4%;
+}
+.folder-card li.date {
+    margin-left: 10%;
+    width: 100px;
+    font-weight: 600;
+    text-align: center;
+}
+.folder-card li.size{
+    margin-left: 4%;
+    width: 100px;
+    font-weight: 600;
+    text-align: center;
+}
+.folder-card li {
+    margin-left: 80px;
+    width: 100px;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+    .card {
+    background: #fff !important;
+    overflow-y: scroll;
+    height: 525px;
+    overflow-x: hidden;
+}
+
+/*
+ *  STYLE 4
+ */
+
+ .style-4::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(128, 128, 128, 0.3);
+	background-color: #F5F5F5;
+}
+
+.style-4::-webkit-scrollbar
+{
+	width: 6px;
+	background-color: #F5F5F5;
+}
+
+.style-4::-webkit-scrollbar-thumb
+{
+	background-color: #4a4a4a;
+	border: 2px solid #555555;
+}
+
+
+
+    @keyframes growProgressBar {
+
+        0%,
+        33% {
+            --pgPercentage: 0;
+        }
+
+        100% {
+            --pgPercentage: var(--value);
+        }
+    }
+
+    
+
+    div[role="progressbar"] {
+        --size: 5rem;
+        --fg: #233882;
+        --bg: rgb(208, 211, 215);
+        --pgPercentage: var(--value);
+        animation: growProgressBar 3s 1 forwards;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background:
+            radial-gradient(closest-side, white 80%, transparent 0 99.9%, white 0),
+            conic-gradient(var(--fg) calc(var(--pgPercentage) * 1%), var(--bg) 0);
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: calc(var(--size) / 5);
+        color: var(--fg);
+    }
+
+    .div[role="progressbar"]::before {
+        counter-reset: percentage var(--value);
+        content: 50 '%';
+    }
+
+    .listbtn {
+        background-color:#29a8ffe0;
+        border-radius: 3px 0 0 3px;
+        color: #ffffff;
+        border-right: 1px solid #eaeaea;
+        padding-right: 13px;
+        text-decoration: none;
+    }
+
+    .listbtn:hover {
+        background-color:#2370b9;
+        border-radius: 3px 0 0 3px;
+        color: #ffffff;
+        border-right: 1px solid #eaeaea;
+        padding-right: 13px;
+        text-decoration: none;
+    }
+
+    .gridbtn {
+        background-color: #29a8ffe0;
+        border-radius: 0 3px 3px 0;
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+    .gridbtn:hover {
+        background-color: #2370b9;
+        border-radius: 0 3px 3px 0;
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+    .blog-box .folder-box {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .blog-box .folder-box .folder-details {
+        display: flex;
+    }
+
+    .blog-box .folder-box .folder-details span {
+        display: none;
+    }
+
+    .blog-box .folder-box .folder-details li {
+        width: 167px;
+        font-size: 12px;
+    }
+    .blog-box .folder-box .folder-details li.size{
+        padding-left: 20px;
+    }
+
+    .blog-box .folder-box img {
+        width: 20px;
+    }
+    .mini-preview{
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.3s;
+        box-shadow: 0 0 10px 0 #ddd;
+        width: 70%;
+        border-radius: 8px;
+    }
+
+/* .btn-primary {
+    color: #fff;
+    background-color: #DE8721 !important;
+    border-color: #DE8721 !important;
+}
+.btn-success {
+    background-color: #DE8721 !important;
+    border-color: #DE8721 !important;
+}
+.btn-success:hover{
+  background-color: #DE8721 !important;
+    border-color: #DE8721 !important;
+} */
+.modal-header, .card-header {
+    background: #29a8ff !important;
+    border-radius: 0px !important;
+}
+</style>
+
+
+
+
+<div class="row style-4" >
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12">
+
+            <div class=" mb-1 mt-3 mx-4">
+                    <div class="">
+                        <ul class="after-login">
+<!--                         <li> -->
+<!--                             <h4 style="display:flex; align-items: center;gap: 10px;font-size: 22px;">My Cloud</h4> -->
+<%--                             <p style="margin-bottom: 0px; color: #3b5eda;"><strong>${greetings}</strong></p> --%>
+<!--                         </li> -->
+                       <!--  <li>
+                            <div role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="--value:50"></div>
+                        </li> -->
+                        <li class="bread-c">
+                            <div class="btn-up text-center">
+                            <c:if test="${canCreateFolder == true}">
+                                <button style="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createFolderModalId"> <i class="fa fa-folder"></i> CREATE </button>
+                            </c:if>
+                            <c:if test="${canUploadFile == true}">
+                                <button style="" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadFileModalId" > <i class="fa fa-upload"></i> UPLOAD </button>
+                            </c:if>
+                            </div>
+                            <c:if test="${not empty folderOrFileLink}">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="#"><i class="fa fa-folder"></i>${backFolderPaths}</a></li>
+                                </ol>
+                            </nav>
+                        </c:if>
+                        </li>
+                        </ul>
+                        </div>
+                    </div>
+            </div>
+
+            <div class="col-md-9">
+
+                <div class="card mt-3 style-4" style="margin-left: 5px;">
+                    <div class="card-body">
+                        <div class="row mb-3 mt-3 px-2">
+                            <nav class="col-md-12" style="margin-top: -22px;">
+                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                    <button class="nav-link" id="nav-SELF" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true" value="SELF" onclick="getFolderAndFilesOnTab(this)">My Files & Folders</button>
+                                    <button class="nav-link" id="nav-SHARED" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false" value="SHARED" onclick="getFolderAndFilesOnTab(this)">Shared Files & Folders </button>
+                                    <button class="nav-link" id="nav-PUBLIC" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false" value="PUBLIC" onclick="getFolderAndFilesOnTab(this)">Public Files & Folders</button>
+                                    <button class="nav-link" id="nav-TRASH" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false" value="TRASH" onclick="getFolderAndFilesOnTab(this)">Trash Files & Folders</button>
+                                </div>
+                            </nav>
+                        
+                        </div>
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                                <div class="inner-cardbox" style="height: 450px;">
+                                    <div class="search-box">
+                                        <input type="text" class="form-control-sm form-control" placeholder="Search here..." id="searchbar" onkeyup="searchFolderAndFiles()" />
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </div>
+                                    <div class="row  mt-3 d-flex justify-content-between align-items-center">
+                                        <div class="col-md-4">
+                                            <!-- <label for="folderName" class="form-label">Modules:</label> -->
+                                            <select class="form-select form-control from-control-sm" aria-label="Default select example" id="modules" name="moduleCode" style="padding: 5px 15px;" onchange="getFolderAndFilesOnModuleChange()">
+<!--                                                 <option value="">Select Module</option> -->
+                                                <option value="">Select Module</option>
+                                                <c:forEach items="${moduleMstList}" var="module">
+                                                    <option value="${module.moduleCode}">${module.moduleName}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+
+                                        <!-- Sort by Name, Date, size radio button -->
+                                        <div class="col-md-2" style="display: none; align-items: center;">
+                                            <label class="form-check-label " for="sortByName">Sort By : </label>
+                                            <button class="btn btn-primary btn-sm" onclick="sortFolderAndFiles()">?</button>
+                                            <button class="btn btn-primary btn-sm" onclick="sortFolderAndFiles()">?</button>
+                                            <input class="form-check-input" type="radio" name="sortType" id="sortByName" value="name" checked>
+                                            <label class="form-check-label " for="sortByName">Name</label>
+                                            <input class="form-check-input" type="radio" name="sortType" id="sortByDate" value="date">
+                                            <label class="form-check-label" for="sortByDate">Date</label>
+                                            <input class="form-check-input" type="radio" name="sortType" id="sortBySize" value="size">
+                                            <label class="form-check-label" for="sortBySize">Size</label>
+                                        </div>
+                                        
+
+
+                                        <div class="col-lg-6 col-md-6 col-sm-12 arrangebtn d-flex justify-content-end align-items-center">
+                                            <a href="javascript:void(0)" id="list" class="btn btn-default btn-sm listbtn"><i class="fas fa-list-ul px-2"></i></a>
+                                            <a href="javascript:void(0)" id="grid" class="btn btn-default btn-sm gridbtn"><i class="fas fa-th px-2"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 topheader hidden-div" >
+                                        <ul class="folder-card">
+                                            <li class="name"><span>Name</span> </li>
+                                            <li class="date"><span>Date modified</span> </li>
+                                            <li class="size"><span>Size</span></li>
+                                            <li class="owner"><span>owner</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="row folder-sec" id="fileFolderDiv">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3  blog-box" >
+                <div class="card style-4" style="margin-top: 15px;">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="card-title" style="color:#ffffff">Bookmark</h5>
+                        <i class="fa-solid fa-bookmark" style="color: #ffffff  !important"></i>
+                    </div>
+                    <div class="inner-cardbox" style="height: 100vh;">
+                        <div class="search-box">
+                        <input type="text" id="favsearchbar" class="form-control-sm form-control" placeholder="Search here..." />
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                        <ul class="left-side-folder" id="favFolderList">
+                        <c:forEach items="${bookMarkFolders}" var="folder">
+                            <c:choose>
+                                <c:when test="${folder.folderOrFile == 'FILE'}">
+                                    <li id="${folder.folderOrFileLink}"  ondblclick="downLoadThisFile(this, '${folder.folderOrFileLink}')"><a href="#"><i class='${folder.icon}'></i><span title="${folder.folderFileName}">${folder.folderFileName}</span></a></li>
+                                </c:when>
+                                <c:otherwise>
+                                    <li id="${folder.folderOrFileLink}" ondblclick="insideFolder(this, '${folder.folderOrFileLink}')"><a href="#"><i class='fa-regular fa-folder'></i><span title="${folder.folderFileName}">${folder.folderFileName}</span></a></li>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- create a Folder Modal -->
+<div class="modal fade" id="createFolderModalId" tabindex="-1" data-bs-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="${contextPath}/dms/createFolder" method="post" id="createFolderForm" modelAttribute="folderFileDto">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+            <input type="hidden" name="folderUuid" id="folderUuidId" value="${folderOrFileLink}" />
+            <input type="hidden" name="type" value="${activeTab}" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create Folder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Dropdown for folder name -->
+                    <div class="">
+                        <label for="folderName" class="form-label">Modules:</label>
+                        <select class="form-select" aria-label="Default select example" id="modules" name="moduleCode">
+                            <option selected>Select Module</option>
+                            <c:forEach items="${moduleMstList}" var="module">
+                                <option value="${module.moduleCode}">${module.moduleName}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+
+                    <!--  -->
+                    <div class="">
+                        <label for="folderName" class="form-label">Folder Name:<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="folderName" name="folderName">
+                    </div>
+
+                    <!-- Checkboxes for private/public -->
+                    <div class="">
+                        <label class="form-check-label form-label">Privacy:<span class="text-danger">*</span></label>
+                        <div style="display:flex;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="private" value="private" name="Privacy" ${isPublic == false ? 'checked' : ''} ${isPublic == true ? 'disabled' : ''}>
+                            <label class="form-check-label" for="private">Private</label>
+                        </div>
+                        <div class="form-check" style="margin-left: 10px;">
+                            <input class="form-check-input" type="radio" id="public" value="public" name="Privacy" ${isPublic == true ? 'checked' : ''}>
+                            <label class="form-check-label" for="public">Public</label>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- List Of Check box -->
+                    <div class="mt-3 mb-2" id="actionDivIdForCreateFolder" style="${isPublic == true ? 'display: block;' : 'display: none;'}">
+                        <label for="tags" class="form-label">Access Facilities:<span class="text-danger">*</span></label>
+                        <input class="form-check-input" type="checkbox" id="allCheckActions" name="checklist"> &nbsp;<label for="allCheckActions">Check-All</label>
+                        <div style="display: flex; flex-wrap: wrap; column-gap: 20px;">
+                            <c:forEach items="${actionList}" var="action" varStatus="loop">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="${action.actionCode}" id="action_${action.id}" name="actionCodes[${loop.index}]">
+                                    <label class="" for="action_${action.id}">${action.actionName}</label>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </div>
+
+                    <!-- Input field for tags -->
+                    <div class="">
+                        <label for="tags" class="form-label">Tags:<span class="text-danger">USE # to create new tag like #tag1 #tag2</span></label>
+                        <input type="text" class="form-control" id="tags" name="tags">
+                    </div>
+                    <div class="">
+                        <label for="tags" class="form-label">Description:</label>
+                        <textarea class="form-control" id="description" name="description"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="createFolder()">Create</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <!-- Add your save or submit button here if needed -->
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Uplaod File Modal -->
+<div class="modal fade" id="uploadFileModalId" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="${contextPath}/dms/uploadFileInFolder" method="post" id="uploadFileFormId" modelAttribute="folderFileDto" enctype="multipart/form-data">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+            <input type="hidden" name="folderOrFileLink" id="folderOrFileLink" value="${folderOrFileLink}" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Upload Folder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Dropdown for folder name -->
+                        <div class="col-md-12">
+                            <label>Upload File</label>
+                            <input type="file" id="uplodFileId" class="form-control" name="file" onchange="checkFileExtension(this)">
+                        </div>
+
+
+                    <div class="mb-3">
+                        <label for="folderName" class="form-label">Modules:</label>
+                        <select class="form-select" aria-label="Default select example" id="modulesForUploadId" name="moduleCodeForUpload">
+                            <option value="">Select Module</option>
+                            <c:forEach items="${moduleMstList}" var="module">
+                                <option value="${module.moduleCode}">${module.moduleName}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+
+                    <!-- Checkboxes for private/public -->
+                    <div class="mb-3">
+                        <label class="form-check-label">Privacy:<span class="text-danger">*</span></label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" value="private" checked id="privateForUploadInModal" name="privacyForUpload">
+                            <label class="form-check-label" for="private">Private</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" value="public" id="publicForUploadInModal" name="privacyForUpload">
+                            <label class="form-check-label" for="public">Public</label>
+                        </div>
+                    </div>
+
+                    <!-- Input field for tags -->
+                    <div class="mb-3">
+                        <label for="tags" class="form-label">Tags:<span class="text-danger">USE # to create new tag like #tag1 #tag2</span></label>
+                        <input type="text" class="form-control" id="tagsForUploadInModal" name="tagsForUpload">
+                    </div>
+                    <div class="mb-3">
+                        <label for="tags" class="form-label">Description:</label>
+                        <textarea class="form-control" id="descriptionForUploadInModal" name="descriptionForUpload"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="uploadFileOrFolder()">Upload</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <!-- Add your save or submit button here if needed -->
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Share Modal -->
+<div class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" id="shareFolderModalId">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <form action="${contextPath}/dms/shareEntitiesToRoleAndUser" method="post" modelAttribute="shareEntitiesFileDto" enctype="multipart/form-data" id="shareEntityFormId">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+            <input type="hidden" id="folderOrFileLinkForShare" name="folderOrFileLinkForShare" value="" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Share Folder/File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="min-height: 500px;">
+                    <div class="row">
+                        <div class="col-md-12 mb-3" style="background-color: #adb6d9b0;">
+                            <div class="row mt-1">
+                               <div class="col-md-4 mt-1" style="display: none;" id="keyBaseAccessShareDivId">
+                                    <input class="" type="radio" name="shareType" id="keyBaseAccessShareId" value="api-key">
+                                    <label class="" for="keyBaseAccessShareId">Share through API Key</label>
+                                </div>
+                                <div class="col-md-4 mt-1" style="display: none;" id="freeAccessShareDivId">
+                                    <input class="" type="radio" name="shareType" id="freeAccessShareId" value="anyone">
+                                    <label class="" for="freeAccessShareId">Anyone with the link</label>
+                                </div>
+                                <div class="col-md-4 mt-1" style="display: none;" id="indivisualAccessShareDivId">
+                                    <input class="" type="radio" name="shareType" id="indivisualAccessShareId" value="indivisual">
+                                    <label class="" for="indivisualAccessShareId">Indivisual</label>
+                                </div> 
+                            </div>
+                            <!-- Two radio button share through api-key or indivisual -->
+                            </div>
+							<div style="display: none;" id="apiKeyDivId">
+                            <div class="col-md-12">
+                            <div class="row mt-3">
+                                    <div class="col-md-4 text-end"><button type="button" class="btn btn-submit" id="generateApiKeyBtnId" onclick="generateApiKey()">Generate API Key</button></div>
+                                    <div class="col-md-4"><button type="button" class="btn btn-primary" id="copyApiKeyBtnId" onclick="copyApiKey(this, 'apiKeyId')">Copy API Key</button></div>
+                                    <div class="col-md-9 mt-3"><label>API Key</label>
+                                    <input type="text" class="form-control" id="apiKeyId" name="apiKey" readonly></div>
+                                    <div class="col-md-3 mt-3">
+                                        <label>Access Facilities</label>
+                                        <select class="selectpicker" multiple="multiple" data-live-search="true" aria-label="Default select example" id="apiKeyActionTypeId" name="actionType[]" >
+                                            <c:forEach items="${actionList}" var="action">
+                                                <option value="${action.id}">${action.actionName}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mt-2" style="display: none;" id="updateAccessFacilitiesDivId">
+                                        <button type="button" class="btn btn-submit" id="reGenerateApiKeyBtnId" onclick="updateAccessFacilities()">Update Access Facilities</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+						<div style="display: none;" id="anyOneWithLinkDivId" style="max-height: 300px !important;">
+                            <div class="row align-items-end">
+                                <div class="col-md-4">
+                                    <label>Access Facilities</label>
+                                    <select class=" selectpicker" multiple="multiple" data-live-search="true" aria-label="Default select example" id="freeAccessLinkActionTypeId" name="actionType[]" >
+                                        <c:forEach items="${actionList}" var="action">
+                                            <option value="${action.id}">${action.actionName}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <input type="hidden" id="freeAccessLink" name="freeAccessLink" value="" />
+                                <div class="col-md-5">
+                                    <button type="button" class="btn btn-primary" id="copyLinkBtnId" onclick="copyApiKey(this, 'freeAccessLink')">Copy Link</button>
+                                    <button type="button" class="btn btn-submit" id="addOrRemoveAccessFacilitiesBtnId" onclick="addOrRemoveAccessFacilities()">Generate Link</button>
+                                </div>
+                                <div class="col-md-2 mt-4">
+
+                                </div>
+                            </div>
+                        </div>
+				<!-- indivisualShareDivId -->
+                    <div class="row"style="display: none;" id="indivisualShareDivId">
+                        <div class="col-md-4">
+                            <label>Share Entity</label>
+                            <select class="form-select" aria-label="Default select example" id="shareEntityCodeId" name="orgCode" onchange="getDataByShareEntityCode(this);">
+                                <option selected value="">Select</option>
+                                <c:forEach items="${shareEntities}" var="shareEntity">
+                                    <option value="${shareEntity.shareEntityCode}">${shareEntity.displayName}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+						<div class="col-md-12 mt-3">
+                            <div class="">
+                                <table class="datatable table table-striped table-bordered" id="shareTableId">
+                                    <thead class="bagGroundColorRvr">
+                                        <tr>
+                                            <th style="text-align:center">Sl. No</th>
+                                            <th>Share-to</th>
+                                            <th>Type</th>
+                                            <th>Access Facilities</th>
+                                            <th><input type="checkbox" id="allCheck" name="checklist">Check-All</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id= "addTableDataDynamicalyId">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="shareFileOrFolder()">Share</button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                            <!-- Add your save or submit button here if needed -->
+                        </div>
+                    </div>
+				</div>
+              </div>
+              </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+<form action="${contextPath}/dms/list" method="GET" id="insideFolderForm">
+    <input type="hidden" name="folderOrFileLink" id="insideFolderLink" value="${folderOrFileLink}" />
+    <input type="hidden" name="type" value="${activeTab}" id="typeId" />
+</form>
+
+<form action="${contextPath}/dms/downloadFile" method="GET" id="downloadFileForm">
+    <input type="hidden" name="fileLink" id="downloadFileLink" value="" />
+</form>
+
+<form action="${contextPath}/dms/deleteFolderOrFile" method="POST" id="deleteFolderForm">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="folderOrFileLink" id="deleteFolderLink" value="" />
+</form>
+
+<form action="${contextPath}/dms/markAsFavourite" method="POST" id="markAsFavouriteForm">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="folderOrFileLink" id="markAsFavouriteLink" value="" />
+</form>
+
+<form action="${contextPath}/dms/shareEntitiesModalData" method="POST" id="shareEntityModalFormId">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	<input type="hidden" name="shareEntityData" id="shareEntityDataId" value="" />
+    <input type="hidden" name="folderOrFileLink" value="${folderOrFileLink}" />
+</form>
+
+<form action="${contextPath}/dms/trash/recover" method="POST" id="recoverThisFileForm">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="folderOrFileLink" id="recoverThisFileLinkId" value="" />
+</form>
+
+<form action="${contextPath}/dms/trash/permanentDeleteThisFolder" method="POST" id="permanentDeleteThisFolderForm">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="folderOrFileLink" id="permanentDeleteThisFolderLinkId" value="" />
+</form>
+
+
+<script>
+
+    $('#fileFolderDiv > div').removeClass('blog-box');
+    $('#grid').click(function(){
+        $('#fileFolderDiv > div').removeClass('col-lg-12 col-md-12 col-sm-12 blog-box');
+        $('#fileFolderDiv > div').addClass('col-lg-4 col-md-4 col-sm-12 ');
+        $('.topheader').addClass('hidden-div');
+    });
+    $('#list').click(function(){
+        $('#fileFolderDiv > div').removeClass('col-lg-4 col-md-4 col-sm-12 blog-box');
+        $('#fileFolderDiv > div').addClass('col-lg-12 col-md-12 col-sm-12 blog-box');
+        $('.topheader').removeClass('hidden-div');
+    });
+
+
+    var parentFolderOrFileLink = "${folderOrFileLink}";
+    var activeTab = "${activeTab}";
+    var isInsideFolder = "${isInsideFolder}";
+    // ready function
+    $(document).ready(function(){
+        $('#nav-'+activeTab).addClass('active');
+        let thisObj = $('#nav-'+activeTab);
+        getFolderAndFiles(thisObj);
+    });
+
+    function getFolderAndFilesOnTab(thisObj){
+        $('#insideFolderLink').val("");
+        $('#typeId').val(thisObj.value);
+        $('#insideFolderForm').submit();
+    }
+
+    function getFolderAndFilesOnModuleChange(){
+        let thisObj = $('#nav-'+activeTab);
+        getFolderAndFiles(thisObj);
+    }
+
+    function searchFolderAndFiles(){
+        let thisObj = $('#nav-'+activeTab);
+        getFolderAndFiles(thisObj);
+    }
+
+
+    function hide(){
+        $("#messageDiv").hide();
+    }
+    setTimeout(function() {
+        $('#messageDiv').fadeOut('slow');
+    }, 4000);
+
+    function createFolderOrFileSection(folderOrFile){
+        let fnHtml = '';
+        if(folderOrFile.folderOrFile == 'FOLDER'){
+            fnHtml = 'insideFolder(this, \''+folderOrFile.folderOrFileLink+'\')';
+        }else{
+            fnHtml = 'downLoadThisFile(this, \''+folderOrFile.folderOrFileLink+'\')';
+        }
+        let documentTypeCode = folderOrFile.documentTypeCode;
+        let html = '<div class="col-md-4 position-relative">';
+        html += '<div class="folder-box" target="_blank" ondblclick="'+fnHtml+' "';
+        if(folderOrFile.folderOrFile == 'FOLDER'){
+            html += 'style="cursor: pointer;"';
+        }
+
+        if(documentTypeCode == 'PDF'){
+            html += 'onmouseover="showPreview(this, \'' + folderOrFile.folderOrFileLink + '\')" onmouseout="hidePreview(\'' + folderOrFile.folderOrFileLink + '\')"';
+        }
+        html += '>';
+
+        if(folderOrFile.actionList.length > 0){
+            html += attachedActionsToFileOrFolder(folderOrFile);
+        }
+        html += '<a class="folder-name" href="javascript:void(0)">';
+        html += '<i class="'+folderOrFile.icon+'" id="ICON_'+folderOrFile.folderOrFileLink+'" style="font-size: 40px;color: #F1870D;" ondblclick="downLoadThisFile(this, \''+folderOrFile.folderOrFileLink+'\')"></i>';
+        html += '<h4 id="NAME_'+folderOrFile.folderOrFileLink+'">'+folderOrFile.folderFileName+'</h4>';
+        html += '</a>';
+        html += createFolderOrFileDetails(folderOrFile);
+        html += createFolderOrFileBookmark(folderOrFile);
+        html += '</div>';
+        
+        // Mini preview
+        //html += '<div class="mini-preview" id="PREVIEW_' + folderOrFile.folderOrFileLink + '" style="display:none; position: absolute; background: #fff; border: 1px solid #ddd; padding: 10px; z-index: 1000;">';
+        //html += '<p>Loading preview...</p>';  // Placeholder for the preview content
+        //html += '</div>';
+
+
+        html += '</div>';
+
+       
+        return html;
+    }
+
+    // when mouse out from the folder or file then hide all the preview
+    $(document).on('mouseout', '.folder-box', function(){
+        $('.mini-preview').hide();
+    });
+
+   
+
+
+
+
+
+   async function showPreview(element, folderOrFileLink) {
+        // close any other previews that are open
+        $('.mini-preview').hide();
+
+        const previewElement = document.getElementById('PREVIEW_' + folderOrFileLink);
+        if (previewElement) {
+            const url = '${contextPath}/dms/downloadFile?fileLink=' + folderOrFileLink;
+            // make an iframe with the URL for the preview load the content in the iframe load in a tag
+            // Create an iframe element if it doesn't already exist
+            const csrfToken = document.querySelector('input[name="${_csrf.parameterName}"]').value;
+            try {
+            const response = await fetch(url, {
+                method: 'GET',
+                
+            });
+
+            if (!response.ok) {
+                previewElement.innerHTML = '<p>Failed to load preview</p>';
+                previewElement.style.display = 'block';
+                return;
+            }
+
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+
+
+
+
+
+
+            let iframe = previewElement.querySelector('iframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                previewElement.appendChild(iframe);
+            }
+            // Set the iframe's source to the URL for the preview  with proxy 
+            iframe.src = blobUrl;
+
+            previewElement.style.display = 'block';
+        } catch (error) {
+            console.error('Failed to load preview:', error);
+            previewElement.innerHTML = '<p>Failed to load preview</p>';
+            previewElement.style.display = 'block';
+            }
+        }
+    }
+
+    function hidePreview(folderOrFileLink) {
+        const previewElement = document.getElementById('PREVIEW_' + folderOrFileLink);
+        if (previewElement) {
+            previewElement.style.display = 'none';
+        }
+    }
+    function attachedActionsToFileOrFolder(folderOrFile){
+        let actionList = folderOrFile.actionList;
+        let html = '';
+        html += '<div>';
+        html += '<i class="fa-solid fa-ellipsis-vertical" aria-expanded="false" data-bs-toggle="dropdown"></i>';
+        html += '<ul class="dropdown-menu" aria-labelledby="dropdownMicroProcessorTrigger">';
+        let isAanyActionIsthere = false;
+        for(let i=0; i<actionList.length; i++){
+            if(actionList[i].actionCode == 'CREATE_FOLDER' || actionList[i].actionCode == 'UPLOAD_FILE'){
+                continue;
+            }
+            isAanyActionIsthere = true;
+            html += '<li><a class="dropdown-item" href="#" onclick="dyActionFn(this, \''+folderOrFile.folderOrFileLink+'\', \''+actionList[i].actionCode+'\')">'+actionList[i].actionName+'</a></li>';
+        }
+        if(isAanyActionIsthere == false){
+            html += '<li><a class="dropdown-item" href="#">No Action</a></li>';
+        }
+        html += '</ul>';
+        html += '</div>';
+        return html;
+    }
+
+    function dyActionFn(that, folderOrFileLink, actionCode){
+        let action = actionCode;
+        if(action == 'SHARE'){
+            openShareFolderModal(that, folderOrFileLink, actionCode);
+        }else if(action == 'DOWNLOAD'){
+            downLoadThisFile(that, folderOrFileLink);
+        }else if(action == 'COPY_LINK'){
+            copyLink(that, folderOrFileLink);
+        }else if(action == 'DELETE'){
+            deleteFolder(that, folderOrFileLink);
+        }else if(action == 'RENAME'){
+            renameFolder(that, folderOrFileLink);
+        }else if(action == 'RECOVER'){
+            recoverThisFile(that, folderOrFileLink);
+        }else if(action == 'DELETE_PERMANENTLY'){
+            permanentDeleteThisFolder(that, folderOrFileLink);
+        }
+    }
+
+    function createFolderOrFileDetails(folderOrFile){
+        let html = '';
+        html += '<ul class="folder-details">';
+        html += '<li class="date"><span>Date:</span> <strong>'+folderOrFile.createdTimeWithAmPm+'</strong></li>';
+        html += '<li class="size"><span>Size:</span> <strong>'+folderOrFile.sizeStr+'</strong></li>';
+        html += '<li><span>Created By:</span> <strong>'+folderOrFile.owner+'</strong></li>';
+        html += '</ul>';
+        return html;
+    }
+
+    function createFolderOrFileBookmark(folderOrFile){
+        let html = '';
+        if(folderOrFile.isBookMark == false){
+            html += '<i class="fa-regular fa-bookmark tag" onclick="addFolderToFavorite(this, \''+folderOrFile.folderOrFileLink+'\')"></i>';
+        }else{
+            html += '<i class="fa-solid fa-bookmark tag" onclick="addFolderToFavorite(this, \''+folderOrFile.folderOrFileLink+'\')"></i>';
+        }
+        return html;
+    }
+
+    function insideFolder(that, folderOrFileLink){
+        $('#insideFolderLink').val(folderOrFileLink);
+        $('#insideFolderForm').submit();
+    }
+
+    // on scroll of the page load more folder and files
+    $(window).scroll(function() {
+        if($(window).scrollTop() + $(window).height() == $(document).height()) {
+            // ajax call to get more folder and files
+            getFolderAndFiles($('#nav-'+activeTab), globalPageNo, globalPageSize);
+        }
+    });
+    let globalPageNo = 0;
+    let globalPageSize = 10;
+    async function getFolderAndFiles(that, pageNo=0, pageSize=10){
+        let tab = $(that).val();
+        if(tab == 'PUBLIC'){
+            // in create modal
+            // uncheck privacy radio button and cursor non and check public 
+            $('#private').prop('checked', false);
+            $('#private').prop('disabled', true);
+            $('#public').prop('checked', true);
+            $('#actionDivIdForCreateFolder').show();
+
+            // in upload modal
+            // uncheck privacy radio button and cursor non and check public
+            $('#privateForUploadInModal').prop('checked', false);
+            $('#privateForUploadInModal').prop('disabled', true);
+            $('#publicForUploadInModal').prop('checked', true);
+        }else{
+
+            // in create modal
+            // uncheck privacy radio button and cursor non and check private
+            $('#private').prop('checked', true);
+            $('#private').prop('disabled', false);
+            $('#public').prop('checked', false);
+            $('#actionDivIdForCreateFolder').hide();
+
+            // in upload modal
+            // uncheck privacy radio button and cursor non and check private
+            $('#privateForUploadInModal').prop('checked', true);
+            $('#privateForUploadInModal').prop('disabled', false);
+            $('#publicForUploadInModal').prop('checked', false);
+
+        }
+
+        let search = $('#searchbar').val();
+        let moduleCode = $('#modules').val();
+        let data = {type: tab, moduleCode: moduleCode, searchText: search, pageNo: pageNo, pageSize: pageSize, folderOrFileLink: parentFolderOrFileLink};
+        let response = await asyncAjaxCall('${contextPath}/dms/getFolderAndFiles', 'GET', data);
+        $('#fileFolderDiv').html('');
+        if(response.outcome){
+            let data = response.data; //[]
+            data.forEach(folderOrFile => {
+                let html = createFolderOrFileSection(folderOrFile);
+                $('#fileFolderDiv').append(html);
+            });
+            globalPageNo = pageNo + 1;
+            globalPageSize = pageSize;
+
+        }
+
+
+    }
+
+
+    // async ajax call to get folder and files
+    async function asyncAjaxCall(url, type, data){
+		return new Promise((resolve, reject) => {
+			$.ajax({
+			url: url,
+			type: type,
+			async: true,
+			data: data,
+			success: function(response){
+				resolve(response);
+			},
+			error: function(response){
+				reject(response);
+			}
+			});
+		});
+    }
+
+
+
+    function createFolder(){
+        // folder name and privacy is mandatory
+        var folderName = $('#folderName').val();
+        var privacy = $('input[name="Privacy"]:checked').val();
+        if(folderName == ''){
+            bootbox.alert('Folder name is mandatory');
+            return false;
+        }
+        if(privacy == ''){
+            bootbox.alert('Privacy is mandatory');
+            return false;
+        }
+
+        // if privacy is public then check at least one action is selected or not
+        if(privacy == 'public'){
+            var actionCodes = $('input[name^="actionCodes["]:checked').length;
+            if(actionCodes == 0){
+                bootbox.alert('At least one action is mandatory');
+                return false;
+            }
+        }
+
+        // submit the form
+        bootbox.confirm({
+            message: "Are you sure you want to create folder?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    $('#createFolderForm').submit();
+                }
+            }
+        });
+    }
+
+
+    function uploadFileOrFolder(){
+        var file = $('#uplodFileId').val();
+        if(file == ''){
+            bootbox.alert('File is mandatory');
+            return false;
+        }
+        var privacy = $('input[name="privacyForUpload"]:checked').val();
+        if(privacy == ''){
+            bootbox.alert('Privacy is mandatory');
+            return false;
+        }
+        var moduleCode = $('#modulesForUploadId').val();
+        if(moduleCode == 'Select Module'){
+            bootbox.alert('Module is mandatory');
+            return false;
+        }
+
+        // submit the form
+        bootbox.confirm({
+            message: "Are you sure you want to upload file?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    $('#uploadFileFormId').submit();
+                }
+            }
+        });
+
+    }
+
+    // on click of Privacy radio button div show/hide
+    $('input[name="Privacy"]').click(function(){
+        var privacy = $(this).val();
+        if(privacy == 'public'){
+            $('#actionDivIdForCreateFolder').show();
+        }else{
+            $('#actionDivIdForCreateFolder').hide();
+        }
+    });
+
+    // on click of allCheckActions check all checkbox of actions 
+    $('#allCheckActions').click(function(){
+        // name="actionCodes[0]", name="actionCodes[1]", name="actionCodes[2]" .... so check name like actionCodes[
+        var allCheckActions = $(this).prop('checked');
+        if(allCheckActions){
+            $('input[name^="actionCodes["]').prop('checked', true);
+        }else{
+            $('input[name^="actionCodes["]').prop('checked', false);
+        }
+    });
+
+    // on any checkbox click check allCheckActions checkbox checked or not
+    $('input[name^="actionCodes["]').click(function(){
+        var allCheckActions = true;
+        $('input[name^="actionCodes["]').each(function(){
+            if(!$(this).prop('checked')){
+                allCheckActions = false;
+            }
+        });
+        if(allCheckActions){
+            $('#allCheckActions').prop('checked', true);
+        }else{
+            $('#allCheckActions').prop('checked', false);
+        }
+    });
+
+    async function openShareFolderModal(that, folderOrFileLink, actionCode){
+        let url = "${contextPath}/dms/getShareSubActions";
+        let data = {folderOrFileLink: folderOrFileLink, actionCode: actionCode};
+        let type = "GET";
+        let response = await asyncAjaxCall(url, type, data);
+        console.log(response);
+
+        let res = response.data;
+        // loop on this res
+        res.forEach(subAction => {
+            if(subAction.actionCode == 'KEY_BASE_ACCESS'){
+                $('#keyBaseAccessShareDivId').css('display', 'block');
+            }
+            if(subAction.actionCode == 'FREE_ACCESS'){
+                $('#freeAccessShareDivId').css('display', 'block');
+            }
+            if(subAction.actionCode == 'INDIVISUAL_ACCESS'){
+                $('#indivisualAccessShareDivId').css('display', 'block');
+            }
+
+        });
+
+        $('#keyBaseAccessShareId').prop('checked', false);
+        $('#freeAccessShareId').prop('checked', false);
+        $('#indivisualAccessShareId').prop('checked', false);
+        // make all div hide
+        $('#apiKeyDivId').hide();
+        $('#anyOneWithLinkDivId').hide();
+        $('#indivisualShareDivId').hide();
+        $('#folderOrFileLinkForShare').val(folderOrFileLink);
+        $('#shareFolderModalId').modal('show');
+    }
+
+      // on click of any radio button show/hide div
+      $('input[name="shareType"]').click(async function(){
+        var shareType = $(this).val();
+        var fileFolderLink = $('#folderOrFileLinkForShare').val();
+        if(shareType == 'api-key'){
+            try {
+                let url = "${contextPath}/DMSAjax/isApiKeyGenerated";
+                let type = "GET";
+                let data = { folderOrFileLink: fileFolderLink };
+                let result = await asyncAjaxCall(url, type, data);
+                if (result && result.outcome) {
+                        $('#generateApiKeyBtnId').text('Re-Generate API Key');
+                        let apiKeyData = result.data;
+                        $('#apiKeyId').val(apiKeyData.apiKey);
+                        let actions = apiKeyData.actions;
+                        if (actions.length > 0) {
+                            // apiKeyActionTypeId make selected
+                            actions.forEach(action => {
+                                $('#apiKeyActionTypeId').find('option[value="' + action + '"]').prop('selected', true);
+                            });
+                            $('#apiKeyActionTypeId').selectpicker('refresh');
+                            // updateAccessFacilitiesDivId
+                            $('#updateAccessFacilitiesDivId').show();
+                        }
+                    }
+                } catch (error) {
+                    // Handle error as needed
+                } finally {
+                    $('#apiKeyDivId').show();
+                    $('#anyOneWithLinkDivId').hide();
+                    $('#indivisualShareDivId').hide();
+                }
+        }else if(shareType == 'anyone'){
+            try {
+                let url = "${contextPath}/DMSAjax/isFreeAccessLinkGenerated";
+                let type = "GET";
+                let data = { folderOrFileLink: fileFolderLink };
+                
+                let result = await asyncAjaxCall(url, type, data);
+                if (result && result.outcome) {
+                    let freeAccessLinkData = result.data;
+                    let freeAccessLink = freeAccessLinkData.freeAccessLink;
+                    // make link line 
+                    let origin = window.location.origin;
+                    let pathname = window.location.pathname;
+                    pathname = pathname.substring(0, pathname.indexOf('/', 1));
+                    let url = origin + pathname + '/dms/freeAssessByLink?folderOrFileLink=' + freeAccessLink;    
+                    $('#freeAccessLink').val(url);
+                    let actions = freeAccessLinkData.actions;
+                    if (actions.length > 0) {
+                        actions.forEach(action => {
+                            $('#freeAccessLinkActionTypeId').find('option[value="' + action + '"]').prop('selected', true);
+                        });
+                        $('#freeAccessLinkActionTypeId').selectpicker('refresh');
+                        $('#addOrRemoveAccessFacilitiesBtnId').text('Update Link Access Facilities');
+                    }
+                }
+            } catch (error) {
+                    // Handle error as needed
+                } finally {
+                    $('#apiKeyDivId').hide();
+                    $('#anyOneWithLinkDivId').show();
+                    $('#indivisualShareDivId').hide();
+            }
+        }else if(shareType == 'indivisual'){
+            $('#apiKeyDivId').hide();
+            $('#anyOneWithLinkDivId').hide();
+            $('#indivisualShareDivId').show();
+        }
+    });
+
+    async function getDataByShareEntityCode(that){
+        $('#addTableDataDynamicalyId').empty();
+        // allCheckbox unchecked
+        $('#allCheck').prop('checked', false);
+        let shareEntityCode = $('#shareEntityCodeId').val();
+        let fileFolderLink = $('#folderOrFileLinkForShare').val();
+        if(shareEntityCode == ''){
+            bootbox.alert('Please select share entity');
+            return false;
+        }
+        let url = "${contextPath}/DMSAjax/getDataByShareEntityCode";
+        let data = {
+            shareEntityCode: shareEntityCode,
+            folderOrFileLink: fileFolderLink,
+            scope: true
+        };
+        let type = "GET";
+        
+        let result = await asyncAjaxCall(url, type, data);
+        
+        if(result && result.outcome){
+            if ($.fn.DataTable.isDataTable('#shareTableId')) {
+                $('#shareTableId').DataTable().destroy(); // Destroy the existing instance
+            }
+            let data = result.data;
+            let allActions = data.allActions;
+            let profiles = data.profiles;
+            let html = '';
+            if(profiles.length > 0){
+                profiles.forEach(profile => {
+                    let actions = profile.actions;
+                    // sl-> count, Share-to-> profileName, Type-> profileType, Access Facilities-> allActions but maked selected profile.actions, Check-All-> checkbox
+                    html += '<tr>';
+                    html += '<td style="text-align:center">' + (profiles.indexOf(profile) + 1) + '</td>';
+                    html += '<td>' + profile.profileName + '</td>';
+                    html += '<td>' + profile.profileCode + '</td>';
+                    html += '<td>';
+                    html += '<select class="selectpicker" multiple="multiple" data-live-search="true" aria-label="Default select example">';
+                    allActions.forEach(action => {
+                        html += '<option value="'+action.actionId+'"';
+                        if(actions.includes(action.actionId)){
+                            html += ' selected';
+                        }
+                        html += '>'+action.actionName+'</option>';
+                    });
+                    html += '</select>';
+                    html += '</td>';
+                    // profile.isAllReadyShared ? 'checked' : ''
+                    html += '<td><input type="checkbox" name="checklist" onclick="checkMark(this)" '+ (profile.isAllReadyShared ? 'checked' : '') +' value="'+profile.profileId+'"></td>';
+                    // id = CODE_ID -> COLG_1
+                    html += '<input type="hidden" value="'+profile.profileCode+'" id="code_'+profile.profileCode+'_'+profile.profileId+'">';
+                    html += '</tr>';
+                });
+                $('#addTableDataDynamicalyId').empty().append(html);
+                // refresh selectpicker
+                $('.selectpicker').selectpicker('refresh');
+
+                // make addTableDataDynamicalyId min-height 200px
+                $('#addTableDataDynamicalyId').css('min-height', '200px');
+
+                
+
+                $('#shareTableId').DataTable();
+
+
+            }
+        }
+    }
+
+    
+    function addFolderToFavorite(that, folderOrFileLink){
+        // ajax call to add folder to favorite
+        $.ajax({
+            url: "${contextPath}/dms/markAsFavourite",
+            type: "GET",
+            data: {
+                folderOrFileLink: folderOrFileLink
+            },
+            success: function(data){
+                if(data){
+                $(that).removeClass('fa-regular fa-bookmark').addClass('fa-solid fa-bookmark');
+                    appendOrRemoveInFavFolderList(that, folderOrFileLink, true);
+                }else{
+                    $(that).removeClass('fa-solid fa-bookmark').addClass('fa-regular fa-bookmark');
+                    appendOrRemoveInFavFolderList(that, folderOrFileLink, false);
+
+                }
+            }
+        });
+    }
+
+   function appendOrRemoveInFavFolderList(that, folderOrFileLink, isAppend){
+	   
+        var icon = $("#ICON_"+folderOrFileLink).attr('class');
+        var folderName = $("#NAME_"+folderOrFileLink).text();
+        var fileFolderType = $("#FILE_FOLDER_TYPE_"+folderOrFileLink).val();
+        var favFolderList = $('#favFolderList');
+        if(isAppend){
+            let appendFunction = fileFolderType == 'FILE' ? 'downLoadThisFile(this, \''+folderOrFileLink+'\')' : 'insideFolder(this, \''+folderOrFileLink+'\')';
+            var li = '<li id="'+folderOrFileLink+'" ondblclick="'+appendFunction+'"><a href="#"><i class="'+icon+'"></i><span title="'+folderName+'">'+folderName+'</span></a></li>';
+            favFolderList.append(li);
+        }else{
+            favFolderList.find('li[id="'+folderOrFileLink+'"]').remove();
+        }
+    }
+
+
+    function checkFileExtension(that){
+        var file = $(that).val();
+        var ext = file.split('.').pop();
+        if(ext != 'pdf' && ext != 'doc' && ext != 'docx' && ext != 'xls' && ext != 'xlsx' && ext != 'ppt' && ext != 'pptx' && ext != 'txt' && ext != 'jpg' && ext != 'jpeg' && ext != 'png' && ext != 'gif' && ext != 'zip' && ext != 'rar' && ext != '7z'){
+            bootbox.alert('Only pdf, doc, docx, xls, xlsx, ppt, pptx, txt, jpg, jpeg, png, gif, zip, rar, 7z file allowed');
+            $(that).val('');
+            return false;
+        }
+        // check file size can't be more than 10MB
+        if(that.files[0].size > 10485760){
+            bootbox.alert('File size can\'t be more than 10MB');
+            $(that).val('');
+            return false;
+        }
+    }
+
+</script>
+
+<script>
+
+    function shareFileOrFolder(){
+    	let fileFolderLink = $('#folderOrFileLinkForShare').val();
+        let profiles = [];
+        let bool = true;
+        $('#addTableDataDynamicalyId').find('input[type="checkbox"]').each(function(){
+            if($(this).is(':checked')){
+                let profileId = $(this).val();
+                let pCode = $(this).closest('tr').find('td').eq(2).text();
+                let actions = [];
+                $(this).closest('tr').find('select').find('option:selected').each(function(){
+                    actions.push($(this).val());
+                });
+
+                if(actions.length == 0){
+                    bootbox.alert('Please select atleast one action');
+                    bool = false;
+                    return false;
+                }
+                let profileCode = $('#code_'+pCode+'_'+profileId).val();
+                let profileObject = {
+                    profileId: profileId,
+                    actions: actions,
+                    profileCode: profileCode
+                };
+                profiles.push(profileObject);
+            }
+        });
+        if(!bool){
+            return false;
+        }
+
+        if(profiles.length == 0){
+            bootbox.alert('Please select atleast one profile');
+            return false;
+        }
+
+        // finall json object
+        let shareData = {
+            fileFolderLink: fileFolderLink,
+            profiles: profiles,
+            shareEntityCode: $('#shareEntityCodeId').val()
+        };
+        // make this base64 encode
+        let shareDataStr = JSON.stringify(shareData);
+        let shareDataStrBase64 = btoa(shareDataStr);
+
+        bootbox.confirm({
+            message: "Are you sure you want to share file or folder?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    $('#shareEntityDataId').val(shareDataStrBase64);
+                    $('#shareEntityModalFormId').submit();
+                }
+            }
+        });
+    }
+
+    function deleteFolder(that, folderOrFileLink){
+        bootbox.confirm({
+            message: "Are you sure you want to delete folder?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    $('#deleteFolderLink').val(folderOrFileLink);
+                    $('#deleteFolderForm').submit(); 
+                }
+            }
+        });
+    }
+
+    function downLoadThisFile(that, folderOrFileLink){
+        $('#downloadFileLink').val(folderOrFileLink);
+        $('#downloadFileForm').submit();
+    }
+
+    function copyLink(that, folderOrFileLink){
+        let origin = window.location.origin;
+        let pathname = window.location.pathname;
+        pathname = pathname.substring(0, pathname.indexOf('/', 1));
+        let url = origin + pathname + '/dms/canViewOrDownloadFile?folderOrFileLink=' + folderOrFileLink;
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val(url).select();
+        document.execCommand("copy");
+        $temp.remove();
+        // bootbox alert 'copied to clipboard' but after 3 seconds auto close the alert
+        bootbox.alert({
+            message: "Link copied to clipboard",
+            closeButton: false,
+            dismissible: true,
+            timeout: 3000
+        });
+    }
+
+    function renameFolder(that, folderOrFileLink){
+        bootbox.prompt({
+            title: "Rename Folder " + $("#NAME_"+folderOrFileLink).text(),
+            inputType: 'text',
+            callback: function (result) {
+                if(result){
+                    if(result.trim() === ''){
+                        bootbox.alert('Folder name is mandatory');
+                        return false;
+                    }
+                    $.ajax({
+                        url: "${contextPath}/dms/renameFolder",
+                        type: "GET",
+                        data: {
+                            folderOrFileLink: folderOrFileLink,
+                            newName: result
+                        },
+                        success: function(data){
+                            $("#NAME_"+folderOrFileLink).text(data);
+                            // refresh the page
+                            window.location.reload();
+                            
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    function recoverThisFile(that, folderOrFileLink){
+    	bootbox.confirm({
+            message: "Are you sure you want to recover this folder or file?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    $('#recoverThisFileLinkId').val(folderOrFileLink);
+                    $('#recoverThisFileForm').submit();
+                }
+            }
+        });
+    }
+    
+    function permanentDeleteThisFolder(that, folderOrFileLink){
+    	bootbox.confirm({
+            message: "Are you sure you want to permanently delete this folder or file? You can't recover it after permanent delete.",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    $('#permanentDeleteThisFolderLinkId').val(folderOrFileLink);
+                    $('#permanentDeleteThisFolderForm').submit();
+                }
+            }
+        });
+    }
+
+
+    function generateApiKey(){
+        let actions = $('#apiKeyActionTypeId').val();
+        if(actions == null || actions == ''){
+            bootbox.alert('Please select at least one action');
+            return false;
+        }
+        let actionList = [];
+        if(actions){
+            for(let i=0; i<actions.length; i++){
+                actionList.push(actions[i]);
+            }
+        }
+        let actionText = '';
+        if(actions){
+            for(let i=0; i<actions.length; i++){
+                let actiId = actions[i];
+                let actionName = $('#apiKeyActionTypeId').find('option[value="'+actiId+'"]').text();
+                actionText += actionName + ', ';
+            }
+            actionText = actionText.substring(0, actionText.length-2);
+        }
+        // in red color
+        actionText = '<span style="color: red;">' + actionText + '</span>';
+        bootbox.confirm({
+            message: "Are you sure you want to Re-generate API Key? with actions: " + actionText,
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    var fileFolderLink = $('#folderOrFileLinkForShare').val();
+                    let url = "${contextPath}/DMSAjax/generateApiKey";
+                    let type = "GET";
+                    actionList = actionList.join(',');
+                    let data = {folderOrFileLink: fileFolderLink, actions: actionList};
+                    
+                    asyncAjaxCall(url, type, data).then((result) => {
+                        if(result){
+                            let data = result.data;
+                            $('#apiKeyId').val(data.apiKey);
+                            $('#generateApiKeyBtnId').text('Re-Generate API Key');
+                            let actions = data.actions;
+                            if(actions.length > 0){
+                                // apiKeyActionTypeId make selected
+                                for(let i=0; i<actions.length; i++){
+                                    $('#apiKeyActionTypeId').find('option[value="'+actions[i]+'"]').prop('selected', true);
+                                }
+                                $('#apiKeyActionTypeId').selectpicker('refresh');
+                                // updateAccessFacilitiesDivId
+                                $('#updateAccessFacilitiesDivId').show();
+                            }
+                            bootbox.alert('API Key generated successfully');
+                        }
+                        
+                    });
+                }
+            }
+        });
+    }
+
+
+
+    async function handleGenerateApiKey(fileFolderLink) {
+        try {
+        let url = "${contextPath}/DMSAjax/isApiKeyGenerated";
+        let type = "GET";
+        let data = { folderOrFileLink };
+        
+
+        let result = await asyncAjaxCall(url, type, data);
+
+        if (result && result.outcome) {
+                $('#generateApiKeyBtnId').text('Re-Generate API Key');
+                let apiKeyData = result.data;
+                $('#apiKeyId').val(apiKeyData.apiKey);
+
+                let actions = apiKeyData.actions;
+                if (actions.length > 0) {
+                    // apiKeyActionTypeId make selected
+                    actions.forEach(action => {
+                        $('#apiKeyActionTypeId').find('option[value="' + action + '"]').prop('selected', true);
+                    });
+                    $('#apiKeyActionTypeId').selectpicker('refresh');
+                    // updateAccessFacilitiesDivId
+                    $('#updateAccessFacilitiesDivId').show();
+                }
+            }
+        } catch (error) {
+            // Handle error as needed
+        } finally {
+            
+            $('#apiKeyDivId').show();
+            $('#anyOneWithLinkDivId').hide();
+            $('#indivisualShareDivId').hide();
+        }
+    }
+
+
+
+    function addOrRemoveAccessFacilities(){
+        let actions = $('#freeAccessLinkActionTypeId').val();
+        if(actions == null || actions == ''){
+            bootbox.alert('Please select atleast one action');
+            return false;
+        }
+        let actionList = [];
+        if(actions){
+            for(let i=0; i<actions.length; i++){
+                actionList.push(actions[i]);
+            }
+        }
+        let actionText = '';
+        if(actions){
+            for(let i=0; i<actions.length; i++){
+                let actiId = actions[i];
+                let actionName = $('#freeAccessLinkActionTypeId').find('option[value="'+actiId+'"]').text();
+                actionText += actionName + ', ';
+            }
+            actionText = actionText.substring(0, actionText.length-2);
+        }
+        // in red color
+        actionText = '<span style="color: red;">' + actionText + '</span>';
+        bootbox.confirm({
+            message: "Are you sure you want to update Free Access Link? with actions: " + actionText,
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result) {
+                if(result){
+                    var fileFolderLink = $('#folderOrFileLinkForShare').val();
+                    let url = "${contextPath}/DMSAjax/generateFreeAccessLink";
+                    let type = "GET";
+                    actionList = actionList.join(',');
+                    let data = {folderOrFileLink: fileFolderLink, actions: actionList, freeLinkKey: $('#freeAccessLink').val()};
+                    
+                    asyncAjaxCall(url, type, data).then((result) => {
+                        if(result){
+                            let data = result.data;
+                            let freeAccessLink = data.freeAccessLink;
+                            let origin = window.location.origin;
+                            let pathname = window.location.pathname;
+                            pathname = pathname.substring(0, pathname.indexOf('/', 1));
+                            freeAccessLink = origin + pathname + '/dms/freeAssessByLink?folderOrFileLink=' + freeAccessLink;
+                            $('#freeAccessLink').val(freeAccessLink);
+                            let actions = data.actions;
+                            if(actions.length > 0){
+                                // freeAccessLinkActionTypeId make selected
+                                for(let i=0; i<actions.length; i++){
+                                    $('#freeAccessLinkActionTypeId').find('option[value="'+actions[i]+'"]').prop('selected', true);
+                                }
+                                $('#freeAccessLinkActionTypeId').selectpicker('refresh');
+                                $('#addOrRemoveAccessFacilitiesBtnId').text('Update Link Access Facilities');
+                            }
+                            bootbox.alert('Free Access Link updated successfully');
+                        }
+                        
+                    });
+                }
+            }
+        });
+    }
+
+    async function copyApiKey(that, id) {
+        var apiKey = $('#' + id).val();
+        if (apiKey == '') {
+            bootbox.alert('API Key is not generated');
+            return false;
+        }
+
+        // Create a temporary textarea element
+        var $tempTextarea = $("<textarea>");
+        $("body").append($tempTextarea);
+        $tempTextarea.val(apiKey).select();
+
+        try {
+            // Copy the text to the clipboard using the Clipboard API
+            await navigator.clipboard.writeText(apiKey);
+            // Show 'copied to clipboard' message
+            let copiedToClipboard = '<span style="color: green; display:block">Copied to clipboard</span>';
+            $(that).parent().append(copiedToClipboard);
+
+            // Remove the temporary textarea after a short delay
+            setTimeout(() => {
+                $tempTextarea.remove();
+                $(that).parent().find('span').remove();
+            }, 1000);
+        } catch (err) {
+            console.error('Unable to copy to clipboard', err);
+            // Handle the error as needed
+        }
+    }
+
+    // favsearchbar
+    $('#favsearchbar').on('keyup', function(){
+        var value = $(this).val();
+        getFavFolderList(value);
+    });
+
+    async function getFavFolderList(search){
+        let url = "${contextPath}/dms/getFavFolderList";
+        let data = {search: search};
+        let type = "GET";
+        let response = await asyncAjaxCall(url, type, data);
+        $('#favFolderList').html('');
+        if(response.outcome){
+            let data = response.data;
+            data.forEach(folderOrFile => {
+                let icon = folderOrFile.folderOrFileLinkType == 'FILE' ? 'fa-solid fa-file' : 'fa-regular fa-folder';
+                let appendFunction = folderOrFile.folderOrFileLinkType == 'FILE' ? 'downLoadThisFile(this, \''+folderOrFile.folderOrFileLink+'\')' : 'insideFolder(this, \''+folderOrFile.folderOrFileLink+'\')';
+                var li = '<li id="'+folderOrFile.folderOrFileLink+'" ondblclick="'+appendFunction+'"><a href="#"><i class="'+icon+'"></i><span title="'+folderOrFile.folderFileName+'">'+folderOrFile.folderFileName+'</span></a></li>';
+                $('#favFolderList').append(li);
+            });
+        }
+    }
+
+
+/*$('#shareFolderModalId').on('hidden.bs.modal', function () {
+    location.reload();
+});*/
+$('#shareFolderModalId').on('hidden.bs.modal', function () {
+    $(this).find('form')[0].reset();
+    $('#addTableDataDynamicalyId').empty();
+});
+$('#shareFolderModalId').on('show.bs.modal', function () {
+    $.ajax({
+        url: '/path-to-data',
+        method: 'GET',
+        success: function(data) {
+            $('#addTableDataDynamicalyId').html(data);
+        }
+    });
+});
+</script>
+
+

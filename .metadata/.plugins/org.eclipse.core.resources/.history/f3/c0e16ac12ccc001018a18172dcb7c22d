@@ -1,0 +1,82 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+
+<section class="">
+	<form  method="POST" action="${contextPath}/assetflow/master/itemType/save" id="addItemTypeFrm">
+		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+		<input type="hidden" id="itemTypeId" name="itemTypeId"  value="${itemType.itemTypeId }">
+		 <div class="row">
+		 <div class="col-md-12" >
+		 	<div class="row">
+		 		<div class="form-group col-md-2">
+		 			<label class="col-md-12 required" for="text">ItemType Name:</label>
+		 			<input class="form-control form-control-sm" type="text" id="itemTypeName" name="itemTypeName"  placeholder="enter ItemType name" value="${itemType.itemTypeName }" maxlength="100" >
+		 		</div>
+		 		<div class="form-group col-md-2">
+		 			<label class="col-md-12 required" for="text">ItemType Code:</label>
+		 			<input class="form-control form-control-sm" type="text" name="itemTypeCode" id="itemTypeCode" placeholder="enter ItemType code" value="${itemType.itemTypeCode }" maxlength="100" readonly>
+		 		</div>
+		 		<div class="col-md-2 ">
+		 		 <input type="button" class="btn-submit" value="${not empty itemType.itemTypeId  ? 'Update' : 'Submit' }" onclick="validateForms()">
+		     
+		       <a href="${contextPath}" class="btn-back">Cancel</a>
+		       </div>
+		 </div>
+		 </div>
+		 </div>
+	 </form>
+	  <div class="col-md-12">
+        <div class="table-responsive">
+	 <table class="datatable table table-striped table-bordered exportbtn mt-3">
+	 	<thead>
+	 		<tr>
+	 			<th>Sl No</th>
+	 			<th>ItemType Name</th>
+	 			<th>ItemType Code</th>
+	 			<th>Action</th>
+	 		</tr>	
+	 	</thead>
+	 	<tbody>
+	 		<c:forEach items="${itemTypeList}" var="itemTypee" varStatus="status">
+	 			<tr>
+	 				<td>${status.count}</td>
+	        		<td>${itemTypee.itemTypeName}</td>
+	        		<td>${itemTypee.itemTypeCode}</td>
+	                <td>
+	                	<a href="${contextPath}/assetflow/master/itemType/add?itemTypeId=${itemTypee.itemTypeId}" class="btn button-alert btn-sm"  data-toggle="tooltip" title="Edit itemType"><i class='fa-regular fa-pen-to-square'></i></a>
+	                	<a class="btn btn-danger btn-sm"  data-toggle="tooltip" title="Remove itemType" onclick="deleteItemType(${itemTypee.itemTypeId})"><i class='fa-solid fa-trash'></i></a>
+		            </td>	
+	 			</tr>
+	 		</c:forEach>
+	 	</tbody>
+	 </table>
+	 </div>
+	 </div>
+</section>
+<form  method="post" action="${contextPath}/assetflow/master/itemType/delete" id="deleteItemType">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" id="itemTypeIdd" name="itemTypeId"  value="">
+</form>
+<script>
+	function validateForms(){
+		var itmTypName=$("#itemTypeName").val();
+		if(itmTypName==''){
+			alert("Please Enter ItemType Name....");
+			return false;
+		}else{
+			$("#addItemTypeFrm").submit();
+		}
+	}
+	function deleteItemType(id){
+		$("#itemTypeIdd").val(id);
+		$("#deleteItemType").submit();
+	}
+</script>

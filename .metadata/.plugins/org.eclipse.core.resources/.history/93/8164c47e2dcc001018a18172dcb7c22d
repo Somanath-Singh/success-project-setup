@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="store_wise_item" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5fca9062-7b94-4a5b-a319-c7633d83f2ac">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
+	<parameter name="CollegeName" class="java.lang.String"/>
+	<parameter name="storeId" class="java.lang.Long"/>
+	<parameter name="entityId" class="java.lang.Long"/>
+	<parameter name="entityLevel" class="java.lang.String"/>
+	<parameter name="storeName" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[select * from asset_mgmt.fun_inspection_register( $P{entityId} , $P{entityLevel} , $P{storeId}   )]]>
+	</queryString>
+	<field name="store_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="store_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="store_name"/>
+	</field>
+	<field name="item_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="item_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="item_name"/>
+	</field>
+	<field name="quantity" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="quantity"/>
+		<property name="com.jaspersoft.studio.field.label" value="quantity"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="550" height="20" uuid="8a7542fe-b154-4b8e-a77c-28b4098cdee7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="13" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CollegeName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="20" width="550" height="20" uuid="287739ef-50cd-4860-b942-27bff40bdc9e"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Store Wise Item Listing (" +$P{storeName} +")"]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="480" y="40" width="70" height="20" uuid="0c7d6abe-7e4d-495d-b82d-9a6aaa9c2185"/>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd/MM/yyyy").format(new Date())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="420" y="60" width="60" height="20" uuid="67bb4348-c828-4bc7-95a8-b3fa3a4dff24"/>
+				<text><![CDATA[Run Time : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="420" y="40" width="60" height="20" uuid="a968743a-e100-4d5b-8a64-b947eec22839"/>
+				<text><![CDATA[Run Date : ]]></text>
+			</staticText>
+			<textField pattern="HH:mm">
+				<reportElement x="480" y="60" width="70" height="20" uuid="d65604e7-1cc4-4999-ad19-bf7639838162"/>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("hh:mm:ss a").format(new Date())]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="192" height="30" uuid="f3548ab0-516b-4510-ad60-020f89212334">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ea64e33b-1d4d-45ed-aee4-a4f1c82c4d84"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Store Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="192" y="0" width="238" height="30" uuid="2bb3a4bf-7c30-4ba5-9cdc-a5e70923de27">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="729dfd65-939f-40a2-a1fe-947f24b66a0f"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Item Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="430" y="0" width="120" height="30" uuid="309dcbfa-5fb4-43f5-b9b3-f9190fe50dfb">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7da466d2-91b9-4ea7-a805-32fc3f9cb59c"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Quantity]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="192" height="30" uuid="2133ebe4-5eaf-4886-b0ff-f2b89d592699">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ea64e33b-1d4d-45ed-aee4-a4f1c82c4d84"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{store_name}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="192" y="0" width="238" height="30" uuid="46410732-587a-4f05-bc5a-295c6b8e46d2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="729dfd65-939f-40a2-a1fe-947f24b66a0f"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{item_name}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToBandHeight" x="430" y="0" width="120" height="30" uuid="39b2b16e-ee87-424f-b6ae-a666d6526339">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7da466d2-91b9-4ea7-a805-32fc3f9cb59c"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.text.DecimalFormat("0.00").format($F{quantity})]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

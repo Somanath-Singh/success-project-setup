@@ -1,0 +1,57 @@
+package com.aashdit.common.model;
+
+import com.aashdit.framework.core.annotation.Sortable;
+import com.aashdit.umt3.utils.NewAuditable;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.context.i18n.LocaleContextHolder;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Locale;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+
+@DynamicInsert
+@DynamicUpdate
+@Entity
+@Table(name = "t_mst_state", schema = "public")
+public class State extends NewAuditable<Long> implements Serializable {
+
+	private static final long serialVersionUID = 285701719160134651L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "state_id")
+	private Long stateId;
+
+	@Column(name = "state_name_en")
+	@Sortable(lang = "en")
+	private String stateNameEN;
+
+	@Column(name = "state_name_hi")
+	@Sortable(lang = "hi")
+	private String stateNameHI;
+
+	@Column(name = "state_code")
+	private String stateCode;
+
+	@Column(name = "is_active")
+	private Boolean isActive;
+	
+	@Transient
+	private String stateName;
+
+	public String getStateName() {
+		Locale locale = LocaleContextHolder.getLocale();
+        if (locale.getLanguage().equals("hi")) {
+            return this.getStateNameHI();
+        }
+        return this.getStateNameEN();
+    }
+
+}

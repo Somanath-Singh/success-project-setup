@@ -1,0 +1,706 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<style>
+	tbody#itemTableBody tr{
+		vertical-align: middle;
+	}
+</style>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Plan Estimation</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa-solid fa-house"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Plan Estimation</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+
+	<div class="col-md-12">
+
+		<div class="card">
+			<div class="card-header">
+				<c:choose>
+					<c:when test="${not empty projectEstimation}">
+						<h4 class="card-title">Update Plan Estimation</h4>
+					</c:when>
+					<c:otherwise>
+						<h4 class="card-title">Add Plan Estimation</h4>
+					</c:otherwise>
+				</c:choose>
+			</div>
+			<div class="card-body">
+                        <form method="POST" action="${contextPath}/project-estimation/save-project-estimation" id="projectEstimationForm">
+                           	<input type="hidden" id="cipherText" name="cipherText" value="">
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+							<input type="hidden" id="prjEstId" name="prjEstId" value="${projectEstimation.prjEstId}" />
+							<input type="hidden" id="isActive" name="isActive" value="${projectEstimation.isActive}" />
+							<input type="hidden" id="buttonCode" name="buttonCode">	
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="smallInput required" for="financialYear">Financial Year :</label>
+                                        <select class="form-control form-control-sm form-select" id="financialYear" name="financialYearId" onchange="getProjectByFinancialYear(this.value);">
+                                            <option value="0" selected disabled>- Select -</option>
+                                            <c:forEach items="${financialYearList}" var="fy" varStatus="index">
+                                                <option value="${fy.financialYearId}" ${ fy.financialYearId eq projectEstimation.financialYearId ? 'selected' : ''}>${fy.financialYear}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+<!--                                         <label class="smallInput required" for="projectId">Project :</label> -->
+                                        <label class="smallInput required" for="projectId">Building :</label>
+                                        <select class="form-control form-control-sm select2 form-select select2" id="projectId" name="projectId" onchange="getPlanEstimationNo(this.value);fetchProjectFinalCostByProjectId(this.value)">
+                                            <option value="0" selected disabled>- Select -</option>
+                                          	<c:if  test="${not empty projectEstimation}">
+                                          		 <c:forEach items="${projectList}" var="project">
+                                                 <option value="${project.projectId}" ${ project.projectId eq projectEstimation.projectId ? 'selected' : ''}>
+                                                     ${project.projectName}
+                                                 </option>
+                                            	</c:forEach>
+                                          	</c:if>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="smallInput required" for="fundSource">Fund Source :</label>
+                                        <select class="form-control form-control-sm form-select" id="fundSource" name="fundSource">
+                                            <option value="0" selected disabled>- Select -</option>
+                                            <c:forEach items="${fundSourceList}" var="fund" varStatus="index">
+                                                <option value="${fund.valueEn}" ${ fund.valueEn eq projectEstimation.fundSource ? 'selected' : ''}>${fund.valueEn}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="smallInput" for="planEstimationNo">Plan Estimation No.</label>
+										<input type="text" class="form-control form-control-sm " id="planEstimationNo" name="planEstimationNo" readonly value="${projectEstimation.planEstimationNo}" />
+                                    </div>
+                                </div>
+                                 <div class="col-md-2">
+                                    <div class="form-group">
+<!--                                         <label class="smallInput" for="projectCost">Project Available Cost.</label> -->
+                                        <label class="smallInput" for="projectCost">Building Available Cost.</label>
+                                        <input type="text" class="form-control form-control-sm text-end" id="projectAvailableCost" name="projectAvailableCost" readonly value="${projectEstimation.projectAvailableCost}" />
+                                    </div>
+                                </div>
+							</div>
+						  	<div class="row mt-1" id="additionalFields">
+						    	<div class="col-md-12">
+						        	<table class="table table-bordered">
+						          		<thead>
+								            <tr>
+								              <th class="text-center" style="width: 60px;">Sl No</th>
+								              <th class="required">Item of Work</th>
+								              <th class="required">Quantity</th>
+								              <th class="required">Unit</th>
+								              <th class="required">Rate (Rupees)</th>
+								              <th style="width: 235px;">Amount (Rupees)</th>
+								              <th class="text-center" style="width: 100px;">
+												<button type="button" class="btn btn-sm btn-success apend-btn-sec-button"><i class="fa fa-plus"></i></button>
+											  </th>
+								            </tr>
+							          	</thead>
+							     		<c:if test="${empty projectEstimation}">
+									 		<tbody id="itemTableBody">
+									            <tr>
+									              <td class="text-center">
+									              		1
+									              	<input type="hidden" class="form-control form-control-sm prjEstDtlId form-select" name="projectEstimationDetails[0].prjEstDtlId"/>
+										          </td>
+									              <td>
+									                <select class="form-control form-control-sm item-select form-select" name="projectEstimationDetails[0].itemId">
+									                    <option value="" selected disabled>- Select -</option>
+		                                                <c:forEach items="${itemList}" var="item">
+		                                                    <option value="${item.itemId}">${item.itemName}</option>
+		                                                </c:forEach>
+									                </select>
+									              </td>
+									              <td><input type="number" class="form-control form-control-sm quantity" name="projectEstimationDetails[0].quantity" /></td>
+									              <td>
+									              	<select class="form-control form-control-sm unit-select form-select" name="projectEstimationDetails[0].unitOfMeasurementId">
+		                                                <option value="" selected disabled>- Select -</option>
+		                                                <c:forEach items="${unitList}" var="unit">
+		                                                    <option value="${unit.unitId}">${unit.unitName}</option>
+		                                                </c:forEach>
+		                                           	</select>
+									              </td>
+									              <td><input type="number" class="form-control form-control-sm rate text-end" name="projectEstimationDetails[0].unitPrice" /></td>
+									              <td><input type="number" class="form-control form-control-sm amount text-end" name="projectEstimationDetails[0].totalPrice" readonly /></td>
+									              <td class="text-center">
+									                <button type="button" class="btn btn-sm btn-danger remove-row"><i class="fa fa-minus"></i></button>
+									              </td>
+									            </tr>
+								      		</tbody>
+										</c:if>
+										<c:if test="${not empty projectEstimation}">
+									 		<tbody id="itemTableBody">
+								 	 			<c:forEach items="${projectEstimationDetailsList}" var="details" varStatus="count">
+										            <tr>
+										              <td class="text-center">
+										              	${count.index + 1} 
+										              	<input type="hidden" class="form-control form-control-sm prjEstDtlId form-select" name="projectEstimationDetails[${count.index}].prjEstDtlId" value="${details.prjEstDtlId}" />
+										              </td>
+										              <td>
+										               <select class="form-control form-control-sm item-select form-select" name="projectEstimationDetails[${count.index}].itemId">
+									                    <option value="" selected disabled>- Select -</option>
+		                                                <c:forEach items="${itemList}" var="item">
+		                                                    <option value="${item.itemId}" ${ item.itemId eq details.itemId ? 'selected' : ''}>${item.itemName}</option>
+		                                                </c:forEach>
+									                	</select>
+										              </td>
+										              <td><input type="number" class="form-control form-control-sm quantity" name="projectEstimationDetails[${count.index}].quantity" value="${details.quantity}" /></td>
+										              <td>
+										              	<select class="form-control form-control-sm unit-select form-select" name="projectEstimationDetails[${count.index}].unitOfMeasurementId">
+			                                                <option value="" selected disabled>- Select -</option>
+			                                                <c:forEach items="${unitList}" var="unit">
+			                                                    <option value="${unit.unitId}" ${ unit.unitId eq details.unitOfMeasurementId ? 'selected' : ''}>${unit.unitName}</option>
+			                                                </c:forEach>
+			                                           	</select>
+										              </td>
+										              <td><input type="number" class="form-control form-control-sm rate text-end" name="projectEstimationDetails[${count.index}].unitPrice" value="${details.unitPrice}"/></td>
+										              <td><input type="number" class="form-control form-control-sm amount text-end" name="projectEstimationDetails[${count.index}].totalPrice" value="${details.totalPrice}" readonly /></td>
+										              <td class="text-center">
+										                <button type="button" class="btn btn-sm btn-danger remove-row"><i class="fa fa-minus"></i></button>
+										              </td>
+										            </tr>
+								          		</c:forEach>
+								      		</tbody>
+										</c:if>
+						        	</table>
+						    	</div>
+						  	</div>
+					
+                               <!-- Tax and Grand Total Section -->
+                               	<div class="row" style="margin: 0 auto; max-width: 580px; margin-right: 95px;">
+                               		<div class="col-md-12">
+		                               <div class="row" style="align-items: center;">
+										    <div class="col-md-7">
+										        <div class="form-group" style="text-align: right;">
+										            <label class="smallInput" for="totalAmount"><b>TOTAL AMOUNT :</b></label>
+										        </div>
+										    </div>
+										    <div class="col-md-5">
+										        <div class="form-group">
+										           <input type="text" class="form-control form-control-sm  text-end" id="totalAmount" name="estimationAmount" readonly value="${projectEstimation.estimationAmount}"/>
+										        </div>
+										    </div>
+										</div>
+										<!-- GST % -->
+										<div class="row" style="align-items: center;">
+										    <div class="col-md-7">
+										        <div class="form-group" style="text-align: right;">
+										            <label class="smallInput required" for="gstPercentage"><b>GST % :</b></label>
+										        </div>
+										    </div>
+										    <div class="col-md-5">
+										        <div class="form-group">
+										        	<select class="form-control form-control-sm form-select" id="gstPercentage" name="gstPercentage" onchange="divideGST(this.value)">
+													    <option value="" disabled selected>- Select -</option>
+													    <option value="5"  ${projectEstimation.gstPercentage == 5 ? 'selected' : ''}>5 %</option>
+													    <option value="18" ${projectEstimation.gstPercentage == 18 ? 'selected' : ''}>18 %</option>
+													    <option value="40" ${projectEstimation.gstPercentage == 40 ? 'selected' : ''}>40 %</option>
+													</select>
+										        </div>
+										    </div>
+										</div>
+										<div class="row" style="align-items: center;">
+										    <div class="col-md-7">
+										        <div class="form-group" style="text-align: right;">
+										             <label class="smallInput" for="sgstPercent"><b>SGST :</b></label>
+										        </div>
+										    </div>
+										    <div class="col-md-5">
+										    	<div class="row">
+										    		 <div class="col-md-6">
+										    		 	<div class="form-group">
+										           			<span><label class="smallInput" for="sgstPercent" style="font-size: 11px;">SGST (%)</label></span>
+										            		<input type="number" class="form-control form-control-sm" id="sgstPercent" name="sgstPercentage" readonly value="${projectEstimation.cgstPercentage}"/>
+										        		</div>
+										    		 </div>
+										    		 <div class="col-md-6">
+										    		 	<div class="form-group">
+										    		 		<span><label class="smallInput" for="sgstAmount" style="font-size: 11px;">SGST (Amount)</label></span>
+										            		<input type="number" class="form-control form-control-sm text-end" id="sgstAmount" name="sgstAmount" readonly value="${projectEstimation.sgstAmount}"/>
+										    		 	</div>
+										    		 </div>
+										    	</div>
+										    </div>
+										</div>
+										<div class="row" style="align-items: center;">
+										    <div class="col-md-7">
+										        <div class="form-group" style="text-align: right;">
+										             <label class="smallInput" for="sgstPercent"><b>CGST :</b></label>
+										        </div>
+										    </div>
+										    <div class="col-md-5">
+										    	<div class="row">
+										    		 <div class="col-md-6">
+										    		 	<div class="form-group">
+										           			 <label class="smallInput" for="cgstPercent" style="font-size: 11px;">CGST (%)</label>
+										            		 <input type="number" class="form-control form-control-sm" id="cgstPercent" name="cgstPercentage" readonly  value="${projectEstimation.cgstPercentage}"/>
+										        		</div>
+										    		 </div>
+										    		 <div class="col-md-6">
+										    		 	<div class="form-group">
+										    		 		 <label class="smallInput" for="cgstAmount" style="font-size: 11px;">CGST (Amount)</label>
+										            		 <input type="number" class="form-control form-control-sm text-end" id="cgstAmount" name="cgstAmount" readonly value="${projectEstimation.cgstAmount}"/>
+										    		 	</div>
+										    		 </div>
+										    	</div>
+										    </div>
+										</div>
+										<div class="row" style="align-items: center;">
+										    <div class="col-md-7">
+										        <div class="form-group" style="text-align: right;">
+										           <label class="smallInput" for="totalGst"><b>GST TOTAL AMOUNT (INR) :</b></label>
+										        </div>
+										    </div>
+										    <div class="col-md-5">
+										        <div class="form-group">
+										           <input type="number" class="form-control form-control-sm text-end" id="totalGst" name="totalGst"   readonly  value="${projectEstimation.totalGst}"/>
+										        </div>
+										    </div>
+										</div>
+										
+										<div class="row" style="align-items: center;">
+										    <div class="col-md-7">
+										        <div class="form-group" style="text-align: right;">
+										           <label class="smallInput" for="grandTotal"><b>Grand TOTAL (INR) :</b></label>
+										        </div>
+										    </div>
+										    <div class="col-md-5">
+										        <div class="form-group">
+										           <input type="number" class="form-control form-control-sm text-end" id="grandTotal" name="totalAmount"   readonly  value="${projectEstimation.totalAmount}"/>
+										        </div>
+										    </div>
+										</div>
+									</div>
+								</div>
+								
+                                <div class="col-md-12">
+                                	<hr>
+                                </div>
+                                
+                                <div class="row">
+							    	<div class="text-center">
+							        <%-- Comment out the previous button logic
+							        <c:choose>
+							            <c:when test="${not empty projectEstimation}">
+							                <input type="button" name="add&ManageApplication"
+							                    value="Update" id="add&ManageApplications"
+							                    class="btn btn-success btn-sm" onclick="submitFormData()">  
+							                <a href="${contextPath}/master/addschool" type="button"
+							                    class="btn btn-danger btn-sm">Back</a>
+							            </c:when>
+							            <c:otherwise>
+							                <input type="button" name="add&ManageApplication"
+							                    value="Save As Draft" id="addManageApplications"
+							                    class="btn btn-success btn-sm" onclick="submitFormData()">  
+							                <a href="${contextPath}/home" type="button"
+							                    class="btn btn-danger btn-sm">Back</a>
+							                <button type="reset" class="btn btn-warning btn-sm">Reset</button>
+							            </c:otherwise>
+							        </c:choose>
+							        --%>
+							        <c:set var="dynamicFromId" value="projectEstimationForm" scope="request" />
+							        <c:set var="wonFunction" value="submitFormData()" />
+							        <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp" %>
+							    </div>
+							</div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<script>
+
+function submitFormData() {
+	
+	const buttonCode = $("#hdnButtonCode").val();
+	$("#buttonCode").val(buttonCode);
+	var prjEstId = $("#prjEstId").val();
+    var financialYear = $("#financialYear").val();
+    var fundSource = $("#fundSource").val();
+    var projectId = $("#projectId").val();
+    var planEstimationNo = $("#planEstimationNo").val();
+    var gstPercentage = $("#gstPercentage").val();
+    var sgstPercent = $("#sgstPercent").val();
+    var sgstAmount = $("#sgstAmount").val();
+    var cgstPercent = $("#cgstPercent").val();
+    var cgstAmount = $("#cgstAmount").val();
+    var totalGst = $("#totalGst").val();
+    var totalAmount = $("#totalAmount").val();
+    var grandTotal = $("#grandTotal").val();
+
+    if (!financialYear || financialYear === "0") {
+        bootbox.alert("Please select financial year");
+        return false;
+    }else if (!projectId || projectId === "0") {
+        bootbox.alert("Please select project");
+        return false;
+    }else if(!fundSource || fundSource === "0"){
+    	bootbox.alert("Please select Fund Source");	
+    }else if (!planEstimationNo || planEstimationNo.trim() === "") {
+        bootbox.alert("Please enter Plan Estimation Number");
+        return false;
+    }else if (!validateEstimationItems()) {
+        return false;
+    }else if (!gstPercentage || parseFloat(gstPercentage) < 0) {
+        bootbox.alert("Please enter a valid GST Percentage");
+        return false;
+    }else if (!sgstPercent || parseFloat(sgstPercent) < 0) {
+        bootbox.alert("SGST percent missing");
+        return false;
+    }else if (!sgstAmount || parseFloat(sgstAmount) < 0) {
+        bootbox.alert("SGST amount missing");
+        return false;
+    }else if (!cgstPercent || parseFloat(cgstPercent) < 0) {
+        bootbox.alert("CGST percent missing");
+        return false;
+    }else if (!cgstAmount || parseFloat(cgstAmount) < 0) {
+        bootbox.alert("CGST amount missing");
+        return false;
+    }else if (!totalGst || parseFloat(totalGst) < 0) {
+        bootbox.alert("GST total amount missing");
+        return false;
+    }else if (!totalAmount || parseFloat(totalAmount) <= 0) {
+        bootbox.alert("Total amount must be greater than 0");
+        return false;
+    }else if (!grandTotal || parseFloat(grandTotal) <= 0) {
+        bootbox.alert("Grand total must be greater than 0");
+        return false;
+    }else{
+    	getFinalCostByProjectId(projectId,grandTotal);
+   	}
+}
+
+
+function getFinalCostByProjectId(projectId, grandTotal) {
+    var prjEstId = $("#prjEstId").val();
+
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/project-estimation/getFinalCostByProjectId",
+        data: {
+            projectId: projectId,
+            prjEstId: prjEstId || null
+        },
+        success: function (projectAmount) {
+            if (parseFloat(grandTotal) > parseFloat(projectAmount)) {
+                bootbox.alert("Project estimation amount can't exceed the project final cost.\n\nProject final cost: ₹" + projectAmount);
+                return false;
+            } else {
+                $("#cipherText").val(enc_password(collectEstimationData()));
+                bootbox.confirm("Do you want to submit the form?", function (result) {
+                    if (result === true) {
+                        showLoader();
+                        $("#projectEstimationForm").submit();
+                    }
+                });
+            }
+        },
+        error: function () {
+            bootbox.alert("Failed to fetch project final cost.");
+        }
+    });
+}
+
+
+function fetchProjectFinalCostByProjectId(projectId) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/project-estimation/getFinalCostByProjectId",
+        data: {
+            projectId: projectId,
+        },
+        success: function (projectAmount) {
+        	$("#projectAvailableCost").val(parseFloat(projectAmount).toFixed(2));
+        },
+        error: function () {
+            bootbox.alert("Failed to fetch project final cost.");
+        }
+    });
+}
+
+$(document).ready(function (){
+	
+	fetchProjectFinalCostByProjectId(projectId);
+	
+});
+
+
+function collectEstimationData() {
+	  const projectEstimationDetails = [];
+
+	  $("#itemTableBody tr").each(function () {
+	    const row = $(this);
+	    const item = {
+	      prjEstDtlId: parseInt(row.find("input[name*='prjEstDtlId']").val()) || null,
+	      itemId: parseInt(row.find("select[name*='itemId']").val()) || null,
+	      quantity: parseFloat(row.find("input[name*='quantity']").val()) || 0,
+	      unitOfMeasurementId: parseInt(row.find("select[name*='unitOfMeasurementId']").val()) || null,
+	      unitPrice: parseFloat(row.find("input[name*='unitPrice']").val()) || 0,
+	      totalPrice: parseFloat(row.find("input[name*='totalPrice']").val()) || 0
+	    };
+	    projectEstimationDetails.push(item);
+	  });
+
+	  const fullData = {
+		prjEstId: $("#prjEstId").val(),
+	    financialYearId: $("#financialYear").val(),
+	    projectId: $("#projectId").val(),
+	    fundSource: $("#fundSource").val(),
+	    planEstimationNo: $("#planEstimationNo").val(),
+	    gstPercentage: $("#gstPercentage").val(),
+	    cgstPercentage: $("#cgstPercent").val(),
+	    sgstPercentage: $("#sgstPercent").val(),
+	    cgstAmount: $("#cgstAmount").val(),
+	    sgstAmount: $("#sgstAmount").val(),
+	    totalGst: $("#totalGst").val(),
+	    estimationAmount: $("#totalAmount").val(),
+	    totalAmount: $("#grandTotal").val(),
+	    projectAvailableCost : $("#projectAvailableCost").val(),
+	    projectType: $("#projectType").val(),
+	    isActive: $("#isActive").val(),
+	    buttonCode: $("#buttonCode").val(),
+	    projectEstimationDetails: projectEstimationDetails
+	  };
+	  return JSON.stringify(fullData);
+	}
+
+function validateEstimationItems() {
+	  let isValid = true;
+	  let rowIndex = 1;
+
+	  $("#itemTableBody tr").each(function () {
+	    const item = $(this).find(".item-select").val();
+	    const quantity = $(this).find(".quantity").val();
+	    const unit = $(this).find(".unit-select").val();
+	    const rate = $(this).find(".rate").val();
+
+	    if (!item || item === "") {
+	      bootbox.alert("Please select Item of Work in row " + rowIndex);
+	      isValid = false;
+	      return false;
+	    }
+
+	    if (!quantity || parseFloat(quantity) <= 0) {
+	      bootbox.alert("Please enter valid Quantity in row " + rowIndex);
+	      isValid = false;
+	      return false;
+	    }
+
+	    if (!unit || unit === "") {
+	      bootbox.alert("Please select Unit in row " + rowIndex);
+	      isValid = false;
+	      return false;
+	    }
+
+	    if (!rate || parseFloat(rate) <= 0) {
+	      bootbox.alert("Please enter valid Rate in row " + rowIndex);
+	      isValid = false;
+	      return false;
+	    }
+	    rowIndex++;
+	  });
+	  return isValid;
+	}
+
+function getPlanEstimationNo(projectId){
+	
+	$.ajax({
+        url: "${contextPath}/project-estimation/fetch-plan-estimationNo-by-project",
+        type: "GET",
+        data: {
+        	projectId: projectId
+        },
+        success: function (data) {
+        	$("#planEstimationNo").val(data);
+        },
+        error: function (error) {
+            bootbox.alert("Error generating Plan Estimation No :", error);
+        }
+    });
+	
+}
+
+function getProjectByFinancialYear(finYearId){
+    $.ajax({
+        url: "${contextPath}/common/fetch-approved-project-by-financialYear",
+        type: "GET",
+        data: {
+        	financialYearId: finYearId
+        },
+        success: function (projects) {
+   
+            var projectSelect = $("#projectId");
+            projectSelect.empty(); 
+            projectSelect.append('<option value="0" selected disabled>- Select -</option>');
+            
+            $.each(projects, function(index, project) {
+                projectSelect.append('<option value="' + project.projectId + '">' + project.projectName + '</option>');
+            });
+        },
+        error: function (error) {
+            bootbox.alert("Error fetching projects :",error);
+        }
+    });
+}
+
+$(document).ready(function () {
+	  function debounce(func, delay = 300) {
+	    let timeout;
+	    return function (...args) {
+	      clearTimeout(timeout);
+	      timeout = setTimeout(() => func.apply(this, args), delay);
+	    };
+	  }
+
+	  function calculateAllAmounts() {
+	    let totalAmount = 0;
+
+	    $("#itemTableBody tr").each(function () {
+	      const qty = parseFloat($(this).find(".quantity").val()) || 0;
+	      const rate = parseFloat($(this).find(".rate").val()) || 0;
+	      const amount = qty * rate;
+	      $(this).find(".amount").val(amount.toFixed(2));
+	      totalAmount += amount;
+	    });
+
+	    $("#totalAmount").val(totalAmount.toFixed(2));
+	    divideGST($("#gstPercentage").val());
+	  }
+
+	  function divideGST(gstValue) {
+	    const gst = parseFloat(gstValue) || 0;
+	    const total = parseFloat($("#totalAmount").val()) || 0;
+	    const half = gst / 2;
+
+	    const sgst = (total * half) / 100;
+	    const cgst = (total * half) / 100;
+	    const grand = total + sgst + cgst;
+
+	    $("#sgstPercent").val(half.toFixed(2));
+	    $("#cgstPercent").val(half.toFixed(2));
+	    $("#sgstAmount").val(sgst.toFixed(2));
+	    $("#cgstAmount").val(cgst.toFixed(2));
+	    $("#grandTotal").val(grand.toFixed(2));
+	    $("#totalGst").val((sgst+cgst).toFixed(2));
+	  }
+	  
+	 $(document).on('click', '.apend-btn-sec-button', function () {
+	     if (!validateEstimationItems()) {
+	         return false;
+	     }
+	     
+	     const newIndex = $('#itemTableBody tr').length;
+	     
+	     const newRow = '<tr>' +
+	         '<td class="text-center">' 
+	         	+ (newIndex + 1) +
+	            '<input type="hidden" class="prjEstDtlId" name="projectEstimationDetails[' + newIndex + '].prjEstDtlId"/>' +
+	         '</td>' +
+	         '<td>' +
+	             '<select class="form-control form-control-sm form-select item-select" name="projectEstimationDetails[' + newIndex + '].itemId">' +
+	                 '<option value="" selected disabled>- Select -</option>' +
+	                 '<c:forEach items="${itemList}" var="item">'+
+	                 '<option value="${item.itemId}">${item.itemName}</option>'+
+	               	 '</c:forEach>'+
+	             '</select>' +
+	         '</td>' +
+	         '<td><input type="number" class="form-control form-control-sm quantity" name="projectEstimationDetails[' + newIndex + '].quantity" value="0"/></td>' +
+	         '<td>' +
+	             '<select class="form-control form-control-sm form-select unit-select" name="projectEstimationDetails[' + newIndex + '].unitOfMeasurementId">' +
+	                 '<option value="" selected disabled>- Select -</option>' +
+	                 '<c:forEach items="${unitList}" var="unit">'+
+	                 '<option value="${unit.unitId}">${unit.unitName}</option>'+
+	               	 '</c:forEach>'+
+	             '</select>' +
+	         '</td>' +
+	         '<td><input type="number" class="form-control form-control-sm rate text-end" name="projectEstimationDetails[' + newIndex + '].unitPrice" step="0.01" value="0.00"/></td>' +
+	         '<td><input type="number" class="form-control form-control-sm amount text-end" name="projectEstimationDetails[' + newIndex + '].totalPrice" readonly value="0.00"/></td>' +
+	         '<td class="text-center">' +
+	             '<button type="button" class="btn btn-sm btn-danger remove-row"><i class="fa fa-minus"></i></button>' +
+	         '</td>' +
+	     '</tr>';
+	     
+	     $('#itemTableBody').append(newRow);
+	     calculateAllAmounts();
+	 });
+ 
+	 $(document).on('click', '.remove-row', function() {
+	     const $row = $(this).closest('tr');
+	     
+	     if ($('#itemTableBody tr').length > 1) {
+	         $row.remove();
+	         reindexRows();
+	         calculateAllAmounts();
+	     }
+	 });
+
+	 function reindexRows() {
+		    $('#itemTableBody tr').each(function(index) {
+		        $(this).find('td:first').contents().filter(function () {
+		            return this.nodeType === 3; 
+		        }).first().replaceWith((index + 1) + ' ');
+		    });
+		}
+
+	  $(document).on("input", ".quantity, .rate", debounce(calculateAllAmounts, 200));
+
+	  $("#gstPercentage").on("input", function () {
+	    const val = $(this).val().replace(/[^0-9.]/g, "");
+	    $(this).val(val);
+	    divideGST(val);
+	  });
+	});
+
+	$(document).ready(function () {
+	    $('.quantity, .rate').on('input', function () {
+	        let val = $(this).val();
+	        if (!/^\d*\.?\d*$/.test(val)) {
+	            val = val.slice(0, -1);
+	        }
+
+	        let parts = val.split('.');
+	        let intPart = parts[0] || '';
+	        let decPart = parts[1] || '';
+	        let totalLength = intPart.length + decPart.length;
+
+	        if (totalLength > 12) {
+	            val = val.slice(0, -1);
+	        }
+	        $(this).val(val);
+	    });
+	});
+
+	/* $(document).ready(function () {
+	    var selectedProjectId = $("#projectId").val();
+	    if (selectedProjectId && selectedProjectId !== "0") {
+	        fetchProjectFinalCostByProjectId(selectedProjectId);
+	    }
+
+	    $("#projectId").on("change", function () {
+	        var projectId = $(this).val();
+	        if (projectId && projectId !== "0") {
+	            fetchProjectFinalCostByProjectId(projectId);
+	        }
+	    });
+	}); */
+
+</script>

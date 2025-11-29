@@ -1,0 +1,214 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<style>
+bagGroundColorRvr td a:visited{
+        color: purple !important;
+    }
+</style>
+
+<section>
+    <div class="mt-2">
+        <form action="${contextPath}/procurement/purchaseOrder/purchaseOrderTracker" method="get">
+            <div class="panel-body">
+				<div class="row">
+					<div class="col-md-12">
+					<h5 class="mb-3">Track Purchase Order</h5>
+						<div class="row">
+							<div class="col-md-3">
+								<div class="form-group">
+									<label class="col-md-12 required" for="text"><spring:message code="PROC.REQ.STATUS" /></label>
+									<div class="col-md-12">
+										<select class="form-control" id="status" name="status" >
+											<option value="All" ${activeStatus eq 'All' ? 'selected' : ''}><spring:message code="COMMON.ALL" /></option>
+											<option value="DRAFT" ${activeStatus eq 'DRAFT' ? 'selected' : ''}><spring:message code="COMMON.DRAFT" /></option>
+											<option value="PENDING" ${activeStatus eq 'PENDING' ? 'selected' : ''}><spring:message code="COMMON.PRNDING" /></option>
+											<option value="APPROVE" ${activeStatus eq 'APPROVE' ? 'selected' : ''}><spring:message code="COMMON.APPROVE" /></option>
+											<option value="REVERT" ${activeStatus eq 'REVERT' ? 'selected' : ''}><spring:message code="COMMON.Revert" /></option>
+											<option value="REJECT" ${activeStatus eq 'REJECT' ? 'selected' : ''}><spring:message code="COMMON.REJECT" /></option>
+										</select>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2 ">
+								<input type="submit" class="btn-submit" value="Submit"> 
+								<a href="${contextPath}" class="btn btn-danger">Cancel</a>
+							</div>
+							<div class="col-md-12">
+								<table class="datatable table table-striped table-bordered mt-3">
+									<thead>
+										<tr>
+											<th>Sl No.</th>
+											<th>Requisition No</th>
+											<th>Purchase Number</th>
+											<th>Supplier Name</th>
+											<th>Po Generate Date</th>
+											<th>Po Reciept Generate Date</th>
+											<th>Closing Date</th>
+											<th>Status</th>
+											<th>Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach items="${lstPo}" var="po"  varStatus="count">
+											<tr>
+												<td>${count.count}</td>
+												<td>${po.directPo ? 'N/A' : po.rfqQuote.requisition.requisitionNo }</td>
+												<td>
+													<c:choose>
+														<c:when test="${po.stageForwardedRule.actionType.actionCode eq 'APPROVE'}">
+															<a href="${contextPath}/procurement/purchaseOrder/poInvoice?poId=${po.poId}" target="_blank">${po.poNo}</a>
+														</c:when>
+														<c:otherwise>
+															${po.poNo}
+														</c:otherwise>
+													</c:choose>
+												</td>
+												<td>${po.vendor.vendorName}</td>
+												<td><fmt:formatDate value='${po.poCreateDate}' pattern='dd/MM/yyyy'/></td>
+												<td><fmt:formatDate value='${po.poReceiptGeneratedDate }' pattern='dd/MM/yyyy'/></td>
+												<td><fmt:formatDate value='${po.poClosingDate }' pattern='dd/MM/yyyy'/></td>
+												<td>${po.stageForwardedRule.displayName}</td>
+												<td>
+												<!-- 													po.stageForwardedRule.actionType.actionCode eq 'DRAFT' &&  -->
+													<c:choose>
+
+														<c:when test="${po.directPo}">
+															<a href="${contextPath}/procurement/purchaseOrder/viewEditDirectPo?poId=${po.poId}"><i class='fa-regular fa-eye' style="font-size: 25px;"></i></a>
+														</c:when>
+														<c:otherwise>
+															<a href="${contextPath}/procurement/purchaseOrder/viewEditPurchase?poId=${po.poId}"><i class='fa-regular fa-eye' style="font-size: 25px;"></i></a>
+														</c:otherwise>
+													</c:choose>
+													
+													<c:if test="${po.stageForwardedRule.actionType.actionCode eq 'APPROVE'}">
+															<c:choose>
+																<c:when test="${po.poClosed eq false && po.revise eq false}">
+																	 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" style="margin-top:-10px" onclick="getModal(${po.poId},'${po.poNo}','<fmt:formatDate value='${po.poReceiptGeneratedDate }' pattern='dd/MM/yyyy'/>')">PO Close </button>
+																</c:when>
+																<c:otherwise>
+																	<c:if test="${not empty po.closeDoc}">
+																		<i class='fa-regular fa-file-lines' style="font-size: 19px;color: #cc0000;top: -3px;position: relative;" onclick="downloadDoc('${po.closeDoc}')"></i>
+																	</c:if>
+																</c:otherwise>
+															</c:choose>
+													</c:if>
+												</td>
+											</tr>
+										</c:forEach>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+        </form>
+	</div>
+</section>
+
+
+<div class="modal" id="myModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Purchase Order Close</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+	<form action="${contextPath}/procurement/purchaseOrder/closePurchase" method="post" id="closeform" enctype="multipart/form-data">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+            <input type="hidden" name="poId" id="poId" value="" />
+      <!-- Modal body -->
+      <div class="modal-body">
+      	<div class="row">
+      		<div class="col-md-3">
+				<div class="form-group">
+					<label class="col-md-12 required" for="text">PO No.</label>
+					<div class="col-md-12">
+						<input type="text" class="form-control" id="poNo" readonly="readonly">			
+					</div>
+				</div>
+			</div>
+      		<div class="col-md-3">
+				<div class="form-group">
+					<label class="col-md-12 required" for="text">Purchase Closing Date</label>
+					<div class="col-md-12">
+						<div class="datepicker-box ">
+            				<input type="text" class="form-control form-control-sm requiredField closeDate"  
+                  				id="closeDate" value="" name="closeDate" /> <i class='fa-solid fa-calendar-week'></i>
+                		</div>
+					</div>
+				</div>
+			</div>
+  			<div class="col-md-3">
+				<div class="form-group">
+					<label class="col-md-12 required" for="text">Closing Document</label>
+					<div class="col-md-12">
+						<input type="file" class="form-control" id="closeDoc" placeholder="Enter email" name="closeDoc">		
+					</div>
+				</div>
+			</div>
+      	</div>
+      </div>
+	</form>
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="closePurchase()">Submit</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<form method="post" action="${contextPath}/document/download" id="download" target="empty">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+	<input type="hidden" id="docPath" name="docPath" value="">
+	<input type="hidden" id="module" name="module" value="Purchase/Close">
+</form>
+<script>
+var poDate='';
+	function getModal(id,no,date) {
+		$("#poNo").val(no);
+		$("#poId").val(id);
+		poDate=date;
+	}
+	$(function() {
+		$('.closeDate').datepick({
+			dateFormat: 'dd/mm/yyyy',maxDate:0, showOnFocus: true,
+			 onSelect: function(selected) {
+				 var alltDate=poDate.split("/");
+				 var modAllotDate=new Date(alltDate[1]+"/"+alltDate[0]+"/"+alltDate[2]);
+				 if(modAllotDate > new Date(selected)){
+					bootbox.alert('PO Closing date sholud not be less than PO creation date.');
+					$('.closeDate').val("");
+				 }
+			 }
+		});
+	});
+	function closePurchase() {
+		var closeDate=$("#closeDate").val();
+		var closeDoc=$("#closeDoc").val();
+		if(closeDate==""){
+			bootbox.alert("please select close date.");
+			return false;
+		}else if(closeDoc==""){
+			bootbox.alert("please upload closer document.");
+			return false;
+		}else{
+			$("#closeform").submit();
+		}
+	}
+	
+	function downloadDoc(path,module){
+		$("#docPath").val(path);
+		$("#download").submit();
+	}
+</script>

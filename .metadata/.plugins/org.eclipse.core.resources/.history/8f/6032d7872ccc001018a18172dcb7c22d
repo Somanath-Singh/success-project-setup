@@ -1,0 +1,256 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+
+					<!-- #######################################################  ADDRESS DETAILS TAB  ####################################################### -->
+					
+						<form action="${contextPath}/staff/saveStaffDetails" id="address" method="post"> 
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+							<input type="hidden" id="staffId" name="staffId" value="${staffDetails.staffId}" />
+	                         <input type="hidden" name="pageCode" id="pageCode" value="address"/>
+	                         
+
+							<!-- =============================  Present Address Section  ============================= -->
+							<div style="margin-top: 20px"><h6 class="headingbg mb-4">Present Address :</h6></div>
+
+							<div class="row">
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="streetLacalityCurrent">Plot/House No.</label>
+										<div class="col-sm-12">
+											<input type="text" class="form-control require form-control-sm" value="${staffDetails.staffAddress.presStreet}" name="presStreet" id="streetLacalityCurrent" maxlength="50">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="cityTownVillageCurrent">City/Area</label>
+										<div class="col-sm-12">
+											<input type="text" value="${staffDetails.staffAddress.presVillage}" class="form-control form-control-sm require" name="presVillage" id="cityTownVillageCurrent" maxlength="50">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="pinCurrent">Pincode</label>
+										<div class="col-sm-12">
+											<input type="text" class="form-control form-control-sm require NumbersOnly" value="${staffDetails.staffAddress.presPinCode}" name="presPinCode" id="pinCurrent" maxlength="6">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="policeStationCurrent">Police Station</label>
+										<div class="col-sm-12">
+											<input type="text" class="form-control form-control-sm require" name="presPoliceStation" id="policeStationCurrent" value="${staffDetails.staffAddress.presPoliceStation}" maxlength="50">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="state">State</label>
+										<div class="col-sm-12">
+											<select class="form-control form-select require" id="presState" name="presStateId" data-plugin-selectTwo data-live-search="true">
+												<option value=""><spring:message code="label.common.select"></spring:message></option>
+												<c:forEach items="${satffLoadData.stateList}" var="stateList">
+													<c:choose>
+														<c:when test="${employeeAddress.stateMasterCurrent.stateId eq stateList.stateId}">
+															<option value="${stateList.stateId}" ${stateList.stateId eq staffDetails.staffAddress.presStateId.stateId ? 'selected' : ''}>${stateList.stateName}</option>
+														</c:when>
+														<c:otherwise>
+															<option value="${stateList.stateId}" ${stateList.stateId eq staffDetails.staffAddress.presStateId.stateId ? 'selected' : ''}>${stateList.stateName}</option>
+														</c:otherwise>
+													</c:choose>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="distId">District</label> <!-- onchange="getBlock('distId','blockId')" -->
+										<div class="col-sm-12">
+											<select id="presDistId" name="presDistrictId"  class="form-control require" data-live-search="true">
+												<option value=""><spring:message code="label.common.select" /></option>
+												<c:forEach items="${satffLoadData.districtList}" var="dst">
+													<option value="${dst.districtId}" ${dst.districtId eq staffDetails.staffAddress.presDistrictId.districtId ? 'selected' : ''}>${dst.districtName}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12 col-sm-12" style="text-align: left; margin-top: 20px;">
+										<div class="form-group">
+											<label class="col-md-12" for="inputDefault" style=" font-weight: 600;">Tick if permanent address is same as the present address.
+												<input type="checkbox" name="isPermanent" id="selectAll" style="margin: 2px 5px 0px 0px; float: left; cursor: pointer;" class="selectAll1" onclick="isSameAsPermanent()" value="${staffDetails.staffAddress.isPermanent}" ${staffDetails.staffAddress.isPermanent ? 'checked' : ''}>
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+
+
+							<!-- =============================  Permanent Address Section  ============================= -->
+							<div style="margin-top: 5px;"><h6 class="headingbg mb-4">Permanent Address :</h6></div>
+
+							<div class="row" id="permanentDiv">
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="streetLacalityPermanent">Plot/House No.</label>
+										<div class="col-sm-12">
+											<input type="text" class="form-control form-control-sm require" name="permStreet" value="${staffDetails.staffAddress.permStreet}" id="streetLacalityPermanent" maxlength="50">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="cityTownVillagePermanent">City/Area</label> 
+										<div class="col-sm-12">
+											<input type="text" class="form-control form-control-sm require" value="${staffDetails.staffAddress.permVillage}" name="permVillage" id="cityTownVillagePermanent" maxlength="50">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="pinPermanent">Pincode</label>
+										<div class="col-sm-12">
+											<input type="text" class="form-control form-control-sm NumbersOnly require" value="${staffDetails.staffAddress.permPinCode}" name="permPinCode" id="pinPermanent" maxlength="6">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="policeStationPerm">Police Station</label>
+										<div class="col-sm-12">
+											<input type="text" class="form-control form-control-sm require" name="permPoliceStation" id="policeStationPerm" value="${staffDetails.staffAddress.permPoliceStation}" maxlength="50">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="statePermanent">State</label>
+										<div class="col-sm-12">
+											<select class="form-control form-select require" id="statePermanent" name="permStateId" data-plugin-selectTwo>
+												<option value=""><spring:message code="label.common.select"></spring:message></option>
+												<c:forEach items="${satffLoadData.stateList}" var="stateList">
+													<c:choose>
+														<c:when test="${employeeAddress.stateMasterPermanent.stateId eq stateList.stateId}">
+															<option value="${stateList.stateId}" ${stateList.stateId eq staffDetails.staffAddress.permStateId.stateId ? 'selected' : ''}>${stateList.stateName}</option>
+														</c:when>
+														<c:otherwise>
+															<option value="${stateList.stateId}" ${stateList.stateId eq staffDetails.staffAddress.permStateId.stateId ? 'selected' : ''}>${stateList.stateName}</option>
+														</c:otherwise>
+													</c:choose>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="col-sm-12 required" for="distId1">District</label> <!-- onchange="getBlock('distId1','blockId1')" -->
+										<div class="col-sm-12">
+											<select id="distId1" name="permDistrictId"  class="form-control require" data-live-search="true">
+												<option value=""><spring:message code="label.common.select" /></option>
+												<c:forEach items="${satffLoadData.districtList}" var="dst">
+													<option value="${dst.districtId}" ${dst.districtId eq staffDetails.staffAddress.permDistrictId.districtId ? 'selected' : ''}>${dst.districtName}</option>
+												</c:forEach>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- =============================  Permanent Address Section  ============================= -->
+
+							<%-- <div class="col-md-12 text-center" style="margin-top: 15px;">
+								<hr style="margin-top: 5px;" />
+								<div class="form-group">
+									<c:if test="${_StaffDetails.serviceStatusCode eq 'ONSERVICE' || _StaffDetails.serviceStatusCode eq 'SUSPENDED'}">
+									<button type="button" class="btn-submit" onclick="validateAddressFormData();">Update</button>
+									</c:if>
+									<a href="" class="btn btn-cancel">Cancel</a>
+								</div>
+							</div> --%>
+							<div class="col-md-12 text-center" style="margin-top: 15px;">
+	                  <hr style="margin-top: 5px;" />
+	                  <div class="form-group">
+	                     <button type="button" onclick="submitForm('address');" class="btn btn-success btn-sm">Save</button>
+	                     <a href="${contextPath}/staff/staffMemberList" class="btn btn-warning btn-sm">Back to List</a>
+	                  </div>
+	               </div>
+						</form>
+					<!-- #######################################################  END : ADDRESS DETAILS TAB  ####################################################### -->
+
+
+<script>
+function isSameAsPermanent() {
+	
+    // Check if all current address fields are filled
+    var currentStreet = document.getElementById('streetLacalityCurrent').value;
+    var currentCity = document.getElementById('cityTownVillageCurrent').value;
+    var currentPin = document.getElementById('pinCurrent').value;
+    var currentPoliceStation = document.getElementById('policeStationCurrent').value;
+    var currentDistId = document.getElementById('presDistId').value;
+    var currentState = document.getElementById('presState').value;
+
+    if (currentStreet && currentCity && currentPin && currentPoliceStation && currentDistId && currentState) {
+        // All fields in the current address are filled
+        if (document.getElementById('selectAll').checked) {
+            // Copy values from present address fields to permanent address fields
+            document.getElementById('streetLacalityPermanent').value = currentStreet;
+            document.getElementById('cityTownVillagePermanent').value = currentCity;
+            document.getElementById('pinPermanent').value = currentPin;
+            document.getElementById('policeStationPerm').value = currentPoliceStation;
+            document.getElementById('distId1').value = currentDistId;
+            document.getElementById('statePermanent').value = currentState;
+            
+            document.getElementById('streetLacalityPermanent').readOnly = true;
+            document.getElementById('cityTownVillagePermanent').readOnly = true;
+            document.getElementById('pinPermanent').readOnly = true;
+            document.getElementById('policeStationPerm').readOnly = true;
+            $('#distId1').attr('background-color','e7eaf2').css('pointer-events','none');
+            $('#statePermanent').attr('background-color','e7eaf2').css('pointer-events','none');
+
+            document.getElementById('selectAll').value = true;
+        } else {
+            // Clear the values in the permanent address fields if the checkbox is unchecked
+            document.getElementById('streetLacalityPermanent').value = '';
+            document.getElementById('cityTownVillagePermanent').value = '';
+            document.getElementById('pinPermanent').value = '';
+            document.getElementById('policeStationPerm').value = '';
+            document.getElementById('distId1').value = '';
+            document.getElementById('statePermanent').value = '';
+            
+            document.getElementById('streetLacalityPermanent').readOnly = false;
+            document.getElementById('cityTownVillagePermanent').readOnly = false;
+            document.getElementById('pinPermanent').readOnly = false;
+            document.getElementById('policeStationPerm').readOnly = false;
+            $('#distId1').css('background-color','#fff').css('pointer-events','auto');
+            $('#statePermanent').attr('background-color','#fff').css('pointer-events','auto');
+            
+            document.getElementById('selectAll').value = false;
+        }
+    } else {
+        // Alert or handle the case where not all fields in the current address are filled
+        alert('Please fill in all current address fields.');
+        document.getElementById('selectAll').checked = false;
+    }
+}
+
+$(function(){
+	if('${staffDetails.staffAddress.isPermanent}' == 'true'){
+		document.getElementById('streetLacalityPermanent').readOnly = true;
+        document.getElementById('cityTownVillagePermanent').readOnly = true;
+        document.getElementById('pinPermanent').readOnly = true;
+        document.getElementById('policeStationPerm').readOnly = true;
+        $('#distId1').attr('background-color','e7eaf2').css('pointer-events','none');
+        $('#statePermanent').attr('background-color','e7eaf2').css('pointer-events','none');
+	}
+});
+</script>        

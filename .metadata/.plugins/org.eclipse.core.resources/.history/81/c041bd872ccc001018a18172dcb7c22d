@@ -1,0 +1,64 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/AadharVaidator.js"></script>
+<%--<jsp:useBean id="strUtils" class="com.aashdit.demography.utils.ApplicationStringUtils"/> --%>
+           <div class="content">
+                <div class="panel-header bg-primary-gradient">
+					<div class="page-inner">
+						<div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+ 							<div>
+								<h2 class="text-blue pb-2 fw-bold">Manage Transaction</h2>
+							</div> 
+							<div class="ml-md-auto py-1 py-md-0">
+								<a href="${contextPath}" class="btn btn-sm btn-border btn-blue btn-round mr-2"><i class="fa fa-home"></i></a>
+								<a href="#" class="btn btn-sm btn-border btn-blue btn-round mr-2">/ Manage Transaction</a>
+							</div>
+						</div>
+					</div>
+				</div>
+                <div class="page-inner">
+                    <div class="row mt--2">
+                    
+                        <div class="col-md-12">
+                         
+                            <div class="card full-height">
+                                <div class="card-header">
+                                    <h4 class="card-title">Transaction List</h4>
+                                    <div class="panel-actions">
+                                        <a href="#" class="fa fa-caret-down"></a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="col-md-12">
+                                        <table class="table table-bordered DataTable mt-2 mb-4">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                   <th style="width: 55px;">Sl No.</th>
+                                                   <th>Financial Year</th>
+                                                   <th>Scheme Component Name</th>
+                                                   <th> Entity Type</th>
+                                                   <th>Amount</th>
+                                                </tr>
+	                                            </thead>
+												<tbody>
+													<c:forEach items="${fundTransactionList}" var="fundTransaction"	varStatus="count">
+														<tr>
+															<td>${count.count}</td>
+															<td>${fundTransaction.finyear.finYear}</td>
+															<td>${fundTransaction.entitySchemeMapping.scheme.schemeName}</td>
+															<td>${fundTransaction.entitySchemeMapping.cboType.valueEn}</td>
+															<td class="text-right">${strUtils.convertAmountToINRFormat(fundTransaction.amount)}</td>
+														</tr>
+													</c:forEach>
+												</tbody>
+								        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>                  

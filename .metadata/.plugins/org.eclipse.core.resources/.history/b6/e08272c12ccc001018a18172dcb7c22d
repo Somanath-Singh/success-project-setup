@@ -1,0 +1,558 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<style>
+.table-striped>tbody>tr:nth-of-type(odd) {
+    --bs-table-accent-bg: rgb(247 249 244) !important;
+    /* color: var(--bs-table-striped-color); */
+}
+.accordion-body {
+    padding: 0.5rem;
+    background: #091a16 !important;
+}
+ table .table-header td.tbl-bdr {
+    line-height: 30px !important;
+}
+
+/*  */
+
+/*  */
+</style>
+
+
+<div class="breadcrumb_conatiner">
+  	<div class="col-md-6">
+ 		<h4 class="change-color">Add Budget</h4>
+ 	</div>
+ 	<div class="col-md-6">
+ 		<nav aria-label="breadcrumb">
+ 			<ol class="breadcrumb">
+ 				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+ 				<li class="breadcrumb-item active" aria-current="page">Add Budget</li>
+ 			</ol>
+ 		</nav>
+ 	</div>
+ </div>
+ <div class="row">
+ 	<div class="col-md-12">
+ 		<div class="card">
+ 			<div class="card-header">
+                 <h5 class="card-title">Add Budget</h5>
+             </div>
+ 			<div class="card-body">
+ 			    <div class="row">
+		        <div class="col-md-12">
+		            <form action="${contextPath}/budget/create-budget" method="post"
+							id="budgetFrm">
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+							<input type="hidden" name="budgetId" id="budgetId" value="${budgetData.budgetId}" />
+							<input type="hidden" name="action" id="action" value="" />
+
+							<table class="table table-bordered" style="width: 100%" border="1">
+								<thead class="table-header">
+									<tr>
+										<td class="tbl-bdr" colspan="100%" style="font-size: 20px;">
+											<center>AASHDIT TECHNOLOGY</center>
+										</td>
+									</tr>
+									<tr>
+										<td class="tbl-bdr" colspan="100%" style="font-size: 18px;">
+											<center>4th Floor, Galaxy Mall, Raghunathpur, Bhubaneswar, Odisha 751024</center>
+										</td>
+									</tr>
+									<tr class="text-center">
+										<td class="tbl-bdr" colspan="3" align="left">
+											<label>
+												Entity Type: 
+													</label>
+												<select name="entityType" id="entityType" required="required" class="require select-color form-control" >
+											
+													<option value="">Select Entity</option>
+													<c:forEach items="${commonData.entityTypes}" var="type">
+                                               <option value="${type}" ${type eq budgetData.entityType ?'selected':''}>${type.displayName}</option>
+                                                    </c:forEach>
+												</select>
+											
+										</td>
+										<td class="tbl-bdr" colspan="2" align="left" style="text-align: left !important;">
+										<label>
+										Annual Financial Statement FOR:
+											</label>
+											 <select name="finYearStr" class="require select-color form-control form-select"
+											id="finYearId" required="required"
+											onchange="calllabelledChange();getBudgetData();">
+												<option value="">Select Year</option>
+												<c:forEach var="finYr" items="${commonData.finYears}">
+													<option value="${finYr.finyearId}-${finYr.finYear}"
+														${budgetData.finYearId eq finYr.finyearId? 'selected':''}>${finYr.finYear}</option>
+												</c:forEach>
+										</select>
+										</td>
+										
+										<td class="tbl-bdr" colspan="2" align="left" style="text-align: left !important;">
+										<label>
+											Budget Group :
+											</label>
+                                                <select name="groupId"id="groupId" class="select-color form-control from-select" required="required"onchange="getSubGroupByGroup(0);getBudgetData();">
+												<option value="">Select Group</option>
+												<c:forEach var="gr" items="${commonData.budgetGroupList}">
+													<option value="${gr.budgetGrpId}"${gr.budgetGrpId eq budgetData.groupId? 'selected':'' }>${gr.displayChar} . ${gr.budgetGroup}</option>
+												</c:forEach>
+										</select>
+										</td>
+										<td class="tbl-bdr" colspan="2" align="left" style="text-align: left !important;">
+										<label>
+											BUDGET SUB GROUP: 
+											</label>
+											<select name="subGroupId" id="subGroupId" class="select-color form-control form-select" required="required"onchange="getBudgetData();">
+												<option value="">Select Group</option>
+												
+										</select>
+										</td>
+										
+									</tr>
+									<tr>
+										
+									</tr>
+									<tr>
+										<td class="tbl-bdr" colspan="100%"  style="font-size: 14px;"><center>Receipt Expenditure - Abstract (Rs. In Lakhs)</center></td>
+									</tr>
+									<tr style="vertical-align: middle;">
+										<td class="tbl-bdr" rowspan="3" colspan="3" width="400px;" style="font-size: 13px;"><center>Particulars</center></td>
+										<td class="tbl-bdr" rowspan="3"><center>Annual Financial Statement (Budget Estimate) for <span id="prevYrLarge"></span></center></td>
+										<td class="tbl-bdr" rowspan="3"><center>Actual From April'<span id="prevYrSm1"></span> to Sept' <span id="prevYrSm2"></span></center></td>
+										<td class="tbl-bdr" rowspan="3"><center>Estimate From Oct'<span id="prevYrSm3"></span> to March' <span id="selYrSm1"></span></center></td>
+										<td class="tbl-bdr" rowspan="3"><center>Supplementary Financial Statement (Revised Estimate) for <span id="prevYrLg2"></span></center></td>
+										<td class="tbl-bdr" rowspan="3"><center>Next year revised per  <span id="prevYrLg2"></span></center></td>
+										<td class="tbl-bdr" rowspan="3"><center>Annual Financial Statement (Budget Estimate) for <span id="selYrLg"></span></center></td>
+									</tr>
+								</thead>
+								
+								
+								<c:choose>
+                            <c:when test="${not empty budgetData}">
+							<tbody id="budgetDtls">
+									  <c:set var="totalCount" value="0" />
+									  <c:forEach var="group" items="${budgetData.groupList}">
+									      <tr class="tbl-bdr">
+									          <td colspan="100%" class="tbl-bdr tbl-td-cellpadding">
+									              <strong>${group.budgetGroupName.toUpperCase()} (${group.budgetGroupCode})</strong>
+									          </td>
+									      </tr> 
+									
+									      <c:forEach var="subGroup" items="${group.subGroupList}">
+									          <tr class="tbl-bdr">
+									              <td class="tbl-bdr tbl-td-cellpadding" width="30px;" align="center">
+									                  <strong>${subGroup.subGroupName}</strong>
+									              </td>
+									              <td class="tbl-bdr" colspan="2">
+									                  <strong>${subGroup.subGroupName.toUpperCase()}</strong>
+									              </td>
+									              <td class="tbl-bdr"></td>
+									              <td class="tbl-bdr"></td>
+									              <td class="tbl-bdr"></td>
+									              <td class="tbl-bdr"></td>
+									              <td class="tbl-bdr"></td>
+									          </tr>
+									
+									          <c:forEach var="entity" items="${subGroup.entityMapList}" varStatus="rowCnt">
+									              <c:set var="totalCount" value="${totalCount + 1}" /> 
+									              <tr class="tbl-bdr">
+									                  <td class="tbl-bdr tbl-td-cellpadding" width="30px;" align="center">${totalCount}</td>
+									                  <td class="tbl-bdr" width="900px;" colspan="2">${entity.entityName}
+									                      <input type="hidden" name="entityId" value="${entity.entityId}" />
+									                       <input type="hidden" name="budgetGrpEntityMapId" value="${entity.budgetGrpEntityMapId}" />
+									                      <%-- <input type="hidden" name="subGroupId" value="${subGroup.subGroupId}" /> --%>
+									                  </td>
+									                  <td class="tbl-bdr">
+									                      <input type="text" class="text-end form-control provisionAmount${subGroup.subGroupId}" name="provisionAmount" 
+									                             id="provisionAmount${totalCount}" style="width: 100%" 
+									                             value="${entity.provisionAmount}" 
+									                             onblur="calculateEstimateAmount('${subGroup.subGroupId}','${totalCount}')" 
+									                             onkeypress="return validateInputDecimal(event,this);" />
+									                  </td>
+									                  <td class="tbl-bdr">
+									                      <input type="text" class="text-end form-control firstQtrAmount${subGroup.subGroupId}" name="firstQtrAmount" 
+									                             id="firstQtrAmount${totalCount}" style="width: 100%" 
+									                             value="${entity.firstQtrAmount}" 
+									                             onblur="calculateEstimateAmount('${subGroup.subGroupId}','${totalCount}')" 
+									                             onkeypress="return validateInputDecimal(event,this);" />
+									                  </td>
+									                  <td class="tbl-bdr">
+									                      <input type="text" class="text-end form-control secondQtrAmount${subGroup.subGroupId}" name="secondQtrAmount" 
+									                             id="secondQtrAmount${totalCount}" style="width: 100%" 
+									                             value="${entity.secondQtrAmount}" 
+									                             onblur="calculateEstimateAmount('${subGroup.subGroupId}','${totalCount}')" 
+									                             onkeypress="return validateInputDecimal(event,this);" />
+									                  </td>
+									                  <td class="tbl-bdr">
+									                      <input type="text" class="text-end form-control revisedAmount${subGroup.subGroupId}" name="revisedAmount" 
+									                             id="revisedAmount${totalCount}" style="width: 100%" 
+									                             value="${entity.revisedAmount}" 
+									                             onblur="calculateEstimateAmount('${subGroup.subGroupId}','${totalCount}')" 
+									                             onkeypress="return validateInputDecimal(event,this);" />
+									                  </td>
+									                  <td class="tbl-bdr">
+									                      <input type="text" class="text-end form-control nextYrRevisedPer${subGroup.subGroupId}" name="nextYrRevisedPer" 
+									                             id="nextYrRevisedPer${totalCount}" style="width: 100%" 
+									                             value="${entity.nextYrRevisedPer}"  onblur="calculateEstimateAmount('${subGroup.subGroupId}','${totalCount}')" 
+									                             onkeypress="return validateInputDecimal(event,this);" />
+									                  </td>
+									                  <td class="tbl-bdr">
+									                      <input type="text" class="text-end form-control estimateAmount${subGroup.subGroupId}" name="estimateAmount" 
+									                             id="estimateAmount${totalCount}" style="width: 100%" 
+									                             value="${entity.estimateAmount}" 
+									                             onkeypress="return validateInputDecimal(event,this);" />
+									                  </td>
+									              </tr>
+									          </c:forEach>
+									
+									          <!-- SubGroup Totals -->
+									          <tr class="tbl-bdr">
+									              <td></td>
+									              <td class="tbl-bdr" colspan="2" align="right">
+									                  <strong>Total for ${subGroup.subGroupName.toUpperCase()}:</strong>
+									              </td>
+									              <td class="tbl-bdr" align="right">
+									                  <input type="text" class="form-control form-control-sm text-end" 
+									                         id="totalProvision${subGroup.subGroupId}" name="totalProvision" 
+									                         value="${subGroup.totalProvision}" readonly />
+									              </td>
+									              <td class="tbl-bdr" align="right">
+									                  <input type="text" class="form-control form-control-sm text-end" 
+									                         id="totalFirstQtr${subGroup.subGroupId}" name="totalFirstQtr" 
+									                         value="${subGroup.totalFirstQtr}" readonly />
+									              </td>
+									              <td class="tbl-bdr" align="right">
+									                  <input type="text" class="form-control form-control-sm text-end" 
+									                         id="totalSecondQtr${subGroup.subGroupId}" name="totalSecondQtr" 
+									                         value="${subGroup.totalSecondQtr}" readonly />
+									              </td>
+									              <td class="tbl-bdr" align="right">
+									                  <input type="text" class="form-control form-control-sm text-end" 
+									                         id="totalRevised${subGroup.subGroupId}" name="totalRevised" 
+									                         value="${subGroup.totalRevised}" readonly />
+									              </td>
+									              <td></td>
+									              <td class="tbl-bdr" align="right">
+									                  <input type="text" class="form-control form-control-sm text-end" 
+									                         id="totalEstimate${subGroup.subGroupId}" name="totalEstimate" 
+									                         value="${subGroup.totalEstimate}" readonly />
+									              </td>
+									          </tr>
+									      </c:forEach>
+									  </c:forEach>
+									</tbody>
+
+
+								</c:when> 
+                                   <c:otherwise> 
+								
+							
+								
+ 								</c:otherwise> 
+                                 </c:choose>
+								
+								
+							</table>
+							<%--  <c:if test="${budgetInfoDto.budgetMastersId ne null}">
+							<div class="col-md-6">
+                        <div class="form-group col">
+                          <label for="inputEmail4">Remarks (Mandatory when Reverted, Max 500 characters)</label>
+                          
+                         <textarea rows="3" class="form-control" name="remarks" id="remarksValId" maxlength="500" ></textarea>
+                        </div>
+
+                      </div>
+                       </c:if> --%>
+						</form>
+						
+						<%-- <div class="row">
+		                    <div class="col-sm-12" style="margin-top:30px;">
+		                        <div class="form-group text-center">
+		                            <button type="button" class="btn btn-success" onclick="submitFormData();">
+		                                <spring:message code="COMMON.BUTTON.SAVE" />
+		                            </button>
+		                            <a href="${contextPath}/home">
+		                                <input type="button" class="btn btn-danger" value=<spring:message code="COMMON.BUTTON.BACK"></spring:message>>
+		                            </a>
+		                            
+		                            <button onclick="showLoader()">Show Loader</button>
+                                    <button onclick="hideLoader()">Hide Loader</button>
+		                        </div>
+		                    </div>
+		                </div> --%>
+                        <c:set var="dynamicFromId" value="budgetFrm" scope="request" />
+						<c:set var="wonFunction" value="submitFormData()"/>
+                        <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+		        </div>
+		    </div>
+		</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!--End::row-1 -->
+      </div>
+               
+		
+		
+		
+
+        
+        
+    
+<form action="${contextPath}/budget/getBudgetDataBasedOnParam" method="get" id="bdgt">   
+    <input type="hidden" id="subGroupIdHd" class="" name="subGroupId"/>
+     <input type="hidden" id="groupIdHd" class="" name="groupId"/>
+      <input type="hidden" id="finYearIdHd" class="" name="finYearId"/>
+       <input type="hidden" id="entityTypeHd" class="" name="entityType"/>
+        <input type="hidden" id="budgetIdHd" class="" name="budgetId"/>
+        
+</form>
+
+	<script>
+	$( document ).ready(function() {
+		
+		calllabelledChange();
+		
+		
+	});
+	function submitFormData(){
+		if(validateForm()){
+		 if(encryptFormData('budgetFrm', tableOrTbodyIDS, tableOrTbodyKeys)){
+				 confirmation('budgetFrm');
+			 }
+		}
+		
+	}
+	function getBudgetData(){
+		//document.cookie = "username=DT Doe";
+		//console.log(document.cookie);
+		debugger
+		
+		var finYearStr = $('#finYearId').val();
+		var finYearParts = finYearStr.split('-');
+		var finYearId = finYearParts[0];
+		
+		$('#budgetIdHd').val($('#budgetId').val());
+		$('#groupIdHd').val($('#groupId').val());
+		$('#finYearIdHd').val(finYearId);
+		$('#entityTypeHd').val($('#entityType').val());
+		$('#subGroupIdHd').val($('#subGroupId').val());
+		if($('#entityType').val()!=''){
+		 if(encryptFormData('bdgt', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('bdgt');
+		 }
+		}else{
+			bootbox.alert("Entity Type should not be empty.");
+		}
+		
+	}
+	
+	
+	function getSubGroupByGroup(selectedSubGroupId) {
+		   debugger	
+	       var groupId = $('#groupId').val();
+		   
+		   
+		   var formDataJson = {
+			        "groupId": groupId,
+			        
+			    };
+		   
+		   var encryptedData = encryptJSONobj(formDataJson);
+	       $.ajax({
+	           type: "GET",
+	           url: "${contextPath}/budget/sub-group-by-groupId",
+	           data: {
+	        	   "encodedData" : encryptedData,
+	           },
+	          // contentType: "application/json; charset=utf-8",
+	           success: function(response) {
+					
+	           var html = '';
+	           html +='<option value=""> --select--</option>'
+				if(response.outcome){
+					var subGroupList = response.result;
+					$.each(subGroupList, function(index, subGroup) {
+						html += '<option value="' + subGroup.subGroupId + '">' + subGroup.subGroupName + '</option>';
+	           });
+					$('#subGroupId').empty().append(html);
+				
+				
+				}
+				else{
+					$('#subGroupId').empty().append(html);
+				}
+				
+				if(selectedSubGroupId!=0){
+					$('#subGroupId').val(selectedSubGroupId);
+				}
+	           },
+	           error: function(error) {
+	               console.log("Error:", error);
+	           }
+	       });
+	   }
+	
+	
+	
+	function calculateTotalProvision(subGroupId, index) {
+	    let totalProvision = 0;
+	    let provisionInputs = document.getElementsByClassName('provisionAmount'+subGroupId);
+
+	    Array.from(provisionInputs).forEach(function(input) {
+	        let inputValue = parseFloat(input.value) || 0;
+	        totalProvision += inputValue;
+	    });
+
+	    document.getElementById('totalProvision'+subGroupId).value = totalProvision.toFixed(2);
+	 //   calculateEstimateAmount(subGroupId, index)
+	}
+
+	function calculateTotalFirstQtr(subGroupId, index) {
+	    let totalFirstQtr = 0;
+	    let firstQtrInputs = document.getElementsByClassName('firstQtrAmount'+subGroupId);
+
+	    Array.from(firstQtrInputs).forEach(function(input) {
+	        let inputValue = parseFloat(input.value) || 0;
+	        totalFirstQtr += inputValue;
+	    });
+
+	    document.getElementById('totalFirstQtr'+subGroupId).value = totalFirstQtr.toFixed(2);
+	   // calculateEstimateAmount(subGroupId, index)
+	}
+
+	function calculateTotalSecondQtr(subGroupId, index) {
+	    let totalSecondQtr = 0;
+	    let secondQtrInputs = document.getElementsByClassName('secondQtrAmount'+subGroupId);
+
+	    Array.from(secondQtrInputs).forEach(function(input) {
+	        let inputValue = parseFloat(input.value) || 0;
+	        totalSecondQtr += inputValue;
+	    });
+
+	    document.getElementById('totalSecondQtr'+subGroupId).value = totalSecondQtr.toFixed(2);
+	    //calculateEstimateAmount(subGroupId, index)
+	}
+
+	function calculateTotalRevised(subGroupId, index) {
+		debugger
+	    let totalRevised = 0;
+	    let revisedInputs = document.getElementsByClassName('revisedAmount'+subGroupId);
+
+	    Array.from(revisedInputs).forEach(function(input) {
+	        let inputValue = parseFloat(input.value) || 0;
+	        totalRevised += inputValue;
+	    });
+
+	    document.getElementById('totalRevised'+subGroupId).value = totalRevised.toFixed(2);
+	  //  calculateEstimateAmount(subGroupId, index)
+	}
+
+	function calculateTotalEstimate(subGroupId, index) {
+		debugger
+	    let totalEstimate = 0;
+	    let estimateInputs = document.getElementsByClassName('estimateAmount'+subGroupId);
+
+	    Array.from(estimateInputs).forEach(function(input) {
+	        let inputValue = parseFloat(input.value) || 0;
+	        totalEstimate += inputValue;
+	    });
+
+	    document.getElementById('totalEstimate'+subGroupId).value = totalEstimate.toFixed(2);
+	    
+	   // calculateEstimateAmount(subGroupId, index)
+	}
+
+	function calculateEstimateAmount(subGroupId, index) {
+	    var prevYearEstimateElmt = document.getElementById('provisionAmount' + index);
+	    var firstQtrEstimateElmt = document.getElementById('firstQtrAmount' + index);
+	    var secondQtrEstimateElmt = document.getElementById('secondQtrAmount' + index);
+	    var revisedPrevYearEstimateElmt = document.getElementById('revisedAmount' + index);
+	    var selectedFinYearEstimateElmt = document.getElementById('estimateAmount' + index);
+	    var nextYrRevisedPerElmt = document.getElementById('nextYrRevisedPer' + index);
+
+	    $("#" + prevYearEstimateElmt.id).val(parseFloat(prevYearEstimateElmt.value || 0).toFixed(2));
+	    $("#" + firstQtrEstimateElmt.id).val(parseFloat(firstQtrEstimateElmt.value || 0).toFixed(2));
+	    $("#" + secondQtrEstimateElmt.id).val(parseFloat(secondQtrEstimateElmt.value || 0).toFixed(2));
+	    $("#" + revisedPrevYearEstimateElmt.id).val(parseFloat(revisedPrevYearEstimateElmt.value || 0).toFixed(2));
+	    $("#" + selectedFinYearEstimateElmt.id).val(parseFloat(selectedFinYearEstimateElmt.value || 0).toFixed(2));
+	    $("#" + nextYrRevisedPerElmt.id).val(parseFloat(nextYrRevisedPerElmt.value || 0).toFixed(2));
+
+	    if (firstQtrEstimateElmt.value != '' && secondQtrEstimateElmt.value != '') {
+	        $("#" + revisedPrevYearEstimateElmt.id).val(
+	            (parseFloat(firstQtrEstimateElmt.value) + parseFloat(secondQtrEstimateElmt.value)).toFixed(2)
+	        );
+	        
+	        const firstQtrEstimate = parseFloat(firstQtrEstimateElmt.value) || 0;
+	        const secondQtrEstimate = parseFloat(secondQtrEstimateElmt.value) || 0;
+	        const nextYrRevisedPercentage = parseFloat(nextYrRevisedPerElmt.value) || 0;
+	        const totalEstimate = firstQtrEstimate + secondQtrEstimate;
+	        
+	        if (nextYrRevisedPercentage !== 0) {
+	            const hike = totalEstimate * (nextYrRevisedPercentage / 100);
+	            $("#" + selectedFinYearEstimateElmt.id).val((totalEstimate + hike).toFixed(2));
+	        } else {
+	            $("#" + selectedFinYearEstimateElmt.id).val(totalEstimate.toFixed(2));
+	        }
+	    }
+	    
+	    calculateTotalEstimate(subGroupId, index);
+	    
+	    calculateTotalRevised(subGroupId, index);
+	    
+	    calculateTotalSecondQtr(subGroupId, index);
+	    
+	    calculateTotalFirstQtr(subGroupId, index);
+	    
+	    calculateTotalProvision(subGroupId, index);
+	}
+
+	function validateInputDecimal(evt, element) {
+	    let charCode = evt.which ? evt.which : evt.keyCode;
+	    if (charCode > 31 && (charCode < 48 || charCode > 57) && charCode != 46) {
+	        return false;
+	    }
+	    return true;
+	}
+	function calllabelledChange() {
+		debugger
+		var selectedYr = document.getElementById('finYearId');
+		if (selectedYr.value !=='') {
+		var labelVal = selectedYr.value.split("-");
+		var prevYrLarge = (parseInt(labelVal[1]) - 1) + '-'+ (parseInt(labelVal[1]) - 2000);
+		var selectedYr = labelVal[1] + '-' + labelVal[2];
+		var shortPerv = (parseInt(labelVal[1]) - 2000);
+		var shortCurr = (parseInt(labelVal[1]) - 1999);
+		var selectedNextYr=(parseInt(labelVal[1]) + 1) + '-'+ (parseInt(labelVal[1]) - 1998);
+		console.log('prevYrLarge ' + prevYrLarge + ' selectedYr ' + selectedYr+ ' shortPerv ' + shortPerv + ' shortCurr ' + shortCurr);
+		
+// 		document.getElementById("prevYrLarge").innerHTML = prevYrLarge;
+// 		document.getElementById("prevYrSm1").innerHTML = shortPerv;
+// 		document.getElementById("prevYrSm2").innerHTML = shortPerv;
+// 		document.getElementById("prevYrSm3").innerHTML = shortPerv;
+// 		document.getElementById("selYrSm1").innerHTML = shortCurr;
+// 		document.getElementById("prevYrLg2").innerHTML = prevYrLarge;
+// 		document.getElementById("selYrLg").innerHTML = selectedYr;
+
+		document.getElementById("prevYrLarge").innerHTML = prevYrLarge;
+		document.getElementById("prevYrSm1").innerHTML = shortPerv;
+		document.getElementById("prevYrSm2").innerHTML = shortPerv;
+		document.getElementById("prevYrSm3").innerHTML = shortPerv;
+		document.getElementById("selYrSm1").innerHTML = shortCurr;
+		document.getElementById("prevYrLg2").innerHTML = selectedYr;
+		document.getElementById("selYrLg").innerHTML = selectedNextYr;
+		}
+	}
+	
+	
+    </script>
+								
+		

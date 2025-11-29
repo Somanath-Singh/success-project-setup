@@ -1,0 +1,240 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+
+<%-- <div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">School Details Report</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">School Details Report</li>
+            </ol>
+        </nav>
+    </div>
+</div> --%>
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h5 class="card-title">School Details Report</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+			<div class="col-md-3">
+				<div class="form-group">
+					<label class="col-md-12 required" for="districtId">District Name :</label>
+					<div class="col-md-12">
+						<select class="form-control form-control-sm form-select"
+							data-live-search="true" id="districtId" name="districtId" onchange="LoadBlockByDistrict(this.value,'blockId');" >
+							<option value="0">- All -</option>													
+							<c:forEach var="district" items="${districtList}">
+								<option value="${district.districtId}" ${district.districtId eq selectedDistrictId ? 'selected' : ''}>${district.districtName}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-md-3">
+				<div class="form-group">
+					<label class="col-md-12 required" for="blockId">Block Name :</label>
+					<div class="col-md-12">
+						<select id="blockId" name="blockId" class="form-control form-control-sm form-select" onchange="LoadGrampanchayatByBlock(this.value,'gpId');" required="required">
+							<option value="0">- All -</option>
+							<c:forEach var="block" items="${blockList}">
+								<option value="${block.blockId}" ${block.blockId eq selectedBlockId ? 'selected' : ''}> ${block.blockName}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="form-group">
+					<label class="col-md-12 required" for="gpId">GramPanchayat Name :</label>
+					<div class="col-md-12">
+						<select id="gpId" name="gpId" class="form-control form-control-sm form-select" onchange="LoadVillageByGrampanchayat(this.value);" required="required">
+							<option value="0">- All -</option>
+							<c:forEach var="panchayat" items="${gpList}">
+								<option value="${panchayat.gpId}" ${panchayat.gpId eq selectedGpId ? 'selected' : ''}>${panchayat.gpName}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+			  <div class="form-group">
+				<label class="col-md-12 required" for="gpId">Village Name :</label>
+				<div class="col-md-12">
+					<select id="villageId" name="villageId" class="form-control form-control-sm form-select" required="required">
+						<option value="0">- All -</option>
+						<c:forEach var="village" items="${villageList}">
+							<option value="${village.villageId}" ${village.villageId eq selectedVillageId ? 'selected' : ''}>${village.villageName}</option>
+						</c:forEach>
+						</select>
+					</div>
+				</div>
+			</div>
+			 <div class="col-md-3">
+                <div class="form-group">
+                    <label class="col-md-12 required" for="type">School Type :</label>
+                    <select class="form-control form-control-sm form-select" id="type" name="type">
+                        <option value="null">- All -</option>
+                        <c:forEach items="${schoolTypeList}" var="schoolType" varStatus="index">
+                            <option value="${schoolType.valueEn}" ${ schoolType.valueEn eq selectedType ? 'selected' : ''}>${schoolType.valueEn}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+            </div> 
+			<div class="col-md-3">
+                <label class="required">Start Date :</label>
+                <div class="datepicker-box">
+                    <input type="text" id="startDate" name="startDate" value="${selectedStartDate}" class="form-control form-control-sm datepicker" required readonly>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="required">End Date :</label>
+                <div class="datepicker-box">
+                    <input type="text" id="endDate" name="endDate" value="${SelectedEndDate}" class="form-control form-control-sm datepicker" required readonly>
+                </div>
+            </div>
+            <div class="col-md-2 text-center mt-4">
+                <button type="button" class="btn btn-success" onclick="filterData()"><i class="fa-solid fa-filter"></i> Filter</button>
+                <a href="javascript:void();" onclick="history.back();" type="button" class="btn btn-warning btn-sm"><i class="fa-solid fa-rotate-left"></i>  Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3" id="project-performance-report">
+    <div class="card-header">
+        <h5 class="card-title">School Data</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+	        <table class="table table-bordered table-striped exportbtn" id="schoolTable">
+			    <thead class="table-light">
+			        <tr>
+			            <th class="text-center" style="width:60px;">Sl.No.</th>
+			            <th>School Name</th>
+			            <th>District</th>
+			            <th>Block</th>
+			            <th>Gram Panchayat</th>
+			            <th>Village</th>
+			            <th>Head Master</th>
+			            <th>School Type</th>
+			            <th>Class Range</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			        <c:choose>
+			            <c:when test="${not empty reportDataList}">
+			                <c:forEach items="${reportDataList}" var="school" varStatus="status">
+			                    <tr>
+			                        <td class="text-center">${status.index + 1}</td>
+			                        <td>${school.schName}</td>
+			                        <td>${school.districtName}</td>
+			                        <td>${school.blockNameEn}</td>
+			                        <td>${school.gpNameEn}</td>
+			                        <td>${school.villageNameEn}</td>
+			                        <td>${school.headmaster}</td>
+			                        <td>${school.schoolType}</td>
+			                        <td>${school.clsRange}</td>
+			                    </tr>
+			                </c:forEach>
+			            </c:when>
+			            <c:otherwise>
+			                <tr>
+			                    <td colspan="9" class="text-center text-muted">
+			                        No records found for the selected criteria.
+			                    </td>
+			                </tr>
+			            </c:otherwise>
+			        </c:choose>
+			    </tbody>
+			</table>
+        </div>
+    </div>
+</div>
+
+ <form id="filterForm" action="${contextPath}/report/getSchoolReport" method="GET">
+	<input type="hidden" name="cipherText" id="hiddenCipherText">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	<input type="hidden" id="hiddenStartDate" name="startDate">
+	<input type="hidden" id="hiddenEndDate" name="endDate">
+	<input type="hidden" id="hiddenDistrictId" name="districtId">
+    <input type="hidden" id="hiddenBlockId" name="blockId">
+    <input type="hidden" id="hiddenGpId" name="gpId">
+    <input type="hidden" id="hiddenVillageId" name="villageId">
+    <input type="hidden" id="hiddenType" name="type">
+</form>
+
+<script>
+
+function filterData() {
+    debugger;
+    var startDate  = $("#startDate").val(); 
+    var endDate    = $("#endDate").val();    
+    var districtId = $("#districtId").val() || 0; 
+    var blockId    = $("#blockId").val() || 0;    
+    var gpId       = $("#gpId").val() || 0;
+    var villageId  = $("#villageId").val() || 0;
+    var type    = $("#type").val();
+
+    $('#hiddenStartDate').val(startDate);
+    $('#hiddenEndDate').val(endDate);
+    $('#hiddenDistrictId').val(districtId);
+    $('#hiddenBlockId').val(blockId);
+    $('#hiddenGpId').val(gpId);
+    $('#hiddenVillageId').val(villageId);
+    $('#hiddenType').val(type);
+
+    showLoader();
+
+    var bizContent = $("#filterForm").serializeArray();
+    $("#hiddenCipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    $("#filterForm").submit();
+}
+
+ 	
+	
+	$(document)
+			.ready(
+					function() {
+						var today = new Date();
+						var oneMonthAgo = new Date();
+						oneMonthAgo.setMonth(today.getMonth() - 1);
+						debugger;
+						$(".datepicker")
+								.datepick(
+										{
+											dateFormat : "dd-mm-yyyy",
+											onShow : $.datepick.monthOnly,
+											yearRange : "c-20:c+10",
+											showOnFocus : true,
+											showTrigger : '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+										});
+
+						if (!$("#startDate").val()) {
+							$('#startDate').datepick('setDate', oneMonthAgo);
+						}
+						if (!$("#endDate").val()) {
+							$('#endDate').datepick('setDate', today);
+						}
+
+						var $table = $("#schoolTable");
+
+						if ($table.find("tbody tr td").hasClass("text-muted")) {
+							$table.removeClass("exportbtn");
+						} else {
+							$table.addClass("exportbtn");
+						}
+
+					});
+	
+	
+</script>

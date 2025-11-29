@@ -1,0 +1,557 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<%-- <link rel="stylesheet"
+	href="${contextPath}/assets/js/plugin/jquery_autocomplete/jquery.autocomplete.css" />
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<script src="resources/javascripts/common.js"></script>
+<script src="${contextPath}/assets/appJs/validation/party-master.js"></script>
+<script src="${contextPath}/assets/appJs/validation/invoice.js"></script>--%>
+<%@ page import="com.aashdit.fams.utils.ApplicationStringUtilsFams" %> 
+<style>
+    .table .btn-success{
+        padding: 8px 12px;
+    }
+    .btn.btnchng{
+        padding: 8px 14px 8px 14px;
+    }
+
+</style>
+
+<script>
+					$(function()
+					{
+						$('#datatable-default').dataTable({
+					 		"bSort": false,
+					 		"autoWidth": false
+						});
+					})
+					</script>
+
+
+
+<!-- Start::row-1 -->
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Work Estimation</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+	        <ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Work Estimation</li>
+			</ol>
+        </nav>
+     </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+            <div class="card custom-card">
+                <div class="card-header">
+                    <h6 class="card-title">Work Estimation</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="partyDtlsInRequest">
+                        <div class="col-md-12">
+                            <form class="form-horizontal form-bordered" id="uploadExcel" action="${contextPath}/estimation/featchEstItemDtlsFromExcel" method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                <input type="hidden" value="true" id="labelmsg" name="labelmsg">
+                                <div class="row">
+                                    <div class="col-md-7"></div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label for="inputEmail4" class="form-label">Upload Excel </label>
+                                            <div class="col-md-12">
+                                                <input type="file" name="estFile" class="form-control form-control-sm  ">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-sm-3" style="margin-top: 25px;">
+                                        <div class="form-group d-flex align-items-center gap-2">
+                                            <button type="button" class="btn btn-success btnchng" title=" Generate Estimation Excel Format" onclick="generateExcel();">
+                                                <i class="fa-solid fa-download"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-success btnchng" title="Upload Excel" onclick="uploadExcel();">
+                                               <i class="fa-solid fa-upload"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <form class="form-horizontal form-bordered" id="finalSubmit" action="${contextPath}/estimation/save" method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                              <input type="hidden" value="true" id="labelmsg" name="labelmsg">
+                                <input type="hidden" value="${estimationData ne null ? estimationData.estimationId:''}" id="estimationId" name="estimationId">
+                                <div class="row">
+                                
+							<%@ include file="/WEB-INF/views/entityIdAndUserLevelListDrp.jsp"%>
+                                    <div class="col-md-2 col-sm-3">
+                                        <div class="form-group">
+                                            <label class=" required" for="projectHeadId">Project:</label>
+                                                <div class="col-md-12">
+                                                    <select class="form-select require" name="projectId" id="projectId" onchange="checkEstimationPresent()" >
+                                                        <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+                                                        <c:forEach items="${loadData.projectMasterList}" var="head">
+                                                            <option value="${head.projectId}" ${estimationData.projectId eq head.projectId ? 'selected' :''}>${head.projectName}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </div>
+                                            </div>
+										</div>
+                                    <div class="col-md-2 col-sm-3">
+                                        <div class="form-group">
+                                            <label for="estimationNo" class="requiredd ">Estimation No </label>
+                                            <div class="col-md-12">
+                                                <input type="text" class="form-control  disabled" name="estimationNo" id="estimationNo"  value="${estimationData ne null ? estimationData.estimationNo:''}" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-sm-3">
+                                        <div class="form-group">
+                                            <label for="estimationDate" class="required">Estimation Date</label>
+                                            <c:set var="est" value="${fn:split(estimationData.estimationDate, ' ')}" />
+                                            <fmt:parseDate pattern="yyyy-MM-dd" value="${est[0]}" var="parsedDate" />
+                                            <fmt:formatDate value="${parsedDate}" pattern="dd/MM/yyyy" var="estimationDateStr" />
+
+                                            <div class="datepicker_con">
+											    <input class="form-control form-control-sm require" type="text" id="estimationDate" name="estimationDate" value="${estimationDateStr}" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-sm-3">
+                                           <div class="form-group">
+                                              <label for="inputEmail4">Upload Reference Doc </label>
+                                              <div class="col-md-12">
+                                                <input type="file" name="refDoc" id="refDoc" class="form-control form-control-sm  ">
+                                              </div>
+                                           </div>
+                                        </div>
+                                        <c:if test="${estimation.refDoc ne null }">
+                                            <div class="col-md-2 col-sm-3" style="margin-top: 25px;">
+                                                <div class="form-group ">
+                                                    <button type="button" class="btn btn-success btnchng unfreezeField" title=" Download ref doc" onclick="viewDocument('${estimation.refDoc}','Estimation');">
+                                                        <i class="fa-solid fa-download"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </c:if>
+                                </div>
+                                <div class="table-responsive">
+                                    <table id="product-table" class="table">
+                                        <h6 class="panel-title"><span>Estimation Details</span></h6>
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No.</th>
+                                                <th class="required ">Work Item</th>
+                                                <th class="required ">Unit</th>
+                                                <th class="required ">Rate</th>
+                                                <th class="required ">Quantity </th>
+                                                <th class="required ">Amount</th>
+                                                <th>
+                                                    <button type="button" id="estBtn" class="btn btn-success btn-add-product"><i class="fa-solid fa-plus"></i></button>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="emstimation">
+                                            <c:choose>
+                                                <c:when test="${estimationData ne null && not empty estimationData.workEstDetails}">
+                                                    <c:forEach items="${estimationData.workEstDetails}" var="itemDetails" varStatus="index">
+                                                        <tr>
+                                                            <td>${index.count}</td>
+                                                            <!-- Row number -->
+                                                            <td>
+                                                                <input type="text" class="form-control require" id="item${index.index}" name="workEstDetails[${index.index}].item" value="${itemDetails.item}" placeholder="Please enter item">
+                                                            </td>
+                                                            <td>
+                                                                <select id="unit${index.index}" name="workEstDetails[${index.index}].unit" data-plugin-selectTwo class="form-control multi-formcontrol require" style="width: 250px;">
+                                                                    <option value="">
+                                                                        <spring:message code="COMMON.LABEL.DROPDOWN.SELECT" />
+                                                                    </option>
+                                                                    <c:forEach items="${loadData.unitList}" var="unitx">
+                                                                        <option value="${unitx.unitTypeId}" ${itemDetails.unit eq unitx.unitTypeId ? 'selected' : ''}>
+                                                                            ${unitx.unitTypeName}
+                                                                        </option>
+                                                                    </c:forEach>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control text-end require tbl_inputO" id="rate${index.index}" name="workEstDetails[${index.index}].rate" onkeypress="return validateInputDecimal(event,this);" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(itemDetails.rate)}" onblur="calculateAmount();" placeholder="Please enter rate">
+                                                            </td>
+                                                            <td>
+
+                                                                <input type="text" class="form-control text-end require" id="quantity${index.index}" name="workEstDetails[${index.index}].quantity" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(itemDetails.quantity)}" onkeypress="return validateInputDecimal(event,this);" onblur="calculateAmount();" placeholder="Please enter quantity">
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control text-end require" id="amount${index.index}" name="workEstDetails[${index.index}].amount" value="${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(itemDetails.amount)}" onkeypress="return validateInputDecimal(event,this);" onblur="calculateAmount();" placeholder="Please enter amount">
+                                                            </td>
+                                                            <td>
+                                                                <c:if test="${index.index > 0}">
+                                                                    <div class="btn-group">
+                                                                        <button type="button" class="btn btn-danger btn-sm deleteRow" id="deleteRow${index.index}">
+                                                                            <i class="fas fa-minus"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </c:if>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>
+                                                            <input type="text" class="form-control require" id="item0" name="workEstDetails[0].item" placeholder="Please enter item">
+                                                        </td>
+                                                        <td>
+                                                            <select id="unit0" name="workEstDetails[0].unit" data-plugin-selectTwo class="form-control multi-formcontrol require" style="width: 250px;">
+                                                                <option value="">
+                                                                    <spring:message code="COMMON.LABEL.DROPDOWN.SELECT" />
+                                                                </option>
+                                                                <c:forEach items="${loadData.unitList}" var="unit">
+                                                                    <option value="${unit.unitTypeId}">${unit.unitTypeName}</option>
+                                                                </c:forEach>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control text-end require tbl_inputO" id="rate0" name="workEstDetails[0].rate" onkeypress="return validateInputDecimal(event,this);" onblur="calculateAmount();" placeholder="Please enter rate">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control text-end require" id="quantity0" name="workEstDetails[0].quantity" onkeypress="return validateInputDecimal(event,this);" onblur="calculateAmount();" placeholder="Please enter quantity">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control text-end require" id="amount0" name="workEstDetails[0].amount" onkeypress="return validateInputDecimal(event,this);" onblur="calculateAmount();" placeholder="Please enter amount">
+                                                        </td>
+
+                                                        <td>
+                                                        </td>
+                                                    </tr>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                             <div class="row">
+                                             <div class="col-md-7"></div>
+                                             <div class="col-md-5">
+                                                <div class="form-group d-flex align-items-center justify-content-end gap-3">
+                                                    <label for="estimationNo" class="required ">Total Estimation Amount </label>
+                                                    <div class="">
+                                                        <input type="text" class="form-control text-end require" value="${estimationData ne null ? ApplicationStringUtilsFams.convertDoubleToTwoDecimal(estimationData.totalEstAmount):''}"  name="totalEstAmount" id="totalEstAmount">
+                                                   </div>
+                                                </div>
+                                                <div class="form-group d-flex align-items-center justify-content-end gap-3">
+                                                    <label for="estimationNo" class="required ">Gst per ${estimationData.gstPer} </label>
+                                                    <div class="">
+                                                        <input type="text" class="form-control text-end require" name="gstPer" id="gstPer"   onblur="calculateAmount();" value="${estimationData ne null ? ApplicationStringUtilsFams.convertDoubleToTwoDecimal(estimationData.gstPer):''}">
+                                                   </div>
+                                                </div>
+                                                <div class="form-group d-flex align-items-center justify-content-end gap-3">
+                                                    <label for="estimationNo" class="required ">Gst Amount </label>
+                                                   <div class="">
+                                                        <input type="text" class="form-control text-end require" name="gstAmount" id="gstAmount" onblur="calculateAmount();" value="${estimationData ne null ? ApplicationStringUtilsFams.convertDoubleToTwoDecimal(estimationData.gstAmount):''}">
+                                                      </div>
+                                                </div>
+                                                <div class="form-group d-flex align-items-center justify-content-end gap-3">
+                                                    <label for="estimationNo" class="required ">Grand Total Amount </label>
+                                                   <div class="">
+                                                      <input type="text" class="form-control text-end require" name="grandTotalAmount" id="grandTotalAmount" value="${estimationData ne null ? ApplicationStringUtilsFams.convertDoubleToTwoDecimal(estimationData.grandTotalAmount):''}">
+                                                   </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <%-- <div class="col-md-3 col-sm-3">
+                                           <div class="form-group">
+                                              <label for="inputEmail4">Upload Reference Doc </label>
+                                              <div class="col-md-12">
+                                                <input type="file" name="refDoc" id="refDoc" class="form-control form-control-sm  ">
+                                              </div>
+                                           </div>
+                                        </div>
+                                        <c:if test="${estimation.refDoc ne null }">
+                                            <div class="col-md-2 col-sm-3" style="margin-top: 25px;">
+                                                <div class="form-group ">
+                                                    <button type="button" class="btn btn-success btnchng unfreezeField" title=" Download ref doc" onclick="viewDocument('${estimation.refDoc}','Estimation');">
+                                                        <i class="fa-solid fa-download"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </c:if> --%>
+                                        </form>
+                                    </div>
+                        <div class="row">
+                            <div class="col-sm-12" style="margin-top: 30px;">
+                                 <div class="form-group text-center">
+                                       <!--  <input type="button" class="btn btn-success" onclick="submitFormData()" value="Save" /> -->
+                                        <c:set var="dynamicFromId" value="finalSubmit" scope="request" />
+                                            <c:set var="wonFunction" value="submitFormData()"/>
+                                        <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+                                </div>
+                            </div>
+                        </div>
+                 <%--  <div class="row">
+                            <div class="col-sm-12" style="margin-top:30px;">
+                                <div class="form-group text-center">
+                                    <button type="button" class="btn btn-success" onclick="submitFormData();">
+                                        <spring:message code="COMMON.BUTTON.SAVE" />
+                                    </button>
+                                    <a href="${contextPath}/home">
+                                        <input type="button" class="btn btn-danger" value=<spring:message code="COMMON.BUTTON.BACK">
+                                        </spring:message>>
+                                    </a>
+                                </div>
+                            </div>
+                        </div> --%>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--End::row-1 -->
+
+
+
+<form action="${contextPath}/estimation/generateWorkEstimationExcel" method="get" id="excelGen">
+</form>
+
+ <form action="${contextPath}/download/download" method="get" id="formDownLoad"  target="_blank">
+	    <input type="hidden" name="code" id="code"/>
+	    <input type="hidden" name="module" id="module"/>
+	    <input type="hidden" name="filename" id="filename"/>
+  </form>
+
+
+<script>
+$( document ).ready(function() {
+	calculateAmount();
+});
+
+
+
+$(document).ready(function() {
+    var count = 1;
+    const addBtn = document.getElementById('estBtn');
+    
+    addBtn.addEventListener('click', function() {
+    	  var fields = document.getElementsByClassName("tbl_inputO");
+  	    count = fields.length;
+       if (validateFormByFormID('finalSubmit')) {
+            let html = '';
+            
+            html += '<tr>';
+            html += '<td>' + (count + 1) + '</td>'; 
+            
+            // Item input
+            html += '<td>';
+            html += '<input type="text" class="form-control require" id="item' + count + '" name="workEstDetails[' + count + '].item" placeholder="Please enter item">';
+            html += '</td>';
+            
+            // Unit select
+            html += '<td>';
+            html += '<select id="unit' + count + '" name="workEstDetails[' + count + '].unit" data-plugin-selectTwo class="form-control multi-formcontrol require" style="width: 250px;">';
+            html += '<option value="">';
+            html += '<spring:message code="COMMON.LABEL.DROPDOWN.SELECT" />';
+            html += '</option>';
+            html += '<c:forEach items="${loadData.unitList}" var="unit"><option value="${unit.unitTypeId}">${unit.unitTypeName}</option></c:forEach>';
+            html += '</select>';
+            html += '</td>';
+            
+            // Rate input
+            html += '<td>';
+            html += '<input type="text" class="form-control text-end require tbl_inputO" id="rate' + count + '" name="workEstDetails[' + count + '].rate" onkeypress="return validateInputDecimal(event,this);" onblur="calculateAmount();" placeholder="Please enter rate">';
+            html += '</td>';
+            
+            // Quantity input
+            html += '<td>';
+            html += '<input type="text" class="form-control text-end require" id="quantity' + count + '" name="workEstDetails[' + count + '].quantity" onkeypress="return validateInputDecimal(event,this);" onblur="calculateAmount();" placeholder="Please enter quantity">';
+            html += '</td>';
+            
+            // Amount input
+            html += '<td>';
+            html += '<input type="text" class="form-control text-end require" id="amount' + count + '" name="workEstDetails[' + count + '].amount" onkeypress="return validateInputDecimal(event,this);" onblur="calculateAmount();" placeholder="Please enter amount">';
+            html += '</td>';
+            
+            // Remove row button
+            html += '<td class="sorting_1">';
+            html += '<div class="btn-group">';
+            html += '<button type="button" class="btn btn-danger btn-sm deleteRow" id="deleteRow' + count + '"><i class="fas fa-minus"></i></button>';
+            html += '</div>';
+            html += '</td>';
+            html += '</tr>';
+            
+            $('#emstimation').append(html);
+            
+            
+            // Add click event to delete button for the newly added row
+            $('#deleteRow' + count).click(function() {
+                $(this).closest('tr').remove();
+                calculateAmount();
+            });
+            
+       }
+    });
+});
+
+$(document).on('click', '.deleteRow', function () {
+    $(this).closest('tr').remove();
+    calculateAmount();
+
+});
+
+function validateInputDecimal(event, inputElement) {
+	  var inputValue = inputElement.value;
+	  var isDigitOrDecimal = (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46;
+	  var decimalIndex = inputValue.indexOf('.');
+	  if (decimalIndex !== -1) {
+	    if (event.charCode == 46) {
+	      event.preventDefault();
+	      return false;
+	    }
+	    var decimalPart = inputValue.substr(decimalIndex + 1);
+	  }
+	  return isDigitOrDecimal;
+	}
+	
+function calculateAmount() {
+	debugger
+    const fields = document.getElementsByClassName("tbl_inputO");
+    let totalEstAmount = 0.00;
+
+    for (let i = 0; i < fields.length; i++) {
+        const rate = parseFloat(document.getElementById('rate' + i).value) || 0.00;
+        const quantity = parseFloat(document.getElementById('quantity' + i).value) || 0.00;
+
+        const amount = rate * quantity;
+        document.getElementById('amount' + i).value = amount.toFixed(2);
+        
+        document.getElementById('rate' + i).value = rate.toFixed(2);
+        
+        document.getElementById('quantity' + i).value = quantity.toFixed(2);
+        
+        totalEstAmount += amount;
+    }
+    
+    document.getElementById('totalEstAmount').value = totalEstAmount.toFixed(2);
+
+    let gstAmount = parseFloat(document.getElementById('gstAmount').value) || 0.00;
+    let gstPer = parseFloat(document.getElementById('gstPer').value) || 0.00;
+    
+
+     if (gstPer > 0) {
+        gstAmount = (totalEstAmount * gstPer / 100).toFixed(2);
+    }
+     else if (gstAmount > 0) {
+        gstPer = ((gstAmount / totalEstAmount) * 100).toFixed(2);
+    }
+
+    const grandTotalAmount = (totalEstAmount + parseFloat(gstAmount)).toFixed(2);
+
+    document.getElementById('gstAmount').value = parseFloat(gstAmount).toFixed(2);
+    document.getElementById('gstPer').value = parseFloat(gstPer).toFixed(2);
+    document.getElementById('grandTotalAmount').value = parseFloat(grandTotalAmount).toFixed(2);
+}
+
+
+
+function submitFormData(){
+	
+	tableOrTbodyIDS=['emstimation'];
+	tableOrTbodyKeys=['workEstDetails'];
+	if(validateForm()){
+		addOrUpdateHiddenFields();
+	 if(encryptFormData('finalSubmit', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('finalSubmit');
+		 }
+	}
+	
+}
+
+
+function generateExcel(){
+	$('#excelGen').submit();
+}
+
+function uploadExcel(){
+	 confirmation('uploadExcel');
+}
+
+function viewDocument(imageName,moduleName) {
+    $("#module").val(moduleName);
+    $("#filename").val(imageName);
+
+    if (encryptFormData('formDownLoad', tableOrTbodyIDS, tableOrTbodyKeys)) {
+        $('#formDownLoad').submit();
+    }
+}
+
+
+function checkEstimationPresent(){
+	var projectId =$("#projectId").val();
+	
+	formDataJson={"projectId":projectId}
+	var encryptedData = encryptJSONobj(formDataJson); 
+	  $.ajax({
+	        url: "${contextPath}/estimation/check_est_present_against_project",
+	        async: false,
+	        data: {encodedData: encryptedData},
+	        success: function(response) {
+	            if (response && response !== "") {
+	              if(response.isPresent){
+	            	  bootbox.alert(response.message);
+	            	  $("#projectId").val("");
+	              }  
+	              
+	            } else {
+	                bootbox.alert("No Data Found");
+	            }
+	        },
+	        error: function() {
+	            bootbox.alert("Error fetching data");
+	        }
+	    });
+	
+}
+
+function addOrUpdateHiddenFields() {
+    const form = document.getElementById("finalSubmit");
+    if (!form) {
+        console.warn("Form with id 'finalSubmit' not found!");
+        return;
+    }
+debugger
+    const inputIds = ["totalEstAmount", "gstPer", "gstAmount", "grandTotalAmount"];
+
+    for (let i = 0; i < inputIds.length; i++) {
+        let id = inputIds[i];
+        let visibleInput = document.getElementById(id);
+        
+        if (visibleInput) {
+            let hiddenInput = document.getElementById(id + "hd");
+
+            if (!hiddenInput) {
+                hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = id; 
+                hiddenInput.id = id + "hd"; 
+                form.appendChild(hiddenInput);
+            }
+
+            hiddenInput.value = visibleInput.value || "";
+            console.log(`Updated hidden field: ${hiddenInput.id} with value: ${hiddenInput.value}`);
+        } else {
+            console.warn(`Visible input with id '${id}' not found!`);
+        }
+    }
+}
+
+
+
+</script>

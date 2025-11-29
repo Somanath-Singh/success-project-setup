@@ -1,0 +1,669 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<script src="${contextPath}/resources/javascripts/accountMaster.js"></script>
+<script src="${contextPath}/resources/javascripts/common.js"></script>
+<script src="resources/javascripts/createAccountMaster.js"></script>
+<style>
+.table-striped>tbody>tr:nth-of-type(odd) {
+    --bs-table-accent-bg: rgb(247 249 244) !important;
+    /* color: var(--bs-table-striped-color); */
+}
+.accordion-body {
+    padding: 0.5rem;
+    background: #091a16 !important;
+}
+</style>
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Add Master</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Add Master</li>
+			</ol>
+		</nav>
+	</div>
+</div><div class="row">
+          <div class="col-md-12">
+              <div class="card">
+                  <div class="card-header">
+                      <h5 class="mb-0 card-title" id="headingOne">Add Project</h5>
+                  </div>
+                  <div class="card-body" id="partyDtlsInRequest">
+						<%-- <p class="mandatory" align="right"><spring:message code="HRMS.CSR.PROJECTADD"/></p> --%>
+							<div class="col-md-12">
+								<form class="form-horizontal form-bordered"  id="projectMasterForm"  action="${contextPath}/mst/manageProject" method="POST" enctype="multipart/form-data">
+										<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+										<input type="hidden" name="projectMasterId" value="${projectMaster.projectId}"/>
+                                        <input type="hidden" name="cipherText" id="encodedDataprojectMasterForm"/>
+                                       <!--  <input type="hidden" name="cipherText" id="hdnData"/> -->
+									<div class="row">
+									
+									<c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+									<c:set var="upperOrDown" value="down" />
+									<%-- <c:set var="functionList2" value="getParentFacilities(this)"/> --%>
+									<%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+									
+										<div class="col-md-5 col-sm-6">
+											<div class="form-group">
+												<label class="required" for="projectName"><spring:message code="OC.CHRGRTMST.PROJNAME"/>:</label>
+												<div class="col-md-12">
+													<input type="text" name="projectName" class="form-control" id="projectName" value="${projectMaster.projectName}" maxlength="100">
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="projectCode"><spring:message code="ACCOUNTS.WORK.PROJECTCODE"/>:</label>
+												<div class="col-md-12">
+													<input type="text" name="projectCode" class="form-control" id="projectCode" value="${not empty projectMaster.projectCode ? projectMaster.projectCode : nextProjectCode }" maxlength="10" >
+												</div>
+											</div>
+										</div>	
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="projectShortName"><spring:message code="ACCOUNT.PROJECT.PSHORTMNAME"/>:</label>
+												<div class="col-md-12">
+													<input type="text" name="projectShortName" class="form-control" id="projectShortName" value="${projectMaster.projectShortName}">
+												</div>
+											</div>
+										</div>													
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="projectHeadId"><spring:message code="ACCOUNT.PROJECT.PMHEAD" />:</label>
+													<div class="col-md-12">
+														<select class="form-select" name="projectHeadId" id="projectHeadId" >
+															<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+															<c:forEach items="${ProjectHead}" var="head">
+																<option value="${head.projectHeadId}" ${head.projectHeadId eq projectMaster.projectHead.projectHeadId ? 'selected':'' }>${head.projectHeadName}</option>
+															</c:forEach>
+														</select>
+													</div>
+												</div>
+										</div>
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="projetTypeId"><spring:message code="ECL.PROINFO.PROJECTTYPE" />:</label>
+													<div class="col-md-12">
+														<select class="form-select" name="projetTypeId" id="projetTypeId">
+															<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+															<c:forEach items="${projectType}" var="type">
+																<option value="${type.projectTypeId}" ${type.projectTypeId eq projectMaster.projectType.projectTypeId ?'selected':'' }>${type.projectType}</option>
+															</c:forEach>
+														</select>
+													</div>
+												</div>
+										</div>
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="projectNatureId"><spring:message code="ACCOUNT.PROJECT.PMNATURE" />:</label>
+													<div class="col-md-12">
+														<select class="form-select" name="projectNatureId" id="projectNatureId">
+															<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+															<c:forEach items="${ProjectNature}" var="nature">
+																<option value="${nature.projectNatureId}" ${nature.projectNatureId eq projectMaster.projectNature.projectNatureId ?'selected':'' }>${nature.projectNature}</option>
+															</c:forEach>
+														</select>
+													</div>
+												</div>
+										</div>
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="projectStatusId"><spring:message code="ACCOUNT.PROJECT.PMSTATUS" />:</label>
+												<div class="col-md-12">
+													<select class="form-select" name="projectStatusId" id="projectStatusId">
+														<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+														<c:forEach items="${ProjectStatus}" var="status">
+															<option value="${status.projectStatusId}" ${status.projectStatusId eq projectMaster.projectStatus.projectStatusId ?'selected':'' }>${status.projectStatus}</option>
+														</c:forEach>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="clientId"><spring:message code="ACCOUNT.PROJECT.PARTYAdETAILS" />:</label>
+												<div class="col-md-12">
+													<select class="form-select" name="clientId" id="clientId">
+														<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT" /></option>
+														<c:forEach items="${partyDetail}" var="party">
+															<option value="${party.partyId}" ${party.partyId eq projectMaster.clientId.partyId ?'selected':'' }>${party.partyName}</option>
+														</c:forEach>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="superVisionCharges"><spring:message code="ACCOUNT.PROJECT.PMSUPER"/>:</label>
+												<div class="col-md-12">
+													<input type="text" name="superVisionCharges" class="form-control text-end numeric" id="superVisionCharges" value="${projectMaster.supervisionCharges}"
+													 >
+												</div>
+											</div>
+										</div>	
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="orderNo"><spring:message code="ACCOUNT.PROJECT.PMODER"/>:</label>
+												<div class="col-md-12 ">
+													<input type="text" name="orderNo" class="form-control" id="orderNo" value="${projectMaster.orderNo}">
+												</div>
+											</div>
+										</div>	
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required " for="orderDate"><spring:message code="ACCOUNT.PROJECT.PMODERDATE"/>:</label>
+												<div class="col-md-12 datepicker_con">
+													<input type="text" name="orderDate" class="form-control datepicker" pattern="dd/mm/yyyy" id="orderDate" value="<fmt:formatDate pattern="dd/MM/yyyy" value="${projectMaster.orderDate}"/>" readonly>
+												</div>
+											</div>
+										</div>	
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="confirmDate"><spring:message code="ACCOUNT.PROJECT.PMCONFIRM"/>:</label>
+												<div class="col-md-12 datepicker_con">
+													<input type="text" name="confirmDate" class="form-control datepicker" pattern="dd/mm/yyyy" id="confirmDate" value="<fmt:formatDate pattern="dd/MM/yyyy" value="${projectMaster.confirmationDate}"/>" readonly>
+												</div>
+											</div>
+										</div>	
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="timeExtension"><spring:message code="ACCOUNT.PROJECT.PMEXTENTION"/>:</label>
+												<div class="col-md-12">
+													<input type="text" name="timeExtension" class="form-control" id="timeExtension" value="${projectMaster.extensionTime}">
+												</div>
+											</div>
+										</div>	
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="startDate"><spring:message code="ACCOUNT.PROJECT.PMSTARTDATE"/>:</label>
+												<div class="col-md-12  datepicker_con">
+													<input type="text" name="startDate" class="form-control datepicker" pattern="dd/mm/yyyy" id="startDate" value="<fmt:formatDate pattern="dd/MM/yyyy" value="${projectMaster.startDate}"/>" readonly>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required datepicker_con" for="completionDate"><spring:message code="ACCOUNT.PROJECT.PMCOMPATE"/>:</label>
+												<div class="col-md-12 datepicker_con">
+													<input type="text" name="completionDate" class="form-control datepicker" pattern="dd/mm/yyyy" id="completionDate" value="<fmt:formatDate pattern="dd/MM/yyyy" value="${projectMaster.completionDate}"/>" readonly>
+												</div>
+											</div>
+										</div>	
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="estimationCost"><spring:message code="ACCOUNT.PROJECT.PMESTIMATE"/>:</label>
+												<div class="col-md-12">
+													<input type="text" name="estimationCost" class="form-control text-end numberWithTwoDesimal" id="estimationCost" value="${projectMaster.estimatedCost}" maxlength="10" minlength="3"
+													  >
+												</div>
+											</div>
+										</div>	
+<!-- 										<div class="col-md-3 col-sm-3"> -->
+<!-- 											<div class="form-group"> -->
+<!-- 												<label class="col-md-12 required" for="finalCost"> -->
+<%-- 													<spring:message code="ACCOUNT.PROJECT.PMFINAL"/>:</label> --%>
+<!-- 												<div class="col-md-12"> -->
+<!-- 													<input type="text" name="finalCost" class="form-control text-end numberWithTwoDesimal" id="finalCost"  -->
+<%-- 													value="${projectMaster.finalCost}" maxlength="10" minlength="3"> --%>
+<!-- 												</div> -->
+<!-- 											</div> -->
+<!-- 										</div>	 -->
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="baseCost">Base Cost:</label>
+												<div class="col-md-12">
+													<input type="text" name="baseCost" class="form-control numberWithTwoDesimal text-end" id="baseCost" 
+													value="${projectMaster.baseCost}" maxlength="10" minlength="3">
+												</div>
+											</div>
+										</div>
+										<div class="col-md-3 col-sm-3">
+											<div class="form-group">
+												<label class="col-md-12 required" for="orderCost">Total Order Value:</label>
+												<div class="col-md-12">
+													<input type="text" name="orderCost" class="form-control text-end numberWithTwoDesimal" id="orderCost" 
+													 value="${projectMaster.totalOrderCost}" maxlength="10" minlength="3" onchange="check(this.value)">
+												</div>
+											</div>
+										</div>
+											
+										<div class="col-md-3">
+										<div class="form-group position-relative">
+											<label class="col-md-12 required" for="workOrderDoc">Work  Order Document :</label> <input
+												type="file"
+												class="form-control form-control-sm "
+												name="workOrderDoc" id="workOrderDocument"
+												onchange="fileValidation();"
+													value="">
+											<c:if test="${not empty projectMaster.workOrderDocument}">
+											    <button type="button" onclick="viewDocument('${projectMaster.workOrderDocument}', 'ProjectMaster')" class="btn btn-primary unfreezeField" style="position: absolute; bottom: 2px;right:2px;padding:5px 6px;"><i class="fa fa-eye" aria-hidden="true"></i></button>
+											</c:if>
+										</div>
+									</div>
+									
+									<div class="col-md-3">
+										<div class="form-group position-relative">
+											<label class="col-md-12 required" for="bankDoc">Bank   Document :</label> <input
+												type="file"
+												class="form-control form-control-sm "
+												name="bankDoc" id="bankDocument"
+												onchange="fileValidation();"
+													value="">
+                                                 <c:if test="${not empty projectMaster.bankDocument}">
+											    <button type="button" onclick="viewDocument('${projectMaster.bankDocument}', 'ProjectMaster')" class="btn btn-primary unfreezeField" style="position: absolute; bottom: 2px;right:2px;padding:5px 6px;"><i class="fa fa-eye" aria-hidden="true"></i></button>
+											</c:if>
+										</div>
+									</div>
+									
+											<div class="col-md-3">
+										<div class="form-group position-relative">
+											<label class="col-md-12 required" for="additionalDoc">Additional Document :</label> <input
+												type="file"
+												class="form-control form-control-sm "
+												name="additionalDoc" id="additionalDocument"
+												onchange="fileValidation();"
+													value="">
+                                                 <c:if test="${not empty projectMaster.additionalDocument}">
+											    <button type="button" onclick="viewDocument('${projectMaster.additionalDocument}', 'ProjectMaster')" class="btn btn-primary unfreezeField" style="position: absolute; bottom: 2px;right:2px;padding:5px 6px;"><i class="fa fa-eye" aria-hidden="true"></i></button>
+											</c:if>
+										</div>
+									</div>
+										
+									</div>
+									<div class="row">
+										<div class="col-sm-12" style="margin-top:30px;">
+											<div class="form-group text-center">
+												<input type="button" class="btn btn-success"  onclick="customValidation('projectMasterForm')" value="${not empty projectMaster.projectId ? 'Update' : 'Save'}" />
+			<button type="button" class="btn btn-warning no-print unfreezeField back" onclick="backToModule()">Back</button>
+											</div>
+											
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+          			</div>
+          		</div>
+        
+        
+          <div class="col-lg-12 mt-3">
+            <div class="card" id="accordionExample1">
+                <div class="panel-actions">
+                    <c:choose>
+                        <c:when test="${not empty dto.accountId}">
+                            <c:set var="sectionHead" value="none"></c:set>
+                        </c:when>
+                        <c:when test="${empty dto.accountId}">
+                            <c:set var="sectionHead" value="block"></c:set>
+                        </c:when>
+                    </c:choose>
+				</div>
+                <div class="card-header">
+					<h4 class="card-title mb-2">Project Lists</h4>
+			    </div>
+
+                <div class="card-body" style="display:block">
+                <div class="row">
+                						<%@ include file="/WEB-INF/views/entityIdAndUserLevelListDrp.jsp"%>
+                					</div>
+                <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingtwo" data-bs-parent="#accordionExample1">
+    					<div class="col-md-12">
+						<form id="editAccountMaster" action="${contextPath}/generalledger.htm" method="post">
+								<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+								<table class="table table-bordered mb-none exportbtn" id="datatable-default">
+									<thead>
+										<tr>
+											<th class="width42Percent text-center">Sl No.</th>
+											<th class="width10Percent">Project Name</th>
+											<th class="width17Percent">Project Code</th>
+											<th class="width11Percent">Project Short name</th>
+											<th class="width10Percent">Project Head</th>
+											<th class="width10Percent">Project Type</th>
+											<th class="width10Percent">Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach items="${projectMasterList}" var="master" varStatus="status">								
+											<tr class="gradeX">
+												<td class="text-center">${status.count}</td>
+												<td>${master.projectName}</td>
+												<td>${master.projectCode}</td>
+												<td>${master.projectShortName}</td>
+												<td>${master.projectHead.projectHeadName}</td>
+												<td>${master.projectType.projectType}</td>
+												<td>
+											 	<input type="hidden" name="accountId" id="account_ids">
+													<a class="btn btn-primary" title = <spring:message code="COMMON.BUTTON.ICONEDIT"/> onclick="edit('${master.projectId}')">
+													<i class="fa fa-pencil" aria-hidden="true"></i></a> 
+												</td> 
+											</tr> 
+										</c:forEach>	
+									</tbody>
+								</table>
+							</form>
+					</div>
+				</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+    <form action="${contextPath}/mst/manageProject" method="POST" id="finalSubmit">
+	    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+	    <input type="hidden" name="cipherText" id="hdnData"/>
+    </form>
+     <form action="${contextPath}/mst/updatedProjectedMaster" method="post" id="editForm">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+	    <input type="hidden" name="hdnAccountId" id="hdnAccountId"/>
+	    <input type="hidden" name="encDataa" id="hdnData1"/>
+    </form>
+	</div>
+	
+	    
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!--End::row-1 -->
+      </div>
+    </section>
+    
+    <form action="${contextPath}/download/download" method="get" id="formDownLoad"  target="_blank">
+    <input type="hidden" name="code" id="code"/>
+    <input type="hidden" name="module" id="module"/>
+    <input type="hidden" name="filename" id="filename"/>
+  </form>
+
+	<script>
+	
+	$(document).ready(function() {
+	    debugger;
+
+	    function formatInputDate(inputId) {
+	        var inputValue = $(inputId).val();
+	        if(inputValue) {
+	            var date = new Date(inputValue);
+	            var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
+	            $(inputId).val(formattedDate);
+	        }
+	    }
+
+	  /*   formatInputDate('#orderDate');
+	    formatInputDate('#confirmDate');
+	    formatInputDate('#startDate');
+	    formatInputDate('#completionDate'); */
+
+	    // Initialize the datepickers
+	    /* $('#orderDate').datepicker({
+	        dateFormat: 'dd/mm/yy'
+	    });
+
+	    $('#confirmDate').datepicker({
+	        dateFormat: 'dd/mm/yy'
+	    });
+
+	    $('#startDate').datepicker({
+	        dateFormat: 'dd/mm/yy'
+	    });
+
+	    $('#completionDate').datepicker({
+	        dateFormat: 'dd/mm/yy'
+	    }); */
+	});
+
+
+	
+	 function viewDocument(imageName,ProjectMaster) {
+	        $("#module").val(ProjectMaster);
+	        $("#filename").val(imageName);
+
+	        if (encryptFormData('formDownLoad', tableOrTbodyIDS, tableOrTbodyKeys)) {
+	            $('#formDownLoad').submit();
+	        }
+		}
+
+	const customValidation = async (formId) => {
+	    const requiredFields = document.querySelectorAll('.required');
+	    let validationFailed = false;
+
+	    // Check for required fields
+	    for (const field of requiredFields) {
+	        const inputId = field.getAttribute('for');
+	        const inputField = document.getElementById(inputId);
+	        
+	        // Check if the input field exists
+	        if (inputField && !inputField.value) {
+	            inputField.style.borderColor = 'red';
+	            await showNotification(true, field.textContent.replace(/:/g, "") + " is required.");
+	            setTimeout(() => {
+	                inputField.style.borderColor = '';
+	            }, 3000);
+	            validationFailed = true;
+	            break; // Exit the loop if validation fails
+	        }
+	    }
+
+	    if (!validationFailed) {
+	        // Confirmation dialog
+	        bootbox.confirm({
+	            message: "Do you want to save all the details?",
+	            buttons: {
+	                confirm: {
+	                    label: 'Yes',
+	                    className: 'btn-success'
+	                },
+	                cancel: {
+	                    label: 'No',
+	                    className: 'btn-danger'
+	                }
+	            },
+	            callback: async (result) => {
+	                if (result) {
+	                    // Handle the encryption and form submission
+// 	                    const encryptFormDataResult = await encryptHiddenFormData(formId);
+	                    if (encryptFormData('projectMasterForm', tableOrTbodyIDS, tableOrTbodyKeys)) {
+// 	                        $('#hdnData').val(encryptFormDataResult);
+	                        $('#projectMasterForm').submit();
+	                    } else {
+	                        showNotification(true, 'Unable to process your request. Please try again later.');
+	                    }
+	                }
+	            }
+	        });
+	    }
+
+	    return false; // Prevent default form submission
+	};
+
+
+
+
+function edit(projectId){
+    	debugger
+//     	$("#hdnData1").val(AES256.encrypt(projectId));
+    	$("#hdnAccountId").val(projectId);
+    	
+    	 if(encryptFormData('editForm', tableOrTbodyIDS, tableOrTbodyKeys)){
+			 confirmation('editForm');
+		 }
+// 	    $('#editForm').submit();
+    }
+    
+    
+    
+    $(document).ready(function() {
+
+    	 var groupId='${dto.accountGroupId}';
+    	  var subGroup='${dto.accountSubGroupId}';
+    	  if(groupId!=''){
+    		 getAccountSubGroups(groupId,subGroup);
+    	  }
+    	
+    	var val = '${not empty dto.scheduleIds}';
+    	if(val=='true'){
+    		getSubSchedule();
+    	}   	
+    });
+    
+    
+    
+
+    
+    function validateNameAndCode(element)
+    {
+    	var result = element.value.replace(/[\u005F\u003D\u200B-\u200D\u201A-\u201E\u2013-\u2122\uFEFF\!@#$^&*+<>\\\/|\?~{}())(\:%]/g,'');
+    	element.value =result;
+    }
+    
+    
+    function showDiv(select){
+    	   if(select.value == "Bank"){
+    	    document.getElementById('bankDiv').style.display = "block";
+    	    document.getElementById('office').style.display = "block";
+    	   }else if(select.value == "Cash"){
+    		   document.getElementById('office').style.display = "block";
+    		   document.getElementById('bankDiv').style.display = "none";
+    	   }else{
+    	   
+    	    document.getElementById('bankDiv').style.display = "none";
+    	    document.getElementById('office').style.display = "none";
+    	   }
+    	}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+    
+    function getAccountSubGroups(groupId,selectedSubGrp){
+        debugger
+        $.ajax({
+            type: "GET",
+            url: '${contextPath}/mst/getAccountSubGroups',
+            data: {
+                "accountId": AES256.encrypt(groupId), 
+            },
+            success: function(response) {
+                var subScheduleDropdown = $('#subAccountGroup');
+                subScheduleDropdown.empty();
+                $.each(JSON.parse(response), function(index, value) { 
+                    subScheduleDropdown.append($('<option>', {
+                        value: value.accountGroupId, 
+                        text: value.accountGroupCode + ' | ' + value.accountGroupName 
+                    }));
+                });
+                
+                if(selectedSubGrp!=''){
+                	$("#subAccountGroup").val(selectedSubGrp);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error occurred: " + status + " " + error);
+            }
+        });
+    }
+
+
+
+    function getSubSchedule(){
+    	debugger
+        var selectedScheduleIds = $('#scheduleId').val();
+        if (selectedScheduleIds.length > 0) {
+            $.ajax({
+                type: "GET",
+                url: '${contextPath}/mst/getSubSchedules',
+                data: {
+                    "scheduleIds":AES256.encrypt(JSON.stringify(selectedScheduleIds)),
+                },
+                contentType: "application/json; charset=utf-8",
+                success: function(response) {
+                    var subScheduleDropdown = $('#subScheduleId');
+                    subScheduleDropdown.empty();
+                    $.each(response, function(index, subSchedule) {
+                        subScheduleDropdown.append($('<option>', {
+                            value: subSchedule.scheduleId,
+                            text: subSchedule.scheduleCode + ' | ' + subSchedule.scheduleName
+                        }));
+                    });
+                    
+                    debugger
+                    	var result = '${not empty dto.subScheduleIds}';
+                    	if(result=='true'){
+                    		var values = $(".hdnSubSchIds");
+                    		var preSelectedSubScheduleIds=[];
+                    		 $.each(values, function(index, elem) {
+                    			 preSelectedSubScheduleIds.push(elem.value);
+                             });
+                    		 if(preSelectedSubScheduleIds.length > 0){
+                    			 subScheduleDropdown.val(preSelectedSubScheduleIds).trigger('change');
+                    		 }
+                    	}
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error occurred: " + status + " " + error);
+                }
+            });
+        }
+    }
+
+
+    function getBankBranchList()
+    {
+    	var bankId = $('#bankName').val();
+    	var trHTML='<option value="">' +labelDropdownTextSelect+ '</option>';
+    	$.ajax({
+    		url : './getBankBranchList.htm',
+    		type:'GET',
+    		data : ({
+    				bankId : $('#bankName').val()
+    			}),
+    		cache:false,
+    		asynch:false,
+    		success : function(response) 
+    		{
+    			if(response !="")
+    			{
+    				var obj=jQuery.parseJSON(response);		
+    				$.each(obj, function(i, value) 
+    				{
+    					trHTML +='<option value="'+value.id+'">'+value.branchName+'</option>';
+    				}); 
+    				$('#bankBranchId').empty().append(trHTML); 
+    			}
+    			else
+    			{
+    				$('#bankBranchId').empty().append(trHTML); 
+    			}
+    		},
+    		error:function(transport)
+    		{
+    			$('#bankBranchId').empty().append(trHTML); 
+    		}
+    		
+    	});
+    	
+    }
+    
+    function check() {
+    	debugger
+        var baseCost = parseFloat($('#baseCost').val());
+        var orderCost = parseFloat($('#orderCost').val());
+
+        if (isNaN(baseCost) || isNaN(orderCost)) {
+            alert("Please enter valid numbers for both Base Cost and Order Cost.");
+            return;
+        }
+        if (orderCost < baseCost) {
+            bootbox.alert("Total Order Value should be greater than or equal to the base order value.");
+        } 
+    }
+   
+    
+</script>
+								
+		

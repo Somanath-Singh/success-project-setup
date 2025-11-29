@@ -1,0 +1,131 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<%-- <script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script> --%>
+<%-- <script src="${contextPath}/assets/appJs/validation/party-master.js"></script> --%>
+
+<%@ page import="com.aashdit.fams.utils.ApplicationStringUtilsFams" %>
+<style>
+.table .btn-success:hover{
+    border: none !important;
+}
+</style>
+
+<script>
+$(function()
+{
+	$('#datatable-default').dataTable({
+	});
+});
+</script>
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Work Order Agreement List</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+	        <ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Estimation List</li>
+			</ol>
+        </nav>
+     </div>
+</div>
+<div class="container-fluid">
+	 <div class="row">
+	 <div class="card custom-card">
+                     <div class="card-header">
+                         <h6 class="card-title">Work Order Agreement List</h6>
+                     </div>
+                     <div class="card-body">
+<div class="row">
+<%@ include file="/WEB-INF/views/entityIdAndUserLevelListDrp.jsp"%>
+    <div class="col-lg-12">
+        <div class="accordion" id="accordionExample1">
+            <div class="panel-actions">
+                  <c:choose>
+                      <c:when test="${not empty dto.accountId}">
+                          <c:set var="sectionHead" value="none"></c:set>
+                      </c:when>
+                      <c:when test="${empty dto.accountId}">
+                          <c:set var="sectionHead" value="block"></c:set>
+                      </c:when>
+                  </c:choose>
+              </div>
+
+              <div class="col-md-12">
+                          <table class="table mb-none  table-bordered " id="datatable-default">
+
+                              <thead>
+                                  <tr>
+                                      <th class="width42Percent">Sl No.</th>
+                                      <th>Project Name</th>
+                                      <th class="width17Percent">Work Code</th>
+                                      <th class="width11Percent">Work order Date</th>
+                                      <th class="width10Percent">Work Amount</th>
+                                      <th class="width10Percent">Work Start Date</th>
+                                      <th class="width10Percent">Work End Date</th>
+                                      <th>Action</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                <c:forEach items="${workList}" var="work" varStatus="status">
+                                    <tr class="gradeX">
+                                        <td>${status.count}</td>
+                                        <td>${work.project.projectName}</td>
+                                        <td>${work.workOrderNo}</td>
+
+                                        <!-- Formatting workOrderDate -->
+                                        <td><fmt:formatDate value="${work.workOrderDate}" pattern="MM/dd/yyyy"/></td>
+
+                                        <td style="text-align: right;">${ApplicationStringUtilsFams.convertDoubleToTwoDecimal(work.amount)}</td>
+
+                                        <!-- Formatting startDate -->
+                                        <td><fmt:formatDate value="${work.startDate}" pattern="MM/dd/yyyy"/></td>
+
+                                        <!-- Formatting endDate -->
+                                        <td><fmt:formatDate value="${work.endDate}" pattern="MM/dd/yyyy"/></td>
+
+                                        <td>
+                                            <input type="hidden" name="accountId" id="account_ids">
+                                            <a class="btn btn-primary"
+                                            title="<spring:message code='COMMON.BUTTON.ICONEDIT'/>"
+                                            onclick="edit('${work.workOrderId}')">
+                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                              </tbody>
+                          </table>
+              </div>
+          </div>
+    </div>
+  </div>
+</div>
+</div>
+<div>
+</div>
+                          </div>
+</div>
+
+ <form action="${contextPath}/workOrder/edit" method="get" id="editForm">
+	    <input type="hidden" class="remove" name="woId" id="woId"/>
+    </form>
+<script>
+
+
+function edit(projectId){
+	debugger
+	$("#woId").val(projectId);
+		 if(encryptFormData('editForm', tableOrTbodyIDS, tableOrTbodyKeys)){
+				 confirmation('editForm');
+			 }
+}
+</script>

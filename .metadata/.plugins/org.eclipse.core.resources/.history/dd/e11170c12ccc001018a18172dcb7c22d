@@ -1,0 +1,148 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Store wise item  Report</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa-solid fa-house"></i></a></li>
+				<li class="breadcrumb-item">
+					<a href="#">Procurement</a>
+				</li>
+				<li class="breadcrumb-item active" aria-current="page">Store wise item Report</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Store wise item Report</h5>
+			</div>
+			<div class="card-body">
+				<form method="POST" action="${contextPath}/asset/getStoreWiseItemReport" id="form">
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+					<input type="hidden" class="" id="encodedDataform" name="encodedDataform" value="" />
+					<div class="row">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="form-group col-md-3">
+									<label class="inputEmail4 required" for="text">Store:</label>
+									<select class="form-select thisRequiredField ${not empty storeId ? 'frezz' : ''}" id="storeId" name="storeId" >
+										<option value="">-Select-</option>
+										<c:forEach items="${storeList}" var="store">
+											<option value="${store.storeId}" ${store.storeId eq storeId ? 'selected' : ''}>${store.storeName}</option>
+										</c:forEach>
+									</select>
+								</div>
+								<div class="form-group col-md-3 btn-div" style="margin-top: 20px;">
+									<button type="button" class="btn btn-submit" onclick="validateForms()">Filter</button>
+									<a type="button" class="btn btn-sm btn-danger" onclick="backToModule()">Cancel</a>
+									<c:if test="${not empty storeId}">
+										<a type="button" href="${contextPath}/asset/getStoreWiseItemReport" class="btn btn-submit">Reset</a>
+									</c:if>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row mt-3">
+	<div class="col-md-12">
+	   <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Store wise item Report List</h5>
+            </div>
+		   <div class="card-body">
+			   <div class="cardcontainer cardContainerNotFirst" style="position: relative;">
+			        <div class="row">
+                        <c:if test="${not empty storeWiseItemList}">
+                            <div style="" class="col-md-12">
+                                <button type="button" class="btn btn-submit" style="float:right;width:auto;" onclick="generateReport()">Export to PDF</button>
+                            </div>
+                        </c:if>
+                        <div class="col-md-12">
+                            <table class=" table table-striped table-bordered mt-3">
+                               <thead>
+                                   <tr>
+                                       <th>Sl No</th>
+                                       <th>Store Name</th>
+                                       <th>Item Name</th>
+                                       <th>Quantity</th>
+                                   </tr>
+                               </thead>
+                               <tbody>
+                                    <c:choose>
+                                        <c:when test="${not empty storeWiseItemList}">
+                                            <c:forEach items="${storeWiseItemList}" var="lst" varStatus="count">
+                                                    <tr>
+                                                        <td>${count.count}</td>
+                                                        <td>${lst[0]}</td>
+                                                        <td>${lst[1]}</td>
+                                                        <td><fmt:formatNumber value="${lst[2]}" type="number" maxFractionDigits="2" minFractionDigits="2" /></td>
+                                                </tr>
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <tr>
+                                                <td colspan="100%" style="text-align: center;">No Data Available</td>
+                                            </tr>
+                                        </c:otherwise>
+                                    </c:choose>
+                               </tbody>
+                           </table>
+                       </div>
+                    </div>
+			   </div>
+		   </div>
+	   </div>
+   </div>
+</div>
+<form  method="post" action="${contextPath}/asset/generateStoreWiseItemReport" id="genRpt" target="_blank">
+	<input type="hidden" id="storeIdGen" name="storeId"  value="">
+	<input type="hidden" name="status"  value="VIEW">
+	<input type="hidden" class="" id="encodedDatagenRpt" name="encodedDatagenRpt" value="" />
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+</form>
+<script>
+	$(function() {
+		$('.datepick_con').datepick({
+		 dateFormat: 'dd/mm/yyyy',maxDate:0, showOnFocus: true
+		});
+	});
+	var tableOrTbodyID=[];
+	var tableOrTbodyKey=[];
+	function validateForms(){
+		let isRequiredValid=validateRequiredFields("thisRequiredField", 'form');
+		if(isRequiredValid){
+			encryptFormData("form", tableOrTbodyIDS, tableOrTbodyKeys);
+			$("#form").submit();
+		}
+	}
+
+	function generateReport(){
+		var storeId=$("#storeId").val();
+		$("#storeIdGen").val(storeId);
+		encryptFormData("genRpt", tableOrTbodyIDS, tableOrTbodyKeys);
+		$("#genRpt").submit();
+	}
+	function backToModule(){
+       let currentModuleCode =  localStorage.getItem('currentModuleCode');
+       $('#moduleId').val(enc_password(currentModuleCode));
+       $('#moduleForm').submit();
+    }
+</script>

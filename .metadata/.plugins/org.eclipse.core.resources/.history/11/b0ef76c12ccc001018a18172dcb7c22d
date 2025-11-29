@@ -1,0 +1,837 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet"
+	href="${contextPath}/assets/js/plugin/jquery_autocomplete/jquery.autocomplete.css" />
+<script src="${contextPath}/assets/js/plugin/jquery.autocomplete.min.js"></script>
+<!-- <script src="resources/javascripts/common.js"></script> -->
+<%-- <script src="${contextPath}/assets/appJs/validation/party-master.js"></script> --%>
+<%-- <script src="${contextPath}/assets/appJs/validation/invoice.js"></script> --%>
+<style>
+.partyAddrDtlsDiv h6{
+    padding: 5px;
+    background: #00ffff80;
+}
+</style>
+
+<script>
+					$(function()
+					{
+						$('#datatable-default').dataTable({
+					 		"bSort": false,
+					 		"autoWidth": false
+						});
+					})
+					</script>
+
+
+
+<!-- Start::row-1 -->
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Invoice Details</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+	        <ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home" title="Home"><i class="fa fa-home"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Invoice Details</li>
+			</ol>
+        </nav>
+     </div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title">INVOICE DETAILS</h6>
+            </div>
+            <div class="card-body" id="partyDtlsInRequest">
+                <div class="col-md-12">
+                    <form class="form-horizontal form-bordered" id="invoiceDetails" action="${contextPath}/inv/saveInvoice" method="post">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                        <input type="hidden" id="cipherTextList" name="cipherTextList" value="">
+                        <input type="hidden" id="cipherText" name="cipherText" value="">
+                        <input type="hidden" id="invoiceId1" name="invoiceId1" value="${invoiceMaster.invoiceId}">
+                        <input type="hidden" value="false" id="isCrDeNote" name="isCrDeNote">
+                      <div class="row">
+                        <c:set var="ownFunctions" value="" />
+                        <c:set var="functionList" value="getOrganizationDwonEHL(this)" />
+                        <c:set var="upperOrDown" value="down" />
+                        <c:set var="functionList2" value="${invoiceMaster.invoiceId eq null?'generateInvoiceNum();':''}"/>
+                        <%@ include file="/WEB-INF/views/entityIdAndUserLevelList.jsp"%>
+					    <div class="col-md-2 col-sm-3">
+                            <div class="form-group">
+                                <label for="FinancialYear" class="required">Financial Year :</label>
+                                <div class="col-md-12">
+                                    <select class="form-control form-select require" name="finYearId" id="finYearId" onchange="generateInvoiceNum();"  data-plugin-selectTwo>
+                                        <option value="">
+                                            <spring:message code="COMMON.LABEL.DROPDOWN.SELECT" />
+                                        </option>
+                                        <c:forEach items="${loadData.finList}" var="fin">
+                                            <option value="${fin.finyearId}" ${fin.finyearId eq invoiceMaster.finanicalYear.finyearId ? 'selected' : '' }>${fin.finYear}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <%-- <div class="col-md-2 col-sm-3">
+                            <div class="form-group">
+                                <label for="FinancialYear" class="required ">Office </label>
+                                <div class="col-md-12">
+                                    <!-- onchange="gettingDepartmentList(this.value,0);"  -->
+                                    <select class="form-control form-select require remove" name="officeMasterId" id="officeMasterId" onchange="generateInvoiceNum();"  >
+                                        <option value="">
+                                            <spring:message code="COMMON.LABEL.DROPDOWN.SELECT" />
+                                        </option>
+                                        <c:forEach items="${loadData.officeMasterList}" var="off">
+                                            <option value="${off.id}" ${off.id eq invoiceMaster.offMaster.id ? 'selected' : '' }>${off.name}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+
+                            </div>
+                        </div>--%>
+                        <div class="col-md-3">
+
+                            <div class="form-group">
+                                <label for="invoice-id">Invoice Code :</label>
+<%-- 													<c:if test="${not empty invoiceMaster }"> --%>
+                                    <input type="text" id="invoiceCode" name="invoiceCode" class="form-control disabled" value="${invoiceMaster.invoiceCode}">
+<%-- 													</c:if> --%>
+                                <%-- <c:if test="${empty invoiceMaster }">
+                                <input type="text" id="invoiceCode" name="invoiceCode" class="form-control" value="${randomGenerateInvoiceCode}">
+                                </c:if>	 --%>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="date-issued">Date Issued :</label>
+                                <fmt:formatDate var="formattedDate" value="${invoiceMaster.dueIssueDate1}" pattern="yyyy-MM-dd" />
+                                <input type="date" id="dateIssued"  value="${formattedDate}" name="dateIssued" onchange="getOneMonthAfterDate(this.value)" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="due-date">Due Date :</label>
+                                    <fmt:formatDate var="formattedDate1" value="${invoiceMaster.dueDate1}" pattern="yyyy-MM-dd" />
+                                <input type="Date" value="${formattedDate1}" id="due-date" name="dueDate" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="due-amount">Due Amount :</label> <input
+                                    type="text"  name="dueAmount" id="dueAmount" value="${invoiceMaster.dueAmount}"
+                                    class="form-control" style="text-align:right">
+                            </div>
+                        </div>
+                    </div>
+            <div class="row">
+                <div class="col-md-12">
+                      <h6 class="panel-title"><span>Billing Details :</span></h6>
+
+                            <div class="partyDtlsDiv" style=" margin-top: 10px;">
+                        <!-- PARTY BILLING ADDRESS DIV -->
+                        <div class="row justify-content-center">
+                            <div class="col-md-10" style="border: 1px solid #95c8d7; border-radius: 4px;background: #a4d9d929;">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6" style="padding:10px;border-right: 1px solid #ddd;">
+                                        <div class="partyAddrDtlsDiv">
+                                            <div class="form-group">
+                                                <h6 class="text-start">BILLING FROM :</h6>
+                                            </div>
+                                        </div>
+
+                                        <div class="partyAddrDtlsDiv">
+                                            <div class="form-group">
+                                                <label class="required" for="inputDefault"><spring:message code="LABEL.ACCOUNTS.INVOICE.PARTY.CODENAME" /> :</label>
+                                                <input type="text" class="form-control" name="billingFromPartyName" id="billingFromPartyName" value="${invoiceMaster.fromParty1.partyName}">
+                                                <input type="hidden" name="fromParty" id="partyId" value="${invoiceMaster.fromParty1.partyId}">
+                                            </div>
+                                        </div>
+
+                                        <div class="partyAddrDtlsDiv" >
+                                            <div class="form-group">
+                                                <label for="inputDefault"><spring:message code="LABEL.ACCOUNTS.INVOICE.PARTY.ADDRESS" /> :</label>
+                                                <input type="text" class="form-control" style="min-height:100px;" readonly id="partyAddress" value="${invoiceMaster.fromParty1.address}">
+                                            </div>
+                                        </div>
+
+                                            <div class="col-md-12 col-sm-12">
+                                                <div class="form-group">
+                                                    <label for="inputDefault">Mobile No.</label>
+                                                    <input type="text" class="form-control" readonly id="partyMobileNo" value="${invoiceMaster.fromParty1.mobileNo}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-sm-12">
+                                                <div class="form-group">
+                                                    <label for="inputDefault">Email Id :</label>
+                                                    <input type="text" class="form-control" readonly id="partyEmail" value="${invoiceMaster.fromParty1.emailId}">
+                                                </div>
+                                            </div>
+
+                                        <div class="row">
+                                            <div class="form-group col-md-7">
+                                                <label for="inputDefault"><spring:message code="LABEL.ACCOUNTS.INVOICE.PARTY.GSTIN" /> :</label>
+                                                <input type="text" class="form-control" readonly id="partyGst" value="${invoiceMaster.fromParty1.gstNo}">
+                                            </div>
+                                            <div class="form-group col-md-5">
+                                                <label for="inputDefault"><spring:message code="LABEL.ACCOUNTS.INVOICE.PARTY.PAN" /> :</label>
+                                                <input type="text" class="form-control" readonly id="partyPan" value="${invoiceMaster.fromParty1.panNo}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                <!-- END : PARTY BILLING ADDRESS DIV -->
+
+                                <!-- PLACE OF SUPPLY DIV -->
+                                    <div class="col-md-6 col-sm-6" style="padding:10px;">
+                                        <div class="partyAddrDtlsDiv">
+                                            <div class="form-group">
+                                                <h6 class="text-start">BILLING TO :</h6>
+                                            </div>
+                                        </div>
+
+                                        <div class="partyAddrDtlsDiv">
+                                            <div class="form-group">
+                                                <label class="required" for="inputDefault"><spring:message code="LABEL.ACCOUNTS.INVOICE.PARTY.CODENAME" /> :</label>
+                                                <input type="text" class="form-control" id="billingToPartyName" name="billingToPartyName" value="${invoiceMaster.toParty1.partyName}">
+                                                <input type="hidden" name="toParty" id="billingToPartyId" value="${invoiceMaster.toParty1.partyId}">
+                                            </div>
+                                        </div>
+
+                                        <div class="partyAddrDtlsDiv">
+                                            <div class="form-group">
+                                                <label for="inputDefault"><spring:message code="LABEL.ACCOUNTS.INVOICE.PARTY.ADDRESS" /> :</label>
+                                                <input type="text" class="form-control" style="min-height:100px;" readonly id="toAddress" value="${invoiceMaster.toParty1.address}">
+                                            </div>
+                                        </div>
+                                            <div class="col-md-12 col-sm-12">
+                                                <div class="form-group">
+                                                    <label for="inputDefault">Mobile No.</label>
+                                                    <input type="text" class="form-control" readonly id="toMobileNo" value="${invoiceMaster.toParty1.mobileNo}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-sm-12">
+                                                <div class="form-group">
+                                                    <label for="inputDefault">Email Id :</label>
+                                                    <input type="text" class="form-control" readonly id="toEmail" value="${invoiceMaster.toParty1.emailId}">
+                                                </div>
+                                            </div>
+
+                                        <div class="row">
+                                            <div class="form-group col-md-7">
+                                                <label for="inputDefault"><spring:message code="LABEL.ACCOUNTS.INVOICE.PARTY.GSTIN" /> :</label>
+                                                <input type="text" class="form-control" readonly id="topartyGst" value="${invoiceMaster.toParty1.gstNo}">
+                                            </div>
+                                            <div class="form-group col-md-5">
+                                                <label for="inputDefault"><spring:message code="LABEL.ACCOUNTS.INVOICE.PARTY.PAN" /> :</label>
+                                                <input type="text" class="form-control" readonly id="topartyPan" value="${invoiceMaster.toParty1.panNo}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- END : PLACE OF SUPPLY DIV -->
+                    </div>
+                    </div>
+
+
+
+<!-- 											<div class="col-md-4 hidden"> -->
+<!-- 												<div class="form-group"> -->
+<!-- 													<label for="currency">Currency</label> <select -->
+<!-- 														id="currency" name="currency" class="form-control"> -->
+<!-- 														<option value="RS">RS - (RUPEES)</option> -->
+<!-- 													</select> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+                        </div>
+
+
+
+                        <div class="row mt-3">
+                      <h6 class="panel-title"><span><u>Product Details :</u></span></h6>
+                      </div>
+                      <div class="row">
+                      <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table id="product-table" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>HSN Code</th>
+                                        <th class="text-end">Discount</th>
+                                        <th>Description</th>
+                                        <th class="text-end">Quantity</th>
+                                        <th class="text-end">Price per Unit</th>
+                                        <th class="text-end" style="min-width: 80px;">GST</th>
+                                        <th class="text-end" style="min-width: 80px;">SGST</th>
+                                        <th class="text-end" style="min-width: 80px;">CGST</th>
+                                        <th class="text-end" style="min-width: 80px;">IGST</th>
+                                        <th class="text-end">Total</th>
+                                        <th> <button type="button" class="btn btn-primary btn-add-product" style="padding: 6px 8px 6px 8px;"><i class="fa-solid fa-plus"></i></button></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="tbd">
+                                    <c:if test="${not empty productDetailsList}">
+
+                                    <c:forEach items="${productDetailsList}" var="productDetailsList" varStatus="status">
+                                        <tr>
+                                        <td>
+                                        <select name="productName${status.count - 1}" id="productName${status.count - 1}" data-plugin-selectTwo class="form-control form-select multi-formcontrol"  onchange="getProductPrice('${contextPath}',${status.count - 1}); fetchProductDetails(${status.count - 1});" style="width: 250px;">
+                                                <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+                                                <c:forEach items="${productList}" var="productList">
+                                                    <option value="${productList.productId}" ${productList.productId eq productDetailsList.productName1.productId ? 'selected' :''}>${productList.productName} </option>
+                                                </c:forEach>
+                                            </select>
+
+                                         <input type="hidden" class="form-control" name="productDetailsId${status.count - 1}"    id="productDetailsId${status.count - 1}" placeholder="Product Name">
+
+                                        </td>
+                                        <td>
+                                            <select name="hsncode${status.count - 1}" id="hsnCode${status.count - 1}" data-plugin-selectTwo class="form-control form-select multi-formcontrol" onchange="getGstTaxBreakupDetails('${contextPath}',${status.count - 1});" style="width: 250px;">
+                                                <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+                                                <c:forEach items="${hsnCodeList}" var="hsnSacCodesList">
+                                                    <option value="${hsnSacCodesList.gstId}" ${hsnSacCodesList.gstId eq productDetailsList.hsnCode1.gstId ? 'selected' :''}>${hsnSacCodesList.hsnSacCode} || ${hsnSacCodesList.description}</option>
+                                                </c:forEach>
+                                            </select>
+    <!-- 													<input type="text" class="form-control" name="hsncode0" placeholder="Description">
+    -->
+                                        </td>
+                                        <td><input type="text" class="form-control text-end numeric"  id="discount${status.count - 1}" name="discount${status.count - 1}"  onchange='total_amount(${status.count - 1},0);' placeholder="" value="${productDetailsList.discount}" maxlength="3"></td>
+                                        <td><input type="text" class="form-control" id="description${status.count - 1}" name="description${status.count - 1}" placeholder="Description" value="${productDetailsList.descrpition}" title="${productDetailsList.descrpition}"></td>
+
+                                        <td><input type="number" class="form-control text-end numeric" id="quantity${status.count - 1}" name="quantity${status.count - 1}" onchange='total_amount(${status.count - 1},0);' value="${productDetailsList.quantity}" placeholder="Quantity" oninput="calculateTotal(this)"></td>
+                                        <td ><input type="text"  class="form-control numeric text-end"  id="price${status.count - 1}" name="price${status.count - 1}" onchange='total_amount(${status.count - 1},0);' value="${productDetailsList.price}"  style="width: 150px;text-align: right;" oninput="calculateTotal(this)"></td>
+                                        <td><input type="text" class="form-control text-end" id="gst${status.count - 1}" name="gst${status.count - 1}" onchange='total_amount(${status.count - 1},0);' value="${productDetailsList.gst}"  readonly="readonly" style="" placeholder="GST" maxlength="2"></td>
+                                        <td><input type="text" class="form-control text-end" id="sgst${status.count - 1}" name="sgst${status.count - 1}" onchange='total_amount(${status.count - 1},0);' value="${productDetailsList.sgst}" readonly="readonly" style="" placeholder="SGST" maxlength="2"></td>
+                                        <td><input type="text" class="form-control text-end" id="cgst${status.count - 1}" name="cgst${status.count - 1}" onchange='total_amount(${status.count - 1},0);' value="${productDetailsList.cgst}" readonly="readonly" style="" placeholder="CGST" maxlength="2"></td>
+                                        <td><input type="text" class="form-control text-end" id="igst${status.count - 1}" name="igst${status.count - 1}" onchange='total_amount(${status.count - 1},0);' value="${productDetailsList.igst}" readonly="readonly" style="" placeholder="IGST" maxlength="2"></td>
+                                        <td style="text-align: right;"><input type="text" class="form-control" id="total${status.count - 1}" value="${productDetailsList.productTotal}" style="width: 150px;text-align: right;" name="total${status.count - 1}" readonly></td>
+                                        <td><button type="button" class="btn btn-danger remove-btn" onclick="removeRow(this)"><i class="fa-solid fa-trash"></i></button></td>
+                                    </tr>
+                                    </c:forEach>
+
+                                    </c:if>
+
+
+
+                                <c:if test="${empty productDetailsList }">
+                                    <tr>
+                                        <td>
+                                        <select name="productName0" id="productName0" data-plugin-selectTwo class="form-control form-select multi-formcontrol"  onchange="getProductPrice('${contextPath}',0); fetchProductDetails(0);" style="width: 250px;">
+                                                <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+                                                <c:forEach items="${productList}" var="productList">
+                                                    <option value="${productList.productId}">${productList.productName} </option>
+                                                </c:forEach>
+                                            </select>
+
+                                        <!-- <input type="text" class="form-control" name="product-name" placeholder="Product Name"> -->
+                                        <input type="hidden" class="form-control" name="productDetailsId0"    id="productDetailsId0" placeholder="Product Name">
+                                        </td>
+                                        <td>
+                                            <select name="hsncode" id="hsnCode0" data-plugin-selectTwo class="form-control form-select multi-formcontrol" onchange="getGstTaxBreakupDetails('${contextPath}',0);" style="width: 250px;">
+                                                <option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>
+                                                <c:forEach items="${hsnCodeList}" var="hsnSacCodesList">
+                                                    <option value="${hsnSacCodesList.gstId}">${hsnSacCodesList.hsnSacCode} || ${hsnSacCodesList.description}</option>
+                                                </c:forEach>
+                                            </select>
+    <!-- 													<input type="text" class="form-control" name="hsncode0" placeholder="Description">
+    -->
+                                        </td>
+                                        <td><input type="text" class="form-control text-end numeric"  id="discount0" name="discount0"  onchange='total_amount(0,0);' placeholder="" maxlength="3"></td>
+                                        <td><input type="text" class="form-control" id="description0" name="description0" placeholder="Description"></td>
+
+                                        <td><input type="number" class="form-control text-end numeric" id="quantity0" name="quantity0" onchange='total_amount(0,0);' value="1" placeholder="Quantity" oninput="calculateTotal(this)"></td>
+                                        <td><input type="text"  class="form-control numeric text-end "  id="price0" name="price0" onchange='total_amount(0,0);'  style="width: 150px;text-align: right;" oninput="calculateTotal(this)"></td>
+                                        <td><input type="number" class="form-control text-end" id="gst0" name="gst0" onchange='total_amount(0,0);' readonly="readonly" style="" placeholder="GST" maxlength="2"></td>
+                                        <td><input type="number" class="form-control text-end" id="sgst0" name="sgst0" onchange='total_amount(0,0);' readonly="readonly" style="" placeholder="SGST" maxlength="2"></td>
+                                        <td><input type="number" class="form-control text-end" id="cgst0" name="cgst0" onchange='total_amount(0,0);' readonly="readonly" style="" placeholder="CGST" maxlength="2"></td>
+                                        <td><input type="number" class="form-control text-end" id="igst0" name="igst0" onchange='total_amount(0,0);' readonly="readonly" style="" placeholder="IGST" maxlength="2"></td>
+                                        <td style="text-align: right;"><input type="text" class="form-control" id="total0" value="" style="width: 150px;text-align: right;" name="total0" readonly></td>
+                                        <td><button type="button" class="btn btn-danger remove-btn" onclick="removeRow(this)"><i class="fa-solid fa-trash"></i></button></td>
+                                    </tr>
+                                    </c:if>
+                                    <!-- Add more rows as needed -->
+                                </tbody>
+                                <tfoot style="">
+                                    <tr>
+                                    <td colspan="12"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="9" rowspan="4"></td>
+                                        <th style="min-width: 125px;">Sub total :</th>
+                                        <td colspan="" style="">
+    <%-- 													<span id="ssubTotal">${invoiceMaster.subTotal}</span> --%>
+                                        <input type="text" value="${invoiceMaster.subTotal}" class="form-control text-end"  id="ssubTotal" readonly>
+                                        <input type="hidden" value="${invoiceMaster.subTotal}" class="form-control" name="subTotal" id="subTotal">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th >Avail Discount :</th>
+                                        <td colspan="" style="">
+    <%-- 													<span id="savailDiscount">${invoiceMaster.availDiscount}</span> --%>
+                                        <input type="text" value="${invoiceMaster.availDiscount}" class="form-control text-end"  id="savailDiscount" readonly>
+                                        <input type="hidden" value="${invoiceMaster.availDiscount}" class="form-control" id="availDiscount" name="availDiscount" readonly>
+
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th >GST :</th>
+                                        <td colspan="" style="">
+    <%-- 													<span id="sgstAmount1">${invoiceMaster.gstAmount}</span> --%>
+                                        <input type="text" value="${invoiceMaster.gstAmount}" class="form-control text-end"  id="sgstAmount1" readonly>
+                                        <input type="hidden" value="${invoiceMaster.gstAmount}" class="form-control" id="gstAmount1" name="gstAmount" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th >Total :</th>
+                                        <td colspan="" style="">
+    <%-- 													<span id="stotalAmount">${invoiceMaster.totalAmount}</span> --%>
+                                        <input type="text" value="${invoiceMaster.totalAmount}" class="form-control text-end"  id="stotalAmount" readonly>
+                                        <input type="hidden" value="${invoiceMaster.totalAmount}" class="form-control" name="totalAmount"  id="totalAmount" >
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                    <td colspan="12"></td>
+                                    </tr>
+                                </tfoot>
+
+                            <%-- 	<tfoot style="border:none;">
+                                    <tr>
+                                    <td colspan="12"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="8" rowspan="4"></td>
+                                        <th >Sub total :</th>
+                                        <td colspan="2" style="background-color:  rgba(0, 0, 0, 0.1);">
+                                        <span id="ssubTotal">${invoiceMaster.subTotal}</span>
+                                        <input type="text" value="${invoiceMaster.subTotal}" class="form-control" name="subTotal" id="ssubTotal">
+                                        <input type="hidden" value="${invoiceMaster.subTotal}" class="form-control" name="subTotal" id="subTotal">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th >Avail Discount :</th>
+                                        <td colspan="2" style="background-color:  rgba(0, 0, 0, 0.1);">
+                                        <span id="savailDiscount">${invoiceMaster.availDiscount}</span>
+                                        <input type="text" value="${invoiceMaster.availDiscount}" class="form-control" name="subTotal" id="savailDiscount">
+                                        <input type="hidden" value="${invoiceMaster.availDiscount}" class="form-control" id="availDiscount" name="availDiscount">
+
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th >Gst :</th>
+                                        <td colspan="2" style="background-color:  rgba(0, 0, 0, 0.1);">
+                                        <span id="sgstAmount1">${invoiceMaster.gstAmount}</span>
+                                        <input type="text" value="${invoiceMaster.gstAmount}" class="form-control" name="subTotal" id="sgstAmount1">
+                                        <input type="hidden" value="${invoiceMaster.gstAmount}" class="form-control" id="gstAmount1" name="gstAmount" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th >Total :</th>
+                                        <td colspan="2" style="background-color:  rgba(0, 0, 0, 0.1);">
+                                        <span id="stotalAmount">${invoiceMaster.totalAmount}</span>
+                                        <input type="text" value="${invoiceMaster.totalAmount}" class="form-control" name="subTotal" id="stotalAmount">
+                                        <input type="hidden" value="${invoiceMaster.totalAmount}" class="form-control" name="totalAmount"  id="totalAmount" >
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                    <td colspan="12"></td>
+                                    </tr>
+                                </tfoot> --%>
+                            </table>
+                        </div>
+                        </div>
+
+<!-- 										<div class="row"> -->
+<!-- 											<label for="currency">Sub total : </label> -->
+<%-- 										   <span id="ssubTotal">${invoiceMaster.subTotal}</span> --%>
+<%-- 										   <input type="hidden" value="${invoiceMaster.subTotal}" class="form-control" name="subTotal" id="subTotal"> --%>
+<!-- 										  </div>  -->
+<!-- 										  <div class="row"> -->
+<!-- 													<label for="currency"> Avail Discount : </label> -->
+<%-- 										            <span id="savailDiscount">${invoiceMaster.availDiscount}</span> --%>
+<%-- 										            <input type="hidden" value="${invoiceMaster.availDiscount}" class="form-control" id="availDiscount" name="availDiscount"> --%>
+<!-- 										   </div> -->
+<!-- 										   <div class="row"> -->
+<%-- 											<label for="currency"> Gst:</label> <span id="sgstAmount1">${invoiceMaster.gstAmount}</span> --%>
+<%-- 										   <input type="hidden" value="${invoiceMaster.gstAmount}" class="form-control" id="gstAmount1" name="gstAmount" /> --%>
+
+<!-- 										   </div> -->
+<!-- 										   <div class="row"> -->
+<!-- 											<label for="currency">  Total : </label> -->
+<%-- 										   <span id="stotalAmount">${invoiceMaster.totalAmount}</span> --%>
+<%-- 										   <input type="hidden" value="${invoiceMaster.totalAmount}" class="form-control" name="totalAmount"  id="totalAmount" > --%>
+<!-- 										   </div> -->
+<!-- 										</div> -->
+                        <div class="row">
+                            <div class="col-sm-12" style="margin-top: 30px;">
+                                <div class="form-group text-center">
+                                <c:if test="${empty invoiceMaster }">
+                                    <!-- <input type="button" class="btn btn-success" onclick="formSubmit('SAVE')" value="Save" /> -->
+                                </c:if>
+                                        <%-- <a href="${contextPath}/home"><input type="button" class="btn btn-danger"value=<spring:message code="COMMON.BUTTON.BACK"></spring:message>></a> --%>
+
+                                    <c:set var="dynamicFromId" value="invoiceDetails" scope="request" />
+                                    <c:set var="wonFunction" value="formSubmit('SAVE')"/>
+                                    <%-- <c:if test="${invoiceDto.isInvoiceGenerated eq false}"> --%>
+                                    <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp"%>
+                                    <%-- </c:if>	 --%>
+                                    <c:if test="${invoiceDto.isInvoiceGenerated eq true}">
+                                     <button type="button" class="btn btn-danger" onclick="location.href='${pageContext.request.contextPath}/home';">Back</button>
+                                    </c:if>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+								</div>
+							</div>
+						</section>
+
+
+
+
+
+
+
+					</div>
+				</div>
+			</div>
+
+
+<script>
+var url='${contextPath}';
+
+$(document).ready(function() {
+	$("input[name^='billingFromPartyName']").autocomplete({
+	    serviceUrl: '${contextPath}/inv/findPartyDetailByAutocomplete.htm',
+	    paramName: "clientcode",
+	    delimiter: ",",
+	    width: '150px',
+	    transformResult: function(response) {
+	        return {
+	            suggestions: $.map($.parseJSON(response), function(item) {
+	                return {
+	                    value: item.clientcode,
+	                    data: item.clientid
+	                };
+	            })
+	        };
+	    },
+	    onSelect: function (suggestion) {
+	        var selectedRow = parseInt(this.parentNode.parentNode.rowIndex) - 1;
+	        document.getElementById("partyId").value = suggestion.data;
+
+	        getPartyDetails(suggestion.data,'BILLINGPARTY');
+	    }
+	});
+
+
+	$("input[name^='billingToPartyName']").autocomplete({
+	    serviceUrl: '${contextPath}/inv/findPartyDetailByAutocomplete.htm',
+	    paramName: "clientcode",
+	    delimiter: ",",
+	    width: '150px',
+	    transformResult: function(response) {
+	        return {
+	            suggestions: $.map($.parseJSON(response), function(item) {
+	                return {
+	                    value: item.clientcode,
+	                    data: item.clientid
+	                };
+	            })
+	        };
+	    },
+	    onSelect: function (suggestion) {
+	        var selectedRow = parseInt(this.parentNode.parentNode.rowIndex) - 1;
+	        document.getElementById("billingToPartyId").value = suggestion.data;
+
+	        getPartyDetails(suggestion.data,'BILLINGTOPARTY');
+	    }
+	});
+
+
+});
+
+async function getPartyDetails(partyBillingId, fieldVal) {
+	//debugger;
+
+        try {
+            const response = await $.ajax({
+                url: `${contextPath}/inv/getPartyDetails.htm`,
+                type: 'GET',
+                data: { partyId: partyBillingId },
+                cache: false
+            });
+
+            if (response !== "") {
+                if (fieldVal === "BILLINGPARTY") {
+                    const details =JSON.parse(response) ;
+                    document.getElementById("partyAddress").value = details.address;
+                    document.getElementById("partyGst").value = (details.gstNo !== "null" && details.gstNo !== null) ? details.gstNo : "";
+                    document.getElementById("partyPan").value = details.panNo;
+                    document.getElementById("partyMobileNo").value = (details.phno !== "null" && details.phno !== null) ? details.phno : "";
+                    document.getElementById("partyEmail").value = details.email;
+                }else{
+                	const details =JSON.parse(response) ;
+                    document.getElementById("toAddress").value = details.address;
+                    document.getElementById("topartyGst").value = (details.gstNo !== "null" && details.gstNo !== null) ? details.gstNo : "";
+                    document.getElementById("topartyPan").value = details.panNo;
+                    document.getElementById("toMobileNo").value = (details.phno !== "null" && details.phno !== null) ? details.phno : "";
+                    document.getElementById("toEmail").value = details.email;
+                }
+            } else {
+                // alert("No Details Found");
+            }
+        } catch (error) {
+            // alert("No Details Found");
+        }
+
+}
+
+
+document.querySelector('.btn-add-product').addEventListener('click', function() {
+    addProductRow();
+});
+
+function addProductRow() {
+    var rowCount = document.getElementById("tbd").rows.length;
+    const table = document.getElementById('product-table').getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
+    var path="${contextPath}";
+    const productNameCell = newRow.insertCell(0);
+    const hsncodeCell = newRow.insertCell(1);
+    const discountCell = newRow.insertCell(2);
+    const descriptionCell = newRow.insertCell(3);
+    const quantityCell = newRow.insertCell(4);
+    const priceCell = newRow.insertCell(5);
+    const gstCell = newRow.insertCell(6);
+    const sgstCell = newRow.insertCell(7);
+    const cgstCell = newRow.insertCell(8);
+    const igstCell = newRow.insertCell(9);
+    const totalCell = newRow.insertCell(10);
+    const actionCell = newRow.insertCell(11);
+    productNameCell.innerHTML = '<select name="productName'+rowCount+'" id="productName'+rowCount+'" onchange="getProductPrice( \'' + path + '\',' + rowCount + '); fetchProductDetails(' + rowCount + ');" data-plugin-selectTwo class="form-control form-select multi-formcontrol"  style="width: 250px;"> '+
+		'<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>'	+
+		'<c:forEach items="${productList}" var="productList">'+
+			'<option value="${productList.productId}">${productList.productName} </option>'+
+		'</c:forEach>'+
+	'</select>'
+
+    /* <input type="text" class="form-control" name="product-name'+rowCount+'" placeholder="Product Name">'; */
+    hsncodeCell.innerHTML =
+        '<select name="hsncode' + rowCount + '" id="hsnCode' + rowCount + '" onchange="getGstTaxBreakupDetails(\'' + path + '\',' + rowCount + ');" data-plugin-selectTwo class="form-control form-select multi-formcontrol" style="width: 250px;">' +
+            '<option value=""><spring:message code="COMMON.LABEL.DROPDOWN.SELECT"/></option>' +
+            '<c:forEach items="${hsnCodeList}" var="hsnSacCodesList">' +
+                '<option value="${hsnSacCodesList.gstId}">${hsnSacCodesList.hsnSacCode} || ${hsnSacCodesList.description}</option>' +
+            '</c:forEach>' +
+        '</select>';
+
+
+    /* <input type="text" class="form-control" name="hsncode'+rowCount+'" placeholder="Description">'; */
+    discountCell.innerHTML = '<input type="hidden" class="form-control" name="productDetailsId'+rowCount+'"    id="productDetailsId'+rowCount+'" placeholder="Product Name"> <input type="number" onchange="total_amount('+rowCount+',0);" class="form-control text-end" id="discount'+rowCount+'" name="discount'+rowCount+'" placeholder="Discount" maxlength="3">';
+
+    descriptionCell.innerHTML = '<input type="text" class="form-control" id="description'+rowCount+'" name="description'+rowCount+'" placeholder="Description">';
+
+    quantityCell.innerHTML = '<input type="number" onchange="total_amount('+rowCount+',0);" class="form-control text-end numeric" name="quantity'+rowCount+'" value="1" id="quantity'+rowCount+'" placeholder="Quantity" oninput="calculateTotal(this)">';
+    priceCell.innerHTML = '<input type="text" onchange="total_amount('+rowCount+',0);" class="form-control numeric" style="width: 150px;text-align: right;" name="price'+rowCount+'" id="price'+rowCount+'" placeholder="Price per Unit" oninput="calculateTotal(this)">';
+    gstCell.innerHTML = '<input type="number" class="form-control text-end" style="" onchange="total_amount('+rowCount+',0);" id="gst'+rowCount+'" name="gst'+rowCount+'" placeholder="GST"  maxlength="2">';
+    sgstCell.innerHTML = '<input type="number" class="form-control text-end" style="" onchange="total_amount('+rowCount+',0);" id="sgst'+rowCount+'" name="sgst'+rowCount+'" placeholder="SGST" maxlength="2">';
+    cgstCell.innerHTML = '<input type="number" class="form-control text-end" style="" onchange="total_amount('+rowCount+',0);" id="cgst'+rowCount+'" name="cgst'+rowCount+'" placeholder="CGST" maxlength="2">';
+    igstCell.innerHTML = '<input type="number" class="form-control text-end" style="" onchange="total_amount('+rowCount+',0);" id="igst'+rowCount+'" name="igst'+rowCount+'" placeholder="IGST" maxlength="2">';
+    totalCell.innerHTML = '<input type="text" class="form-control" name="total'+rowCount+'" id="total'+rowCount+'" style="width: 150px;text-align: right;" readonly>';
+    actionCell.innerHTML = '<button class="btn btn-danger remove-btn" type="button" onclick="removeRow(this)"><i class="fa-solid fa-trash"></i></button>';
+
+}
+
+function calculateTotal(element) {
+  /*   debugger;
+    const row = element.closest('tr'); // Use closest to find the nearest tr element
+    const rowIndex = row.rowIndex - 1; // rowIndex will be correct if the table has headers
+
+    const quantity = parseFloat($("#quantity" + rowIndex).val()); // Convert to float
+    const price = parseFloat($("#price" + rowIndex).val()); // Convert to float
+    const total = $("#total" + rowIndex);
+
+    if (!isNaN(quantity) && !isNaN(price)) { // Check if both quantity and price are valid numbers
+        total.text((quantity * price).toFixed(2));
+        $("#total" + rowIndex).val((quantity * price).toFixed(2))
+        dueAmount();
+    } else {
+        total.text('');
+    } */
+
+}
+
+function dueAmount(){
+	var rowCount = document.getElementById("tbd").rows.length;
+	var total = 0.00;
+	for (var i = 0; i < rowCount; i++) {
+	    var totalElement = document.getElementById("total" + i);
+	    if (totalElement) {
+	        var totalValue = parseFloat(totalElement.value) || 0;
+	        total += totalValue;
+	    }
+	}
+	var dueAmount = total;  // If dueAmount is meant to be double the total, use total * 2 instead.
+	//console.log("Total: " + total);
+	//console.log("Due Amount: " + dueAmount);
+   $("#dueAmount").val(dueAmount.toFixed(2));
+	
+}
+
+
+
+function removeRow(button) {
+    const row = button.parentElement.parentElement;
+    row.remove();
+}
+
+function formSubmit(formType) {
+	
+	debugger;
+    let isValid = true; // Initialize isValid to true
+    let dataList = []; // Initialize the dataList array
+    let rowCount = document.getElementById("tbd").rows.length; // Ensure rowCount is defined
+
+    for (let i = 0; i < rowCount; i++) {
+        let productName = document.getElementById("productName" + i).value;
+        let hsnCode = document.getElementById("hsnCode" + i).value;
+        let discount = document.getElementById("discount" + i).value;
+        let description = document.getElementById("description" + i).value;
+        let quantity = document.getElementById("quantity" + i).value;
+        let price = document.getElementById("price" + i).value;
+        let gst = document.getElementById("gst" + i).value;
+        let sgst = document.getElementById("sgst" + i).value;
+        let cgst = document.getElementById("cgst" + i).value;
+        let igst = document.getElementById("igst" + i).value;
+        let total = document.getElementById("total" + i).value;
+        let productDetailsId =document.getElementById("productDetailsId" + i).value;
+        // Validate mandatory fields
+       if (productName === "" || hsnCode === "" || discount === "" || description === "" || quantity === "" || price === "" || gst === "" || sgst === "" || cgst === "" || igst === "" || total === "") {
+            bootbox.alert("Please fill in all mandatory fields for row " + (i + 1) + ".");
+            isValid = false;
+            break;
+        } else { 
+            dataList.push({
+                productName: productName,
+                hsnCode: hsnCode,
+                discount: discount,
+                description: description,
+                quantity: quantity,
+                price: price,
+                gst: gst,
+                sgst: sgst,
+                cgst: cgst,
+                igst: igst,
+                total: total,
+                productDetailsId
+            });
+        }
+    }
+
+    // If isValid is still true, proceed with further processing of dataList
+    if (isValid) {
+        const flag = window.confirm("Do you want to save the data?");
+        if (flag) {
+            const bizContent = $("#invoiceDetails").serializeArray(); // Serialize form data
+            let data = {
+            		productDetailsDTO: dataList
+            };
+
+            $("#cipherTextList").val(enc_password(JSON.stringify(data)));
+            $("#invoiceDetails").append('<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />');
+            $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+            $("#invoiceDetails").submit();
+        }
+    } else {
+        bootbox.alert('Please fill out all required fields.');
+    }
+}
+
+$(document).ready(function() {
+    var details='${invoiceDto}';
+    if(details!=null && details!=''){
+    	debugger;
+    	 document.getElementById("billingFromPartyName").value = '${invoiceDto.partyCodeFrom}'+ ' | '+ '${invoiceDto.partyNameFrom}';
+    	// document.getElementById("dueAmount").value = '${invoiceDto.totalInvoiceAmount}';
+    	document.getElementById("dueAmount").value = parseFloat('${invoiceDto.totalInvoiceAmount}').toLocaleString('en-IN', { minimumFractionDigits: 2,maximumFractionDigits: 2});
+
+     	 document.getElementById("dateIssued").value = '${invoiceDto.dateIssued}';
+    	    document.getElementById("partyAddress").value = '${invoiceDto.partyAddreddFrom}';
+    	    document.getElementById("partyGst").value = '${invoiceDto.partyGstinFrom}' !== 'null' ? '${invoiceDto.partyGstinFrom}' : '';
+    	    document.getElementById("partyPan").value = '${invoiceDto.partyPanFrom}';
+    	    document.getElementById("partyMobileNo").value =  '${invoiceDto.mobileNumberFrom}' !== 'null' ? '${invoiceDto.mobileNumberFrom}' : '';
+    	    document.getElementById("partyEmail").value = '${invoiceDto.emailFrom}';
+    	    
+    	    document.getElementById("billingToPartyName").value = '${invoiceDto.partyCodeTo}' + ' | '+ '${invoiceDto.partyNameTo}';
+       	    document.getElementById("toAddress").value = '${invoiceDto.partyAddreddTo}';
+       	    document.getElementById("topartyGst").value = '${invoiceDto.partyGstinTo}' !== 'null' ? '${invoiceDto.partyGstinTo}' : '';
+       	    document.getElementById("topartyPan").value = '${invoiceDto.partyPanTo}';
+       	    document.getElementById("toMobileNo").value =  '${invoiceDto.mobileNumberTo}' !== 'null' ? '${invoiceDto.mobileNumberTo}' : '';
+       	    document.getElementById("toEmail").value = '${invoiceDto.emailTo}';
+       	    
+	       	 document.getElementById("partyId").value = '${invoiceDto.fromParty}';
+	 	     document.getElementById("billingToPartyId").value = '${invoiceDto.toParty}';
+    }
+   
+});
+
+function generateInvoiceNum() {
+	debugger
+	var entityIdLevelCombo=$("#upperEntityId").val();
+	//var officeMasterId =$("#officeMasterId").val();
+	var finYearId =$("#finYearId").val();
+	
+ if(entityIdLevelCombo!='' & finYearId!=''){
+    $.ajax({
+        url: "${contextPath}/creditDebitNote/genInvoiceNoBasedOnParam",
+        async: false,
+        data: {entityIdLevelCombo: entityIdLevelCombo, finYearId:finYearId},
+        success: function(response) {
+            if (response && response !== "") {
+                document.getElementById("invoiceCode").value = response.generatedInvoiceNo || "";
+              //  bootbox.alert(response.generatedInvoiceNo);
+            } else {
+                bootbox.alert("No Data Found");
+            }
+        },
+        error: function() {
+            bootbox.alert("Error fetching data");
+        }
+    });
+  }
+}
+
+
+function fetchProductDetails(index) {
+	debugger
+    const dropdown = document.getElementById('productName'+index);
+    
+    const productId = dropdown.value;
+    
+    const productName = dropdown.options[dropdown.selectedIndex].text;
+    $("#description"+index).val(productName);
+    
+}
+
+
+</script>

@@ -1,0 +1,494 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<!-- ======== Building Filter Section ======== -->
+<div class="card mt-3">
+    <div class="card-header"><h5 class="card-title">Building Filter</h5></div>
+    <div class="card-body">
+        <div class="row">
+        
+	        <c:if test="${fn:contains(activeFilters, 'STARTDATE')}">
+	            <div class="form-group col-md-3">
+	                <label class="required">Start Date </label>
+	                <div class="datepicker-box">
+	                    <input type="text" id="startDate" name="startDate" class="form-control form-control-sm datepicker" required value="${buildingFilterData.selectedStartDate}" readonly>
+	                </div>
+	            </div>
+	        </c:if>
+	
+			<c:if test="${fn:contains(activeFilters, 'ENDDATE')}">
+				<div class="form-group col-md-3">
+	                <label class="required">End Date </label>
+	                <div class="datepicker-box">
+	                    <input type="text" id="endDate" name="endDate" class="form-control form-control-sm datepicker" required value="${buildingFilterData.selectedEndDate}" readonly>
+	                </div>
+	            </div>
+			</c:if>
+
+            <!-- ======== Financial Year ======== -->
+            <c:if test="${fn:contains(activeFilters, 'FINYEAR')}">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="smallInput required" for="financialYearId">Financial Year :</label>
+                        <select class="form-control form-control-sm form-select" id="financialYearId" name="financialYearId">
+                            <option value="0">- Select -</option>
+                            <c:forEach items="${buildingFilterData.financialYearList}" var="fy">
+                                <option value="${fy.financialYearId}" ${fy.financialYearId eq buildingFilterData.selectedFinancialYearId ? 'selected' : ''}>
+                                    ${fy.financialYear}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+            </c:if>
+
+            <!-- ======== District ======== -->
+            <c:if test="${fn:contains(activeFilters, 'DISTRICT')}">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="required" for="districtId">District Name :</label>
+                        <select class="form-control form-control-sm form-select" id="districtId" name="districtId"
+                                onchange="LoadBlockByDistrict(this.value)">
+                            <option value="">- Select -</option>
+                            <c:forEach var="district" items="${buildingFilterData.districtList}">
+                                <option value="${district.districtId}" ${district.districtId eq buildingFilterData.selectedDistrictId ? 'selected' : ''}>
+                                    ${district.districtName}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+            </c:if>
+
+            <!-- ======== Block ======== -->
+            <c:if test="${fn:contains(activeFilters, 'BLOCK')}">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="required" for="blockId">Block Name :</label>
+                        <select class="form-control form-control-sm form-select" id="blockId" name="blockId"
+                                onchange="LoadGrampanchayatByBlock(this.value)">
+                            <option value="">- Select -</option>
+                            <c:forEach var="block" items="${buildingFilterData.blockList}">
+                                <option value="${block.blockId}" ${block.blockId eq buildingFilterData.selectedBlockId ? 'selected' : ''}>
+                                    ${block.blockName}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+            </c:if>
+
+            <!-- ======== Gram Panchayat ======== -->
+            <c:if test="${fn:contains(activeFilters, 'GP')}">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="required" for="gpId">Gram Panchayat :</label>
+                        <select class="form-control form-control-sm form-select" id="gpId" name="gpId"
+                                onchange="LoadVillageByGrampanchayat(this.value)">
+                            <option value="">- Select -</option>
+                            <c:forEach var="gp" items="${buildingFilterData.gpList}">
+                                <option value="${gp.gpId}" ${gp.gpId eq buildingFilterData.selectedGpId ? 'selected' : ''}>
+                                    ${gp.gpName}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+            </c:if>
+
+            <!-- ======== Village ======== -->
+            <c:if test="${fn:contains(activeFilters, 'VILLAGE')}">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="required" for="villageId">Village Name :</label>
+                        <select class="form-control form-control-sm form-select" id="villageId" name="villageId">
+                            <option value="">- Select -</option>
+                            <c:forEach var="village" items="${buildingFilterData.villageList}">
+                                <option value="${village.villageId}" ${village.villageId eq buildingFilterData.selectedVillageId ? 'selected' : ''}>
+                                    ${village.villageName}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+            </c:if>
+
+            <!-- ======== Agency ======== -->
+            <c:if test="${fn:contains(activeFilters, 'AGENCY')}">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="required" for="agencyName">Agency :</label>
+                        <select class="form-control form-control-sm form-select" id="agencyName" name="agencyName">
+                            <option value="">- Select -</option>
+                            <c:forEach var="agency" items="${buildingFilterData.agencyDetailsList}">
+                                <option value="${agency.agencyName}" ${agency.agencyName eq buildingFilterData.selectedAgencyName ? 'selected' : ''}>
+                                    ${agency.agencyName}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+            </c:if>
+
+            <!-- ======== Building Name ======== -->
+            <c:if test="${fn:contains(activeFilters, 'BUILDING_NAME')}">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="required" for="buildingName">Building Name :</label>
+                        <select class="form-control form-control-sm form-select select2" id="buildingName" name="buildingName">
+                            <option value="">- Select -</option>
+                            <c:forEach var="buildingName" items="${buildingFilterData.buildingNameList}">
+                                <option value="${buildingName}" ${buildingName eq buildingFilterData.selectedBuildingName ? 'selected' : ''}>
+                                    ${buildingName}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+            </c:if>
+
+            <!-- ======== Building Type ======== -->
+            <c:set var="onChangeAttr"
+       		value="${isBuildingTypeOnChangeAllowed ? 'onchange=\"handleBuildingTypeChange(this.value)\"' : ''}" />
+
+			<c:if test="${fn:contains(activeFilters, 'BUILDING_TYPE')}">
+			    <div class="col-md-3">
+			        <div class="form-group">
+			            <label class="required" for="buildingType">Building Type :</label>
+			
+			            <select class="form-control form-control-sm form-select"
+			                    id="buildingType"
+			                    name="buildingType"
+			                    ${onChangeAttr}>
+			                <option value="">- Select -</option>
+			                <c:forEach var="type" items="${buildingFilterData.buildingTypeList}">
+			                    <option value="${type.valueEn}"
+			                        ${type.valueEn eq buildingFilterData.selectedBuildingType ? 'selected' : ''}>
+			                        ${type.valueEn}
+			                    </option>
+			                </c:forEach>
+			            </select>
+			
+			        </div>
+			    </div>
+			</c:if>
+			
+			<c:if test="${isBuildingTypeOnChangeAllowed}">
+	            <!-- ======== Sub Category ======== -->
+	            <div class="col-md-3 sub-category-section" style="display: none;">
+	                <div class="form-group">
+	                    <label class="required">Sub Category :</label>
+	                    <select class="form-control form-control-sm form-select" id="subCategory" name="subCategory"
+	                            onchange="handlesSubCategoryChange(this.value)">
+	                        <option value="">- Select -</option>
+	                        <c:forEach var="subCat" items="${buildingFilterData.residentialSubCategoryList}">
+	                            <option value="${subCat.valueEn}" ${subCat.valueEn eq buildingFilterData.selectedSubCategory ? 'selected' : ''}>
+	                                ${subCat.valueEn}
+	                            </option>
+	                        </c:forEach>
+	                    </select>
+	                </div>
+	            </div>
+	
+	            <!-- ======== School Category ======== -->
+	            <div class="col-md-3 school-category-section" style="display: none;">
+	                <div class="form-group">
+	                    <label class="required">School Category :</label>
+	                    <select class="form-control form-control-sm form-select" id="schoolCategory" name="schoolCategory">
+	                        <option value="">- Select -</option>
+	                        <c:forEach var="schoolCat" items="${buildingFilterData.schoolCategoryList}">
+	                            <option value="${schoolCat.valueEn}" ${schoolCat.valueEn eq buildingFilterData.selectedSchoolCategory ? 'selected' : ''}>
+	                                ${schoolCat.valueEn}
+	                            </option>
+	                        </c:forEach>
+	                    </select>
+	                </div>
+	            </div>
+	
+	            <!-- ======== Class Range ======== -->
+	             <div class="col-md-3 class-range-section" style="display: none;">
+	                 <div class="form-group">
+	                     <label class="col-md-12 required">Class Range :</label>
+	                     <div class="col-md-12">
+	                         <select class="form-control form-control-sm form-select class-range-select" id="classRange" name="classRange">
+	                             <option value="" selected disabled>- Select -</option>
+	                             <c:forEach var="range" items="${buildingFilterData.classRangeList}">
+	                                 <option value="${range.valueEn}" ${range.valueEn eq buildingFilterData.selectedClassRange? 'selected' : ''}>
+	                                     ${range.valueEn}
+	                                 </option>
+	                             </c:forEach>
+	                         </select>
+	                     </div>
+	                 </div>
+	             </div>
+	
+	            <!-- ======== Staff Type ======== -->
+	            <div class="col-md-3 staff-type-section" style="display: none;">
+	                <div class="form-group">
+	                    <label class="required">Staff Type :</label>
+	                    <select class="form-control form-control-sm form-select" id="staffType" name="staffType">
+	                        <option value="">- Select -</option>
+	                        <c:forEach var="staff" items="${buildingFilterData.staffTypeList}">
+	                            <option value="${staff.valueEn}" ${staff.valueEn eq buildingFilterData.selectedStaffType ? 'selected' : ''}>
+	                                ${staff.valueEn}
+	                            </option>
+	                        </c:forEach>
+	                    </select>
+	                </div>
+	            </div>
+	            
+		    	<!-- Hostel Type -->
+		        <div class="col-md-3 hostel-section" style="display: none;">
+		            <div class="form-group">
+		                <label class="required">Hostel Type :</label>
+		                <select class="form-control form-control-sm form-select" id="hostelType" name="hostelType">
+		                    <option value="">- Select -</option>
+		                    <c:forEach var="hostelType" items="${buildingFilterData.hostelTypeList}">
+		                        <option value="${hostelType.valueEn}" ${hostelType.valueEn eq buildingFilterData.selectedHostelType ? 'selected' : ''}>
+		                            ${hostelType.valueEn}
+		                        </option>
+		                    </c:forEach>
+		                </select>
+		            </div>
+		        </div>
+		
+		    	<!-- Hostel Capacity -->
+		        <div class="col-md-3 hostel-section" style="display: none;">
+		            <div class="form-group">
+		                <label class="required">Hostel Capacity :</label>
+		                <select class="form-control form-control-sm form-select" id="hostelCapacity" name="hostelCapacity">
+		                    <option value="">- Select -</option>
+		                    <c:forEach var="hostelCapacity" items="${buildingFilterData.hostelCapacityList}">
+		                        <option value="${hostelCapacity.valueEn}" ${hostelCapacity.valueEn eq buildingFilterData.selectedHostelCapacity ? 'selected' : ''}>
+		                            ${hostelCapacity.valueEn}
+		                        </option>
+		                    </c:forEach>
+		                </select>
+		            </div>
+		        </div>
+		
+		    	<!-- Hostel Category -->
+		        <div class="col-md-3 hostel-section" style="display: none;">
+		            <div class="form-group">
+		                <label class="required">Hostel Category :</label>
+		                <select class="form-control form-control-sm form-select" id="hostelCategory" name="hostelCategory">
+		                    <option value="">- Select -</option>
+		                    <c:forEach var="hostelCategory" items="${buildingFilterData.hostelCategoryList}">
+		                        <option value="${hostelCategory.valueEn}" ${hostelCategory.valueEn eq buildingFilterData.selectedHostelCategory ? 'selected' : ''}>
+		                            ${hostelCategory.valueEn}
+		                        </option>
+		                    </c:forEach>
+		                </select>
+		            </div>
+		        </div>
+	        </c:if>
+
+        </div>
+
+        <!-- ======== Filter Button ======== -->
+        <div class="text-end mt-3">
+            <button type="button" class="btn btn-primary btn-sm" onclick="applyFilter()">
+                <i class="fa-solid fa-filter"></i> Apply Filter
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== HIDDEN ENCRYPTED FORM ===================== -->
+<form id="filterForm" method="GET">
+  <!-- CSRF + Encryption -->
+  <input type="hidden" name="cipherText" id="hiddenCipherText" />
+  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+  
+  <!-- Date Filters -->
+  <input type="hidden" id="hiddenStartDate" name="startDate" />
+  <input type="hidden" id="hiddenEndDate" name="endDate" />
+
+  <!-- Core Filters -->
+  <input type="hidden" id="hiddenFinyearId" name="finyearId" />
+  <input type="hidden" id="hiddenDistrictId" name="districtId" />
+  <input type="hidden" id="hiddenBlockId" name="blockId" />
+  <input type="hidden" id="hiddenGpId" name="gpId" />
+  <input type="hidden" id="hiddenVillageId" name="villageId" />
+  <input type="hidden" id="hiddenAgencyId" name="agencyName" />
+  <input type="hidden" id="hiddenBuildingType" name="buildingType" />
+
+  <!-- Extended Filters -->
+  <input type="hidden" id="hiddenBuildingName" name="buildingName" />
+  <input type="hidden" id="hiddenSubCategory" name="subCategory" />
+  <input type="hidden" id="hiddenSchoolCategory" name="schoolCategory" />
+  <input type="hidden" id="hiddenClassRange" name="classRange" />
+  <input type="hidden" id="hiddenHostelType" name="hostelType" />
+  <input type="hidden" id="hiddenHostelCategory" name="hostelCategory" />
+  <input type="hidden" id="hiddenHostelCapacity" name="hostelCapacity" />
+  <input type="hidden" id="hiddenStaffType" name="staffType" />
+</form>
+
+<!-- ===================== JS SECTION ===================== -->
+<script>
+
+    function handleBuildingTypeChange(selectedType, shouldReset = true) {
+        if (shouldReset) {
+            $(".sub-category-section, .school-category-section, .hostel-section, .staff-type-section")
+                .hide()
+                .find("input, select, textarea")
+                .each(function() {
+                    var field = $(this);
+                    if (field.is(":checkbox") || field.is(":radio")) {
+                        field.prop("checked", false);
+                    } else if (field.is("select")) {
+                        field.prop("selectedIndex", 0);
+                    } else {
+                        field.val("");
+                    }
+                });
+        }
+
+        if (selectedType === "RESIDENTIAL COMPLEX") {
+            $(".sub-category-section").slideDown();
+        } else if (selectedType === "STANDALONE SCHOOL") {
+            $(".school-category-section").slideDown();
+        } else if (selectedType === "STANDALONE HOSTEL") {
+            $(".hostel-section").slideDown();
+        }
+    }
+
+    function handlesSubCategoryChange(selectedType, shouldReset = true) {
+        if (shouldReset) {
+            $(".school-category-section, .hostel-section, .staff-type-section")
+                .hide()
+                .find("input, select, textarea")
+                .each(function() {
+                    var field = $(this);
+                    if (field.is(":checkbox") || field.is(":radio")) {
+                        field.prop("checked", false);
+                    } else if (field.is("select")) {
+                        field.prop("selectedIndex", 0);
+                    } else {
+                        field.val("");
+                    }
+                });
+        }
+
+        if (selectedType === "SCHOOL") {
+            $(".school-category-section").slideDown();
+        } else if (selectedType === "HOSTEL") {
+            $(".hostel-section").slideDown();
+        } else if (selectedType === "STAFF QUARTER") {
+            $(".staff-type-section").slideDown();
+        }
+    }
+
+    function handleClassRangeChange(selectedType){
+        if (selectedType === "HIGH SCHOOL") {
+            $(".class-range-section").slideDown();
+        }
+    }
+
+    function applyFilter() {
+      
+      const startDate = $("#startDate").val();
+      const endDate = $("#endDate").val();
+      const finyearId = $("#financialYearId").val();
+      const districtId = $("#districtId").val();
+      const blockId = $("#blockId").val();
+      const gpId = $("#gpId").val();
+      const villageId = $("#villageId").val();
+      const agencyName = $("#agencyName").val();
+      const buildingType = $("#buildingType").val();
+      const buildingName = $("#buildingName").val();
+      const subCategory = $("#subCategory").val();
+      const schoolCategory = $("#schoolCategory").val();
+      const classRange = $("#classRange").val();
+      const hostelType = $("#hostelType").val();
+      const hostelCategory = $("#hostelCategory").val();
+      const hostelCapacity = $("#hostelCapacity").val();
+      const staffType = $("#staffType").val();
+
+      $("#hiddenStartDate").val(startDate);
+      $("#hiddenEndDate").val(endDate);
+      $("#hiddenFinyearId").val(finyearId);
+      $("#hiddenDistrictId").val(districtId);
+      $("#hiddenBlockId").val(blockId);
+      $("#hiddenGpId").val(gpId);
+      $("#hiddenVillageId").val(villageId);
+      $("#hiddenAgencyId").val(agencyName);
+      $("#hiddenBuildingType").val(buildingType);
+      $("#hiddenBuildingName").val(buildingName);
+      $("#hiddenSubCategory").val(subCategory);
+      $("#hiddenSchoolCategory").val(schoolCategory);
+      $("#hiddenClassRange").val(classRange);
+      $("#hiddenHostelType").val(hostelType);
+      $("#hiddenHostelCategory").val(hostelCategory);
+      $("#hiddenHostelCapacity").val(hostelCapacity);
+      $("#hiddenStaffType").val(staffType);
+
+      showLoader();
+
+      const bizContent = $("#filterForm").serializeArray();
+      const jsonData = JSON.stringify(convertFormToJSONArray(bizContent));
+      const encrypted = enc_password(jsonData);
+
+      $("#hiddenCipherText").val(encrypted);
+
+      const filterUrl = contextPath + "${filterUrl}";
+      $("#filterForm").attr("action", filterUrl);
+      $("#filterForm").submit();
+    }
+
+    $(document).ready(function() {
+        const selectedBuildingType = $("#buildingType").val();
+        handleBuildingTypeChange(selectedBuildingType, false);
+
+        const selectedSubCategoryType = $("#subCategory").val();
+        handlesSubCategoryChange(selectedSubCategoryType, false);
+
+        const selectedClassRange = $("#schoolCategory").val();
+        handleClassRangeChange(selectedClassRange);
+    });
+
+    $(document).ready(function() {
+      const $table = $("#reportTable");
+      if ($table.find("tbody tr td").hasClass("text-muted")) {
+        $table.removeClass("exportbtn");
+      } else {
+        $table.addClass("exportbtn");
+      }
+    });
+    
+   $(document).ready(function() {
+    	$(".datepicker").datepick({
+            onShow: $.datepick.monthOnly,
+            dateFormat: "dd-mm-yyyy",
+            yearRange: "c-20:c+10",
+            showOnFocus: true,
+            showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+            onSelect: function () {
+                applyDateLimits();
+            }
+        });
+    });
+    
+   /*  $(document).ready(function () {
+        var today = new Date();
+        var oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(today.getMonth() - 1);
+
+        $(".datepicker").datepick({
+            dateFormat: "dd-mm-yyyy",
+            onShow: $.datepick.monthOnly,
+            yearRange: "c-20:c+10",
+            showOnFocus: true,
+            showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+        });
+
+        if (!$("#startDate").val()) {
+            $('#startDate').datepick('setDate', oneMonthAgo);
+        }
+        if (!$("#endDate").val()) {
+            $('#endDate').datepick('setDate', today);
+        }
+    }); */
+    
+    
+</script>

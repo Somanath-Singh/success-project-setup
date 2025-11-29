@@ -1,0 +1,7 @@
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+mail.smtp.host=139.59.12.212
+mail.smtp.ssl.trust=139.59.12.212
+mail.smtp.port=8080
+mail.username=aashditTechnologies6@gmail.com
+mail.password=123456

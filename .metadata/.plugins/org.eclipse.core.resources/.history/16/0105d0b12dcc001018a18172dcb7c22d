@@ -1,0 +1,8 @@
+#------- TESTING PROFILE -------#
+
+
+#spring.datasource.url=jdbc:postgresql://209.97.136.18:5432/heads_misc
+#spring.datasource.username=headuser
+#spring.datasource.password=Pass@123
+#
+#UPLOAD.FILE.PATH=/home/heads/uploaded_files

@@ -1,0 +1,313 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<style>
+    tbody#suppBody a{
+        color: #fff;
+    }
+</style>
+
+ <div class="breadcrumb_conatiner">
+              <div class="col-md-6">
+                <h4 class="change-color">Send Quotation</h4>
+              </div>
+              <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="#">Procurement</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Send Quotation</li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h5 class="card-title">Send Quotation</h5>
+                    </div>
+                    <div class="card-body">
+        <form action="${contextPath}/" method="post" id="form" modelAttribute="rfqQuote">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+            <input type="hidden" name="isMail" value="" />
+      	<h6 class="mb-1">Item List</h6>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="row">
+					
+							<div class="col-md-12" style="">
+								<table class="table table-striped table-bordered exportbtn mt-3">
+									<thead class="bagGroundColor">
+										<tr>
+											<th style="width: 70px;">Sl No.</th>
+											<th style="width: 150px;">Sub Category</th>
+											<th style="width: 150px;">Item Name</th>
+											<th style="width: 100px;">Item Code</th>
+											<th style="width: 100px;">Uom</th>
+											<th style="width: 100px;">Available Quantity</th>
+											<th style="width: 100px;">Requested Quantity</th>
+											<th style="width: 100px;">Select</th>
+										</tr>
+									</thead>
+									<tbody id="itemBody">
+										<c:forEach items="${req.requisitionLines}" var="line" varStatus="count">
+											<tr>
+												<td>${count.count}</td>
+												<td>${line.itemDto.subCategoryName}</td>
+												<td>${line.itemDto.itemName}<input type="hidden" id="itemName${count.count}" value="${line.itemDto.itemName}"></td>
+												<td>${line.itemDto.itemCode}<input type="hidden" id="itemId${count.count}" value="${line.requisitionLineId}"></td>
+												<td>${line.itemDto.uom}</td>
+												<td class="text-end">${line.itemDto.avlQty}</td>
+												<td class="text-end">${line.requestQuantity}</td>
+												<td><input type="checkbox" id="selectItem${count.count}"></td>
+											</tr>
+										</c:forEach>
+									</tbody>
+								</table>
+							</div>
+							<h6 class="mb-1">Vendor List</h6>
+							<div class="col-md-12" style="">
+								<table class="dataTable table table-striped table-bordered exportbtn  mt-3">
+									<thead class="bagGroundColor">
+										<tr>
+											<th style="width: 70px;">Sl No.</th>
+											<th style="width: 120px;">Vendor Name</th>
+											<th style="width: 120px;">Vendor Code</th>
+											<th style="width: 100px;">Vendor Mobile No</th>
+											<th style="width: 130px;">Vendor Email</th>
+											<th style="width: 130px;">GSTIN number</th>
+											<th style="width: 100px;">Select</th>
+										</tr>
+									</thead>
+									<tbody id="suppBody">
+										<c:forEach items="${lstVendor}" var="vendor" varStatus="count">
+											<tr>
+												<td>${count.count}</td>
+												<td>${vendor.vendorName}<input type="hidden" id="vendorName${count.count}" value="${vendor.vendorName}"></td>
+												<td>${vendor.vendorCode}<input type="hidden" id="vendorId${count.count}" value="${vendor.vendorId}"></td>
+												<td>${vendor.mobileNo}</td>
+												<td>${vendor.email}</td>
+												<td>${vendor.gstNo}</td>
+												<td><input type="checkbox" id="selectVendor${count.count}"></td>
+											</tr>
+										</c:forEach>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-md-12 " style="text-align: center;">
+								<input type="button" class="btn btn-submit" value="Proceed" onclick="getAllCheckedSupplierIds()">
+								<a href="#" onclick="window.history.back();" class="btn btn-warning">Back</a>
+							</div>
+							
+							<div class="col-md-12" >
+								<table class="datatable table table-striped table-bordered exportbtn  mt-3">
+									<thead class="bagGroundColor">
+										<tr>
+											<th style="width: 70px;">Sl No.</th>
+											<th>Vendor Name</th>
+											<th style="width: 350px;">Rfq Quote No</th>
+											<th style="width: 350px;">Quote received</th>
+											<th style="width: 100px;">Link</th>
+											<th>Copy Link</th>
+										</tr>
+									</thead>
+									<tbody id="suppBody">
+										<c:forEach items="${lstRfq}" var="rfq" varStatus="count">
+											<tr>
+												<td>${count.count}</td>
+												<td>${rfq.assetVendor.vendorName}</td>
+												<td>${rfq.quoteNo}</td>
+												<td>${rfq.rfqReceived eq true ? 'Yes' : 'No'}</td>
+												<td><a href="${contextPath}/procurement/quotation/supplier/vendorRfqQuote?rfqQuoteId=${rfq.rfqQuoteId}" target="_blank" title="Link" class="btn btn-success"><i class="fa-solid fa-link"></i> </a></td>
+												<td><button type="button" class="btn btn-info" onclick="copyToClipboard('${rfq.linkCOde}',this)" title="Copy Link"><i class="fa fa-copy"></i> </button></td>
+											</tr>
+										</c:forEach>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+        </form>
+	</div>
+	</div>
+	</div>
+	</div>
+	
+<!-- Modal -->
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bagGroundColor" style="color: #fff;">
+        <h5 class="modal-title" id="myModalLongTitle" >Supplier List</h5>
+      </div>
+       <form class="form-horizontal" method="post" action="${contextPath}/procurement/quotation/sendRfq" id="itemSupplier" enctype="multipart/form-data">
+        <input type="hidden" class="" id="encodedDataitemSupplier" name="encodedDataitemSupplier" value="" />
+        <div class="modal-body">
+       
+		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+		<input type="hidden" id="requisitionId" name="requisitionId" value="${req.requisitionId}">
+		<input type="hidden" id="sendEmail" name="sendEmail" value="">
+		<table class="table table-bordered">
+
+			<thead class="bagGroundColor">
+			  <tr>
+				<th>Sl. No</th>
+				<th>Item Name</th>
+				<th>Select</th>
+			  </tr>
+			</thead>
+			<tbody id="finalItemTable"></tbody>
+		</table>
+
+		<table class="table table-bordered">
+			<thead class="bagGroundColor">
+			  <tr>
+				<th>Sl. No</th>
+				<th>Supplier Name</th>
+				<th>Select</th>
+			  </tr>
+			</thead>
+			<tbody id="finalSupTable">
+	
+			</tbody>
+		  </table>
+	 
+      </div>
+      <div class="modal-footer">
+        <div class="col-sm-12 text-center">
+		<!-- Green Colour -->
+			<input type="button" id="save" value="Send Rfq without mail" onclick="submitRfq(false)" class="btn btn-success">
+			<input type="button" id="save" value="Send Rfq" onclick="submitRfq(true)" class="btn btn-submit">
+			<!-- Close Button -->
+			<button type="button" class="btn btn-danger" onclick="$('#myModal').hide();">Close</button>
+	   </div>
+      </div>
+       </form>
+    </div>
+  </div>
+</div>
+
+<script>
+var tableIds=['finalItemTable','finalSupTable'];
+var jsonKeys=['itemDto','supplierDto'];
+function getAllCheckedSupplierIds() {
+	allCheckedSupplierIds = [];
+	$('#suppBody').find('input[type="checkbox"]').each(function() {
+		if (this.checked) {
+			var id = this.id.replace('selectVendor', '');
+			var supId = $('#vendorId' + id).val();
+			var supName = $('#vendorName' + id).val();
+			var obj = {
+				"supId" : supId,
+				"supName" : supName
+			};
+			allCheckedSupplierIds.push(obj);
+		}
+	});
+
+	if (allCheckedSupplierIds.length == 0) {
+		alert("Please select atleast one supplier");
+		return false;
+	}
+
+	$('#finalSupTable').empty();
+	var count = 1;
+	allCheckedSupplierIds.forEach(function(supplier) {
+		// append supplier data to modal table
+		$('#finalSupTable').append('<tr><td>' + count + '</td><td>' + supplier.supName + '</td><td><input type="checkbox" id="checkboxsupp' + count + '" name="supplierDto[' + count + '].checked" value="true" onclick="setValue(this)"  checked><input type="hidden" id="supplierId' + count + '" name="supplierDto[' + count + '].supplierId" value="' + supplier.supId + '"></td></tr>');
+		count++;
+	});
+
+	// get selected item ids from itemTableId
+	allCheckedItemIds = [];
+	$('#itemBody').find('input[type="checkbox"]').each(function() {
+		if (this.checked) {
+			var id = this.id.replace('selectItem', '');
+			var itemId = $('#itemId' + id).val();
+			var itemName = $('#itemName' + id).val();
+			var obj = {
+				"itemId" : itemId,
+				"itemName" : itemName
+			};
+			allCheckedItemIds.push(obj);
+		}
+	});
+	if (allCheckedItemIds.length == 0) {
+		bootbox.alert("Please select atleast one item");
+		return false;
+	}
+	// clear modal table data before append
+	$('#finalItemTable').empty();
+	var count = 1;
+	allCheckedItemIds.forEach(function(item) {
+		// append item data to modal table
+		// if checked then value=1 else value=0
+		$('#finalItemTable').append('<tr><td>' + count + '</td><td>' + item.itemName + '</td><td><input type="checkbox" id="checkboxitm' + count + '" name="itemDto[' + count + '].checked" value="true" onclick="setValue(this)" checked><input type="hidden" id="itemId' + count + '" name="itemDto[' + count + '].itemId" value="' + item.itemId + '"></td></tr>');
+		count++;
+	});
+	// show modal
+	$('#myModal').show();
+}
+function submitRfq(sendEmail){
+	var supCount=0;
+	var itemCount=0;
+	$('#finalSupTable').find('input[type="checkbox"]').each(function() {
+		if (this.checked) {
+			supCount++;
+		}
+	});
+	$('#finalItemTable').find('input[type="checkbox"]').each(function() {
+		if (this.checked) {
+			itemCount++;
+		}
+	});
+	if(supCount==0){
+		alert("Please select atleast one supplier");
+		return false;
+	}
+	if(itemCount==0){
+		alert("Please select atleast one item");
+		return false;
+	}
+	if(sendEmail){
+		$("#sendEmail").val(true);
+	}else{
+		$("#sendEmail").val(false);
+	}
+
+    encryptFormData('itemSupplier', tableIds, jsonKeys);
+	$("#itemSupplier").submit();
+}
+function copyToClipboard(text,that) {
+	  var dummy = document.createElement("textarea");
+	  document.body.appendChild(dummy);
+	  dummy.value = text;
+	  dummy.select();
+	  document.execCommand("copy");
+	  document.body.removeChild(dummy);
+	  // under this button show 'copied to clipboard' but after 3 seconds auto close the alert
+      let copiedToClipboard = '<span style="color: green; display:block">Copied to clipboard</span>';
+      $(that).parent().append(copiedToClipboard);
+      setTimeout(() => {
+          $(that).parent().find('span').remove();
+      }, 3000);
+	}
+    function setValue(that) {
+        var id = that.id;
+        if (that.checked) {
+            $("#"+id).val(true);
+        }else{
+            $("#"+id).val(false);
+        }
+    }
+</script>
