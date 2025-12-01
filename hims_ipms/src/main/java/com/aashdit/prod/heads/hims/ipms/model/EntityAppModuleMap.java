@@ -29,28 +29,27 @@ import lombok.Setter;
 @DynamicUpdate
 @Entity
 @Table(name = "t_mst_entity_app_module_map", schema = "public")
-public class EntityAppModuleMap extends Auditable<Long> implements Serializable{/**
-	 * 
-	 */
+public class EntityAppModuleMap extends Auditable<Long> implements Serializable {
+	/**
+	* 
+	*/
 	private static final long serialVersionUID = 6010447830181677924L;
 
-	
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "entity_app_id", nullable = false)
-    private Long entityAppId;
-	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "entity_app_id", nullable = false)
+	private Long entityAppId;
+
 	@ManyToOne
-	@JoinColumn(name="app_module_id")
+	@JoinColumn(name = "app_module_id")
 	private ApplicationModuleMst appModuleId;
-	
-    @Column(name = "object_type")
-    private String objectType;
-	
-	@Column(name="object_id")
+
+	@Column(name = "object_type")
+	private String objectType;
+
+	@Column(name = "object_id")
 	private Long objectId;
 
-
 	@Column(name = "is_active")
-    private Boolean isActive=true;
+	private Boolean isActive = true;
 }

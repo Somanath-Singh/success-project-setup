@@ -126,9 +126,6 @@
 	
 	
 	
-</div>
-
-
 
 		  <!-- Modal End -->
 <form  method="GET" id="formId">

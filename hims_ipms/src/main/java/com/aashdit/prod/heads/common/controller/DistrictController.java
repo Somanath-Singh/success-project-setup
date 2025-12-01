@@ -1,6 +1,5 @@
 package com.aashdit.prod.heads.common.controller;
 
-
 import java.util.List;
 
 import org.jboss.logging.Logger;
@@ -30,129 +29,137 @@ import com.aashdit.prod.heads.framework.core.ServiceOutcome;
 @RequestMapping(value = "/admin/district")
 public class DistrictController {
 
-    final static Logger logger = Logger.getLogger(DistrictController.class);
+	final static Logger logger = Logger.getLogger(DistrictController.class);
 
-    @Autowired
-    private DistrictService districtService;
-    
-    @Autowired
-    private StateService stateService;
-    
-    @Autowired
-    private CommonValidationService commonValidationService;
-    
+	@Autowired
+	private DistrictService districtService;
+
+	@Autowired
+	private StateService stateService;
+
+	@Autowired
+	private CommonValidationService commonValidationService;
+
 	@Autowired
 	private MessageSource messageSource;
 
-    @GetMapping(path = "/list", name = "List District")
-    public String list(Model model, @RequestParam(value = "showDeleted", required = false) Boolean showDeleted) {
-    	
+	@GetMapping(path = "/list", name = "List District")
+	public String list(Model model, @RequestParam(value = "showDeleted", required = false) Boolean showDeleted) {
+
 		try {
-			ServiceOutcome<List<District>> serviceOutcome=districtService.getAllDistrict(true);
-			if(serviceOutcome.getOutcome()) {
+			ServiceOutcome<List<District>> serviceOutcome = districtService.getAllDistrict(true);
+			if (serviceOutcome.getOutcome()) {
 				model.addAttribute("districtList", serviceOutcome.getData());
-			}else {
+			} else {
 				model.addAttribute("error_msg", serviceOutcome.getMessage());
 			}
-		}catch(Exception ex) {
+		} catch (Exception ex) {
 			logger.error(ex);
-			model.addAttribute("error_msg", messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+			model.addAttribute("error_msg",
+					messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
 
 		}
-	
-        return "admin.district.list";
-    }
 
-    @GetMapping(path = "/add", name = "Add District")
-    public String add(Model model) {
-        try {
-			ServiceOutcome<List<State>> staOutcome=stateService.getAllState(true);
-			if(staOutcome.getOutcome()) {
+		return "admin.district.list";
+	}
+
+	@GetMapping(path = "/add", name = "Add District")
+	public String add(Model model) {
+		try {
+			ServiceOutcome<List<State>> staOutcome = stateService.getAllState(true);
+			if (staOutcome.getOutcome()) {
 				model.addAttribute("stateList", staOutcome.getData());
-			}else {
+			} else {
 				model.addAttribute("error_msg", staOutcome.getMessage());
 			}
-		
-        } catch (Exception ex) {
-            logger.error(ex);
-			model.addAttribute("error_msg", messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
 
-        }
+		} catch (Exception ex) {
+			logger.error(ex);
+			model.addAttribute("error_msg",
+					messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
 
-        return "admin.district.add";
-    }
+		}
 
-    @GetMapping(path = "/edit/{districtId}", name = "Edit District")
-    public String edit(Model model,@PathVariable("districtId")Long districtId, RedirectAttributes redirectAttributes) {
-        try {
-			ServiceOutcome<District> serviceOutcome=districtService.getById(districtId);
-			ServiceOutcome<List<State>> staOutcome=stateService.getAllState(true);
-			if(serviceOutcome.getOutcome()) {
+		return "admin.district.add";
+	}
+
+	@GetMapping(path = "/edit/{districtId}", name = "Edit District")
+	public String edit(Model model, @PathVariable("districtId") Long districtId,
+			RedirectAttributes redirectAttributes) {
+		try {
+			ServiceOutcome<District> serviceOutcome = districtService.getById(districtId);
+			ServiceOutcome<List<State>> staOutcome = stateService.getAllState(true);
+			if (serviceOutcome.getOutcome()) {
 				model.addAttribute("districtData", serviceOutcome.getData());
 				model.addAttribute("stateList", staOutcome.getData());
-			}else {
+			} else {
 				model.addAttribute("error_msg", serviceOutcome.getMessage());
 			}
-		
-        } catch (Exception ex) {
-            logger.error(ex);
-			model.addAttribute("error_msg", messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
 
-        }
-        return "admin.district.add";
-    }
-    
-    /**purpose:This method used to validate unique code for district
-	 * since : 11/11/2020
-	 * */
-	@GetMapping(path="/validateDistrictCode",name="Validate district code")
+		} catch (Exception ex) {
+			logger.error(ex);
+			model.addAttribute("error_msg",
+					messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+
+		}
+		return "admin.district.add";
+	}
+
+	/**
+	 * purpose:This method used to validate unique code for district since :
+	 * 11/11/2020
+	 */
+	@GetMapping(path = "/validateDistrictCode", name = "Validate district code")
 	public @ResponseBody DuplicateCheckDto validateDistrictCode(String districtCode, Long districtId, String type) {
 		DuplicateCheckDto duplicateCheckDto = null;
 		try {
-			ServiceOutcome<DuplicateCheckDto> srvOutcome =commonValidationService.checkDuplicateByAnyCode(districtCode.trim(),districtId,type);
-			if(srvOutcome.getOutcome()) {
+			ServiceOutcome<DuplicateCheckDto> srvOutcome = commonValidationService
+					.checkDuplicateByAnyCode(districtCode.trim(), districtId, type);
+			if (srvOutcome.getOutcome()) {
 				duplicateCheckDto = srvOutcome.getData();
 			}
-		}catch(Exception ex) {
+		} catch (Exception ex) {
 			logger.error(ex);
 		}
-		
+
 		return duplicateCheckDto;
 	}
-	
-	/**purpose:This method used to validate unique name for district
-	 * since : 11/11/2020
-	 * */
-	@GetMapping(path="/validateDistrictName",name="Validate district Name")
-	public @ResponseBody DuplicateCheckDto  validateDistrictName(String districtName,Long districtId,String type) {
+
+	/**
+	 * purpose:This method used to validate unique name for district since :
+	 * 11/11/2020
+	 */
+	@GetMapping(path = "/validateDistrictName", name = "Validate district Name")
+	public @ResponseBody DuplicateCheckDto validateDistrictName(String districtName, Long districtId, String type) {
 		DuplicateCheckDto duplicateCheckDto = null;
 		try {
-			ServiceOutcome<DuplicateCheckDto> srvOutcome =commonValidationService.checkDuplicateByAnyName(districtName.trim(),districtId,type);
-			if(srvOutcome.getOutcome()) {
+			ServiceOutcome<DuplicateCheckDto> srvOutcome = commonValidationService
+					.checkDuplicateByAnyName(districtName.trim(), districtId, type);
+			if (srvOutcome.getOutcome()) {
 				duplicateCheckDto = srvOutcome.getData();
 			}
-		}catch(Exception ex) {
+		} catch (Exception ex) {
 			logger.error(ex);
 		}
 		return duplicateCheckDto;
 	}
 
-    @PostMapping(value = "/save", name = "Save District")
-    public String saveDistrict(@ModelAttribute("district") District district,
-            RedirectAttributes attributes) {
-        try {
-			ServiceOutcome<District> serviceOutcome=districtService.saveDistrict(district);
-			if(serviceOutcome.getOutcome()) {
+	@PostMapping(value = "/save", name = "Save District")
+	public String saveDistrict(@ModelAttribute("district") District district, RedirectAttributes attributes) {
+		try {
+			ServiceOutcome<District> serviceOutcome = districtService.saveDistrict(district);
+			if (serviceOutcome.getOutcome()) {
 				attributes.addFlashAttribute("success_msg", serviceOutcome.getMessage());
-			}else {
+			} else {
 				attributes.addFlashAttribute("error_msg", serviceOutcome.getMessage());
 			}
-		
-        } catch (Exception ex) {
-            logger.error(ex);
-            attributes.addFlashAttribute("error_msg", messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
-        }
-    	return "redirect:/admin/district/list";
-    }
+
+		} catch (Exception ex) {
+			logger.error(ex);
+			attributes.addFlashAttribute("error_msg",
+					messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+		}
+		return "redirect:/admin/district/list";
+	}
 
 }

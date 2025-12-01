@@ -1,11 +1,12 @@
 package com.aashdit.prod.heads.hims.umt.dto;
 
-import com.aashdit.prod.heads.hims.umt.model.Role;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.aashdit.prod.heads.hims.umt.model.Role;
+
+import lombok.Data;
 
 @Data
 public class CurrentUserVo {
@@ -26,10 +27,14 @@ public class CurrentUserVo {
 	private String currentUserEntityIdAndUserLevel;
 	@Data
 	public static class AllEntityIdsAndLevel implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private Long entityId;
 		private String entityLevel;
 		private String entityIdAndLevel;
-
+	
 		public AllEntityIdsAndLevel(long entityId, String entityLevel, String entityIdAndLevel) {
 			this.entityId = entityId;
 			this.entityLevel = entityLevel;

@@ -1,0 +1,1367 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+
+<%-- External Resources --%>
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+
+<%-- Inline CSS --%>
+<style>
+    .freeze {
+        pointer-events: none;
+    }
+    .project-supercard {
+        border: 2px solid #ff6f61; /* Vibrant coral border */
+        border-radius: 0.5rem;
+        background: linear-gradient(135deg, #fff5f5, #fefefe); /* Soft gradient background */
+        padding: 20px;
+        margin-top: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+        box-shadow: 0 6px 12px rgba(255, 111, 97, 0.2); /* Subtle shadow with accent color */
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .project-card {
+        margin-bottom: 15px;
+        border: 2px solid #4ecdc4; /* Teal border for contrast */
+        border-radius: 0.5rem;
+        padding: 15px;
+        background: linear-gradient(135deg, #ffffff, #f9fdfd); /* Light gradient */
+        max-width: 100%;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .project-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(78, 205, 196, 0.1) 0%, transparent 70%);
+        animation: rotate 10s linear infinite;
+        z-index: 0;
+    }
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .project-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 10px 20px rgba(78, 205, 196, 0.3);
+        background: linear-gradient(135deg, #ffffff, #e6fafa);
+    }
+    .project-card h6 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #2c3e50; /* Dark slate for readability */
+        position: relative;
+        z-index: 1;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .project-card p {
+        margin: 0;
+        font-size: 1rem;
+        color: #34495e; /* Dark gray-blue for contrast */
+        position: relative;
+        z-index: 1;
+        line-height: 1.4;
+    }
+    .project-card .card-header {
+        background: linear-gradient(90deg, #4ecdc4, #45b7cd); /* Gradient header */
+        padding: 10px;
+        border-bottom: 2px solid #e0e0e0;
+        border-radius: 0.3rem 0.3rem 0 0;
+        color: #fff;
+        font-weight: 600;
+    }
+    .project-card .card-body {
+        padding-top: 15px;
+        position: relative;
+        z-index: 1;
+    }
+    .trigger.datepick-trigger{
+   	  	position: absolute;
+	    right: 8px;
+	    bottom: 0px;
+	    background: #dddddd;
+	    border: none;
+	    color: #0092f6;
+	    padding: 3px 8px;
+	    font-size: 16px;
+	    border-radius: 0 4px 4px 0;
+    }
+    .table>:not(caption)>*>* {
+	    padding: 0.2rem .1rem;
+	    font-size: 13px;
+    }
+</style>
+
+<%-- Breadcrumb Navigation --%>
+<%-- <div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Execution</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa-solid fa-house"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">execution</li>
+            </ol>
+        </nav>
+    </div>
+</div> --%>
+
+<%-- Main Content --%>
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="card">
+          	<%@ include file="/WEB-INF/views/message.jsp"%>
+          	<div class="card-header">
+              	<h5 class="card-title">Execution</h5> 
+          	</div>
+    		<div class="card-body">
+           		<div class="row">
+					              
+	               <div class="col-md-3">
+					  <div class="form-group mb-3">
+					    <label>Financial Year :</label>
+					    <select class="form-select" id="yearId" name="yearId">
+					      <option>--Select--</option>
+					      <c:forEach items="${yearList}" var="year">
+					        <option value="${year.finyearId}"
+					          ${year.finyearId eq yearId ? 'selected' : ''}>
+					          ${year.finYear}
+					        </option>
+					      </c:forEach>
+					    </select>
+					  </div>
+					</div>
+					
+	                <div class="col-md-3">
+					  <div class="form-group mb-3">
+					    <label>District :</label>
+					    <select class="form-select" id="districtId" name="districtId" onchange="loadBlocksByDistrict(this.value),getBuildingNames(this.value);">
+					      <option>--Select--</option>
+					        <c:forEach items="${districtList}" var="dis">
+						      <option value="${dis.districtId}"
+							    ${dis.districtId eq districtId ? 'selected' : ''}>
+							    ${dis.districtName}
+							  </option> 
+							</c:forEach>
+					    </select>
+					  </div>
+					</div> 
+									
+					   <div class="col-md-3">
+		                  <div class="form-group mb-3">
+						    <label for="buildingNameId" class="smallInput">Area Type :</label>
+						    <select id="LocationTypeId" name="LocationTypeId" class="form-control form-select" onchange="hiddenBlock(this.value)">
+						        <option value="">-- Select Location --</option>
+						        <option value="RURAL" ${LocationTypeId eq 'RURAL' ? 'selected' : ''} >Rural</option>
+						        <option value="URBAN" ${LocationTypeId eq 'URBAN' ? 'selected' : ''}>Urban</option>
+						    </select>
+						  </div>
+						</div>
+						
+		                <div class="col-md-3 hidden" id="blockHnId">
+		                  <div class="form-group mb-3">
+		                    <label>Block :</label>
+		                    <select class="form-select" id="blockId" name="blockId" onchange="getBuildingNames(this.value)">
+		                      <option selected>--Select--</option>
+		                    </select>
+		                  </div>
+		                </div>
+		
+		               <div class="col-md-3 hidden" id="munHnId">
+		                  <div class="form-group mb-3">
+		                    <label>Municipality :</label>
+		                    <select class="form-select" id="municipalityId" name="municipalityId" onchange="getBuildingNames(this.value)">
+		                      <option>--Select--</option>
+		                    </select>
+		                  </div>
+		                </div> 
+	                
+			              <div class="col-md-3">
+			                  <div class="form-group mb-3">
+			                    <label>Building Name :</label>
+			                    <select class="form-select" name="buildingName" id="buildingNameId">
+			                      <option>--Select--</option>
+			                    </select>
+			                  </div>
+			                </div> 
+					
+				            <div class="col-md-3">
+				                  <div class="form-group mb-3">
+				                    <label>Building Type :</label>
+				                    <select  class="form-select" id="buildingType" name="buildingType" onchange="buildingTypeHndnItems(this.value)">
+				                      <option>--Select--</option>
+				                        <c:forEach items="${buildingTypeList}" var="dis">
+									      <option value="${dis.valueEn}"
+										    ${dis.valueEn eq buildingType ? 'selected' : ''}>
+										    ${dis.valueEn}
+										  </option> 
+										</c:forEach>
+				                    </select>
+				                  </div>
+				                </div> 
+					
+				                 <div class="col-md-3 hidden" id="subCategoryDiv">
+					                  <div class="form-group mb-3">
+					                    <label>Sub Category :</label>
+						                    <select id="subCategory" class="form-select" name="subCategory" onchange="subchange(this.value)">
+						                      <option>--Select--</option>
+							                      <c:forEach items="${subCategoryList}" var="dis">
+												      <option value="${dis.valueEn}"
+													    ${dis.valueEn eq subCategory ? 'selected' : ''}>
+													    ${dis.valueEn}
+													  </option> 
+												</c:forEach>
+						                   </select>
+					                  </div>
+					                </div> 
+					
+					                <div class="col-md-3" id="staffTypeDiv" style="display: none;">
+					                  <div class="form-group mb-3">
+					                    <label>Staff Type :</label>
+					                    <select id="staffType" class="form-select" name="staffType">
+					                      <option>--Select--</option>
+					                        <c:forEach items="${staffList}" var="dis">
+										      <option value="${dis.valueEn}"
+											    ${dis.valueEn eq staffType ? 'selected' : ''}>
+											    ${dis.valueEn}
+											  </option> 
+											</c:forEach>
+					                    </select>
+					                  </div>
+					                </div> 
+					
+					                <div class="col-md-3 hidden" id="schoolCategoryDiv">
+					                  <div class="form-group mb-3">
+					                    <label>School Category :</label>
+					                    <select id="schoolCategory" name="schoolCategory" class="form-select" onchange="schoolCategoryfun(this.value)">
+					                       <option>--Select--</option>
+				                            <c:forEach items="${schoolList}" var="dis">
+										      <option value="${dis.valueEn}"
+											    ${dis.valueEn eq schoolCategory ? 'selected' : ''}>
+											    ${dis.valueEn}
+											  </option> 
+											</c:forEach>
+					                    </select>
+					                  </div>
+					                </div>
+					
+					                <div class="col-md-3" id="classRangeDiv" style="display: none;">
+					                  <div class="form-group mb-3">
+					                    <label>Class Range :</label>
+					                    <select id="classRange" name="classRange" class="form-select">
+					                      <option>--Select--</option>
+					                      <option value="1 to 10" ${classRange eq '1 to 10' ? 'selected' : ''} >1 to 10</option>
+					                      <option value="6 to 10" ${classRange eq '6 to 10' ? 'selected' : ''} >6 to 10</option>
+					                    </select>
+					                  </div>
+					                </div> 
+					
+					               <div class="col-md-3 hidden" id="hostelTypeDiv">
+					                  <div class="form-group mb-3">
+					                    <label>Hostel Type :</label>
+					                      <select id="hostelType" name="hostelType" class="form-select">
+					                       <option>--Select--</option>
+					                        <c:forEach items="${schoolcatList}" var="dis">
+										      <option value="${dis.valueEn}"
+											    ${dis.valueEn eq hostelType ? 'selected' : ''}>
+											    ${dis.valueEn}
+											  </option> 
+											 </c:forEach>
+					                     </select>
+					                   </div>
+					                </div> 
+					
+					                <div class="col-md-3 hidden" id="hostelCapacityDiv">
+					                  <div class="form-group mb-3">
+					                    <label>Hostel Capacity :</label>
+					                    <select id="hostelCapacity" class="form-select" name="hostelCapacity">
+					                      <option>--Select--</option>
+					                        <c:forEach items="${hostelCapacityList}" var="dis">
+										      <option value="${dis.valueEn}"
+											    ${dis.valueEn eq hostelCapacity ? 'selected' : ''}>
+											    ${dis.valueEn}
+											  </option> 
+											</c:forEach>
+					                    </select>
+					                  </div>
+					                </div> 
+					
+					               <div class="col-md-3 hidden" id="hostelCategoryDiv" >
+					                  <div class="form-group mb-3">
+					                    <label>Hostel Category :</label>
+					                    <select id="hostelCategory" class="form-select" name="hostelCategory">
+					                      <option>--Select--</option>
+						                      <c:forEach items="${hostelCategoryList}" var="dis">
+											      <option value="${dis.valueEn}"
+												    ${dis.valueEn eq hostelCategory ? 'selected' : ''}>
+												    ${dis.valueEn}
+												  </option> 
+											</c:forEach>
+					                    </select>
+					                  </div>
+					                </div> 
+					
+					               <div class="col-md-3">
+					                  <div class="form-group mb-3">
+					                    <label>Agency :</label>
+					                     <select class="form-select" id="agencyName" name="agencyName">
+					                       <option>--Select--</option>
+						                    <c:forEach var="agency" items="${agencyList}">
+												<option value="${agency.agencyName}" ${agency.agencyName eq agencyName ? 'selected' : ''}>${agency.agencyName}</option>
+											</c:forEach>
+					                    </select>
+					                  </div>
+					                </div> 
+					
+					                <div class="col-md-3">
+					                  <div class="form-group">
+					                  		<label class="d-block">&nbsp;</label>
+					                      <button type="button" class="btn btn-primary"  onclick="submitfrm()">
+											  <i class="fa fa-filter" style="color: #fff;"></i> Filter
+										 </button>
+										 
+					                    <button type="button" class="btn btn-secondary btn-reset text-dark">
+					                      <i class="fa-solid fa-undo" style="color: #333;"></i> Back
+					                    </button>
+					                  </div>
+					                </div>
+					                
+				</div> 
+			</div> 
+		</div> 
+	</div> 
+	<div class="col-md-12 mt-3">
+		<div class="card">
+            <div class="card-header">
+          		<h5 class="card-title">Execution List  </h5>
+            </div>
+        	<div class="card-body">
+				<div class="table-responsive">
+			    	<table class="table table-bordered">
+			       		<thead>
+			                    <tr>
+			                      <th style="width:60px;" class="text-center">Sl No.</th>
+			                      <th style="">Location Code</th>
+			                      <th style="">Building Type</th>
+			                      <th style="">Building Name</th>
+			                      <th style="">Last Updated</th>
+			                      <th style="">Work Order Date</th>
+			                      <th style="">Agreement Date</th>
+			                      <th style="">Action</th>
+			                    </tr>
+			                  </thead>
+			                  <tbody>
+			                    <c:forEach var="item" items="${report}" varStatus="loop">
+						            <tr>
+						                <td style="text-align:center">${loop.index + 1}</td>
+						                <td style="">${item.locationCode}</td>
+						                <td style="">${item.buildingName}</td>
+						                <td style="">${item.buildingType}</td>
+						                <td style="">${item.lastUpdatedOn}</td>
+						                <td style="">${item.work_order_date}</td>
+						                <td style="">${item.agreement_date}</td>
+						                <td style="text-align: center;">
+						                    <div class="d-flex justify-content-center gap-2">
+						                   <c:choose>
+												    <c:when test="${item.executionId eq null}">
+												        <button
+												            id="editBuildingBtn"
+												            onclick="showActionModel('${item.sanctionId}', '${item.buildingId}')"
+												            class="btnnew"
+												            title="Edit"
+												            style="background: #d97706; border: none; border-radius: 5px; color: white; padding: 6px 10px;"
+												            onmouseover="this.style.background='#b45309'"
+												            onmouseout="this.style.background='#d97706'"
+												            data-bs-toggle="modal"
+												            data-bs-target="#editModal">
+												            <i class="fa-solid fa-pen-to-square" style="color: #fff"></i>
+												        </button>
+												    </c:when>
+												
+												    <c:otherwise>
+												        <button
+												            id="viewBuildingBtn"
+												            onclick="UpdateExecutionDetails('${item.executionId}')"
+												            class="btn btn-primary"
+												            title="Edit"
+												            data-bs-toggle="modal"
+												            data-bs-target="#editModal">
+												            <i class="fa-solid fa-edit"></i>
+												        </button>
+												    </c:otherwise>
+												</c:choose>
+
+						                       <button
+												    class="btn btn-primary"
+												    data-bs-toggle="modal"
+												    data-bs-target="#viewModal"
+												    title="View"
+												    onclick="viewGivenData('${item.sanctionId}','${item.buildingId}')">
+												    <i class="fa-solid fa-eye" style="color: #fff"></i>
+											</button>
+						            	</div>
+						        	</td>
+						    	</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+			         <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+					    <div class="modal-dialog modal-xl modal-dialog-centered">
+					      <div class="modal-content">
+					        <div class="modal-header text-white" style="">
+					          <h5 style="color: white;">Edit Work Order Details </h5>
+					          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+					        </div>
+					        <div class="modal-body">
+							 <fieldset class="p-3"  >
+							 <div class="form-section-header">
+                               <span>Work Order Details</span>
+                             </div>
+             
+					          <form class="row g-3 mt-2" action="${contextPath}/execution/saveAndUpdateExecutionWorkOrderDetails" method="post"
+					              enctype="multipart/form-data" id="submit">
+					            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+					            
+					            <input type="hidden" name="executionId" id="executionId" /> 
+					            <input type="hidden" name="buildingId" id="buildingIdhn" /> 
+					            <input type="hidden" name="sanctionId" id="sanctionIdhn" /> 
+					            
+					            <div class="col-md-3">
+						              <label class="form-label">Work Start Date :</label>
+						              <input type="text" class="form-control" id="workStartDate" name="workOrderDate" readonly />
+					            </div>
+					
+					            <div class="col-md-3">
+					              <label class="form-label">Completion Due Date : </label>
+					              <input type="text" class="form-control" id="completionDueDate" name="completionDueDate" readonly  />
+					            </div>
+					
+					            <div class="col-md-3 position-relative">
+					              <label class="form-label">Final Completion Date :</label>
+					              <input type="text" class="form-control datepicker" name="finalDueDate" id="finalDueDate" />
+					            </div>
+					
+					            <div class="col-md-3 position-relative">
+					              <label class="form-label">Taken Over Date :</label>
+					              <input type="text" class="form-control datepicker" id="takenOverDate" name="takenOverDate"/>
+					            </div>
+				
+					            <div class="col-md-3">
+					              <label class="form-label">Taken Over Letter No :</label>
+					              <input type="text" class="form-control" id="takenOverLetterNo" name="takenOverLetterNo" placeholder="Enter Letter No"  maxlength="20"/>
+					            </div>
+					
+					            <div class="col-md-3 position-relative">
+					              <label class="form-label">Functionalization Date :</label>
+					              <input type="text" class="form-control datepicker" id="functionalizationDate" name="functionalizationDate"/>
+					            </div>
+					
+					            <div class="col-md-3">
+					              <label class="form-label">Fully Furnished :</label>
+					              <select class="form-select" id="fullyFurnished" name="fullyFurnished">
+					                <option value="">--Select--</option>
+					                <option  value="true">Yes</option>
+					                <option  value="false">No</option>
+					              </select>
+					            </div>
+					
+					        	<div id="schoolFields" class="row d-none">
+								  <div class="col-md-3">
+								    <label class="form-label">Cook Appointed :</label>
+								    <select class="form-select" id="cookAppointed" name="cookAppointed">
+								       <option value="">--Select--</option>
+								      <option  value="true">Yes</option>
+								      <option  value="false">No</option>
+								    </select>
+								  </div>
+								
+								  <div class="col-md-3">
+								    <label class="form-label">Matron Appointed :</label>
+								    <select class="form-select" id="matronAppointed" name="matronAppointed">
+								      <option value="">--Select--</option>
+								      <option value="true">Yes</option>
+								      <option value="false">No</option>
+								    </select>
+								  </div>
+								</div>
+					
+					            <div class="col-md-3 position-relative">
+					              <label class="form-label">UC Submission Date :</label>
+					              <input type="text" class="form-control datepicker" name="ucSubmissionDate" id="ucSubmissionDate"/>
+					            </div>
+					
+					            <div class="col-md-3">
+					              <label class="form-label">Cumulative Amount of UC :</label>
+					              <input type="text" class="form-control NumbersOnly" placeholder="Enter Amount" name="cumulativeAmount" id="cumulativeAmount"  maxlength="12" />
+					            </div>
+					
+					            <div class="col-md-3">
+					              <label class="form-label">Work Order Amount : </label>
+					              <input type="text" class="form-control" id="workOrderAmount" name="workOrderAmount" readonly />
+					            </div>
+					
+					            <div class="col-md-3">
+								    <label class="form-label">Upload UC Document :</label>
+								    <input type="file" class="form-control" name="ucDocumentFile" id="ucDocumentFileId" />
+								    <small id="uploadedFileName" class="text-muted"></small>
+								</div>
+								
+					            <div class="col-md-3">
+					              <label class="form-label">Due Date :</label>
+					              <input type="text" class="form-control" id="dueDate" name="dueDate" readonly />
+					            </div>
+					
+					            <div class="col-md-3">
+					              <label class="form-label">Exceeding Due Date :</label>
+					              <input type="text" class="form-control" id="exceedDays" name="exceedingDueDate" readonly />
+					            </div>
+					             <div class="col-md-3 position-relative">
+					              <label class="form-label">Handing Over Date :</label>
+					              <input type="text" class="form-control datepicker" name="handedOverDate" id="handedOverDate"/>
+					            </div>
+					
+					            <div class="col-md-3">
+					              <label class="form-label">Handing Over Letter No :</label>
+					              <input type="text" class="form-control" placeholder="Enter Letter No" name="handingOverLetterNo" id="handingOverLetterNo"  maxlength="20"/>
+					            </div>
+					
+					           <div class="col-md-3">
+								  <label class="form-label">Handing Over to Other Department :</label>
+								  <select class="form-select" id="handingOverToOtherDept" name="handingOverToOtherDept" onchange="handingOver()">
+								    <option value="" selected>--Select--</option>
+								    <option value="true">Yes</option>
+								    <option value="false">No</option>
+								  </select>
+								</div>
+					            
+								<div class="col-md-3 d-none" id="deptDiv">
+								  <label class="form-label">Department :</label>
+								  <select class="form-select" id="department" name="department" onchange="dept(this.value)">
+								    <option value="">--Select Department--</option>
+								  </select>
+								</div>
+					
+					            <div class="col-md-3 d-none" id="othHn">
+					              <label class="form-label">Other :</label>
+					              <input type="text" class="form-control" name="otheDept" id="otheDept"  maxlength="20"/>
+					            </div>
+					            
+					            <div class="col-md-3 d-none" id="collegeDiv">
+					              <label class="form-label">College Name :</label>
+					              <input type="text" class="form-control" name="college" id="college" placeholder="Enter College Name" />
+					            </div>
+					
+					            <div class="col-md-3 d-none" id="schoolDiv">
+					              <label class="form-label">School Name :</label>
+					              <input type="text" class="form-control" name="school" id="school" placeholder="Enter School Name" />
+					            </div>
+					            
+					          </form>
+							  </fieldset>
+					        </div>
+					
+					         <div class="modal-footer">
+							  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							  <button type="button" class="btn btn-warning" id="draftBtn">Draft</button>
+							  <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+							  <div id="message" class="mt-3 text-success fw-bold"></div>
+							</div>
+							
+					      </div>
+					    </div>
+					  </div>
+			        
+			       <div class="modal fade" id="viewModal" tabindex="-1">
+					  <div class="modal-dialog modal-xl">
+					    <div class="modal-content">
+					
+					      <div class="modal-header">
+					        <h5 style="color: white">View Details</h5>
+					        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+					      </div>
+					
+					      <!-- MAIN MODAL BODY (for PDF export) -->
+					      <div class="modal-body" id="modalContent" style="font-size: 15px; line-height: 23px;">
+					      	<div class="card-header">
+					      		<h5 class="card-title">Work Order Details</h5>
+					      	</div>
+					
+					        <div class="row" style="padding-top:10px;padding-left:5px;">
+					        	<div class="col-md-4">
+					        		<table class="table table-borderless">
+					        			<tr>
+					        				<th>Work Start Date</th>
+					        				<th>:</th>
+					        				<td><span id="workStartDatee"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Completion Due Date</th>
+					        				<th>:</th>
+					        				<td><span id="completionDueDatee"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Final Completion Date</th>
+					        				<th>:</th>
+					        				<td><span id="finalCompletionDatee"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Department</th>
+					        				<th>:</th>
+					        				<td><span id="departmentt"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Other</th>
+					        				<th>:</th>
+					        				<td><span id="otherr"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>College Name</th>
+					        				<th>:</th>
+					        				<td><span id="collegee"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>School Name</th>
+					        				<th>:</th>
+					        				<td><span id="schooll"></span></td>
+					        			</tr>
+					        		</table>
+					        	</div>
+					         <!--  <div class="col-md-4"><p><b>Work Start Date:</b> <span id="workStartDatee"></span></p></div>
+					          <div class="col-md-4"><p><b>Completion Due Date:</b> <span id="completionDueDatee"></span></p></div>
+					          <div class="col-md-4"><p><b>Final Completion Date:</b> <span id="finalCompletionDatee"></span></p></div>
+					
+					          <div class="col-md-4"><p><b>Department:</b> <span id="departmentt"></span></p></div>
+					          <div class="col-md-4"><p><b>Other:</b> <span id="otherr"></span></p></div>
+					          <div class="col-md-4"><p><b>College Name:</b> <span id="collegee"></span></p></div>
+					          <div class="col-md-4"><p><b>School Name:</b> <span id="schooll"></span></p></div> -->
+								<div class="col-md-4">
+					        		<table class="table table-borderless">
+					        			<tr>
+					        				<th>Taken Over Date</th>
+					        				<th>:</th>
+					        				<td><span id="takenOverDatee"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Taken Over Letter No</th>
+					        				<th>:</th>
+					        				<td><span id="takenOverLetterNoo"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Functionalization Date</th>
+					        				<th>:</th>
+					        				<td><span id="functionalizationDatee"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Fully Furnished</th>
+					        				<th>:</th>
+					        				<td><span id="fullyFurnishedd"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Cook Appointed</th>
+					        				<th>:</th>
+					        				<td><span id="cookAppointedd"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Matron Appointed</th>
+					        				<th>:</th>
+					        				<td><span id="matronAppointedd"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>UC Submission Date</th>
+					        				<th>:</th>
+					        				<td><span id="ucSubmissionDatee"></span></td>
+					        			</tr>
+								          <!-- <div class="col-md-4"><p><b>Taken Over Date:</b> <span id="takenOverDatee"></span></p></div>
+								          <div class="col-md-4"><p><b>Taken Over Letter No:</b> <span id="takenOverLetterNoo"></span></p></div>
+								          <div class="col-md-4"><p><b>Functionalization Date:</b> <span id="functionalizationDatee"></span></p></div>
+								
+								          <div class="col-md-4"><p><b>Fully Furnished:</b> <span id="fullyFurnishedd"></span></p></div>
+								          <div class="col-md-4"><p><b>Cook Appointed:</b> <span id="cookAppointedd"></span></p></div>
+								          <div class="col-md-4"><p><b>Matron Appointed:</b> <span id="matronAppointedd"></span></p></div>
+								
+								          <div class="col-md-4"><p><b>UC Submission Date:</b> <span id="ucSubmissionDatee"></span></p></div> -->
+								    </table>
+								</div>
+								<div class="col-md-4">
+					        		<table class="table table-borderless">
+					        			<tr>
+					        				<th>Cumulative Amount of UC</th>
+					        				<th>:</th>
+					        				<td><span id="ucAmountt"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Work Order Amount</th>
+					        				<th>:</th>
+					        				<td><span id="workOrderAmountt"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Due Date</th>
+					        				<th>:</th>
+					        				<td><span id="dueDatee"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Exceeding Due Date</th>
+					        				<th>:</th>
+					        				<td><span id="exceedingDueDatee"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Handing Over Date</th>
+					        				<th>:</th>
+					        				<td><span id="handingOverDatee"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Handing Over Letter No</th>
+					        				<th>:</th>
+					        				<td><span id="handingOverLetterNoo"></span></td>
+					        			</tr>
+					        			<tr>
+					        				<th>Handing Over to Other Department</th>
+					        				<th>:</th>
+					        				<td><span id="handingOverDeptt"></span></td>
+					        			</tr>
+								          <!-- <div class="col-md-4"><p><b>Cumulative Amount of UC:</b> <span id="ucAmountt"></span></p></div>
+								          <div class="col-md-4"><p><b>Work Order Amount:</b> <span id="workOrderAmountt"></span></p></div>
+								
+								          <div class="col-md-4"><p><b>Due Date:</b> <span id="dueDatee"></span></p></div>
+								          <div class="col-md-4"><p><b>Exceeding Due Date:</b> <span id="exceedingDueDatee"></span></p></div>
+								          <div class="col-md-4"><p><b>Handing Over Date:</b> <span id="handingOverDatee"></span></p></div>
+								
+								          <div class="col-md-4"><p><b>Handing Over Letter No:</b> <span id="handingOverLetterNoo"></span></p></div>
+								          <div class="col-md-4"><p><b>Handing Over to Other Department:</b> <span id="handingOverDeptt"></span></p></div> -->
+					        		</table>
+					        	</div>
+					      	</div>
+					
+					      <div class="modal-footer">
+					        <button class="btn btn-primary" id="exportPdfBtn">Export</button>
+					        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					      </div>
+					
+					    </div>
+					  </div>
+					</div>
+					</div>
+			        
+<form action="${contextPath}/execution/filterExcecutionDetails" method="post" id="myForm">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+    <input type="hidden" name="districtId" id="districtIdhn" /> 
+    <input type="hidden" name="blockId" id="blockIdhn" /> 
+    <input type="hidden" name="areaType" id="areaTypehn" /> 
+    <input type="hidden" name="subCategory" id="subCategoryhn" /> 
+    <input type="hidden" name="hostelType" id="hostelTypehn" /> 
+    <input type="hidden" name="schoolCategory" id="schoolCategoryhn" />
+    <input type="hidden" name="hostelCapacity"  id="hostelCapacityhn"/>
+    <input type="hidden" name="hostelCategory" id="hostelCategoryhn"/>
+    <input type="hidden" name="agencyName" id="agencyNamehn" />
+    <input type="hidden" name="buildingName" id="buldingNamehn" />
+    <input type="hidden" name="staffType" id="staffTypehn" />
+    <input type="hidden" name="classRange" id="classRangehn" />
+    <input type="hidden" name="buildingType" id="buildingTypehn" />
+    <input type="hidden" name="yearId" id="yearIdhn" />
+</form>
+
+<form action = "${contextPath}/document/viewDocuments" method="get" id="documentFormView" enctype="multipart/form-data" target="_blank">
+	<input type="hidden" name="moduleName" id="moduleName"/>
+	<input type="hidden" name="filePath" id="filePath"/>
+</form>
+
+<script>
+function loadBlocksByDistrict(districtId) {
+	debugger
+    if (districtId) {
+        $.ajax({
+            url: "${contextPath}/common/fetchBlockByDistrict",
+            type: "GET",
+            data: { districtId: districtId },
+            success: function(blocks) {
+                var blockSelect = $("#blockId");
+                
+                blockSelect.empty();
+                blockSelect.append('<option value="" selected disabled>- Select -</option>');
+                
+                $.each(blocks, function(index, block) {
+                    blockSelect.append('<option value="' + block.blockId + '">' + block.blockName + '</option>');
+                });
+                debugger
+                if('${districtId}' !=0){
+                	$("#blockId").val('${blockId}');
+                }
+            },
+            error: function(error) {
+                bootbox.alert("Error fetching blocks: " + error);
+            }
+        });
+    } else {
+        $("#blockId").empty().append('<option value="" selected disabled>- Select -</option>');
+    }
+}
+
+function getUploadBuildingNames(districtId,blockId) {
+    debugger;
+    $.ajax({
+        url: '${contextPath}/execution/gettingBuildingNameByDistrictIdAndBlockId',
+        type: 'GET',
+        data: {
+            "districtId": districtId,
+            "blockId": blockId
+        },
+        success: function(buildingNames) {
+            var $dropdown = $("#buildingNameId");
+            $dropdown.empty();
+            $dropdown.append('<option value="">-- Select Building Name --</option>');
+            $.each(buildingNames, function(index, name) {
+                $dropdown.append('<option value="' + name + '">' + name + '</option>');
+            });
+            if('${districtId}' && '${blockId}'){
+            	$("#buildingNameId").val('${buildingName}')
+            }
+        },
+    });
+}
+
+function getBuildingNames() {
+    debugger;
+    var districtId = $("#districtId").val();
+    var blockId = $("#blockId").val();
+
+    $.ajax({
+        url: '${contextPath}/execution/gettingBuildingNameByDistrictIdAndBlockId',
+        type: 'GET',
+        data: {
+            "districtId": districtId,
+            "blockId": blockId
+        },
+        success: function(buildingNames) {
+            var $dropdown = $("#buildingNameId");
+            $dropdown.empty();
+            $dropdown.append('<option value="">-- Select Building Name --</option>');
+            $.each(buildingNames, function(index, name) {
+                $dropdown.append('<option value="' + name + '">' + name + '</option>');
+            });
+        },
+    });
+}
+
+function hiddenBlock() {
+    debugger;
+    var id = $("#LocationTypeId").val();
+
+    if (id === "RURAL") {
+        $("#blockHnId").show();
+        $("#munHnId").hide();
+    } else if (id === "URBAN") {
+        $("#blockHnId").hide();
+        $("#munHnId").show();
+    } else {
+        $("#blockHnId").hide();
+        $("#munHnId").hide();
+    }
+}
+
+ function buildingTypeHndnItems(id) {
+    debugger;
+    if (id === "RESIDENTIAL COMPLEX") {
+        $("#subCategoryDiv").show();
+        $("#hostelCategoryDiv").hide();
+        $("#hostelCapacityDiv").hide();
+        $("#hostelTypeDiv").hide();
+        $("#schoolCategoryDiv").hide();
+        $("#classRangeDiv").hide();
+        $("#staffTypeDiv").hide();
+    } 
+    else if (id === "STANDALONE SCHOOL") {
+        $("#schoolCategoryDiv").show();
+        $("#hostelCategoryDiv").hide();
+        $("#hostelCapacityDiv").hide();
+        $("#hostelTypeDiv").hide();
+        $("#classRangeDiv").hide();
+        $("#subCategoryDiv").hide();
+        $("#staffTypeDiv").hide();
+    } 
+    else if (id === "STANDALONE HOSTEL") {
+        $("#hostelCategoryDiv").show();
+        $("#hostelCapacityDiv").show();
+        $("#hostelTypeDiv").show();
+        $("#schoolCategoryDiv").hide();
+        $("#subCategoryDiv").hide();
+        $("#classRangeDiv").hide();
+        $("#staffTypeDiv").hide();
+    } 
+    else {
+        $("#subCategoryDiv, #hostelCategoryDiv, #hostelCapacityDiv, #hostelTypeDiv, #schoolCategoryDiv").hide();
+    }
+} 
+
+ function submitfrm() {
+	    debugger;
+	    function safeValue(selector) {
+	        var val = $(selector).val();
+	        if (!val || val === "--Select--") {
+	            return 0;
+	        }
+	        return val;
+	    }
+	    var districtId = safeValue("#districtId");
+	    var blockId = safeValue("#blockId");
+	    var areaType = safeValue("#LocationTypeId");
+	    var subCategory = safeValue("#subCategory");
+	    var hostelType = safeValue("#hostelType");
+	    var schoolCategory = safeValue("#schoolCategory");
+	    var hostelCapacity = safeValue("#hostelCapacity");
+	    var hostelCategory = safeValue("#hostelCategory");
+	    var agencyName = safeValue("#agencyName");
+	    var buldingName = safeValue("#buildingNameId");
+	    var staffType = safeValue("#staffType");
+	    var classRange = safeValue("#classRange");
+	    var yearId = safeValue("#yearId");
+	    var buildingType = safeValue("#buildingType");
+	    
+	    $("#yearIdhn").val(yearId);
+	    $("#districtIdhn").val(districtId);
+	    $("#blockIdhn").val(blockId);
+	    $("#areaTypehn").val(areaType);
+	    $("#subCategoryhn").val(subCategory);
+	    $("#hostelTypehn").val(hostelType);
+	    $("#schoolCategoryhn").val(schoolCategory);
+	    $("#hostelCapacityhn").val(hostelCapacity);
+	    $("#hostelCategoryhn").val(hostelCategory);
+	    $("#agencyNamehn").val(agencyName);
+	    $("#buldingNamehn").val(buldingName);
+	    $("#classRangehn").val(classRange);
+	    $("#staffTypehn").val(staffType);
+	    $("#buildingTypehn").val(buildingType);
+	    
+	    $("#myForm").submit();
+	}
+
+function subchange() {
+    debugger;
+    var value = $("#subCategory").val();
+
+    $("#staffTypeDiv, #schoolCategoryDiv, #hostelTypeDiv, #hostelCapacityDiv, #hostelCategoryDiv").hide();
+
+    if (value === "STAFF QUARTER") {
+        $("#staffTypeDiv").show();
+        $("#classRangeDiv").hide();
+    } 
+    else if (value === "SCHOOL") {
+        $("#schoolCategoryDiv").show();
+        $("#classRangeDiv").hide();
+    } 
+    else if (value === "HOSTEL") {
+        $("#hostelTypeDiv").show();
+        $("#hostelCapacityDiv").show();
+        $("#hostelCategoryDiv").show();
+        $("#classRangeDiv").hide();
+    }
+}
+
+function schoolCategoryfun(){
+	debugger
+	  var value = $("#schoolCategory").val();
+		if(value ==="HIGH SCHOOL"){
+			$("#classRangeDiv").show();
+		}else{
+			$("#classRangeDiv").hide();
+		}
+  }
+
+function showActionModel(sanctionId,buildingId) {
+    debugger;
+    $("#sanctionIdhn").val(sanctionId);
+
+    $.ajax({
+        url: '${contextPath}/execution/getSanctionDetailsById',
+        type: "GET",
+        data: { sanctionId: sanctionId },
+        dataType: "json",
+        success: function (data) {
+            if (data) {
+                $("#workStartDate").val(data.workStartDate || "");
+                $("#completionDueDate").val(data.completionDueDate || "");
+                $("#workOrderAmount").val(data.workOrderAmount || "");
+                $("#dueDate").val(data.dueDate || "");
+                $("#exceedDays").val(data.dayDifference || "");
+                if (data.departmentList && data.departmentList.length > 0) {
+                    let deptDropdown = $("#department");
+                    deptDropdown.empty();
+                    let html = '<option value="">--Select Department--</option>';
+                    $.each(data.departmentList, function(index, dept) {
+                        html += '<option value="' + dept.deptName + '">' + dept.deptName + '</option>';
+                    });
+                    deptDropdown.append(html);
+                }
+
+                $("#deptDiv").addClass("d-none");
+                $("#handingOverToOtherDept").val("");
+
+                if (data.subCategory && data.subCategory.toUpperCase() === "SCHOOL") {
+                    $("#schoolFields").addClass("d-none");
+                } else {
+                    $("#schoolFields").removeClass("d-none");
+                }
+                $("#sanctionIdhn").val(sanctionId);
+                $("#buildingIdhn").val(buildingId);
+                // Show modal
+                $("#editModal").modal("show");
+            } else {
+                alert("No data found for this sanction ID.");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching sanction details:", error);
+            alert("Failed to load sanction details. Please try again later.");
+        }
+    });
+}
+
+function handingOver(){
+	debugger
+	var or=  $("#handingOverToOtherDept").val();
+	if(or ==="true"){
+		$("#deptDiv").removeClass("d-none");
+	}else if(or ==="false"){
+		$("#deptDiv").addClass("d-none");
+	}else{
+		$("#deptDiv").addClass("d-none");
+	}
+}
+
+function dept(){
+	debugger
+	var dp=$("#department").val();
+	if(dp==="School & Mass Education"){
+		$("#schoolDiv").removeClass("d-none");
+		$("#collegeDiv").addClass("d-none");
+		$("#othHn").addClass("d-none");
+	}else if(dp==="Higher Education Department"){
+		$("#collegeDiv").removeClass("d-none");
+		$("#schoolDiv").addClass("d-none")
+		$("#othHn").addClass("d-none");
+	}else if(dp==="Other"){
+		$("#othHn").removeClass("d-none");
+		$("#schoolDiv").addClass("d-none");
+		$("#collegeDiv").addClass("d-none");
+	}else{
+		$("#othHn").addClass("d-none");
+		$("#collegeDiv").addClass("d-none");
+		$("#schoolDiv").addClass("d-none");
+	}
+}
+
+$(document).ready(function () {
+    $(".datepicker").datepick({
+        onShow: $.datepick.monthOnly,
+        dateFormat: "dd-mm-yyyy",
+        yearRange: "c-20:c+10",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+        onSelect: function () {
+        }
+    });
+});
+
+$(document).ready(function () {
+debugger
+	if('${districtId}' !=0){
+	  loadBlocksByDistrict('${districtId}')
+	}
+    if('${districtId}' != 0 && '${blockId}'!=0){
+    	getUploadBuildingNames('${districtId}','${blockId}');
+    }
+    updatehiddenBlock('${LocationTypeId}');
+    if('${buildingType}' !=0){
+    	buildingTypeHndnItems('${buildingType}');
+    }
+    if('${schoolCategory}' !=0){
+    	upschoolCategoryfun('${schoolCategory}');
+    }
+    //save
+    $("#saveBtn").click(function () {
+        saveWorkOrder("FINAL");
+    });
+
+    $("#draftBtn").click(function () {
+        saveWorkOrder("DRAFT");
+    });
+
+});
+
+function upschoolCategoryfun(value){
+		if(value ==="HIGH SCHOOL"){
+			$("#classRangeDiv").show();
+		}else{
+			$("#classRangeDiv").hide();
+		}
+  }
+  
+function updatehiddenBlock(id) {
+	debugger
+    if (id === "RURAL") {
+        $("#blockHnId").show();
+        $("#munHnId").hide();
+    } else if (id === "URBAN") {
+        $("#blockHnId").hide();
+        $("#munHnId").show();
+    } else {
+        $("#blockHnId").hide();
+        $("#munHnId").hide();
+    }
+}
+
+function saveWorkOrder(statusType) {
+    debugger;
+
+    let form = $("#submit")[0];
+    let formData = new FormData(form);
+
+    formData.append("submitStatus", statusType);
+
+    $.ajax({
+        url: "${contextPath}/execution/saveAndUpdateExecutionWorkOrderDetails",
+        type: "POST",
+        data: formData,
+        enctype: "multipart/form-data",
+        processData: false,
+        contentType: false,
+        cache: false,
+        beforeSend: function () {
+            $("#message")
+                .removeClass("text-success text-danger")
+                .addClass("text-info")
+                .text(statusType === "DRAFT" ? "Saving draft..." : "Saving work order...");
+        },
+        success: function (response) {
+            if (response && response.status === "success_msg") {
+                $("#message")
+                    .removeClass("text-info text-danger")
+                    .addClass("text-success")
+                    .text(statusType === "DRAFT" ? "Draft saved successfully!" : "Work order saved successfully!");
+
+                setTimeout(() => {
+                    $("#editModal").modal("hide");
+                    $("#message").text("");
+                    location.reload(); 
+                }, 1500);
+
+            } else {
+                $("#message")
+                    .removeClass("text-info text-success")
+                    .addClass("text-danger")
+                    .text(response.message || "Failed to save data. Please check inputs.");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $("#message")
+                .removeClass("text-info text-success")
+                .addClass("text-danger")
+                .text("Error saving data. Try again later.");
+        }
+    });
+}
+
+function viewGivenData(sanctionId, buildingId) {
+	debugger
+    $.ajax({
+        url: '${pageContext.request.contextPath}/execution/getExecutionDetailsByIds',
+        type: 'GET',
+        data: { sanctionId: sanctionId, buildingId: buildingId },
+        success: function (data) {
+            console.log("Execution Data Response:", data); 
+            
+            $("#workStartDatee").text(data.workOrderDate || 'NA');
+            $("#completionDueDatee").text(data.completionDueDate || 'NA');
+            $("#finalCompletionDatee").text(data.finalDueDate || 'NA');
+            $("#handingOverDatee").text(data.handedOverDate || 'NA'); 
+            $("#handingOverLetterNoo").text(data.handingOverLetterNo || 'NA');
+            $("#handingOverDeptt").text(data.handingOverToOtherDept ? 'Yes' : 'No');
+            $("#takenOverDatee").text(data.takenOverDate || 'NA');
+            $("#takenOverLetterNoo").text(data.takenOverLetterNo || 'NA');
+            $("#functionalizationDatee").text(data.functionalizationDate || 'NA');
+            $("#fullyFurnishedd").text(data.fullyFurnished ? 'Yes' : 'No');
+            $("#cookAppointedd").text(data.cookAppointed ? 'Yes' : 'No');
+            $("#matronAppointedd").text(data.matronAppointed ? 'Yes' : 'No');
+            $("#ucSubmissionDatee").text(data.ucSubmissionDate || 'NA');
+            $("#ucAmountt").text(data.cumulativeAmount ?  data.cumulativeAmount.toLocaleString() : 'NA');
+            $("#workOrderAmountt").text(data.workOrderAmount ?  data.workOrderAmount.toLocaleString() : 'NA');
+            $("#dueDatee").text(data.dueDate || 'NA');
+            $("#exceedingDueDatee").text(data.exceedingDueDate || 'NA');
+            $("#departmentt").text(data.department || 'NA');
+            $("#schooll").text(data.school || 'NA');
+            $("#collegee").text(data.college || 'NA');
+            $("#otherr").text(data.otheDept || 'NA');
+        },
+        error: function () {
+            alert('Failed to load details.');
+        }
+    });
+}
+
+function UpdateExecutionDetails(id) {
+    debugger;
+    $.ajax({
+        url: '${contextPath}/execution/getEnteryExecutionDetails',
+        type: "GET",
+        data: { executionId: id },
+        dataType: "json",
+        success: function (data) {
+            if (data) {
+                $("#executionId").val(data.executionId || '');
+                $("#workStartDate").val(data.workOrderDate || '');
+                $("#completionDueDate").val(data.completionDueDate || '');
+                $("#finalDueDate").val(data.finalDueDate || '');
+                $("#handedOverDate").val(data.handedOverDate || '');
+                $("#handingOverLetterNo").val(data.handingOverLetterNo || '');
+                $("#handingOverToOtherDept").val(data.handingOverToOtherDept ? 'true' : 'false');
+                $("#department").val(data.department || '');
+                $("#college").val(data.college || '');
+                $("#school").val(data.school || '');
+                $("#takenOverDate").val(data.takenOverDate || '');
+                $("#takenOverLetterNo").val(data.takenOverLetterNo || '');
+                $("#functionalizationDate").val(data.functionalizationDate || '');
+                $("#fullyFurnished").val(data.fullyFurnished ? 'true' : 'false');
+                $("#cookAppointed").val(data.cookAppointed ? 'true' : 'false');
+                $("#matronAppointed").val(data.matronAppointed ? 'true' : 'false');
+                $("#ucSubmissionDate").val(data.ucSubmissionDate || '');
+                $("#cumulativeAmount").val(data.cumulativeAmount || '');
+                $("#workOrderAmount").val(data.workOrderAmount || '');
+                $("#dueDate").val(data.dueDate || '');
+                $("#exceedDays").val(data.exceedingDueDate || '');
+                $("#buildingIdhn").val(data.buildingId || '');
+                $("#sanctionIdhn").val(data.sanctionId || '');
+                $("#otheDept").val(data.otheDept || '');
+               debugger
+                if (data.ucDocument && data.ucDocumentPath) {
+                	$("#uploadedFileName").html(
+                		    '<span onclick="viewDocument(\'' + data.ucDocumentPath + '\', \'UC_DOCUMENT\')" ' +
+                		    'style="cursor:pointer; text-decoration:none; margin-right:12px;">' +
+                		        '<span style="margin-left:6px;">' + data.ucDocument + '</span>' +
+                		    '</span>' +
+
+                		    '<span onclick="viewDocument(\'' + data.ucDocumentPath + '\', \'UC_DOCUMENT\')" ' +
+                		    'style="cursor:pointer; text-decoration:none;">' +
+                		        '<i class="fa fa-download text-success" title="Download Document"></i>' +
+                		    '</span>'
+                		);
+
+                } else {
+                    $("#uploadedFileName").html("");
+                }
+
+                if (data.departmentList && Array.isArray(data.departmentList)) {
+                    const $deptSelect = $("#department");
+                    $deptSelect.empty().append('<option value="">- Select Department -</option>');
+                    
+                    $.each(data.departmentList, function (index, dept) {
+                        $deptSelect.append('<option value="' + dept.deptName + '">' + dept.deptName + '</option>');
+                    });
+
+                    if (data.department) {
+                        $deptSelect.val(data.department);
+                    }
+                }
+
+                if (data.handingOverToOtherDept === true || data.handingOverToOtherDept === 'true') {
+                    $("#deptDiv").removeClass("d-none");
+                } else {
+                    $("#deptDiv").addClass("d-none");
+                }
+
+                if (data.department === 'School & Mass Education') {
+                    $("#schoolDiv").removeClass("d-none");
+                    $("#collegeDiv").addClass("d-none");
+                    $("#othHn").addClass("d-none");
+                } else if (data.department === 'Higher Education Department') {
+                    $("#collegeDiv").removeClass("d-none");
+                    $("#schoolDiv").addClass("d-none");
+                    $("#othHn").addClass("d-none");
+                } else if(data.department === 'Other'){
+                	$("#othHn").removeClass("d-none");
+                	$("#collegeDiv").addClass("d-none");
+                	 $("#schoolDiv").addClass("d-none");
+                } else {
+                    $("#collegeDiv").addClass("d-none");
+                    $("#schoolDiv").addClass("d-none");
+                    $("#othHn").addClass("d-none");
+                }
+                if (data.submitStatus && data.submitStatus.toUpperCase() === "FINAL") {
+                    $("#saveBtn").addClass("d-none");
+                    $("#draftBtn").addClass("d-none");
+                } else {
+                    $("#saveBtn").removeClass("d-none");
+                    $("#draftBtn").removeClass("d-none");
+                }
+
+                $("#editModal").modal("show");
+            } else {
+                alert("No data found for this execution ID.");
+            }
+        },
+        error: function (xhr, status, error) {
+            alert("Failed to load execution details. Please try again later.");
+        }
+    });
+}
+ 
+document.getElementById("ucDocumentFileId").addEventListener("change", function () {
+    const fileInput = this;
+    const file = fileInput.files[0];
+    const fileNameLabel = document.getElementById("uploadedFileName");
+
+    if (!file) {
+        fileNameLabel.textContent = "";
+        return;
+    }
+    const allowedExtensions = ["pdf", "doc", "docx"];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    const maxSizeMB = 5;
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+    if (!allowedExtensions.includes(fileExtension)) {
+        alert("Invalid file type! Only PDF, DOC, and DOCX formats are allowed.");
+        fileInput.value = "";
+        fileNameLabel.textContent = "";
+        return;
+    }
+    if (file.size > maxSizeBytes) {
+        alert("File size exceeds " + maxSizeMB + " MB limit!");
+        fileInput.value = "";
+        fileNameLabel.textContent = "";
+        return;
+    }
+    fileNameLabel.textContent = "Selected File: " + file.name;
+});
+
+function viewDocument(filePath,moduleName){
+	debugger
+	 $('#moduleName').val(moduleName);
+	 $('#filePath').val(filePath);
+	 $('#documentFormView').submit();
+	}
+
+
+</script>

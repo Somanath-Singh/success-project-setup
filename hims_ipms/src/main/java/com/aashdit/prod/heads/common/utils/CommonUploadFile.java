@@ -1,4 +1,4 @@
- package com.aashdit.prod.heads.common.utils;
+package com.aashdit.prod.heads.common.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,35 +22,28 @@ import org.springframework.web.multipart.MultipartFile;
 import com.aashdit.prod.heads.framework.core.util.ApplicationDateUtils;
 import com.aashdit.prod.heads.hims.umt.utils.CommonHelperFunctions;
 
- public class CommonUploadFile
-{
+public class CommonUploadFile {
 	private final static Logger logger = Logger.getLogger(CommonUploadFile.class);
 
-	
-	
 	public static String addCurrenDateTimeToDocAndRenameItModified(String fileName, String extension)
-			throws IOException 
-	{
+			throws IOException {
 		String filePath = "";
 
-		try 
-		{
-			String currDateTime = CommonHelperFunctions.getStringTodayAsDDMMYY().replaceAll("/", "") +"_"+ ApplicationDateUtils.getStringNowAsHrMi24HrFormat().replaceAll(":", "");
-			
-			filePath = CommonConstants.CONST_FILEUPLOAD_PREFIX+fileName +"_"+ currDateTime + "." + extension;
-		} 
-		catch (Exception e) {
-			logger.error("-- Error -- CommonUploadFile -- addCurrenDateTimeToDocAndRenameItModified() --->>"+ExceptionUtils.getFullStackTrace(e));
+		try {
+			String currDateTime = CommonHelperFunctions.getStringTodayAsDDMMYY().replaceAll("/", "") + "_"
+					+ ApplicationDateUtils.getStringNowAsHrMi24HrFormat().replaceAll(":", "");
+
+			filePath = CommonConstants.CONST_FILEUPLOAD_PREFIX + fileName + "_" + currDateTime + "." + extension;
+		} catch (Exception e) {
+			logger.error("-- Error -- CommonUploadFile -- addCurrenDateTimeToDocAndRenameItModified() --->>"
+					+ ExceptionUtils.getFullStackTrace(e));
 		}
 		return filePath;
 	}
-	
 
 	public static String addCurrenDateTimeToDocAndRenameItModified_OLD(String regCode, String extension)
-			throws IOException 
-	{
-		try 
-		{
+			throws IOException {
+		try {
 			LocalDate dt = LocalDate.now();
 			LocalDateTime tm = LocalDateTime.now();
 			Calendar cal = Calendar.getInstance();
@@ -59,24 +52,24 @@ import com.aashdit.prod.heads.hims.umt.utils.CommonHelperFunctions;
 			String filePath = regCode + currdt + "." + extension;
 			return filePath;
 		} catch (Exception e) {
-			logger.error("-- Error -- CommonUploadFile -- addCurrenDateTimeToDocAndRenameItModified_OLD() --->>"+ExceptionUtils.getFullStackTrace(e));
+			logger.error("-- Error -- CommonUploadFile -- addCurrenDateTimeToDocAndRenameItModified_OLD() --->>"
+					+ ExceptionUtils.getFullStackTrace(e));
 			return "";
 		}
 	}
 
-	public static String uploadDocumentCommon(MultipartFile file, String uploadPathStatic, String module, String code) throws IOException 
-	{
+	public static String uploadDocumentCommon(MultipartFile file, String uploadPathStatic, String module, String code)
+			throws IOException {
 		String uniqFileName = "";
 
-		try 
-		{
+		try {
 			String filePath = uploadPathStatic + File.separator + module;
-			if(code.equals("") || code.isEmpty()) {
+			if (code.equals("") || code.isEmpty()) {
 				filePath = filePath + File.separator + code;
 			}
 
 			String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-			String fname = addCurrenDateTimeToDocAndRenameItModified(code,extension);
+			String fname = addCurrenDateTimeToDocAndRenameItModified(code, extension);
 			File checkFolderPath = new File(filePath);
 			if (!checkFolderPath.exists()) {
 				checkFolderPath.mkdirs();
@@ -85,97 +78,95 @@ import com.aashdit.prod.heads.hims.umt.utils.CommonHelperFunctions;
 			Path uploadPath = Paths.get(filePath.concat(File.separator + fname));
 			Files.write(uploadPath, file.getBytes());
 			uniqFileName = fname;
-		} 
-		catch (Exception e) {
-			logger.error("-- Error -- CommonUploadFile -- upload() --->>"+ExceptionUtils.getFullStackTrace(e));
+		} catch (Exception e) {
+			logger.error("-- Error -- CommonUploadFile -- upload() --->>" + ExceptionUtils.getFullStackTrace(e));
 		}
 		return uniqFileName;
 	}
-	
-	public static String getUploadedPath(String path, String module, String code,String filename) 
-	{
+
+	public static String getUploadedPath(String path, String module, String code, String filename) {
 		String uniqePathName = "";
-		try 
-		{
+		try {
 			String filePath = path + File.separator + module;
-			if(code.equals("") || code.isEmpty()) {
+			if (code.equals("") || code.isEmpty()) {
 				filePath = filePath + File.separator + code;
 			}
 
 			filePath += File.separator + filename;
 			uniqePathName = filePath;
-		}
-		catch(Exception ex) {
-			logger.error("-- Error -- CommonUploadFile -- getUploadedPath() --->>"+ExceptionUtils.getFullStackTrace(ex));
+		} catch (Exception ex) {
+			logger.error(
+					"-- Error -- CommonUploadFile -- getUploadedPath() --->>" + ExceptionUtils.getFullStackTrace(ex));
 		}
 		return uniqePathName;
 	}
-	
-	 public static String finalUpload(String base64File, MultipartFile file, String path, String uniqueCode)
-	            throws IOException {
 
-	        String filePath = "";
-	        byte[] byteBase64 = null;
-	        String uniqFileName = null;
-	        Path uploadPath = null;
-	        String fileExtension = "";
-	        String returnData = "";
-	        try {
-	            if (file.getOriginalFilename() != null) {
-	                fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
-	                Boolean fileSuspicious = null;
-	                if (fileExtension.equalsIgnoreCase("pdf")) {
-	                    fileSuspicious = new PdfDocumentDetectorImpl().isSafe(file.getInputStream());
-	                } else {
-	                    fileSuspicious = true;
-	                }
-	                if (fileSuspicious) {
+	public static String finalUpload(String base64File, MultipartFile file, String path, String uniqueCode)
+			throws IOException {
+
+		String filePath = "";
+		byte[] byteBase64 = null;
+		String uniqFileName = null;
+		Path uploadPath = null;
+		String fileExtension = "";
+		String returnData = "";
+		try {
+			if (file.getOriginalFilename() != null) {
+				fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+				Boolean fileSuspicious = null;
+				if (fileExtension.equalsIgnoreCase("pdf")) {
+					fileSuspicious = new PdfDocumentDetectorImpl().isSafe(file.getInputStream());
+				} else {
+					fileSuspicious = true;
+				}
+				if (fileSuspicious) {
 //	                    if (path.endsWith("ARTICLE-275" + File.separator)) {
 //	                        filePath = path + File.separator + uniqueCode;
 //	                    } else {
 //	                        filePath = path;
 //	                    }
 
-	                	filePath = path + File.separator + uniqueCode;
-	                	
-	                    if (Optional.ofNullable(base64File).isPresent()) {
-	                        String[] parts = base64File.split("_");
-	                        String imageString = parts[0];
-	                        String extension = parts[1];
-	                        byteBase64 = Base64.decodeBase64(imageString);
-	                        uniqFileName = addCurrenDateTimeToDocAndRenameItModified(uniqueCode, extension);
-	                    } else {
-	                        byteBase64 = file.getBytes();
-	                        uniqFileName = addCurrenDateTimeToDocAndRenameItModified(uniqueCode, FilenameUtils.getExtension(file.getOriginalFilename()));
-	                    }
+					filePath = path + File.separator + uniqueCode;
 
-	                    File checkFolderPath = new File(filePath);
-	                    if (!checkFolderPath.exists()) {
-	                        checkFolderPath.mkdirs();
-	                    }
+					if (Optional.ofNullable(base64File).isPresent()) {
+						String[] parts = base64File.split("_");
+						String imageString = parts[0];
+						String extension = parts[1];
+						byteBase64 = Base64.decodeBase64(imageString);
+						uniqFileName = addCurrenDateTimeToDocAndRenameItModified(uniqueCode, extension);
+					} else {
+						byteBase64 = file.getBytes();
+						uniqFileName = addCurrenDateTimeToDocAndRenameItModified(uniqueCode,
+								FilenameUtils.getExtension(file.getOriginalFilename()));
+					}
 
-	                    uploadPath = Paths.get(filePath.concat(File.separator + uniqFileName));
-	                    Files.write(uploadPath, byteBase64);
-	                    returnData = uploadPath.getFileName().toString();
-	                } else {
-	                    returnData = null;
+					File checkFolderPath = new File(filePath);
+					if (!checkFolderPath.exists()) {
+						checkFolderPath.mkdirs();
+					}
+
+					uploadPath = Paths.get(filePath.concat(File.separator + uniqFileName));
+					Files.write(uploadPath, byteBase64);
+					returnData = uploadPath.getFileName().toString();
+				} else {
+					returnData = null;
 //	                    throw new MyException("One or more suspicious files were found. Unable to save data.");
-	                    logger.error("One or more suspicious files were found. Unable to save data.");
-	                }
-	            }
-	            return returnData;
-	        } catch (Exception e) {
-	            logger.error(e.getMessage());
-	            return returnData;
-	        }
-	    }
+					logger.error("One or more suspicious files were found. Unable to save data.");
+				}
+			}
+			return returnData;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return returnData;
+		}
+	}
 
-	public static String getCurrentUserLogoPath(HttpServletRequest request,String module,String docName) {
+	public static String getCurrentUserLogoPath(HttpServletRequest request, String module, String docName) {
 		String defaultPath = request.getSession().getServletContext().getRealPath("/");
 
 		// Validate the document name
 		if (docName == null || docName.isEmpty() || docName.isBlank()) {
-			return defaultPath + "/assets/img/aashdit-logo.png"; //Return a web URL instead of a file path
+			return defaultPath + "/assets/img/aashdit-logo.png"; // Return a web URL instead of a file path
 		}
 
 		// Fetch the base upload path
@@ -192,8 +183,5 @@ import com.aashdit.prod.heads.hims.umt.utils.CommonHelperFunctions;
 		// Fallback to default logo
 		return defaultPath + "/assets/img/aashdit-logo.png";
 	}
-
-
-
 
 }

@@ -23,88 +23,66 @@ import com.aashdit.prod.heads.hims.umt.service.UserDetailsServiceImpl;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+	@Autowired
+	private UserDetailsServiceImpl userDetailsService;
 
-    @Autowired
-    private JwtFilter jwtFilter;
+	@Autowired
+	private JwtFilter jwtFilter;
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncode());
-    }
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncode() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public HttpSessionEventPublisher httpSessionEventPublisher() {
-        return new HttpSessionEventPublisher();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
-    @Override
-	protected void configure(HttpSecurity http) throws Exception {
-	
-	    http.headers()
-	            .contentTypeOptions()
-	            .and()
-	            .xssProtection()
-	            .and()
-	            .cacheControl()
-	            .and()
-	            .httpStrictTransportSecurity()
-	            .and()
-	            .frameOptions()
-	            .and()
-	            .contentSecurityPolicy("script-src 'self' 'unsafe-eval' 'unsafe-inline'")
-	            .and()
-	            .referrerPolicy(ReferrerPolicy.SAME_ORIGIN);
-	
-	    http.authorizeRequests()
-	            .antMatchers(HttpMethod.TRACE, "/**").denyAll()
-	            .antMatchers(HttpMethod.PATCH, "/**").denyAll().antMatchers(HttpMethod.PUT, "/**").denyAll()
-	            .antMatchers(HttpMethod.DELETE, "/**").denyAll().antMatchers(HttpMethod.HEAD, "/**").denyAll()
-	            .antMatchers(HttpMethod.OPTIONS, "/**").denyAll()
-	            .antMatchers("/captcha/**").permitAll()
-	            .antMatchers("/umt/login").permitAll()
-	            .antMatchers("/assets/**").permitAll()
-	            .antMatchers("/overwrite/**").permitAll()
-	            .antMatchers("/privacyPolicy").permitAll()
-	            .antMatchers("/system/**").permitAll()
-	            .antMatchers("/api/**").permitAll()
-	            .antMatchers("/mPin/check-pin/**").permitAll()
-	            .antMatchers("/mPin/generate-update-pin/**").permitAll()
-	            .antMatchers("/mPin/send-otp/**").permitAll()
-	            .antMatchers("/mPin/verify-otp-reset-pin/**").permitAll()
-	            .antMatchers("/public/**").permitAll()
-	            .anyRequest().authenticated()
-	            .and()
-	            .formLogin()
-	            .loginPage("/login").permitAll()
-	            .and()
-	            .logout()
-	            .logoutSuccessUrl("/login")
-	            .invalidateHttpSession(true).deleteCookies("Invalid Session", "JSESSIONID").permitAll();
-	
-	    http.cors().and().csrf().ignoringAntMatchers("/ajax/**","/public/**","/core/**","/dashboard/**","/api/**", "/api/login","/api/user-roles","/mPin/check-pin/**","/mPin/generate-update-pin/**","/mPin/send-otp/**","/mPin/verify-otp-reset-pin/**");
-	    http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncode());
 	}
 
-    @Bean
-    public SessionRegistry sessionRegistry() {
-        return new SessionRegistryImpl();
-    }
+	@Bean
+	public BCryptPasswordEncoder passwordEncode() {
+		return new BCryptPasswordEncoder();
+	}
 
-    @Bean
-    public HttpSessionCsrfTokenRepository httpSessionCsrfTokenRepository() {
-        return new HttpSessionCsrfTokenRepository();
-    }
+	@Bean
+	public HttpSessionEventPublisher httpSessionEventPublisher() {
+		return new HttpSessionEventPublisher();
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+
+		http.headers().contentTypeOptions().and().xssProtection().and().cacheControl().and()
+				.httpStrictTransportSecurity().and().frameOptions().and()
+				.contentSecurityPolicy("script-src 'self' 'unsafe-eval' 'unsafe-inline'").and()
+				.referrerPolicy(ReferrerPolicy.SAME_ORIGIN);
+
+		http.authorizeRequests().antMatchers(HttpMethod.TRACE, "/**").denyAll().antMatchers(HttpMethod.PATCH, "/**")
+				.denyAll().antMatchers(HttpMethod.PUT, "/**").denyAll().antMatchers(HttpMethod.DELETE, "/**").denyAll()
+				.antMatchers(HttpMethod.HEAD, "/**").denyAll().antMatchers(HttpMethod.OPTIONS, "/**").denyAll()
+				.antMatchers("/captcha/**").permitAll().antMatchers("/umt/login").permitAll().antMatchers("/assets/**")
+				.permitAll().antMatchers("/overwrite/**").permitAll().antMatchers("/privacyPolicy").permitAll()
+				.antMatchers("/system/**").permitAll().antMatchers("/api/**").permitAll()
+				.antMatchers("/mPin/check-pin/**").permitAll().antMatchers("/mPin/generate-update-pin/**").permitAll()
+				.antMatchers("/mPin/send-otp/**").permitAll().antMatchers("/mPin/verify-otp-reset-pin/**").permitAll()
+				.antMatchers("/public/**").permitAll().anyRequest().authenticated().and().formLogin()
+				.loginPage("/login").permitAll().and().logout().logoutSuccessUrl("/login").invalidateHttpSession(true)
+				.deleteCookies("Invalid Session", "JSESSIONID").permitAll();
+
+		http.cors().and().csrf().ignoringAntMatchers("/ajax/**", "/public/**", "/core/**", "/dashboard/**", "/api/**",
+				"/api/login", "/api/user-roles", "/mPin/check-pin/**", "/mPin/generate-update-pin/**",
+				"/mPin/send-otp/**", "/mPin/verify-otp-reset-pin/**");
+		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+	}
+
+	@Bean
+	public SessionRegistry sessionRegistry() {
+		return new SessionRegistryImpl();
+	}
+
+	@Bean
+	public HttpSessionCsrfTokenRepository httpSessionCsrfTokenRepository() {
+		return new HttpSessionCsrfTokenRepository();
+	}
 
 }

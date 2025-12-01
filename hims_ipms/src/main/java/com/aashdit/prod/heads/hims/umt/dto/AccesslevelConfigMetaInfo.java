@@ -8,23 +8,22 @@ import java.util.List;
 public class AccesslevelConfigMetaInfo implements Serializable {
 
 	private static final long serialVersionUID = 5850565114020440305L;
-	
+
 	private String primaryKey;
-	
+
 	private List<Long> allotedRowIds;
-	
+
 	private String data;
-	
+
 	private LinkedHashMap<Integer, String> columnMetaData;
-	
-	private Integer currentPage ;
-	
+
+	private Integer currentPage;
+
 	private Integer totalPages;
-	
+
 	private Integer pageSize;
-	
-	public AccesslevelConfigMetaInfo()
-	{
+
+	public AccesslevelConfigMetaInfo() {
 		this.allotedRowIds = new ArrayList<Long>();
 		this.columnMetaData = new LinkedHashMap<Integer, String>();
 	}
@@ -36,7 +35,6 @@ public class AccesslevelConfigMetaInfo implements Serializable {
 	public void setPrimaryKey(String primaryKey) {
 		this.primaryKey = primaryKey;
 	}
-
 
 	public List<Long> getAllotedRowIds() {
 		return allotedRowIds;
@@ -85,13 +83,5 @@ public class AccesslevelConfigMetaInfo implements Serializable {
 	public void setPageSize(Integer pageSize) {
 		this.pageSize = pageSize;
 	}
-	
-	
-	
-	
-
-
-	
-	
 
 }

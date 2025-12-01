@@ -10,19 +10,18 @@ import lombok.Data;
 public class FinancialYearMasterDto {
 
 	private Long finyearId;
-	
+
 	private String finYear;
-	
+
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Date startDate;
-	
+
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Date endDate;
-	
+
 	private Boolean currFinYear;
-	
-	
+
 	private String fyStartDate;
-	
+
 	private String fyEndDate;
 }

@@ -1,7 +1,6 @@
 package com.aashdit.prod.heads.common.utils;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.jboss.logging.Logger;
+import static java.text.NumberFormat.getCurrencyInstance;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -14,10 +13,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 
-import static java.text.NumberFormat.getCurrencyInstance;
+import javax.xml.bind.DatatypeConverter;
+
+import org.apache.commons.lang.RandomStringUtils;
+import org.jboss.logging.Logger;
 
 public class ApplicationStringUtils {
-	
+
 	final static Logger logger = Logger.getLogger(ApplicationStringUtils.class);
 
 	static SimpleDateFormat sdfDDMMYYYY = new SimpleDateFormat("dd/MM/yyyy");
@@ -57,65 +59,66 @@ public class ApplicationStringUtils {
 	 * @description Convert amount to INR Format i.e. #,##,##,###.##
 	 */
 	public static String convertAmountToINRFormat(String strInputAmount) {
-		
-		if(strInputAmount.equals("null")) {
+
+		if (strInputAmount.equals("null")) {
 			strInputAmount = "0.0";
 			return strInputAmount;
-		}else {
-		if (strInputAmount.equals(""))
-			strInputAmount = "0.00";
-		String amountToBeConverted = "";
-		String finalFormattedAmount = "";
-		String decimalValue = "";
-
-		DecimalFormat df1 = new DecimalFormat("#");
-		df1.setMaximumFractionDigits(2);
-		strInputAmount = df1.format(Double.parseDouble(strInputAmount));
-
-		if (strInputAmount.indexOf(".") != -1) {
-			amountToBeConverted = strInputAmount.substring(0, strInputAmount.indexOf("."));
-			decimalValue = strInputAmount.substring(strInputAmount.indexOf(".") + 1);
-			if (decimalValue.length() == 0)
-				decimalValue = decimalValue + "00";
-			if (decimalValue.length() == 1)
-				decimalValue = decimalValue + "0";
 		} else {
-			amountToBeConverted = strInputAmount;
-			decimalValue = "00";
-		}
+			if (strInputAmount.equals(""))
+				strInputAmount = "0.00";
+			String amountToBeConverted = "";
+			String finalFormattedAmount = "";
+			String decimalValue = "";
 
-		StringBuilder stringBuilder = new StringBuilder();
-		char amountArray[] = amountToBeConverted.toCharArray();
-		int length1 = 0, length2 = 0;
-		for (int i = amountArray.length - 1; i >= 0; i--) {
-			if (length1 < 3) {
-				stringBuilder.append(amountArray[i]);
-				length1++;
-			} else if (length2 < 2) {
-				if (length2 == 0) {
-					stringBuilder.append(",");
+			DecimalFormat df1 = new DecimalFormat("#");
+			df1.setMaximumFractionDigits(2);
+			strInputAmount = df1.format(Double.parseDouble(strInputAmount));
+
+			if (strInputAmount.indexOf(".") != -1) {
+				amountToBeConverted = strInputAmount.substring(0, strInputAmount.indexOf("."));
+				decimalValue = strInputAmount.substring(strInputAmount.indexOf(".") + 1);
+				if (decimalValue.length() == 0)
+					decimalValue = decimalValue + "00";
+				if (decimalValue.length() == 1)
+					decimalValue = decimalValue + "0";
+			} else {
+				amountToBeConverted = strInputAmount;
+				decimalValue = "00";
+			}
+
+			StringBuilder stringBuilder = new StringBuilder();
+			char amountArray[] = amountToBeConverted.toCharArray();
+			int length1 = 0, length2 = 0;
+			for (int i = amountArray.length - 1; i >= 0; i--) {
+				if (length1 < 3) {
 					stringBuilder.append(amountArray[i]);
-					length2++;
-				} else {
-					stringBuilder.append(amountArray[i]);
-					length2 = 0;
+					length1++;
+				} else if (length2 < 2) {
+					if (length2 == 0) {
+						stringBuilder.append(",");
+						stringBuilder.append(amountArray[i]);
+						length2++;
+					} else {
+						stringBuilder.append(amountArray[i]);
+						length2 = 0;
+					}
 				}
 			}
+
+			finalFormattedAmount = stringBuilder.reverse().append(".").append(decimalValue).toString();
+
+			if (foundScientificNotation(finalFormattedAmount)) {
+				finalFormattedAmount = new BigDecimal(finalFormattedAmount).toPlainString();
+				Format format = getCurrencyInstance(new Locale("en", "in"));
+				finalFormattedAmount = format.format(new BigDecimal(finalFormattedAmount));
+			}
+			if (finalFormattedAmount.contains("Rs."))
+				finalFormattedAmount = finalFormattedAmount.replaceAll("Rs.", "");
+			return finalFormattedAmount.trim();
 		}
 
-		finalFormattedAmount = stringBuilder.reverse().append(".").append(decimalValue).toString();
+	}
 
-		if (foundScientificNotation(finalFormattedAmount)) {
-			finalFormattedAmount = new BigDecimal(finalFormattedAmount).toPlainString();
-			Format format = getCurrencyInstance(new Locale("en", "in"));
-			finalFormattedAmount = format.format(new BigDecimal(finalFormattedAmount));
-		}
-		if (finalFormattedAmount.contains("Rs."))
-			finalFormattedAmount = finalFormattedAmount.replaceAll("Rs.", "");
-		return finalFormattedAmount.trim();
-	}
-	
-	}
 	/**
 	 * @return Encodes a value using Base64 Encryption logic
 	 * @throws UnsupportedEncodingException
@@ -124,7 +127,7 @@ public class ApplicationStringUtils {
 	public static String encodeString(String strStringToEncode) throws UnsupportedEncodingException {
 		String encodedString = "";
 		byte[] byteStringToEncode = strStringToEncode.getBytes("UTF-8");
-//		encodedString = DatatypeConverter.printBase64Binary(byteStringToEncode);
+		encodedString = DatatypeConverter.printBase64Binary(byteStringToEncode);
 		return encodedString;
 	}
 
@@ -135,9 +138,9 @@ public class ApplicationStringUtils {
 	 */
 	public static String decodeString(String strEncodedString) throws UnsupportedEncodingException {
 		String decodedString = "";
-//		byte[] decodedByteArr = DatatypeConverter.parseBase64Binary(strEncodedString);
-//		decodedString = new String(decodedByteArr, "UTF-8");
-		// decodedString = decodedString.substring(0, decodedString.indexOf("^"));
+		byte[] decodedByteArr = DatatypeConverter.parseBase64Binary(strEncodedString);
+		decodedString = new String(decodedByteArr, "UTF-8");
+		decodedString = decodedString.substring(0, decodedString.indexOf("^"));
 		return decodedString;
 	}
 
@@ -168,80 +171,78 @@ public class ApplicationStringUtils {
 		}
 		return row;
 	}
-	
-	
+
 	/**
 	 * get Current year as yyyyy fromat
+	 * 
 	 * @return
 	 */
-	public static String getStringTodayYearAsYYYY()
-	{
+	public static String getStringTodayYearAsYYYY() {
 		Calendar calendarObj = Calendar.getInstance();
 		String strTodayYearAsYYYY = "";
 		strTodayYearAsYYYY = String.valueOf(calendarObj.get(Calendar.YEAR));
 		return strTodayYearAsYYYY;
 	}
-	
+
 	/**
-	 *  get current month as MM
+	 * get current month as MM
+	 * 
 	 * @return
 	 */
-	public static String getStringTodayMonthAsMM()
-	{
+	public static String getStringTodayMonthAsMM() {
 		Calendar calendarObj = Calendar.getInstance();
 		String strTodayMonthAsMM = "";
-		int todayMonth = calendarObj.get(Calendar.MONTH)+1;
-		if(todayMonth < 10)
-			strTodayMonthAsMM = "0"+todayMonth;
+		int todayMonth = calendarObj.get(Calendar.MONTH) + 1;
+		if (todayMonth < 10)
+			strTodayMonthAsMM = "0" + todayMonth;
 		else
-			strTodayMonthAsMM = ""+todayMonth;
+			strTodayMonthAsMM = "" + todayMonth;
 
 		return strTodayMonthAsMM;
 	}
-	
+
 	/**
 	 * Get current date as DD
+	 * 
 	 * @return
 	 */
-	public static String getStringTodayDateAsDD()
-	{
+	public static String getStringTodayDateAsDD() {
 		Calendar calendarObj = Calendar.getInstance();
 		String strTodayDateAsDD = "";
 		int todayDate = calendarObj.get(Calendar.DATE);
-		if(todayDate < 10)
-			strTodayDateAsDD = "0"+todayDate;
+		if (todayDate < 10)
+			strTodayDateAsDD = "0" + todayDate;
 		else
-			strTodayDateAsDD = ""+todayDate;
+			strTodayDateAsDD = "" + todayDate;
 
 		return strTodayDateAsDD;
 	}
-	
+
 	/**
 	 * get current finyear as YYYY-YYYY fromat
+	 * 
 	 * @return
 	 */
-	public static String getCurrFinYearAsYYYYtoYYYY()
-	{
+	public static String getCurrFinYearAsYYYYtoYYYY() {
 		Calendar calendarObj = Calendar.getInstance();
 		String currFinYearAsYYYYtoYYYY = "";
 		int currYear = Integer.parseInt(getStringTodayYearAsYYYY());
 		int currMonth = Integer.parseInt(getStringTodayMonthAsMM());
 		int currDay = 0;
 
-		if(getStringTodayDateAsDD().equals(""))
+		if (getStringTodayDateAsDD().equals(""))
 			currDay = calendarObj.get(Calendar.DATE);
 		else
 			currDay = Integer.parseInt(getStringTodayDateAsDD());
 
 		int finYrStartYear = currYear;
 
-		// Get the year of Fin Year end day -------- 
-		String currDate = finYrStartYear +"-"+ finYrStartMon +"-"+ finYrStartDay;
-		DateFormat sdfStrToDate = new SimpleDateFormat("yyyy-MM-dd"); 
+		// Get the year of Fin Year end day --------
+		String currDate = finYrStartYear + "-" + finYrStartMon + "-" + finYrStartDay;
+		DateFormat sdfStrToDate = new SimpleDateFormat("yyyy-MM-dd");
 		Date currDateObj = new Date();
-		try
-		{
-			currDateObj = (Date)sdfStrToDate.parse(currDate);
+		try {
+			currDateObj = (Date) sdfStrToDate.parse(currDate);
 			calendarObj.setTime(currDateObj);
 
 			calendarObj.add(Calendar.YEAR, 1);
@@ -249,21 +250,17 @@ public class ApplicationStringUtils {
 
 			String finYrEndDate = "";
 			finYrEndDate = sdfDDMMYYYY.format(calendarObj.getTime());
-			int finYrEndYear = Integer.parseInt(finYrEndDate.substring(finYrEndDate.length()-4));
-			// Till this : Get the year of previous day of FinYear start day -------- 
+			int finYrEndYear = Integer.parseInt(finYrEndDate.substring(finYrEndDate.length() - 4));
+			// Till this : Get the year of previous day of FinYear start day --------
 
-			if(finYrStartYear != finYrEndYear)
-			{
-				if((currMonth < finYrStartMon) || (currMonth == finYrStartMon && currDay < finYrStartDay))
-					currFinYearAsYYYYtoYYYY = (finYrStartYear-1) +"-"+ finYrStartYear;
-				else if((currMonth == finYrStartMon && currDay >= finYrStartDay) || currMonth > finYrStartMon)
-					currFinYearAsYYYYtoYYYY = finYrStartYear +"-"+ (finYrStartYear+1);
-			}
-			else
-				currFinYearAsYYYYtoYYYY = finYrStartYear +"-"+ finYrEndYear;
-		}
-		catch (Exception e)
-		{
+			if (finYrStartYear != finYrEndYear) {
+				if ((currMonth < finYrStartMon) || (currMonth == finYrStartMon && currDay < finYrStartDay))
+					currFinYearAsYYYYtoYYYY = (finYrStartYear - 1) + "-" + finYrStartYear;
+				else if ((currMonth == finYrStartMon && currDay >= finYrStartDay) || currMonth > finYrStartMon)
+					currFinYearAsYYYYtoYYYY = finYrStartYear + "-" + (finYrStartYear + 1);
+			} else
+				currFinYearAsYYYYtoYYYY = finYrStartYear + "-" + finYrEndYear;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -282,24 +279,29 @@ public class ApplicationStringUtils {
 	 * return time; }
 	 */
 	public static String generatedTokenNo(String appCode, Long id) {
-		Random random =new Random();
+		Random random = new Random();
 		String uc = id.toString();
-		return appCode+ "-" +ApplicationStringUtils.getStringTodayDateAsDD()+ApplicationStringUtils.getStringTodayMonthAsMM()+ApplicationStringUtils.getStringTodayYearAsYYYY()+"-" +String.valueOf(random.nextInt(5)) +"-"+uc;
+		return appCode + "-" + ApplicationStringUtils.getStringTodayDateAsDD()
+				+ ApplicationStringUtils.getStringTodayMonthAsMM() + ApplicationStringUtils.getStringTodayYearAsYYYY()
+				+ "-" + String.valueOf(random.nextInt(5)) + "-" + uc;
 	}
+
 	public static String grievanceTokenNo(Long grvId) {
-		Random random =new Random();
+		Random random = new Random();
 		String uc = grvId.toString();
-		return  "EMS-"+ApplicationStringUtils.getStringTodayDateAsDD()+ApplicationStringUtils.getStringTodayMonthAsMM()+ApplicationStringUtils.getStringTodayYearAsYYYY()+"-" +String.valueOf(random.nextInt(5)) +"-"+uc;
+		return "EMS-" + ApplicationStringUtils.getStringTodayDateAsDD()
+				+ ApplicationStringUtils.getStringTodayMonthAsMM() + ApplicationStringUtils.getStringTodayYearAsYYYY()
+				+ "-" + String.valueOf(random.nextInt(5)) + "-" + uc;
 
 	}
-	
-    public static String camelCaseToUpperCaseWithUnderscore(String name) {
-        name = name.replaceAll("\\s+", " ");
-        StringBuilder code = new StringBuilder();
-        String[] nameArray = name.split(" ");
-        for (String str : nameArray) {
-            code.append(str.toUpperCase()).append("_");
-        }
-        return code.substring(0, code.length() - 1);
-    }
+
+	public static String camelCaseToUpperCaseWithUnderscore(String name) {
+		name = name.replaceAll("\\s+", " ");
+		StringBuilder code = new StringBuilder();
+		String[] nameArray = name.split(" ");
+		for (String str : nameArray) {
+			code.append(str.toUpperCase()).append("_");
+		}
+		return code.substring(0, code.length() - 1);
+	}
 }

@@ -3,26 +3,16 @@ package com.aashdit.prod.heads.common.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceAware;
 import org.springframework.stereotype.Service;
 
 import com.aashdit.prod.heads.common.model.FinancialYear;
 import com.aashdit.prod.heads.common.repository.FinancialYearRepository;
 
 @Service
-public class FinyearServiceImpl implements FinyearService, MessageSourceAware {
-	@Autowired
-	private MessageSource messageSource;
+public class FinyearServiceImpl implements FinyearService {
+	
 	@Autowired
 	private FinancialYearRepository finyearRepository;
-
-	@Override
-
-	public void setMessageSource(MessageSource messageSource) {
-		this.messageSource = messageSource;
-
-	}
 
 	@Override
 	public Object getAllFinyear(boolean includeDeleted) {

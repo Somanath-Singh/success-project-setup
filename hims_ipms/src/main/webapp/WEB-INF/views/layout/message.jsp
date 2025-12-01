@@ -47,13 +47,6 @@
   </div>
 </c:if>
 
-<c:if test="${not empty err_msg}">
-  <div id="messageDiv" class="alert alert-danger">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" onclick="hide();">×</button>
-    <span>${err_msg}</span>
-  </div>
-</c:if>
-
 <script>
   function hide() {
     $("#messageDiv").hide();
@@ -63,3 +56,4 @@
    }, 10000);
   
 </script>
+

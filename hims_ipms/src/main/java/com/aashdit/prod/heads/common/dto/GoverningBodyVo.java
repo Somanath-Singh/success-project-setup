@@ -6,11 +6,11 @@ import java.util.List;
 
 @Data
 public class GoverningBodyVo {
-	
+
 	private Long governingBodyId;
 	private String governingBodyName;
 	private String governingBodyCode;
-	private Boolean isActive=true;
+	private Boolean isActive = true;
 	private String remarks;
 	private String emailId;
 	private String phoneNo;

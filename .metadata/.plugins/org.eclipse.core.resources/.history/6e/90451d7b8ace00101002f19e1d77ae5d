@@ -1,0 +1,655 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+    <!-- template-outside-layout -->
+    <definition name="template-def" template="/WEB-INF/views/layout/default/defaultLayout.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/layout/header.jsp"/>
+        <put-attribute name="body" value=""/>
+        <put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp"/>
+    </definition>
+
+    <definition name="layout.base" template="/WEB-INF/views/layout/baselayout.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/layout/header.jsp"/>
+        <put-attribute name="menu" value="/WEB-INF/views/menu.jsp"/>
+        <put-attribute name="body" value=""/>
+        <put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp"/>
+        <put-attribute name="pageScripts" value=" "/>
+    </definition>
+
+    <definition name="layout.module" template="/WEB-INF/views/layout/modulelayout.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/layout/header.jsp"/>
+        <put-attribute name="body" value=""/>
+        <put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp"/>
+        <put-attribute name="pageScripts" value=" "/>
+    </definition>
+
+    <definition name="layout.blank" template="/WEB-INF/views/layout/blankLayout.jsp">
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <definition name="template-blank" template="/WEB-INF/views/layout/blankLayout.jsp">
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <definition name="error.layout" template="/WEB-INF/views/layout/errorLayout.jsp">
+        <put-attribute name="title" value="kaushalya"/>
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <!-- <definition name="layout.login" template="/WEB-INF/views/login.jsp"/> -->
+
+    <definition name="layout.login" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/login.jsp"/>
+    </definition>
+
+    
+    <definition name="site.session.timeout" template="/WEB-INF/views/nosession.jsp"/>
+    <definition name="site.privacy.policy" template="/WEB-INF/views/privacyPolicy.jsp"/>
+
+    <!-- BEG Home for various Roles -->
+    <definition name="site.system.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/system.jsp"/>
+    </definition>
+
+    <definition name="site.admin.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/dashboard.jsp"/>
+    </definition>
+
+    <definition name="site.deo.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/dashboard.jsp"/>
+    </definition>
+
+
+    <definition name="site.cdpo.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/dashboard.jsp"/>
+    </definition>
+
+    <definition name="site.dswo.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/dashboard.jsp"/>
+    </definition>
+
+    <definition name="site.sa.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/dashboard/dashboard.jsp"/>
+    </definition>
+
+
+    <!-- END Home for various Roles -->
+    
+    
+     <!-- Start Project Estimation -->
+     
+     
+    <definition name="site.addProject" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/ProjectEstimation/addProjectEstimation.jsp"/>
+    </definition>
+    
+       <definition name="site.viewProject" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/ProjectEstimation/viewProjectEstimation.jsp"/>
+    </definition>
+    
+     <definition name="viewprojectdetails" extends="layout.base">
+		<put-attribute name="body" value="/WEB-INF/views/masters/viewprojectdetails.jsp" />
+	</definition>
+     
+     <!-- END Project Estimation -->
+    
+    <!-- Administartion Module -->
+    <definition name="site.admin.user.acl.configure" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/configureACL.jsp"/>
+    </definition>
+
+    <definition name="site.admin.acl.list" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/listACL.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.module" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/listModules.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.module.add" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/addModule.jsp"/>
+    </definition>
+
+    <definition name="site.addBank" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/addBankMaster.jsp"></put-attribute>
+    </definition>
+
+    <!-- User Management -->
+
+    <definition name="site.umt.userProfile" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/userProfile.jsp"/>
+    </definition>
+
+    <definition name="site.umt.public.registration" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/umt/userRegistration.jsp"/>
+    </definition>
+
+    <definition name="site.umt.changePassword" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/changePassword.jsp"/>
+    </definition>
+
+    <definition name="site.umt.userList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/userList.jsp"/>
+    </definition>
+
+    <definition name="site.umt.addUser" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/addUser.jsp"/>
+    </definition>
+
+    <definition name="site.umt.userEdit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/userEdit.jsp"/>
+    </definition>
+
+    <definition name="site.umt.userView" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/umt/userView.jsp"/>
+    </definition>
+    <!-- sso -->
+    <definition name="application" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/sso/application.jsp"/>
+    </definition>
+    <definition name="roleApplicationMap" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/sso/roleApplicationMap.jsp"/>
+    </definition>
+
+    <!-- Core -->
+    <definition name="site.admin.roleList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleList.jsp"/>
+    </definition>
+
+    <definition name="site.admin.roleEdit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleEdit.jsp"/>
+    </definition>
+
+    <definition name="site.admin.roleView" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleView.jsp"/>
+    </definition>
+
+    <definition name="site.admin.roleLevelMapList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleLevelMapList.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.module.edit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/editModule.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.menu" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/listMenu.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.menu.edit" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/editMenu.jsp"/>
+    </definition>
+
+    <definition name="sysAdmin.setup.menu.add" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/system/addMenu.jsp"/>
+    </definition>
+
+    <definition name="admin.menu.role.map" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleMenuMap.jsp"/>
+    </definition>
+
+    <definition name="admin.mobile.menu.role.map" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/roleMobileMenuMap.jsp"/>
+    </definition>
+
+    <definition name="admin.menu.reorder" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/reorderMenu.jsp"/>
+    </definition>
+
+    <definition name="app.home" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/home.jsp"/>
+    </definition>
+
+    <definition name="admin.permission.map" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/menuPermissionMap.jsp"/>
+    </definition>
+
+    <definition name="site.system.support" extends="template-blank">
+        <put-attribute name="body" value="/WEB-INF/views/system/support/dbPage.jsp"/>
+    </definition>
+
+    <definition name="site.admin.loginHistory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/loginHistory.jsp"/>
+    </definition>
+
+    <definition name="site.admin.loginHistory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/admin/loginHistory.jsp"/>
+    </definition>
+
+
+	<!-- ######################################## ERROR CONFIGURATION START ################################################## -->
+
+    <definition name="site.unauthorizedError" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/unauthorizedError.jsp"/>
+    </definition>
+
+    <definition name="site.accessdenied" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/403.jsp"/>
+    </definition>
+
+    <definition name="site.defaultError" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/400.jsp"/>
+    </definition>
+
+    <definition name="site.400" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/400.jsp"/>
+    </definition>
+
+    <definition name="site.401" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/401.jsp"/>
+    </definition>
+
+    <definition name="site.403" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/403.jsp"/>
+    </definition>
+
+    <definition name="site.404" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/404.jsp"/>
+    </definition>
+
+    <definition name="site.405" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/405.jsp"/>
+    </definition>
+
+    <definition name="site.500" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/500.jsp"/>
+    </definition>
+
+    <definition name="site.503" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/503.jsp"/>
+    </definition>
+
+    <definition name="site.unknownError" extends="error.layout">
+        <put-attribute name="body" value="/WEB-INF/views/error/unknownError.jsp"/>
+    </definition>
+
+<!-- ######################################## ERROR CONFIGURATION END ################################################## -->
+
+    <!-- ================================ MASTER ====================================================== -->
+    <definition name="master.branch" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/bankBranchMaster.jsp"/>
+    </definition>
+
+
+    <!-- ########################################Stage Config START ################################################## -->
+
+    <!-- Stage Config Tiles -->
+    <definition name="stage.config.view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig.jsp"/>
+    </definition>
+
+    <!-- Stage Config Tiles -->
+    <definition name="stage.config.view2" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig2.jsp"/>
+    </definition>
+
+    <!-- Stage Config Tiles -->
+    <definition name="stage.config.view3" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig3.jsp"/>
+    </definition>
+
+    <!-- Stage Config Tiles -->
+    <definition name="stage.config.view4" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig4.jsp"/>
+    </definition>
+
+    <!-- Stage Config Tiles -->
+    <definition name="stage.config.view5" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig5.jsp"/>
+    </definition>
+
+    <definition name="stage.config.appList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfigAppList.jsp"/>
+    </definition>
+
+
+    <definition name="stage.config.processFlow" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/processFlow.jsp"/>
+    </definition>
+
+    <!-- site.view.tableConfig -->
+    <definition name="site.view.tableConfig" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/OptTable.jsp"/>
+    </definition>
+
+    <!-- site.view.tableConfig -->
+    <definition name="site.view.dynamicReportGenerator" template="/WEB-INF/views/stageConfig/dynamicReport.jsp" />
+
+    <!-- site.view.tableConfig -->
+    <definition name="site.view.TblComConfig" extends="template-blank">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/TblComConfig.jsp"/>
+    </definition>
+
+    <!-- site.view.hierarchy -->
+    <definition name="site.config.hierarchyView" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/hierarchy.jsp"/>
+    </definition>
+    <!-- site.view.viewPageData -->
+    <definition name="site.view.viewPageData" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/viewPageData.jsp"/>
+    </definition>
+
+    <definition name="site.genericDataViewFormat" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/genericDataViewFormat.jsp"/>
+    </definition>
+
+    <definition name="site.view.createActions" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/createActions.jsp"/>
+    </definition>
+
+    <definition name="site.view.roleWiseStageTabConfig" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/roleWiseStageTabConfig.jsp"/>
+    </definition>
+
+
+    <definition name="site.view.stageTabConfig" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageTabConfig.jsp"/>
+    </definition>
+
+    <definition name="stage.share.entity.map" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/shareEntityMapModules.jsp"/>
+    </definition>
+
+    <definition name="site.view.roleWiseStatusTabViewConfig" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/roleWiseStatusTabViewConfig.jsp"/>
+    </definition>
+
+    <definition name="site.view.logView" template="/WEB-INF/views/stageConfig/logViewer.jsp"/>
+
+    <!-- stage.config.view4List -->
+    <definition name="stage.config.view4List" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/stageConfig4List.jsp"/>
+    </definition>
+
+    <!-- stage.config.viewConfigView4 -->
+    <definition name="stage.config.viewConfigView4" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/viewConfigView4.jsp"/>
+    </definition>
+
+    <definition name="site.view.createActionType" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/createActionType.jsp"/>
+    </definition>
+
+    <definition name="site.view.workFlowApiDetails" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/workFlowApiDetails.jsp"/>
+    </definition>
+
+    <definition name="site.view.createNativeQueryAndShareEntity" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/stageConfig/createNativeQueryAndShareEntity.jsp"/>
+    </definition>
+
+
+    <!-- ########################################Stage Config END ################################################## -->
+
+
+    <definition name="master.branch" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/bankBranchMaster.jsp"/>
+    </definition>
+
+
+    <definition name="site.report.allStaffRpt" extends="layout.base">
+        <put-attribute name="body" value="/CMC-SWP/src/main/webapp/WEB-INF/jasperReports/allStaffRpt.jrxml"/>
+    </definition>
+
+
+    <!-- ASSET MODULE TILES START -->
+
+    <!-- ####################################### Master START ################################################## -->
+    <definition name="site.master.category" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addCategory.jsp"/>
+    </definition>
+    <definition name="site.master.subcategory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addSubCategory.jsp"/>
+    </definition>
+    <definition name="site.master.itemType" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addItemType.jsp"/>
+    </definition>
+    <definition name="site.master.uom" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addUom.jsp"/>
+    </definition>
+    <definition name="site.master.store" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addStore.jsp"/>
+    </definition>
+    <definition name="site.master.assetVendor" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addVendor.jsp"/>
+    </definition>
+    <definition name="site.master.item" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addItem.jsp"/>
+    </definition>
+    <definition name="site.master.asset" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/addAsset.jsp"/>
+    </definition>
+    <definition name="site.master.assetDtls" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/master/viewAssetDtls.jsp"/>
+    </definition>
+    <definition name="site.item.stock.adjustment" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/assetInvProc/inventory/stock/itemStockAdjustment.jsp"/>
+    </definition>
+    <!-- ####################################### Master End ################################################## -->
+
+
+	
+    <!-- ######################################    DMS Start   ############################################## -->
+
+    <definition name="site.dms.view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/DMS/folderFileList.jsp" />
+    </definition>
+
+    <definition name="site.dms.share.view" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/DMS/shareFolderFileList.jsp" />
+    </definition>
+
+    <definition name="site.dms.update.shareentity" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/DMS/updateShareEntity.jsp" />
+    </definition>
+
+    <definition name="site.dms.view.byKey" template="/WEB-INF/views/DMS/folderFilesOnApiKey.jsp" />
+
+    <definition name="site.dms.free.link.view" template="/WEB-INF/views/DMS/freeViewPage.jsp" />
+
+    <!-- ######################################    DMS End   ############################################## -->
+
+
+    <!-- ######################################    Grievance Start   ############################################## -->
+
+  	<definition name="site.grievence.master.category" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addCategory.jsp"/>
+    </definition>
+    <definition name="site.grievence.master.subcategory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addSubCategory.jsp"/>
+    </definition>
+
+    <definition name="site.addPublicGrievence" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addPublicGrievence.jsp"/>
+    </definition>
+
+    <definition name="site.addGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addGrievence.jsp"/>
+    </definition>
+    <definition name="site.grievenceList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/listGrievence.jsp"/>
+    </definition>
+
+    <definition name="site.addGrievanceDpt" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addGrievanceDpt.jsp"/>
+    </definition>
+    <definition name="site.editGrievance" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/editGrievance.jsp"/>
+    </definition>
+    <definition name="site.listGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/grievanceList.jsp"/>
+    </definition>
+
+    <definition name="site.reqListGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/reqListGrievence.jsp"/>
+    </definition>
+    <definition name="site.grievanceDeptList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/grievanceDeptList.jsp"/>
+    </definition>
+
+    <definition name="site.viewGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewGrievance.jsp"/>
+    </definition>
+    <definition name="site.viewPublicGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewPublicGrievance.jsp"/>
+    </definition>
+    <definition name="site.viewDeptGrievance" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewDeptGrievance.jsp"/>
+    </definition>
+    <definition name="site.searchGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/searchGrievance.jsp"/>
+    </definition>
+    <definition name="site.searchPublicGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/publicSearchGrievance.jsp"/>
+    </definition>
+    <definition name="site.lodgeGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/lodgeGrievance.jsp"/>
+    </definition>
+    <!-- ######################################    Grievance Jasper Start   ############################################## -->
+
+    <definition name="site.rpt.grievanceTrackingDetailsData" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/grievanceReport/grievanceTrackingDetailsData.jsp"/>
+	    </definition>
+
+	     <definition name="site.rpt.budgetVarianceFilterPage" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/grievanceReport/budgetVarianceFilterPage.jsp"/>
+	    </definition>
+
+
+<!--    Debasish Barik-->
+        <definition name="site.rpt.grievance.categorize" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/grievanceReport/grievanceCategorizeReport.jsp"/>
+        </definition>
+
+    <!-- ######################################    Grievance End   ############################################## -->
+
+	<!-- ######################################   MASTER START  ############################################## -->
+	   <definition name="municipality-form" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/Municipality/municipalityOnboard.jsp"/>
+	    </definition>
+	    
+	   <definition name="department-form" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/masters/departmentForm.jsp"/>
+	    </definition>
+	
+	   <definition name="governingBody-form" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/governingBody/governingBodyOnboarding.jsp"/>
+	    </definition>
+	    
+	    <definition name="section-form" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/masters/sectionForm.jsp"/>
+	    </definition>
+	
+	<!-- ######################################   MASTER END  ############################################## -->
+
+<!-- ######################################   Master Data Start  ############################################## -->
+	
+	<definition name="site.financialYearMst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/financialYearMst.jsp"/>
+    </definition>
+
+	<definition name="site.bankBranchMst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/bankBranchMst.jsp"/>
+    </definition>
+
+	<definition name="site.schemeMst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/schemeMst.jsp"/>
+    </definition>
+
+	<definition name="site.programMst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/programMst.jsp"/>
+    </definition>
+    
+    <definition name="site.facilitiesMapMst" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/masters/facilitiesMapMst.jsp"/>
+    </definition>
+<!-- ######################################   Master Data END  ############################################## -->
+
+
+    <!-- ######################################    Grievance Start   ############################################## -->
+
+  <definition name="site.grievence.master.category" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addCategory.jsp"/>
+    </definition>
+    
+    <definition name="site.grievence.master.subcategory" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addSubCategory.jsp"/>
+    </definition>
+
+    <definition name="site.addPublicGrievence" extends="layout.blank">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addPublicGrievence.jsp"/>
+    </definition>
+
+    <definition name="site.addGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addGrievence.jsp"/>
+    </definition>
+    <definition name="site.grievenceList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/listGrievence.jsp"/>
+    </definition>
+
+    <definition name="site.addGrievanceDpt" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/addGrievanceDpt.jsp"/>
+    </definition>
+    <definition name="site.editGrievance" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/editGrievance.jsp"/>
+    </definition>
+    <definition name="site.listGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/grievanceList.jsp"/>
+    </definition>
+
+    <definition name="site.reqListGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/reqListGrievence.jsp"/>
+    </definition>
+    <definition name="site.grievanceDeptList" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/grievanceDeptList.jsp"/>
+    </definition>
+
+    <definition name="site.viewGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewGrievance.jsp"/>
+    </definition>
+    <definition name="site.viewPublicGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewPublicGrievance.jsp"/>
+    </definition>
+    <definition name="site.viewDeptGrievance" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/viewDeptGrievance.jsp"/>
+    </definition>
+    <definition name="site.searchGrievence" extends="layout.base">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/searchGrievance.jsp"/>
+    </definition>
+    <definition name="site.searchPublicGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/publicSearchGrievance.jsp"/>
+    </definition>
+    <definition name="site.lodgeGrievence" extends="template-def">
+        <put-attribute name="body" value="/WEB-INF/views/grievance/lodgeGrievance.jsp"/>
+    </definition>
+    
+    <!-- ######################################    Grievance Jasper Start   ############################################## -->
+
+    <definition name="site.rpt.grievanceTrackingDetailsData" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/grievanceReport/grievanceTrackingDetailsData.jsp"/>
+	    </definition>
+
+	     <definition name="site.rpt.budgetVarianceFilterPage" extends="layout.base">
+	        <put-attribute name="body" value="/WEB-INF/views/grievanceReport/budgetVarianceFilterPage.jsp"/>
+	    </definition>
+
+        <definition name="site.rpt.grievance.categorize" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/grievanceReport/grievanceCategorizeReport.jsp"/>
+        </definition>
+        
+		<definition name="site.auditManagementList" extends="layout.base">
+            <put-attribute name="body" value="/WEB-INF/views/audit/auditManagementList.jsp" />
+        </definition>
+    <!-- ######################################    Grievance End   ############################################## -->
+    
+    
+     <definition name="site.module.directory" extends="layout.module">
+        <put-attribute name="body" value="/WEB-INF/views/moduleDirectory.jsp"></put-attribute>
+    </definition>
+    
+	
+	
+	
+</tiles-definitions>
+

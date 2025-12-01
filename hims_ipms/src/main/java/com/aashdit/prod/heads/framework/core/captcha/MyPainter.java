@@ -157,17 +157,14 @@ public class MyPainter {
 		final Graphics2D g2 = (Graphics2D) g;
 
 		configureGraphicsQuality(g2);
-		
+
 		g2.setComposite(AlphaComposite.Clear);
 		g2.fillRect(0, 0, width, height);
 
 		g2.setComposite(AlphaComposite.Src);
 		g2.setColor(fGround);
-		
+
 		g2.setFont(font);
-
-		
-
 
 		return g2;
 	}

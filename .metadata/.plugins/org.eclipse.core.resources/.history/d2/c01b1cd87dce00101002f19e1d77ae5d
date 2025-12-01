@@ -1,0 +1,141 @@
+package com.aashdit.prod.heads.hims.ipms.utils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import javax.net.ssl.SSLContext;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.jboss.logging.Logger;
+import org.json.JSONObject;
+import org.springframework.web.client.RestTemplate;
+
+import lombok.extern.slf4j.Slf4j;
+
+@SuppressWarnings("deprecation")
+@Slf4j
+public class SmsServiceUtil {
+
+	private static final Logger logger = Logger.getLogger(SmsServiceUtil.class);
+
+	@SuppressWarnings("unused")
+	private static RestTemplate restTemplate = new RestTemplate();
+
+	public static void sendTransactionalMessage(final String mobileno, final String msg) {
+		(new Thread(new Runnable() {
+			public void run() {
+				ResourceBundle rb = ResourceBundle.getBundle("application");
+				String authkey = rb.getString("MSG91.KEY");
+				String mobiles = mobileno;
+				String senderId = rb.getString("MSG91.SENDER");
+				String message = msg;
+				String route = "4";
+				URLConnection myURLConnection = null;
+				URL myURL = null;
+				BufferedReader reader = null;
+				@SuppressWarnings("deprecation")
+				String encoded_message = URLEncoder.encode(message);
+				String mainUrl = "http://api.msg91.com/api/sendhttp.php?";
+				StringBuilder sbPostData = new StringBuilder(mainUrl);
+				sbPostData.append("authkey=" + authkey);
+				sbPostData.append("&mobiles=" + mobiles);
+				sbPostData.append("&message=" + encoded_message);
+				sbPostData.append("&route=" + route);
+				sbPostData.append("&sender=" + senderId);
+				mainUrl = sbPostData.toString();
+				try {
+					myURL = new URL(mainUrl);
+					myURLConnection = myURL.openConnection();
+					myURLConnection.connect();
+					reader = new BufferedReader(new InputStreamReader(myURLConnection.getInputStream()));
+					@SuppressWarnings("unused")
+					String response;
+					while ((response = reader.readLine()) != null)
+						SmsServiceUtil.logger.info("Response From SMS Server: " + reader.readLine());
+					SmsServiceUtil.logger.info("SMS sent successfully..........");
+					reader.close();
+				} catch (IOException e) {
+					SmsServiceUtil.logger.error(e.getMessage());
+				}
+			}
+		})).start();
+	}
+
+	// public static String sendSMS(String message, String senderId, String
+	// mobileNumber, String templateid, String departmentId, String action) {
+//    String json = null;
+//    try {
+//      HttpHeaders headers = new HttpHeaders();
+//      headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//      LinkedMultiValueMap linkedMultiValueMap = new LinkedMultiValueMap();
+//      linkedMultiValueMap.add("action", action);
+//      linkedMultiValueMap.add("department_id", departmentId);
+//      linkedMultiValueMap.add("template_id", templateid);
+//      linkedMultiValueMap.add("sms_content", message);
+//      linkedMultiValueMap.add("phonenumber", mobileNumber);
+//      HttpEntity<MultiValueMap<String, String>> request = new HttpEntity(linkedMultiValueMap, (MultiValueMap)headers);
+//      ResponseEntity<String> responseMain = restTemplate.postForEntity("https://govtsms.odisha.gov.in/api/api.php", request, String.class, new Object[0]);
+//      if (responseMain != null) {
+//        json = (String)responseMain.getBody();
+//        logger.info("STEP 4--" + responseMain);
+//      } 
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    } 
+//    return json;
+// }
+	@SuppressWarnings({ "resource", "deprecation" })
+	public static String sendSms(String message, String senderId, String mobileNumber, String templateid,
+			String departmentId, String action) {
+		String responseString = "";
+		SSLContext context = null;
+		String responseMain = "";
+		try {
+			context = SSLContext.getInstance("TLSv1.2"); // Use this line for Java version 7 and above
+			context.init(null, null, null);
+			HttpClient client = new DefaultHttpClient();
+			HttpPost httpPost = new HttpPost("https://govtsms.odisha.gov.in/api/api.php");
+
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+			nameValuePairs.add(new BasicNameValuePair("action", action));
+			nameValuePairs.add(new BasicNameValuePair("source", senderId));
+			nameValuePairs.add(new BasicNameValuePair("department_id", departmentId));
+			nameValuePairs.add(new BasicNameValuePair("template_id", templateid));
+			nameValuePairs.add(new BasicNameValuePair("sms_content", message));
+			nameValuePairs.add(new BasicNameValuePair("phonenumber", mobileNumber));
+			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			HttpResponse response = client.execute(httpPost);
+			BufferedReader bf = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+			responseMain = bf.readLine();
+
+			if (responseMain != null && responseMain != "") {
+				JSONObject json = new JSONObject(responseMain);
+				responseString = String.valueOf(json.get("status"));
+			}
+		} catch (NoSuchAlgorithmException e) {
+			log.error("Error While Send SMS NoSuchAlgorithmException=====>", e);
+			e.printStackTrace();
+		} catch (KeyManagementException e) {
+			log.error("Error While Send SMS KeyManagementException=====>", e);
+			e.printStackTrace();
+		} catch (Exception e) {
+			log.error("Error While Send SMS Exception=====>", e);
+		}
+		return responseString;
+	}
+}

@@ -1,6 +1,5 @@
 package com.aashdit.prod.heads.hims.ipms.controller;
 
-
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Base64;
@@ -74,7 +73,7 @@ public class HomeController {
 				return "redirect:/home";
 			}
 			// DEBUG: Print available views
-	        System.out.println("=== DEBUG: Returning layout.login ===");
+			System.out.println("=== DEBUG: Returning layout.login ===");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -82,8 +81,8 @@ public class HomeController {
 		return "layout.login";
 	}
 
-	@GetMapping(path = {"/","/home"})
-	public String home(Model model){
+	@GetMapping(path = { "/", "/home" })
+	public String home(Model model) {
 		User user = SecurityHelper.getCurrentUser();
 		if (user == null) {
 			return "redirect:/login";
@@ -93,15 +92,17 @@ public class HomeController {
 	}
 
 	@PostMapping("/moduleDirectory")
-	public String home(Model model, HttpServletRequest request, @RequestParam(value = "moduleCode", required = false) String moduleCode) {
+	public String home(Model model, HttpServletRequest request,
+			@RequestParam(value = "moduleCode", required = false) String moduleCode) {
 		User user = SecurityHelper.getCurrentUser();
 		if (user == null) {
 			return "redirect:/login";
 		}
 
-		LoggedInUser userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoggedInUser
-				? (LoggedInUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()
-				: null;
+		LoggedInUser userDetails = SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal() instanceof LoggedInUser
+						? (LoggedInUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+						: null;
 
 		if (userDetails == null) {
 			return "redirect:/login";
@@ -121,7 +122,7 @@ public class HomeController {
 		model.addAttribute("monthId", LocalDate.now().getMonthValue());
 
 		try {
-			
+
 		} catch (Exception e) {
 			log.error("Exception in /moduleDirectory while loading dashboard: " + e.getMessage(), e);
 		}
@@ -129,7 +130,7 @@ public class HomeController {
 	}
 
 	@ExceptionHandler(HttpSessionRequiredException.class)
-	public String handleSessionTimeOut() {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+	public String handleSessionTimeOut() {
 		return "site.session.timeout";
 	}
 
@@ -183,13 +184,15 @@ public class HomeController {
 				if (txtRePass != null && !txtRePass.trim().isEmpty() && txtPass != null && !txtPass.trim().isEmpty()) {
 					String decryptedPassword = new String(Base64.getDecoder().decode(txtPass));
 					if (decryptedPassword != null && decryptedPassword.split("::").length == 3) {
-						realPass = aesUtil.decrypt(decryptedPassword.split("::")[1], decryptedPassword.split("::")[0],psk, decryptedPassword.split("::")[2]);
+						realPass = aesUtil.decrypt(decryptedPassword.split("::")[1], decryptedPassword.split("::")[0],
+								psk, decryptedPassword.split("::")[2]);
 					}
 					String decryptedRePassword = new String(Base64.getDecoder().decode(txtRePass));
 					if (decryptedRePassword != null && decryptedRePassword.split("::").length == 3) {
-						realRePass = aesUtil.decrypt(decryptedRePassword.split("::")[1],decryptedRePassword.split("::")[0], psk, decryptedRePassword.split("::")[2]);
+						realRePass = aesUtil.decrypt(decryptedRePassword.split("::")[1],
+								decryptedRePassword.split("::")[0], psk, decryptedRePassword.split("::")[2]);
 					}
-					//chk = PasswordValidator.checkString(realPass);
+					// chk = PasswordValidator.checkString(realPass);
 					if (chk) {
 						if (realPass.equals(realRePass)) {
 							Boolean isSuccess = userService.saveResetPassword(user.getUserId(), realRePass);
@@ -226,7 +229,9 @@ public class HomeController {
 
 	@GetMapping("/getPublicAndEntity/specificEntityLevelCodeListList")
 	@ResponseBody
-	public ResponseEntity<?> getPublicAndEntitySpecificEntityLevelCodeListList(@RequestParam("entityIdAndType") String entityIdAndType, @RequestParam(value = "selectedEntityIdAndType", required = false) String selectedEntityIdAndType){
+	public ResponseEntity<?> getPublicAndEntitySpecificEntityLevelCodeListList(
+			@RequestParam("entityIdAndType") String entityIdAndType,
+			@RequestParam(value = "selectedEntityIdAndType", required = false) String selectedEntityIdAndType) {
 		try {
 			Base64.Decoder decoder = Base64.getDecoder();
 			String entityIdDecode = new String(decoder.decode(entityIdAndType));
@@ -235,9 +240,10 @@ public class HomeController {
 			String[] split = entityIdDecode.split("##");
 			Long entityId = Long.parseLong(split[0]);
 			String entityLevel = split[1];
-			List<EntityAppModuleMap> entityLevelCodeList = entityModuleMapService.getPublicAndEntitySpecificEntityLevelCodeListList(entityId, entityLevel);
+			List<EntityAppModuleMap> entityLevelCodeList = entityModuleMapService
+					.getPublicAndEntitySpecificEntityLevelCodeListList(entityId, entityLevel);
 			JsonArray allApps = new JsonArray();
-			for (EntityAppModuleMap app: entityLevelCodeList){
+			for (EntityAppModuleMap app : entityLevelCodeList) {
 				JsonObject appObj = new JsonObject();
 				appObj.addProperty("id", app.getAppModuleId().getId());
 				appObj.addProperty("name", app.getAppModuleId().getModuleName());
@@ -252,8 +258,9 @@ public class HomeController {
 				String[] splitSelected = selectedEntityIdDecode.split("##");
 				Long selectedEntityId = Long.parseLong(splitSelected[0]);
 				String selectedEntityLevel = splitSelected[1];
-				List<EntityAppModuleMap> selectedEntityLevelCodeList = entityModuleMapService.getPublicAndEntitySpecificEntityLevelCodeListList(selectedEntityId, selectedEntityLevel);
-				for (EntityAppModuleMap app: selectedEntityLevelCodeList){
+				List<EntityAppModuleMap> selectedEntityLevelCodeList = entityModuleMapService
+						.getPublicAndEntitySpecificEntityLevelCodeListList(selectedEntityId, selectedEntityLevel);
+				for (EntityAppModuleMap app : selectedEntityLevelCodeList) {
 					JsonObject appObj = new JsonObject();
 					appObj.addProperty("id", app.getAppModuleId().getId());
 					appObj.addProperty("name", app.getAppModuleId().getModuleName());
@@ -264,7 +271,7 @@ public class HomeController {
 			}
 			jsonObject.add("selectedApps", selectedApps);
 			return new ResponseEntity<>(CommonHelperFunctions.onGsonObjectSuccess(jsonObject), HttpStatus.OK);
-		}catch (Exception e){
+		} catch (Exception e) {
 			return new ResponseEntity<>(CommonHelperFunctions.onError(e), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

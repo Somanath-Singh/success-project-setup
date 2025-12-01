@@ -7,7 +7,11 @@ import java.io.Serializable;
 @Data
 public class EntityHierarchy implements Serializable {
 
-    private Long id;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Long id;
     private String levelType;
     private String levelName;
     private String levelIdAndType;

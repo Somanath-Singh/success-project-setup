@@ -1,6 +1,5 @@
 package com.aashdit.prod.heads.hims.ipms.security;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
 	private UserService userService;
 	@Autowired
 	private RoleService roleService;
-	
+
 	@Autowired
 	private CustomLoginController customLoginController;
 
@@ -86,7 +85,8 @@ public class JwtFilter extends OncePerRequestFilter {
 								}
 							} else {
 								// throw new Exception("Session got expired.");
-								httpServletResponse.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT, "Session got expired.");
+								httpServletResponse.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,
+										"Session got expired.");
 							}
 						} catch (Exception ex) {
 							if (!httpServletResponse.isCommitted()) {
@@ -109,7 +109,7 @@ public class JwtFilter extends OncePerRequestFilter {
 			httpServletResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
 		}
 	}
-	
+
 	private LoggedInUser getLoggedInUser(User user) {
 
 		List<UserRoleMap> userRoleMaps = userService.findUserRoleMapByUserId(user.getUserId());
@@ -119,11 +119,14 @@ public class JwtFilter extends OncePerRequestFilter {
 		for (UserRoleMap urm : userRoleMaps) {
 			Role role = this.roleService.findByRoleId(urm.getRoleId()).getData();
 			grantedAuthorities.add(new SimpleGrantedAuthority(role.getRoleCode()));
-			if (role.getIsActive()) lstRoles.add(role);
+			if (role.getIsActive())
+				lstRoles.add(role);
 		}
 		user.setRoles(lstRoles);
-		LoggedInUser userDetails = new LoggedInUser(user.getUserName(), user.getPassword(), true, true, true, true, grantedAuthorities, user.getPrimaryRole(), user);
-		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, grantedAuthorities);
+		LoggedInUser userDetails = new LoggedInUser(user.getUserName(), user.getPassword(), true, true, true, true,
+				grantedAuthorities, user.getPrimaryRole(), user);
+		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+				userDetails, null, grantedAuthorities);
 		SecurityContext sc = SecurityContextHolder.getContext();
 		sc.setAuthentication(usernamePasswordAuthenticationToken);
 		return userDetails;

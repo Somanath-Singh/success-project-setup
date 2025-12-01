@@ -69,11 +69,10 @@ import com.aashdit.prod.heads.hims.umt.utils.SecurityHelper;
 
 import lombok.extern.slf4j.Slf4j;
 
-
 @Service
 @Slf4j
 public class CommonServiceImpl<T> implements CommonService {
-	
+
 	@Autowired
 	private RoleRepository roleRepository;
 
@@ -167,22 +166,26 @@ public class CommonServiceImpl<T> implements CommonService {
 					Long entityId = Long.valueOf(splitData[0]);
 					String entityLevel = splitData[1];
 
-					List<RoleEntityMap> roleEntityMaps = roleEntityMapRepository.findAllByEntityIdAndEntityLevelAndIsActiveTrue(entityId, entityLevel);
+					List<RoleEntityMap> roleEntityMaps = roleEntityMapRepository
+							.findAllByEntityIdAndEntityLevelAndIsActiveTrue(entityId, entityLevel);
 					boolean isPublicRoleNeeded = roleEntityMaps.stream().anyMatch(RoleEntityMap::getIsPublicRoleNeeded);
 
-					List<String> roleCodes = roleEntityMaps.stream().map(RoleEntityMap::getRoleCode).collect(Collectors.toList());
+					List<String> roleCodes = roleEntityMaps.stream().map(RoleEntityMap::getRoleCode)
+							.collect(Collectors.toList());
 					List<Role> roles = roleRepository.findAllByIsActiveTrueAndRoleCodeIn(roleCodes);
 
 					rolesSet.addAll(roles);
 
 					if (isPublicRoleNeeded) {
-						List<Role> publicRoles = roleRepository.findByRoleAccessType(ApplicationConstants.ROLE_ACCESS_TYPE_PUBLIC);
+						List<Role> publicRoles = roleRepository
+								.findByRoleAccessType(ApplicationConstants.ROLE_ACCESS_TYPE_PUBLIC);
 						rolesSet.addAll(publicRoles);
 					}
 				}
 			}
 
-			rolesList = rolesSet.stream().sorted(Comparator.comparing(Role::getDisplayName)).collect(Collectors.toList());
+			rolesList = rolesSet.stream().sorted(Comparator.comparing(Role::getDisplayName))
+					.collect(Collectors.toList());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -221,7 +224,6 @@ public class CommonServiceImpl<T> implements CommonService {
 		return srvc;
 	}
 
-
 	@Override
 	public ServiceOutcome<String> getIfscByBranchId(Long branchId) {
 		ServiceOutcome<String> srvc = new ServiceOutcome<>();
@@ -239,7 +241,6 @@ public class CommonServiceImpl<T> implements CommonService {
 		return srvc;
 	}
 
-
 	@Override
 	public ServiceOutcome<String> getConfigParameterValueFromParamCode(String paramCode) {
 		ServiceOutcome<String> srvc = new ServiceOutcome<>();
@@ -254,8 +255,6 @@ public class CommonServiceImpl<T> implements CommonService {
 		return srvc;
 	}
 
-
-
 	@Override
 	public List<FinancialYear> getAllFinancialYearList() {
 		List<FinancialYear> years = null;
@@ -267,8 +266,6 @@ public class CommonServiceImpl<T> implements CommonService {
 		}
 		return years;
 	}
-
-
 
 	@Override
 	public ServiceOutcome<List<BankMasterVO>> getAllBankList() {
@@ -308,9 +305,9 @@ public class CommonServiceImpl<T> implements CommonService {
 			List<BankMaster> bankList = Optional.ofNullable(bankMasterRepository.findAllByIsActiveTrueOrderByBankName())
 					.orElse(Collections.emptyList());
 
-				srvc.setData(bankList);
-				srvc.setOutcome(true);
-				srvc.setMessage("Bank list fetched successfully.");
+			srvc.setData(bankList);
+			srvc.setOutcome(true);
+			srvc.setMessage("Bank list fetched successfully.");
 
 			return srvc;
 		} catch (Exception e) {
@@ -320,15 +317,14 @@ public class CommonServiceImpl<T> implements CommonService {
 		}
 	}
 
-
 	@Override
 	public ServiceOutcome<List<BankBranchMasterVo>> getAllBranchByBankId(Long bankId) {
 		ServiceOutcome<List<BankBranchMasterVo>> outcome = new ServiceOutcome<>();
 		outcome.setOutcome(false);
 		try {
-			List<BankBranchMasterVo> branchList = Optional.ofNullable(bankBranchMstRepo.findByBankIdBankIdAndIsActiveTrue(bankId))
-					.map(bankBranchList -> bankBranchList.stream()
-							.map(data -> new BankBranchMasterVo(data))
+			List<BankBranchMasterVo> branchList = Optional
+					.ofNullable(bankBranchMstRepo.findByBankIdBankIdAndIsActiveTrue(bankId))
+					.map(bankBranchList -> bankBranchList.stream().map(data -> new BankBranchMasterVo(data))
 							.collect(Collectors.toList()))
 					.orElse(Collections.emptyList());
 
@@ -343,24 +339,23 @@ public class CommonServiceImpl<T> implements CommonService {
 		}
 	}
 
-
+	@SuppressWarnings("unused")
 	private boolean matches(Long value1, Long value2) {
 		return Optional.ofNullable(value1).map(v1 -> v1.equals(value2)).orElse(true);
 	}
 
-
 	@Override
 	public BankBranchMaster getIfscCodeByBranchId(Long branchId) {
-		BankBranchMaster bankMaster  = null;
-        try {
-             bankMaster = bankBranchMstRepo.findByBankBranchId(branchId);
-           // srvc.setData(bankMaster.getIfscCode());
+		BankBranchMaster bankMaster = null;
+		try {
+			bankMaster = bankBranchMstRepo.findByBankBranchId(branchId);
+			// srvc.setData(bankMaster.getIfscCode());
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Error occured in getIfscByBranchId in CommonServiceImpl => ", e);
-        }
-        return bankMaster;
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Error occured in getIfscByBranchId in CommonServiceImpl => ", e);
+		}
+		return bankMaster;
 	}
 
 	@Override
@@ -368,13 +363,12 @@ public class CommonServiceImpl<T> implements CommonService {
 		List<OrganizationStructureHierarchy> levelList = null;
 		try {
 			if (orgData.contains("##"))
-				levelList = organizationStructureHierarchyRepository.findAllUniqueByOrganizationStructureId(Long.valueOf(orgData.split("##")[0]), String.valueOf(orgData.split("##")[1]));
+				levelList = organizationStructureHierarchyRepository.findAllUniqueByOrganizationStructureId(
+						Long.valueOf(orgData.split("##")[0]), String.valueOf(orgData.split("##")[1]));
 			levelList = levelList.stream()
-					.collect(Collectors.toCollection(() ->
-							new TreeSet<>(Comparator.comparing(OrganizationStructureHierarchy::getLevelCode))
-					))
-					.stream()
-					.collect(Collectors.toList());
+					.collect(Collectors.toCollection(
+							() -> new TreeSet<>(Comparator.comparing(OrganizationStructureHierarchy::getLevelCode))))
+					.stream().collect(Collectors.toList());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -386,8 +380,12 @@ public class CommonServiceImpl<T> implements CommonService {
 		List<EntityIdAndUserLevel> entityIdAndUserLevels = null;
 		try {
 			if (levelData.contains("##")) {
-				List<HierarchyEntityMap> hierarchyEntityMaps = hierarchyEntityMapRepository.findAllByOrganizationStructureHierarchyOrganizationStructureObjectIdAndOrganizationStructureHierarchyOrganizationStructureObjectTypeAndObjectTypeAndIsActiveTrue(Long.valueOf(levelData.split("##")[0]), levelData.split("##")[2], levelData.split("##")[1]);
-				List<Long> entityIds = hierarchyEntityMaps.stream().map(HierarchyEntityMap::getObjectId).collect(Collectors.toList());
+				List<HierarchyEntityMap> hierarchyEntityMaps = hierarchyEntityMapRepository
+						.findAllByOrganizationStructureHierarchyOrganizationStructureObjectIdAndOrganizationStructureHierarchyOrganizationStructureObjectTypeAndObjectTypeAndIsActiveTrue(
+								Long.valueOf(levelData.split("##")[0]), levelData.split("##")[2],
+								levelData.split("##")[1]);
+				List<Long> entityIds = hierarchyEntityMaps.stream().map(HierarchyEntityMap::getObjectId)
+						.collect(Collectors.toList());
 				entityIdAndUserLevels = getDynamicEntityList(levelData.split("##")[1], entityIds);
 			}
 		} catch (Exception e) {
@@ -396,6 +394,7 @@ public class CommonServiceImpl<T> implements CommonService {
 		return entityIdAndUserLevels;
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<EntityIdAndUserLevel> getDynamicEntityList(String entityCode, List<Long> entityIds) {
 		List<EntityIdAndUserLevel> entityIdAndUserLevelList = new ArrayList<>();
 		Optional<UmtNativeQuery> nativeQuery = umtNativeQueryRepository.findByQueryCode(entityCode.trim());
@@ -426,9 +425,12 @@ public class CommonServiceImpl<T> implements CommonService {
 		List<Role> rolesList = new ArrayList<>();
 		try {
 			if (actualLevelData.contains("##")) {
-				List<RoleEntityMap> roleEntityMaps = roleEntityMapRepository.findAllByEntityIdAndEntityLevelAndIsActiveTrue(Long.valueOf(actualLevelData.split("##")[0]), actualLevelData.split("##")[1]);
+				List<RoleEntityMap> roleEntityMaps = roleEntityMapRepository
+						.findAllByEntityIdAndEntityLevelAndIsActiveTrue(Long.valueOf(actualLevelData.split("##")[0]),
+								actualLevelData.split("##")[1]);
 //				boolean isPublicRoleNeeded = roleEntityMaps.stream().anyMatch(RoleEntityMap::getIsPublicRoleNeeded);
-				List<String> roleCodes = roleEntityMaps.stream().map(RoleEntityMap::getRoleCode).collect(Collectors.toList());
+				List<String> roleCodes = roleEntityMaps.stream().map(RoleEntityMap::getRoleCode)
+						.collect(Collectors.toList());
 				List<Role> roles = roleRepository.findAllByIsActiveTrueAndRoleCodeIn(roleCodes);
 				rolesSet.addAll(roles);
 //				if (isPublicRoleNeeded) {
@@ -436,7 +438,8 @@ public class CommonServiceImpl<T> implements CommonService {
 //					rolesSet.addAll(roleList);
 //				}
 				// sort in name ascending order
-				rolesList = rolesSet.stream().sorted(Comparator.comparing(Role::getDisplayName)).collect(Collectors.toList());
+				rolesList = rolesSet.stream().sorted(Comparator.comparing(Role::getDisplayName))
+						.collect(Collectors.toList());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -444,55 +447,59 @@ public class CommonServiceImpl<T> implements CommonService {
 		return rolesList;
 	}
 
-    @Override
-    public List<AdditionalCost> getAllActiveAdditionalCostList() {
-        try{
-            return additionalCostRepository.findAllByIsActiveIsTrue();
-        }catch (Exception e) {
-            e.printStackTrace();
-            log.error("Error in VehicleServiceImpl ,Method --> getAllActiveAdditionalCostList"+e);
-        }
-        return new ArrayList<>();
-    }
+	@Override
+	public List<AdditionalCost> getAllActiveAdditionalCostList() {
+		try {
+			return additionalCostRepository.findAllByIsActiveIsTrue();
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Error in VehicleServiceImpl ,Method --> getAllActiveAdditionalCostList" + e);
+		}
+		return new ArrayList<>();
+	}
 
 //	Sourava Pattanayak 16-11-2023
-	//	function of save and update category
+	// function of save and update category
 	@Override
 	public ServiceOutcome<Category> saveAndUpdateCategory(Category category) {
-		ServiceOutcome<Category> result=new ServiceOutcome<>();
+		ServiceOutcome<Category> result = new ServiceOutcome<>();
 		Category cat;
 		try {
-			String catName=category.getCategoryName().replaceAll("\\s+", " ");
-			if(category.getCategoryId()!=null) {
-				cat=categoryRepository.findById(category.getCategoryId()).orElseThrow(() -> new RuntimeException("No Category Found"));
+			String catName = category.getCategoryName().replaceAll("\\s+", " ");
+			if (category.getCategoryId() != null) {
+				cat = categoryRepository.findById(category.getCategoryId())
+						.orElseThrow(() -> new RuntimeException("No Category Found"));
 				cat.setCategoryName(catName);
 				cat.setDescription(category.getDescription());
 				cat.setIsActive(category.getIsActive());
 
 				result.setMessage("Category Successfully Updated.... ");
-			}else {
-				cat=new Category();
+			} else {
+				cat = new Category();
 
 				cat.setCategoryName(catName);
 				cat.setIsActive(true);
 				cat.setDescription(category.getDescription());
-				String categoryCode= ApplicationStringUtils.camelCaseToUpperCaseWithUnderscore(category.getCategoryName());
+				String categoryCode = ApplicationStringUtils
+						.camelCaseToUpperCaseWithUnderscore(category.getCategoryName());
 				cat.setCategoryCode(categoryCode);
 				result.setMessage("Category Successfully Saved....");
 			}
-			Category duplicateWithName=categoryRepository.findByCategoryName(catName);
-			if(duplicateWithName!=null  && (cat.getCategoryId()== null || (cat.getCategoryId()!=null && !cat.getCategoryId().equals(duplicateWithName.getCategoryId())))) {
+			Category duplicateWithName = categoryRepository.findByCategoryName(catName);
+			if (duplicateWithName != null && (cat.getCategoryId() == null || (cat.getCategoryId() != null
+					&& !cat.getCategoryId().equals(duplicateWithName.getCategoryId())))) {
 				result.setOutcome(false);
 				result.setMessage("Category with same name already exists");
 				return result;
 			}
-			Category duplicateWithCode=categoryRepository.findByCategoryCode(cat.getCategoryCode());
-			if(duplicateWithCode!=null  && (cat.getCategoryId()== null || (cat.getCategoryId()!=null && !cat.getCategoryId().equals(duplicateWithCode.getCategoryId())))) {
+			Category duplicateWithCode = categoryRepository.findByCategoryCode(cat.getCategoryCode());
+			if (duplicateWithCode != null && (cat.getCategoryId() == null || (cat.getCategoryId() != null
+					&& !cat.getCategoryId().equals(duplicateWithCode.getCategoryId())))) {
 				result.setOutcome(false);
 				result.setMessage("Category with same code already exists");
 				return result;
 			}
-			cat=categoryRepository.save(cat);
+			cat = categoryRepository.save(cat);
 			result.setData(cat);
 			result.setOutcome(true);
 
@@ -500,7 +507,7 @@ public class CommonServiceImpl<T> implements CommonService {
 			result.setOutcome(false);
 			result.setMessage("Error occured while saving category....");
 			e.printStackTrace();
-			log.error("Error in MasterServiceImpl ,Method -->saveAndUpdateCategory"+e);
+			log.error("Error in MasterServiceImpl ,Method -->saveAndUpdateCategory" + e);
 		}
 		return result;
 	}
@@ -509,16 +516,16 @@ public class CommonServiceImpl<T> implements CommonService {
 //	function of get all active category
 	@Override
 	public ServiceOutcome<List<Category>> getAllActiveCategory() {
-		ServiceOutcome<List<Category>> outcome=new ServiceOutcome<>();
+		ServiceOutcome<List<Category>> outcome = new ServiceOutcome<>();
 		try {
-			List<Category> catList=categoryRepository.findAllByIsActiveIsTrue();
+			List<Category> catList = categoryRepository.findAllByIsActiveIsTrue();
 			outcome.setData(catList);
 			outcome.setOutcome(true);
 		} catch (Exception e) {
 			outcome.setData(null);
 			outcome.setOutcome(false);
 			e.printStackTrace();
-			log.error("Error in MasterServiceImpl ,Method -->getAllActiveCategory"+e);
+			log.error("Error in MasterServiceImpl ,Method -->getAllActiveCategory" + e);
 		}
 
 		return outcome;
@@ -528,82 +535,80 @@ public class CommonServiceImpl<T> implements CommonService {
 //	function of get all active category
 	@Override
 	public ServiceOutcome<List<Category>> getAllCategory() {
-		ServiceOutcome<List<Category>> outcome=new ServiceOutcome<>();
+		ServiceOutcome<List<Category>> outcome = new ServiceOutcome<>();
 		try {
-			List<Category> catList=categoryRepository.findAllByOrderByCategoryNameAsc();
+			List<Category> catList = categoryRepository.findAllByOrderByCategoryNameAsc();
 			outcome.setData(catList);
 			outcome.setOutcome(true);
 		} catch (Exception e) {
 			outcome.setData(null);
 			outcome.setOutcome(false);
 			e.printStackTrace();
-			log.error("Error in MasterServiceImpl ,Method -->getAllActiveCategory"+e);
+			log.error("Error in MasterServiceImpl ,Method -->getAllActiveCategory" + e);
 		}
 
 		return outcome;
 	}
 
-
-	//	Sourava Pattanayak 16-11-2023
+	// Sourava Pattanayak 16-11-2023
 //	function of get category by categoryId
 	@Override
 	public Category getCategoryById(Long categoryId) {
-		Optional<Category> cat=null;
+		Optional<Category> cat = null;
 		try {
-			cat=categoryRepository.findById(categoryId);
+			cat = categoryRepository.findById(categoryId);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.error("Error in MasterServiceImpl ,Method -->getCategoryById"+e);
+			log.error("Error in MasterServiceImpl ,Method -->getCategoryById" + e);
 		}
-		return cat.isPresent()? cat.get() : null;
+		return cat.isPresent() ? cat.get() : null;
 	}
 
 //	Sourava Pattanayak 21-11-2023
 //	function of get all active Vendor Type
 	@Override
 	public List<VendorType> getAllActiveVendorType() {
-		List<VendorType> lstVndTyp=vendorTypeRepository.findAllByIsActiveIsTrue();
+		List<VendorType> lstVndTyp = vendorTypeRepository.findAllByIsActiveIsTrue();
 		return lstVndTyp;
 	}
-
-
 
 //	Sourava Pattanayak 21-11-2023
 //	function of save and update Vendor
 	@Override
 	public ServiceOutcome<AssetVendor> saveAndUpdateVendor(AssetVendor assetVendor, VendorDocuments vendorDoc) {
-		ServiceOutcome<AssetVendor> result=new ServiceOutcome<>();
+		ServiceOutcome<AssetVendor> result = new ServiceOutcome<>();
 		AssetVendor vendorr;
 		try {
-			String vendorName= assetVendor.getVendorName().replaceAll("\\s+", " ");
-			Category cat=null;
-			if(assetVendor.getCategoryId()!=null) {
-				cat=this.getCategoryById(assetVendor.getCategoryId());
+			String vendorName = assetVendor.getVendorName().replaceAll("\\s+", " ");
+			Category cat = null;
+			if (assetVendor.getCategoryId() != null) {
+				cat = this.getCategoryById(assetVendor.getCategoryId());
 			}
 
-			VendorType vendorType = vendorTypeRepository.findById(assetVendor.getVendorTypeId()).orElseThrow(() -> new RuntimeException("No Vendor Type Found"));
+			VendorType vendorType = vendorTypeRepository.findById(assetVendor.getVendorTypeId())
+					.orElseThrow(() -> new RuntimeException("No Vendor Type Found"));
 
-			String action="";
-			if(assetVendor.getVendorId()!=null) {
-				vendorr=this.getVendorById(assetVendor.getVendorId());
+			String action = "";
+			if (assetVendor.getVendorId() != null) {
+				vendorr = this.getVendorById(assetVendor.getVendorId());
 				vendorr.setIsActive(assetVendor.getIsActive());
-				action="Updated";
-			}else {
-				vendorr=new AssetVendor();
+				action = "Updated";
+			} else {
+				vendorr = new AssetVendor();
 				vendorr.setVendorCode(ApplicationStringUtils.camelCaseToUpperCaseWithUnderscore(vendorName));
 				vendorr.setIsActive(true);
 				User currentUser = SecurityHelper.getCurrentUser();
-				if(currentUser==null){
+				if (currentUser == null) {
 					throw new RuntimeException("User not found");
 				}
 				String idAndType = assetVendor.getObjectIdAndType();
-				if(idAndType==null){
+				if (idAndType == null) {
 					throw new RuntimeException("Entity Id and Type not found");
 				}
 				String[] idAndTypeArr = idAndType.split("##");
 				vendorr.setEntityLevel(idAndTypeArr[1]);
 				vendorr.setEntityId(Long.parseLong(idAndTypeArr[0]));
-				action="added";
+				action = "added";
 			}
 			vendorr.setMobileNo(assetVendor.getMobileNo());
 			vendorr.setEmail(assetVendor.getEmail());
@@ -618,56 +623,74 @@ public class CommonServiceImpl<T> implements CommonService {
 			vendorr.setPocEmail(assetVendor.getPocEmail());
 			vendorr.setVendorType(vendorType);
 
-			if(vendorDoc.getGstDocc() != null && vendorDoc.getGstDocc().getSize() > 0) {
-				int lastDotIndex = vendorDoc.getGstDocc().getOriginalFilename() == null ? -1 : vendorDoc.getGstDocc().getOriginalFilename().lastIndexOf('.');
-				String fileExtension = lastDotIndex == -1 ? "" : vendorDoc.getGstDocc().getOriginalFilename().substring(lastDotIndex + 1);
-				String fileName = lastDotIndex == -1 ? vendorDoc.getGstDocc().getOriginalFilename() : vendorDoc.getGstDocc().getOriginalFilename().substring(0, lastDotIndex);
-				String filePath = downloadUploadController.uploadFile(vendorDoc.getGstDocc(), CommonConstants.MASTER_VENDOR_MODULE_GST, fileName, fileExtension);
+			if (vendorDoc.getGstDocc() != null && vendorDoc.getGstDocc().getSize() > 0) {
+				int lastDotIndex = vendorDoc.getGstDocc().getOriginalFilename() == null ? -1
+						: vendorDoc.getGstDocc().getOriginalFilename().lastIndexOf('.');
+				String fileExtension = lastDotIndex == -1 ? ""
+						: vendorDoc.getGstDocc().getOriginalFilename().substring(lastDotIndex + 1);
+				String fileName = lastDotIndex == -1 ? vendorDoc.getGstDocc().getOriginalFilename()
+						: vendorDoc.getGstDocc().getOriginalFilename().substring(0, lastDotIndex);
+				String filePath = downloadUploadController.uploadFile(vendorDoc.getGstDocc(),
+						CommonConstants.MASTER_VENDOR_MODULE_GST, fileName, fileExtension);
 				vendorr.setGstDoc(filePath);
 			}
 
-			if(vendorDoc.getLiorDocc() != null && vendorDoc.getLiorDocc().getSize() > 0) {
-				int lastDotIndex = vendorDoc.getLiorDocc().getOriginalFilename() == null ? -1 : vendorDoc.getLiorDocc().getOriginalFilename().lastIndexOf('.');
-				String fileExtension = lastDotIndex == -1 ? "" : vendorDoc.getLiorDocc().getOriginalFilename().substring(lastDotIndex + 1);
-				String fileName = lastDotIndex == -1 ? vendorDoc.getLiorDocc().getOriginalFilename() : vendorDoc.getLiorDocc().getOriginalFilename().substring(0, lastDotIndex);
-				String filePath = downloadUploadController.uploadFile(vendorDoc.getLiorDocc(), CommonConstants.MASTER_VENDOR_MODULE_LIOR, fileName, fileExtension);
+			if (vendorDoc.getLiorDocc() != null && vendorDoc.getLiorDocc().getSize() > 0) {
+				int lastDotIndex = vendorDoc.getLiorDocc().getOriginalFilename() == null ? -1
+						: vendorDoc.getLiorDocc().getOriginalFilename().lastIndexOf('.');
+				String fileExtension = lastDotIndex == -1 ? ""
+						: vendorDoc.getLiorDocc().getOriginalFilename().substring(lastDotIndex + 1);
+				String fileName = lastDotIndex == -1 ? vendorDoc.getLiorDocc().getOriginalFilename()
+						: vendorDoc.getLiorDocc().getOriginalFilename().substring(0, lastDotIndex);
+				String filePath = downloadUploadController.uploadFile(vendorDoc.getLiorDocc(),
+						CommonConstants.MASTER_VENDOR_MODULE_LIOR, fileName, fileExtension);
 				vendorr.setLiorDoc(filePath);
 			}
 
-			if(vendorDoc.getPanDocc() != null && vendorDoc.getPanDocc().getSize() > 0) {
-				int lastDotIndex = vendorDoc.getPanDocc().getOriginalFilename() == null ? -1 : vendorDoc.getPanDocc().getOriginalFilename().lastIndexOf('.');
-				String fileExtension = lastDotIndex == -1 ? "" : vendorDoc.getPanDocc().getOriginalFilename().substring(lastDotIndex + 1);
-				String fileName = lastDotIndex == -1 ? vendorDoc.getPanDocc().getOriginalFilename() : vendorDoc.getPanDocc().getOriginalFilename().substring(0, lastDotIndex);
-				String filePath = downloadUploadController.uploadFile(vendorDoc.getPanDocc(), CommonConstants.MASTER_VENDOR_MODULE_PAN, fileName, fileExtension);
+			if (vendorDoc.getPanDocc() != null && vendorDoc.getPanDocc().getSize() > 0) {
+				int lastDotIndex = vendorDoc.getPanDocc().getOriginalFilename() == null ? -1
+						: vendorDoc.getPanDocc().getOriginalFilename().lastIndexOf('.');
+				String fileExtension = lastDotIndex == -1 ? ""
+						: vendorDoc.getPanDocc().getOriginalFilename().substring(lastDotIndex + 1);
+				String fileName = lastDotIndex == -1 ? vendorDoc.getPanDocc().getOriginalFilename()
+						: vendorDoc.getPanDocc().getOriginalFilename().substring(0, lastDotIndex);
+				String filePath = downloadUploadController.uploadFile(vendorDoc.getPanDocc(),
+						CommonConstants.MASTER_VENDOR_MODULE_PAN, fileName, fileExtension);
 				vendorr.setPanDoc(filePath);
 			}
 
-			if(vendorDoc.getTanDocc() != null && vendorDoc.getTanDocc().getSize() > 0) {
-				int lastDotIndex = vendorDoc.getTanDocc().getOriginalFilename() == null ? -1 : vendorDoc.getTanDocc().getOriginalFilename().lastIndexOf('.');
-				String fileExtension = lastDotIndex == -1 ? "" : vendorDoc.getTanDocc().getOriginalFilename().substring(lastDotIndex + 1);
-				String fileName = lastDotIndex == -1 ? vendorDoc.getTanDocc().getOriginalFilename() : vendorDoc.getTanDocc().getOriginalFilename().substring(0, lastDotIndex);
-				String filePath = downloadUploadController.uploadFile(vendorDoc.getTanDocc(), CommonConstants.MASTER_VENDOR_MODULE_TAN, fileName, fileExtension);
+			if (vendorDoc.getTanDocc() != null && vendorDoc.getTanDocc().getSize() > 0) {
+				int lastDotIndex = vendorDoc.getTanDocc().getOriginalFilename() == null ? -1
+						: vendorDoc.getTanDocc().getOriginalFilename().lastIndexOf('.');
+				String fileExtension = lastDotIndex == -1 ? ""
+						: vendorDoc.getTanDocc().getOriginalFilename().substring(lastDotIndex + 1);
+				String fileName = lastDotIndex == -1 ? vendorDoc.getTanDocc().getOriginalFilename()
+						: vendorDoc.getTanDocc().getOriginalFilename().substring(0, lastDotIndex);
+				String filePath = downloadUploadController.uploadFile(vendorDoc.getTanDocc(),
+						CommonConstants.MASTER_VENDOR_MODULE_TAN, fileName, fileExtension);
 				vendorr.setTanDoc(filePath);
 			}
-			final AssetVendor vndor= assetVendorRepository.save(vendorr);
-			List<VendorBankDetails> bankDetails = vendorBankDetailsRepository.findAllByVendorIdVendorId(vendorr.getVendorId());
-			assetVendor.getVendorBankDetails().forEach(vndBnk->{
-				VendorBankDetails vendorBankDetails=null;
-				if(vndBnk.getVendorBankMapId()!= null){
+			final AssetVendor vndor = assetVendorRepository.save(vendorr);
+			List<VendorBankDetails> bankDetails = vendorBankDetailsRepository
+					.findAllByVendorIdVendorId(vendorr.getVendorId());
+			assetVendor.getVendorBankDetails().forEach(vndBnk -> {
+				VendorBankDetails vendorBankDetails = null;
+				if (vndBnk.getVendorBankMapId() != null) {
 					try {
-						vendorBankDetails=vendorBankDetailsRepository.findById(vndBnk.getVendorBankMapId()).orElseThrow(()->new Exception("Could not find vendor Bank details"));
+						vendorBankDetails = vendorBankDetailsRepository.findById(vndBnk.getVendorBankMapId())
+								.orElseThrow(() -> new Exception("Could not find vendor Bank details"));
 					} catch (Exception e) {
-						throw new RuntimeException("Could not find vendor Bank details"+e);
+						throw new RuntimeException("Could not find vendor Bank details" + e);
 					}
 					bankDetails.remove(vendorBankDetails);
 					vendorBankDetails.setUpdateBy(SecurityHelper.getCurrentUser().getUserId());
 					vendorBankDetails.setUpdatedOn(new Date());
-				}else{
-					vendorBankDetails=new VendorBankDetails();
+				} else {
+					vendorBankDetails = new VendorBankDetails();
 					vendorBankDetails.setCreatedBy(SecurityHelper.getCurrentUser().getUserId());
 					vendorBankDetails.setCreatedOn(new Date());
 				}
-				BankBranchMaster branch=bankBranchMasterRepository.findByBankBranchId(vndBnk.getBankBranchId());
+				BankBranchMaster branch = bankBranchMasterRepository.findByBankBranchId(vndBnk.getBankBranchId());
 				vendorBankDetails.setBankBranchMaster(branch);
 				vendorBankDetails.setVendorId(vndor);
 				vendorBankDetails.setIsPrimary(vndBnk.getIsPrimary());
@@ -675,19 +698,18 @@ public class CommonServiceImpl<T> implements CommonService {
 				vendorBankDetails.setAccountHolderName(vndBnk.getAccountHolderName());
 				vendorBankDetailsRepository.save(vendorBankDetails);
 			});
-			bankDetails.forEach(x->{
+			bankDetails.forEach(x -> {
 				x.setIsActive(false);
 			});
 			vendorBankDetailsRepository.saveAll(bankDetails);
 
-
-			result.setMessage("Vendor Successfully "+action+"....");
+			result.setMessage("Vendor Successfully " + action + "....");
 			result.setData(vendorr);
 			result.setOutcome(true);
 
 		} catch (Exception e) {
 			result.setOutcome(false);
-			log.error("Error in MasterServiceImpl ,Method -->saveAndUpdateVendor"+e);
+			log.error("Error in MasterServiceImpl ,Method -->saveAndUpdateVendor" + e);
 		}
 		return result;
 	}
@@ -696,15 +718,15 @@ public class CommonServiceImpl<T> implements CommonService {
 //	function of get Vendor by vendorId
 	@Override
 	public AssetVendor getVendorById(Long vendorId) {
-		Optional<AssetVendor> vendor= assetVendorRepository.findById(vendorId);
-		return vendor.isPresent()? vendor.get() : null;
+		Optional<AssetVendor> vendor = assetVendorRepository.findById(vendorId);
+		return vendor.isPresent() ? vendor.get() : null;
 	}
 
 //	Sourava Pattanayak 21-11-2023
 //	function of get all active Vendor
 	@Override
 	public List<AssetVendor> getAllActiveVendor() {
-		List<AssetVendor> lstVnd= assetVendorRepository.findAllByIsActiveIsTrue();
+		List<AssetVendor> lstVnd = assetVendorRepository.findAllByIsActiveIsTrue();
 		return lstVnd;
 	}
 
@@ -714,12 +736,12 @@ public class CommonServiceImpl<T> implements CommonService {
 	public AssetVendor deleteVendor(Long vendorId) {
 		AssetVendor assetVendor = null;
 		try {
-			assetVendor =this.getVendorById(vendorId);
+			assetVendor = this.getVendorById(vendorId);
 			assetVendor.setIsActive(false);
 			assetVendor = assetVendorRepository.save(assetVendor);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.error("Error in MasterServiceImpl ,Method -->deleteVendor"+e);
+			log.error("Error in MasterServiceImpl ,Method -->deleteVendor" + e);
 		}
 		return assetVendor;
 	}
@@ -730,16 +752,15 @@ public class CommonServiceImpl<T> implements CommonService {
 	public Category deleteCategory(Long categoryId) {
 		Category cat = null;
 		try {
-			cat=this.getCategoryById(categoryId);
+			cat = this.getCategoryById(categoryId);
 			cat.setIsActive(false);
-			cat=categoryRepository.save(cat);
+			cat = categoryRepository.save(cat);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.error("Error in MasterServiceImpl ,Method -->deleteCategory"+e);
+			log.error("Error in MasterServiceImpl ,Method -->deleteCategory" + e);
 		}
 		return cat;
 	}
-
 
 	@Override
 	public List<AssetVendor> getAllVendorNameAsc(Long id, String type) {
@@ -748,15 +769,13 @@ public class CommonServiceImpl<T> implements CommonService {
 
 	@Override
 	public List<AdditionalCostMaster> getAllActiveAdditionalCostMasterList() {
-		try{
+		try {
 			return additionalCostMasterRepository.findAllByIsActiveIsTrue();
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			log.error("Error in VehicleServiceImpl ,Method --> getAllActiveAdditionalCostMasterList"+e);
+			log.error("Error in VehicleServiceImpl ,Method --> getAllActiveAdditionalCostMasterList" + e);
 		}
 		return new ArrayList<>();
 	}
 
-
 }
-

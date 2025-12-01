@@ -13,9 +13,9 @@ import org.springframework.context.annotation.Configuration;
 @EnableAutoConfiguration
 public class JSessionConfigurer implements ServletContextInitializer {
 
-    @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
-        servletContext.getSessionCookieConfig().setName("KHAA_PANIKU_KHAA");
-        servletContext.getSessionCookieConfig().setHttpOnly(true);
-    }
+	@Override
+	public void onStartup(ServletContext servletContext) throws ServletException {
+		servletContext.getSessionCookieConfig().setName("KHAA_PANIKU_KHAA");
+		servletContext.getSessionCookieConfig().setHttpOnly(true);
+	}
 }

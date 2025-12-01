@@ -1,6 +1,5 @@
 package com.aashdit.prod.heads.common.controller;
 
-
 import java.util.List;
 
 import org.jboss.logging.Logger;
@@ -25,71 +24,72 @@ import com.aashdit.prod.heads.framework.core.ServiceOutcome;
 @RequestMapping(value = "/admin/state")
 public class StateController {
 
-    final static Logger logger = Logger.getLogger(StateController.class);
+	final static Logger logger = Logger.getLogger(StateController.class);
 
-    @Autowired
-    private StateService stateService;
-    
+	@Autowired
+	private StateService stateService;
+
 	@Autowired
 	private MessageSource messageSource;
 
-    @GetMapping(path = "/list", name = "List State")
-    public String list(Model model, @RequestParam(value = "showDeleted", required = false) Boolean showDeleted) {
+	@GetMapping(path = "/list", name = "List State")
+	public String list(Model model, @RequestParam(value = "showDeleted", required = false) Boolean showDeleted) {
 		try {
-			ServiceOutcome<List<State>> serviceOutcome=stateService.getAllState(false);
-			if(serviceOutcome.getOutcome()) {
+			ServiceOutcome<List<State>> serviceOutcome = stateService.getAllState(false);
+			if (serviceOutcome.getOutcome()) {
 				model.addAttribute("stateList", serviceOutcome.getData());
-			}else {
+			} else {
 				model.addAttribute("error_msg", serviceOutcome.getMessage());
 			}
-		}catch(Exception ex) {
+		} catch (Exception ex) {
 			logger.error(ex);
-			model.addAttribute("error_msg", messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+			model.addAttribute("error_msg",
+					messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
 		}
-        return "admin.state.list";
-    }
+		return "admin.state.list";
+	}
 
-    @GetMapping(path = "/add", name = "Add State")
-    public String add(Model model) {
-    	
-    	
-        return "admin.state.add";
-    }
+	@GetMapping(path = "/add", name = "Add State")
+	public String add(Model model) {
 
-    @GetMapping(path = "/edit/{stateId}", name = "Edit State")
-    public String edit(Model model, @PathVariable("stateId") Long stateId, RedirectAttributes redirectAttributes) {
-    	 try {
- 			ServiceOutcome<State> serviceOutcome=stateService.getById(stateId);
- 			if(serviceOutcome.getOutcome()) {
- 				model.addAttribute("stateData", serviceOutcome.getData());
- 			}else {
- 				model.addAttribute("error_msg", serviceOutcome.getMessage());
- 			}
-         } catch (Exception ex) {
-             logger.error(ex);
- 			model.addAttribute("error_msg", messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
-         }
-    	 return "admin.state.add";
-    }
+		return "admin.state.add";
+	}
 
-    @PostMapping(value = "/save", name = "Save State")
-    public String saveState(@ModelAttribute("state") State state, RedirectAttributes attributes) {
+	@GetMapping(path = "/edit/{stateId}", name = "Edit State")
+	public String edit(Model model, @PathVariable("stateId") Long stateId, RedirectAttributes redirectAttributes) {
+		try {
+			ServiceOutcome<State> serviceOutcome = stateService.getById(stateId);
+			if (serviceOutcome.getOutcome()) {
+				model.addAttribute("stateData", serviceOutcome.getData());
+			} else {
+				model.addAttribute("error_msg", serviceOutcome.getMessage());
+			}
+		} catch (Exception ex) {
+			logger.error(ex);
+			model.addAttribute("error_msg",
+					messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
+		}
+		return "admin.state.add";
+	}
 
-        try {
-			ServiceOutcome<State> serviceOutcome=stateService.saveState(state);
-			if(serviceOutcome.getOutcome()) {
+	@PostMapping(value = "/save", name = "Save State")
+	public String saveState(@ModelAttribute("state") State state, RedirectAttributes attributes) {
+
+		try {
+			ServiceOutcome<State> serviceOutcome = stateService.saveState(state);
+			if (serviceOutcome.getOutcome()) {
 				attributes.addFlashAttribute("success_msg", serviceOutcome.getMessage());
-			}else {
+			} else {
 				attributes.addFlashAttribute("error_msg", serviceOutcome.getMessage());
 			}
-		
-        } catch (Exception ex) {
-            logger.error(ex);
-            attributes.addFlashAttribute("error_msg", messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
 
-        }
-    	return "redirect:/admin/state/list";
-    }
+		} catch (Exception ex) {
+			logger.error(ex);
+			attributes.addFlashAttribute("error_msg",
+					messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
 
-   
+		}
+		return "redirect:/admin/state/list";
+	}
+
 }

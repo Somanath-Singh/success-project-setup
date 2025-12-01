@@ -60,6 +60,7 @@
                      class="btn btn-success btn-sm">
                      <a href="${contextPath}/admin/role/list" class="btn btn-cancel btn-danger">Cancel</a>
                 </div>
+                </div>
             </form>
           </div>
         </div>

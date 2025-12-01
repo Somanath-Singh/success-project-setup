@@ -8,6 +8,10 @@ import java.util.List;
 @Data
 public class OrganizationStructureParentChild implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Long id;
 	private String levelCode;
 	private Integer levelHeight;

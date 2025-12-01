@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -59,7 +58,7 @@
 															code="site.bms.treck.status"></spring:message></label>
 													<div class="col-md-12">
 														<select name="beneScheme.schemeId" id="state"
-															class="form-control" required=""
+															class="form-control"
 															title="This field should not be left blank.">
 															<option value="">Select</option>
 															<c:forEach items="${schemeList}" var="scheme">

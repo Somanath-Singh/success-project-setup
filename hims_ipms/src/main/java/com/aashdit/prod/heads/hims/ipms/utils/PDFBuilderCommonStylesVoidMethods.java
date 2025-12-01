@@ -9,18 +9,19 @@ import com.itextpdf.text.pdf.PdfPCell;
  * @date 14/09/2018
  */
 
-public class PDFBuilderCommonStylesVoidMethods 
-{
-	/* ---------------------------------------  MISCELLANEOUS  -------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left, PaddingTop=14, Padding-Bottom=17
-	 * @border 	Left-Bottom
-	 * @return 	VOID
-	 * @refer 	
+public class PDFBuilderCommonStylesVoidMethods {
+	/*
+	 * --------------------------------------- MISCELLANEOUS
+	 * --------------------------------------------
 	 */
-	public static void voidLeft_BorderLeftBottom_Padding14_17(PdfPCell pCell)
-	{
+	/**
+	 * @since 01-01-2018
+	 * @align Left, PaddingTop=14, Padding-Bottom=17
+	 * @border Left-Bottom
+	 * @return VOID
+	 * @refer
+	 */
+	public static void voidLeft_BorderLeftBottom_Padding14_17(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -32,14 +33,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Left, PaddingTop=14, Padding-Bottom=17
-	 * @border 	Right-Bottom
-	 * @return 	VOID
-	 * @refer 	
+	 * @since 01-01-2018
+	 * @align Left, PaddingTop=14, Padding-Bottom=17
+	 * @border Right-Bottom
+	 * @return VOID
+	 * @refer
 	 */
-	public static void voidLeft_BorderRightBottom_Padding14_17(PdfPCell pCell)
-	{
+	public static void voidLeft_BorderRightBottom_Padding14_17(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -51,14 +51,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Left, PaddingTop=14, Padding-Bottom=17
-	 * @border 	Right-Bottom
-	 * @return 	VOID
-	 * @refer 	
+	 * @since 01-01-2018
+	 * @align Left, PaddingTop=14, Padding-Bottom=17
+	 * @border Right-Bottom
+	 * @return VOID
+	 * @refer
 	 */
-	public static void voidLeft_BorderLeftRightBottom_Padding14_17(PdfPCell pCell)
-	{
+	public static void voidLeft_BorderLeftRightBottom_Padding14_17(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -71,14 +70,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right, PaddingTop=14, Padding-Bottom=17
-	 * @border 	Right-Bottom
-	 * @return 	VOID
-	 * @refer 	
+	 * @since 01-01-2018
+	 * @align Right, PaddingTop=14, Padding-Bottom=17
+	 * @border Right-Bottom
+	 * @return VOID
+	 * @refer
 	 */
-	public static void voidRight_BorderRightBottom_Padding14_17(PdfPCell pCell)
-	{
+	public static void voidRight_BorderRightBottom_Padding14_17(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -90,14 +88,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center, PaddingTop=20, Padding-Bottom=5
-	 * @border 	None
-	 * @return 	VOID
-	 * @refer 	cellLabelBoldCenter, emptyCellStyleHighPadding25Top
+	 * @since 01-01-2018
+	 * @align Center, PaddingTop=20, Padding-Bottom=5
+	 * @border None
+	 * @return VOID
+	 * @refer cellLabelBoldCenter, emptyCellStyleHighPadding25Top
 	 */
-	public static void voidCenter_BorderNone_Padding20_5(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderNone_Padding20_5(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setPaddingTop(20f);
 		pCell.setPaddingBottom(5f);
@@ -106,13 +103,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center, PaddingTop=30, Padding-Bottom=5
-	 * @border 	None
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center, PaddingTop=30, Padding-Bottom=5
+	 * @border None
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderNone_Padding30_5(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderNone_Padding30_5(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setPaddingTop(30f);
 		pCell.setPaddingBottom(5f);
@@ -121,14 +117,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Left, PaddingTop=14, Padding-Bottom=17
-	 * @border 	Left-Bottom
-	 * @return 	VOID
-	 * @refer 	emptyCellStyle
+	 * @since 01-01-2018
+	 * @align Left, PaddingTop=14, Padding-Bottom=17
+	 * @border Left-Bottom
+	 * @return VOID
+	 * @refer emptyCellStyle
 	 */
-	public static void voidEmptyCell_BorderNone(PdfPCell pCell)
-	{
+	public static void voidEmptyCell_BorderNone(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setPaddingLeft(2f);
 		pCell.setPaddingRight(2f);
@@ -137,16 +132,15 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBackgroundColor(BaseColor.WHITE);
 		pCell.setBorder(0);
 	}
-	
+
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftNoPaddingStyle
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Bottom
+	 * @return VOID
+	 * @refer cellLabelLeftNoPaddingStyle
 	 */
-	public static void voidRight_BorderNone_PaddingNone(PdfPCell pCell)
-	{
+	public static void voidRight_BorderNone_PaddingNone(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setPaddingRight(2f);
 		pCell.setPaddingTop(1f);
@@ -154,20 +148,24 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorder(0);
 	}
 
-
-	/* ---------------------------------------  MISCELLANEOUS  -------------------------------------------- */
-
-	
-	/* ---------------------------------------  NO BORDER  -------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	None
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftStyle, cellLabelLeftAlignNoBorderStyle, cellLabelLeftLowPaddingStyle, NoBorderNormalLeftStyle
+	/*
+	 * --------------------------------------- MISCELLANEOUS
+	 * --------------------------------------------
 	 */
-	public static void voidLeft_BorderNone(PdfPCell pCell)
-	{
+
+	/*
+	 * --------------------------------------- NO BORDER
+	 * --------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border None
+	 * @return VOID
+	 * @refer cellLabelLeftStyle, cellLabelLeftAlignNoBorderStyle,
+	 *        cellLabelLeftLowPaddingStyle, NoBorderNormalLeftStyle
+	 */
+	public static void voidLeft_BorderNone(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -177,13 +175,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Left, Padding-Top=10
-	 * @border 	None
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Left, Padding-Top=10
+	 * @border None
+	 * @return VOID
 	 */
-	public static void voidLeft_BorderNone_Padding10_4(PdfPCell pCell)
-	{
+	public static void voidLeft_BorderNone_Padding10_4(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -193,14 +190,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	None
-	 * @return 	VOID
-	 * @refer 	cellLabelNormalCenter
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border None
+	 * @return VOID
+	 * @refer cellLabelNormalCenter
 	 */
-	public static void voidCenter_BorderNone(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderNone(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -209,13 +205,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center, Padding=0
-	 * @border 	None
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center, Padding=0
+	 * @border None
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderNone_Padding0(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderNone_Padding0(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(0);
@@ -224,14 +219,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center, PaddingTop=10
-	 * @border 	None
-	 * @return 	VOID
-	 * @refer 	cellLabelNormalCenter
+	 * @since 01-01-2018
+	 * @align Center, PaddingTop=10
+	 * @border None
+	 * @return VOID
+	 * @refer cellLabelNormalCenter
 	 */
-	public static void voidCenter_BorderNone_Padding10(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderNone_Padding10(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(10f);
@@ -240,14 +234,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	None
-	 * @return 	VOID
-	 * @refer 	cellLabelRightStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border None
+	 * @return VOID
+	 * @refer cellLabelRightStyle
 	 */
-	public static void voidRight_BorderNone(PdfPCell pCell)
-	{
+	public static void voidRight_BorderNone(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -255,18 +248,18 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setPaddingBottom(4f);
 		pCell.setBackgroundColor(BaseColor.WHITE);
 	}
+
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftAlignBottomBorderStyle, dataRowHeaderBoldLeft
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Bottom
+	 * @return VOID
+	 * @refer cellLabelLeftAlignBottomBorderStyle, dataRowHeaderBoldLeft
 	 */
-	public static void voidRight_BorderDottedBottom(PdfPCell pCell)
-	{
+	public static void voidRight_BorderDottedBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(PdfPCell.NO_BORDER);
-	    pCell.setCellEvent(new TableDottedBorderEvent(PdfPCell.BOTTOM));
+		pCell.setCellEvent(new TableDottedBorderEvent(PdfPCell.BOTTOM));
 		pCell.setPaddingLeft(2f);
 		pCell.setPaddingTop(1f);
 		pCell.setPaddingBottom(4f);
@@ -274,14 +267,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right, PaddingTop=1, PaddingBottom=10
-	 * @border 	None
-	 * @return 	VOID
-	 * @refer 	
+	 * @since 01-01-2018
+	 * @align Right, PaddingTop=1, PaddingBottom=10
+	 * @border None
+	 * @return VOID
+	 * @refer
 	 */
-	public static void voidRight_BorderNone_Padding10_4(PdfPCell pCell)
-	{
+	public static void voidRight_BorderNone_Padding10_4(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -290,17 +282,22 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBackgroundColor(BaseColor.WHITE);
 	}
 
-	/* -------------------------------------------  NO BORDER  ---------------------------------------- */
-
-	/* -------------------------------------------  ALL BORDER  ---------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	All
-	 * @return 	VOID
+	/*
+	 * ------------------------------------------- NO BORDER
+	 * ----------------------------------------
 	 */
-	public static void voidLeft_BorderAll(PdfPCell pCell)
-	{
+
+	/*
+	 * ------------------------------------------- ALL BORDER
+	 * ----------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border All
+	 * @return VOID
+	 */
+	public static void voidLeft_BorderAll(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -314,14 +311,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	All
-	 * @return 	VOID
-	 * @refer 	headerRowWithAllBorder
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border All
+	 * @return VOID
+	 * @refer headerRowWithAllBorder
 	 */
-	public static void voidCenter_BorderAll(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderAll(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -332,8 +328,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthTop(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	public static void voidCenterPINKBG_BorderAll(PdfPCell pCell)
-	{
+
+	public static void voidCenterPINKBG_BorderAll(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -346,14 +342,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center, Colspan=2
-	 * @border 	All
-	 * @return 	VOID
-	 * @refer 	createBoldCenterAlignLeftRightTopBottomBorderColspan2
+	 * @since 01-01-2018
+	 * @align Center, Colspan=2
+	 * @border All
+	 * @return VOID
+	 * @refer createBoldCenterAlignLeftRightTopBottomBorderColspan2
 	 */
-	public static void voidCenter_BorderAll_Colspan2(PdfPCell pCell) 
-	{
+	public static void voidCenter_BorderAll_Colspan2(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setColspan(2);
 		pCell.setPaddingTop(1f);
@@ -367,14 +362,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center, Colspan=2
-	 * @border 	Left-Top-Bottom
-	 * @return 	VOID
-	 * @refer 	createBoldCenterAlignLeftTopBottomBorderColspan2
+	 * @since 01-01-2018
+	 * @align Center, Colspan=2
+	 * @border Left-Top-Bottom
+	 * @return VOID
+	 * @refer createBoldCenterAlignLeftTopBottomBorderColspan2
 	 */
-	public static void voidCenter_BorderLeftTopBottom_Colspan2(PdfPCell pCell) 
-	{
+	public static void voidCenter_BorderLeftTopBottom_Colspan2(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setColspan(2);
 		pCell.setPaddingTop(1f);
@@ -387,14 +381,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center, Rowspan=2
-	 * @border 	Left-Top-Bottom
-	 * @return 	VOID
-	 * @refer 	createBoldCenterAlignLeftTopBottomBorderRowspan2
+	 * @since 01-01-2018
+	 * @align Center, Rowspan=2
+	 * @border Left-Top-Bottom
+	 * @return VOID
+	 * @refer createBoldCenterAlignLeftTopBottomBorderRowspan2
 	 */
-	public static void voidCenter_BorderLeftTopBottom_Rowspan2(PdfPCell pCell) 
-	{
+	public static void voidCenter_BorderLeftTopBottom_Rowspan2(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setRowspan(2);
 		pCell.setPaddingTop(1f);
@@ -407,14 +400,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center, Rowspan=2
-	 * @border 	Left-Right-Bottom
-	 * @return 	VOID
-	 * @refer 	createBoldCenterAlignLeftRightBottomBorderRowspan2
+	 * @since 01-01-2018
+	 * @align Center, Rowspan=2
+	 * @border Left-Right-Bottom
+	 * @return VOID
+	 * @refer createBoldCenterAlignLeftRightBottomBorderRowspan2
 	 */
-	public static void voidCenter_BorderLeftRightBottom_Rowspan2(PdfPCell pCell) 
-	{
+	public static void voidCenter_BorderLeftRightBottom_Rowspan2(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setRowspan(2);
 		pCell.setPaddingTop(1f);
@@ -427,14 +419,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center, Rowspan=2
-	 * @border 	All
-	 * @return 	VOID
-	 * @refer 	createBoldCenterAlignLeftRightTopBottomBorderRowspan2
+	 * @since 01-01-2018
+	 * @align Center, Rowspan=2
+	 * @border All
+	 * @return VOID
+	 * @refer createBoldCenterAlignLeftRightTopBottomBorderRowspan2
 	 */
-	public static void voidCenter_BorderAll_Rowspan2(PdfPCell pCell) 
-	{
+	public static void voidCenter_BorderAll_Rowspan2(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setRowspan(2);
 		pCell.setPaddingTop(1f);
@@ -448,14 +439,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	All
-	 * @return 	VOID
-	 * @refer 	cellLabelRightAlignTopBottomLeftRightBorderStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border All
+	 * @return VOID
+	 * @refer cellLabelRightAlignTopBottomLeftRightBorderStyle
 	 */
-	public static void voidRight_BorderAll(PdfPCell pCell)
-	{
+	public static void voidRight_BorderAll(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -467,18 +457,23 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthTop(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	/* ------------------------------------------ ALL BORDER  ----------------------------------------- */
-	
-	/* ------------------------------------------ LEFT BORDER  ----------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Left
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftAlignLeftBorderStyle
+	/*
+	 * ------------------------------------------ ALL BORDER
+	 * -----------------------------------------
 	 */
-	public static void voidLeft_BorderLeft(PdfPCell pCell)
-	{
+
+	/*
+	 * ------------------------------------------ LEFT BORDER
+	 * -----------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Left
+	 * @return VOID
+	 * @refer cellLabelLeftAlignLeftBorderStyle
+	 */
+	public static void voidLeft_BorderLeft(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -489,13 +484,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Left
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Left
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderLeft(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderLeft(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -505,14 +499,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Left
-	 * @return 	VOID
-	 * @refer 	cellLabelNormalRightAlignLeftBorderStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Left
+	 * @return VOID
+	 * @refer cellLabelNormalRightAlignLeftBorderStyle
 	 */
-	public static void voidRight_BorderLeft(PdfPCell pCell)
-	{
+	public static void voidRight_BorderLeft(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -521,18 +514,23 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBackgroundColor(BaseColor.WHITE);
 		pCell.setBorderWidthLeft(0.5f);
 	}
-	/* ---------------------------------------- LEFT BORDER  ------------------------------------------- */
-
-	/* ---------------------------------------- RIGHT BORDER  ------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Right
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftAlignRightBorderStyle, cellLabelLeftAlignRightBorderStyle
+	/*
+	 * ---------------------------------------- LEFT BORDER
+	 * -------------------------------------------
 	 */
-	public static void voidLeft_BorderRight(PdfPCell pCell)
-	{
+
+	/*
+	 * ---------------------------------------- RIGHT BORDER
+	 * -------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Right
+	 * @return VOID
+	 * @refer cellLabelLeftAlignRightBorderStyle, cellLabelLeftAlignRightBorderStyle
+	 */
+	public static void voidLeft_BorderRight(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -543,13 +541,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Right
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Right
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderRight(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderRight(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -559,14 +556,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Right
-	 * @return 	VOID
-	 * @refer 	cellLabelRightBorderRightStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Right
+	 * @return VOID
+	 * @refer cellLabelRightBorderRightStyle
 	 */
-	public static void voidRight_BorderRight(PdfPCell pCell)
-	{
+	public static void voidRight_BorderRight(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -575,18 +571,23 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBackgroundColor(BaseColor.WHITE);
 		pCell.setBorderWidthRight(0.5f);
 	}
-	/* ------------------------------------------- RIGHT BORDER  ---------------------------------------- */
-
-	/* ------------------------------------------- TOP BORDER  ---------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Top
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftAlignTopBorderStyle
+	/*
+	 * ------------------------------------------- RIGHT BORDER
+	 * ----------------------------------------
 	 */
-	public static void voidLeft_BorderTop(PdfPCell pCell)
-	{
+
+	/*
+	 * ------------------------------------------- TOP BORDER
+	 * ----------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Top
+	 * @return VOID
+	 * @refer cellLabelLeftAlignTopBorderStyle
+	 */
+	public static void voidLeft_BorderTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -597,13 +598,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Top
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Top
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderTop(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -613,13 +613,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Top
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Top
+	 * @return VOID
 	 */
-	public static void voidRight_BorderTop(PdfPCell pCell)
-	{
+	public static void voidRight_BorderTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -628,18 +627,23 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBackgroundColor(BaseColor.WHITE);
 		pCell.setBorderWidthTop(0.5f);
 	}
-	/* ---------------------------------------- TOP BORDER  ------------------------------------------- */
-
-	/* ---------------------------------------- BOTTOM BORDER  ------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftAlignBottomBorderStyle, dataRowHeaderBoldLeft
+	/*
+	 * ---------------------------------------- TOP BORDER
+	 * -------------------------------------------
 	 */
-	public static void voidLeft_BorderBottom(PdfPCell pCell)
-	{
+
+	/*
+	 * ---------------------------------------- BOTTOM BORDER
+	 * -------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Bottom
+	 * @return VOID
+	 * @refer cellLabelLeftAlignBottomBorderStyle, dataRowHeaderBoldLeft
+	 */
+	public static void voidLeft_BorderBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -648,28 +652,28 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBackgroundColor(BaseColor.WHITE);
 		pCell.setBorderWidthBottom(0.5f);
 	}
+
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftAlignBottomBorderStyle, dataRowHeaderBoldLeft
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Bottom
+	 * @return VOID
+	 * @refer cellLabelLeftAlignBottomBorderStyle, dataRowHeaderBoldLeft
 	 */
-	public static void voidLeft_BorderDottedBottom(PdfPCell pCell)
-	{
+	public static void voidLeft_BorderDottedBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(PdfPCell.NO_BORDER);
-	    pCell.setCellEvent(new TableDottedBorderEvent(PdfPCell.BOTTOM));
+		pCell.setCellEvent(new TableDottedBorderEvent(PdfPCell.BOTTOM));
 		pCell.setPaddingLeft(2f);
 		pCell.setPaddingTop(1f);
 		pCell.setPaddingBottom(4f);
 		pCell.setBackgroundColor(BaseColor.WHITE);
 	}
-	public static void voidLeft_BorderDottedTop(PdfPCell pCell)
-	{
+
+	public static void voidLeft_BorderDottedTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(PdfPCell.NO_BORDER);
-	    pCell.setCellEvent(new TableDottedBorderEvent(PdfPCell.TOP));
+		pCell.setCellEvent(new TableDottedBorderEvent(PdfPCell.TOP));
 		pCell.setPaddingLeft(2f);
 		pCell.setPaddingTop(1f);
 		pCell.setPaddingBottom(4f);
@@ -677,14 +681,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Bottom 1f
-	 * @return 	VOID
-	 * @REFERS	sectionHeaderBoldLeftThickBottomLineStyle
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Bottom 1f
+	 * @return VOID
+	 * @REFERS sectionHeaderBoldLeftThickBottomLineStyle
 	 */
-	public static void voidLeft_BorderBottom1f_Padding7_4(PdfPCell pCell)
-	{
+	public static void voidLeft_BorderBottom1f_Padding7_4(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -693,9 +696,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBackgroundColor(BaseColor.WHITE);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	
-	public static void voidLeft_BorderBottom1f_Padding7_4_no_bottom_width(PdfPCell pCell)
-	{
+
+	public static void voidLeft_BorderBottom1f_Padding7_4_no_bottom_width(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -704,14 +706,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Bottom
-	 * @return 	VOID
-	 * @REFERS	sectionHeaderBoldCenterStyle
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Bottom
+	 * @return VOID
+	 * @REFERS sectionHeaderBoldCenterStyle
 	 */
-	public static void voidCenter_BorderBottom(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -721,14 +722,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Bottom 1f
-	 * @return 	VOID
-	 * @REFERS	sectionHeaderBoldCenterThickBottomLineStyle
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Bottom 1f
+	 * @return VOID
+	 * @REFERS sectionHeaderBoldCenterThickBottomLineStyle
 	 */
-	public static void voidCenter_BorderBottom1f_Padding7_4(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderBottom1f_Padding7_4(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(7f);
@@ -736,9 +736,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBackgroundColor(BaseColor.WHITE);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	
-	public static void voidCenter_BorderBottom1f_Padding7_4_no_bottom_width(PdfPCell pCell)
-	{
+
+	public static void voidCenter_BorderBottom1f_Padding7_4_no_bottom_width(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(7f);
@@ -746,14 +745,14 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelRightAlignBottomBorderStyle, dataRowHeaderBoldRight, sectionHeaderBoldRightStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Bottom
+	 * @return VOID
+	 * @refer cellLabelRightAlignBottomBorderStyle, dataRowHeaderBoldRight,
+	 *        sectionHeaderBoldRightStyle
 	 */
-	public static void voidRight_BorderBottom(PdfPCell pCell)
-	{
+	public static void voidRight_BorderBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -764,14 +763,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Bottom 1f
-	 * @return 	VOID
-	 * @REFERS	sectionHeaderBoldRightThickBottomLineStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Bottom 1f
+	 * @return VOID
+	 * @REFERS sectionHeaderBoldRightThickBottomLineStyle
 	 */
-	public static void voidRight_BorderBottom1f_Padding7_4(PdfPCell pCell)
-	{
+	public static void voidRight_BorderBottom1f_Padding7_4(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -780,9 +778,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBackgroundColor(BaseColor.WHITE);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	
-	public static void voidRight_BorderBottom1f_Padding7_4_no_bottom_width(PdfPCell pCell)
-	{
+
+	public static void voidRight_BorderBottom1f_Padding7_4_no_bottom_width(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -790,19 +787,23 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBackgroundColor(BaseColor.WHITE);
 	}
 
-
-	/* -------------------------------------- BOTTOM BORDER  --------------------------------------------- */
-
-	/* --------------------------------------  LEFT-RIGHT BORDER  --------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Left-Right
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftAlignLeftRightBorderStyle
+	/*
+	 * -------------------------------------- BOTTOM BORDER
+	 * ---------------------------------------------
 	 */
-	public static void voidLeft_BorderLeftRight(PdfPCell pCell)
-	{
+
+	/*
+	 * -------------------------------------- LEFT-RIGHT BORDER
+	 * ---------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Left-Right
+	 * @return VOID
+	 * @refer cellLabelLeftAlignLeftRightBorderStyle
+	 */
+	public static void voidLeft_BorderLeftRight(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -814,13 +815,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Left-Right
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Left-Right
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderLeftRight(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderLeftRight(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -831,14 +831,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Left-Right
-	 * @return 	VOID
-	 * @refer 	cellLabelNormalRightAlignLeftRightBorderStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Left-Right
+	 * @return VOID
+	 * @refer cellLabelNormalRightAlignLeftRightBorderStyle
 	 */
-	public static void voidRight_BorderLeftRight(PdfPCell pCell)
-	{
+	public static void voidRight_BorderLeftRight(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -848,17 +847,22 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthLeft(0.5f);
 		pCell.setBorderWidthRight(0.5f);
 	}
-	/* -------------------------------------  LEFT-RIGHT BORDER  ---------------------------------------------- */
-
-	/* -------------------------------------  LEFT-TOP BORDER  ---------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Left-Top
-	 * @return 	VOID
+	/*
+	 * ------------------------------------- LEFT-RIGHT BORDER
+	 * ----------------------------------------------
 	 */
-	public static void voidLeft_BorderLeftTop(PdfPCell pCell)
-	{
+
+	/*
+	 * ------------------------------------- LEFT-TOP BORDER
+	 * ----------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Left-Top
+	 * @return VOID
+	 */
+	public static void voidLeft_BorderLeftTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -870,13 +874,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Left-Top
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Left-Top
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderLeftTop(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderLeftTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -887,13 +890,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Left-Top
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Left-Top
+	 * @return VOID
 	 */
-	public static void voidRight_BorderLeftTop(PdfPCell pCell)
-	{
+	public static void voidRight_BorderLeftTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -903,18 +905,23 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthLeft(0.5f);
 		pCell.setBorderWidthTop(0.5f);
 	}
-	/* -------------------------------------  LEFT-TOP BORDER  ---------------------------------------------- */
-
-	/* -------------------------------------  LEFT-BOTTOM BORDER  ---------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Left-Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftAlignBottomLeftBorderStyle
+	/*
+	 * ------------------------------------- LEFT-TOP BORDER
+	 * ----------------------------------------------
 	 */
-	public static void voidLeft_BorderLeftBottom(PdfPCell pCell)
-	{
+
+	/*
+	 * ------------------------------------- LEFT-BOTTOM BORDER
+	 * ----------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Left-Bottom
+	 * @return VOID
+	 * @refer cellLabelLeftAlignBottomLeftBorderStyle
+	 */
+	public static void voidLeft_BorderLeftBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -924,8 +931,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthLeft(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	public static void voidLeft_BorderLeftBottomLightGrayBG(PdfPCell pCell)
-	{
+
+	public static void voidLeft_BorderLeftBottomLightGrayBG(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -937,14 +944,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Left-Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelCenterAlignLeftBottomBorderStyle
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Left-Bottom
+	 * @return VOID
+	 * @refer cellLabelCenterAlignLeftBottomBorderStyle
 	 */
-	public static void voidCenter_BorderLeftBottom(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderLeftBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -953,8 +959,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthLeft(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	public static void voidCenterPINKBG_BorderLeftBottom(PdfPCell pCell)
-	{
+
+	public static void voidCenterPINKBG_BorderLeftBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -965,14 +971,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Left-Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelRightBorderBottomAndLeftStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Left-Bottom
+	 * @return VOID
+	 * @refer cellLabelRightBorderBottomAndLeftStyle
 	 */
-	public static void voidRight_BorderLeftBottom(PdfPCell pCell)
-	{
+	public static void voidRight_BorderLeftBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -982,8 +987,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthLeft(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	public static void voidRight_BorderLeftBottomGrayBG(PdfPCell pCell)
-	{
+
+	public static void voidRight_BorderLeftBottomGrayBG(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -993,8 +998,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthLeft(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	public static void voidRight_BorderBottomGrayBG(PdfPCell pCell)
-	{
+
+	public static void voidRight_BorderBottomGrayBG(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -1003,18 +1008,23 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	/* ---------------------------------------  LEFT-BOTTOM BORDER  -------------------------------------------- */
-
-	/* ---------------------------------------  TOP-BOTTOM BORDER  -------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Top-Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftAlignTopBottomBorderStyle
+	/*
+	 * --------------------------------------- LEFT-BOTTOM BORDER
+	 * --------------------------------------------
 	 */
-	public static void voidLeft_BorderTopBottom(PdfPCell pCell)
-	{
+
+	/*
+	 * --------------------------------------- TOP-BOTTOM BORDER
+	 * --------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Top-Bottom
+	 * @return VOID
+	 * @refer cellLabelLeftAlignTopBottomBorderStyle
+	 */
+	public static void voidLeft_BorderTopBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -1026,14 +1036,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Top-Bottom
-	 * @return 	VOID
-	 * @refer 	headerGSTRDetailsRowWithBorder
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Top-Bottom
+	 * @return VOID
+	 * @refer headerGSTRDetailsRowWithBorder
 	 */
-	public static void voidCenter_BorderTopBottom(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderTopBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -1044,14 +1053,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Top-Bottom
-	 * @return 	VOID
-	 * @refer 	topBottomBorderNormalRightStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Top-Bottom
+	 * @return VOID
+	 * @refer topBottomBorderNormalRightStyle
 	 */
-	public static void voidRight_BorderTopBottom(PdfPCell pCell)
-	{
+	public static void voidRight_BorderTopBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -1061,17 +1069,22 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthTop(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	/* ---------------------------------------  TOP-BOTTOM BORDER  -------------------------------------------- */
-
-	/* ---------------------------------------  RIGHT-TOP BORDER  -------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Right-Top
-	 * @return 	VOID
+	/*
+	 * --------------------------------------- TOP-BOTTOM BORDER
+	 * --------------------------------------------
 	 */
-	public static void voidLeft_BorderRightTop(PdfPCell pCell)
-	{
+
+	/*
+	 * --------------------------------------- RIGHT-TOP BORDER
+	 * --------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Right-Top
+	 * @return VOID
+	 */
+	public static void voidLeft_BorderRightTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -1083,13 +1096,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Right-Top
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Right-Top
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderRightTop(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderRightTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -1100,13 +1112,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Right-Top
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Right-Top
+	 * @return VOID
 	 */
-	public static void voidRight_BorderRightTop(PdfPCell pCell)
-	{
+	public static void voidRight_BorderRightTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -1116,18 +1127,23 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthRight(0.5f);
 		pCell.setBorderWidthTop(0.5f);
 	}
-	/* ---------------------------------------  RIGHT-TOP BORDER  -------------------------------------------- */
-
-	/* ---------------------------------------  RIGHT-BOTTOM BORDER  -------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Right-Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelCenterAlignRightBottomBorderStyle
+	/*
+	 * --------------------------------------- RIGHT-TOP BORDER
+	 * --------------------------------------------
 	 */
-	public static void voidLeft_BorderRightBottom(PdfPCell pCell)
-	{
+
+	/*
+	 * --------------------------------------- RIGHT-BOTTOM BORDER
+	 * --------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Right-Bottom
+	 * @return VOID
+	 * @refer cellLabelCenterAlignRightBottomBorderStyle
+	 */
+	public static void voidLeft_BorderRightBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -1137,8 +1153,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthRight(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	public static void voidLeft_BorderRightBottomLightGrayBG(PdfPCell pCell)
-	{
+
+	public static void voidLeft_BorderRightBottomLightGrayBG(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -1150,13 +1166,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Right-Bottom
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Right-Bottom
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderRightBottom(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderRightBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -1167,14 +1182,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Right-Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelRightBorderBottomAndRightStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Right-Bottom
+	 * @return VOID
+	 * @refer cellLabelRightBorderBottomAndRightStyle
 	 */
-	public static void voidRight_BorderRightBottom(PdfPCell pCell)
-	{
+	public static void voidRight_BorderRightBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -1184,17 +1198,22 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthRight(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	/* ----------------------------------------  RIGHT-BOTTOM BORDER  ------------------------------------------- */
-
-	/* ----------------------------------------  LEFT-RIGHT-TOP BORDER  ------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Left-Right-Top
-	 * @return 	VOID
+	/*
+	 * ---------------------------------------- RIGHT-BOTTOM BORDER
+	 * -------------------------------------------
 	 */
-	public static void voidLeft_BorderLeftRightTop(PdfPCell pCell)
-	{
+
+	/*
+	 * ---------------------------------------- LEFT-RIGHT-TOP BORDER
+	 * -------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Left-Right-Top
+	 * @return VOID
+	 */
+	public static void voidLeft_BorderLeftRightTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -1207,13 +1226,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Left-Right-Top
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Left-Right-Top
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderLeftRightTop(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderLeftRightTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -1225,13 +1243,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Left-Right-Top
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Left-Right-Top
+	 * @return VOID
 	 */
-	public static void voidRight_BorderLeftRightTop(PdfPCell pCell)
-	{
+	public static void voidRight_BorderLeftRightTop(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -1242,18 +1259,23 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthRight(0.5f);
 		pCell.setBorderWidthTop(0.5f);
 	}
-	/* ----------------------------------------  LEFT-RIGHT-TOP BORDER  ------------------------------------------- */
-
-	/* ----------------------------------------  LEFT-RIGHT-BOTTOM BORDER  ------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Left-Right-Bottom
-	 * @return 	VOID
-	 * @refer 	firstRowCellStyleBoldLeftBorderTopLeft
+	/*
+	 * ---------------------------------------- LEFT-RIGHT-TOP BORDER
+	 * -------------------------------------------
 	 */
-	public static void voidLeft_BorderLeftRightBottom(PdfPCell pCell)
-	{
+
+	/*
+	 * ---------------------------------------- LEFT-RIGHT-BOTTOM BORDER
+	 * -------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Left-Right-Bottom
+	 * @return VOID
+	 * @refer firstRowCellStyleBoldLeftBorderTopLeft
+	 */
+	public static void voidLeft_BorderLeftRightBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -1264,8 +1286,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthRight(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	public static void voidLeft_BorderLeftRightBottomLightGrayBG(PdfPCell pCell)
-	{
+
+	public static void voidLeft_BorderLeftRightBottomLightGrayBG(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -1278,14 +1300,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Left, Rowspan=2
-	 * @border 	Left-Right-Bottom
-	 * @return 	VOID
-	 * @refer 	
+	 * @since 01-01-2018
+	 * @align Left, Rowspan=2
+	 * @border Left-Right-Bottom
+	 * @return VOID
+	 * @refer
 	 */
-	public static void voidLeft_BorderLeftRightBottom_Rowspan2(PdfPCell pCell) 
-	{
+	public static void voidLeft_BorderLeftRightBottom_Rowspan2(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setRowspan(2);
 		pCell.setBorder(0);
@@ -1299,14 +1320,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Left-Right-Bottom
-	 * @return 	VOID
-	 * @refer 	contentAddressTitleRowWithBorder
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Left-Right-Bottom
+	 * @return VOID
+	 * @refer contentAddressTitleRowWithBorder
 	 */
-	public static void voidCenter_BorderLeftRightBottom(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderLeftRightBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -1316,8 +1336,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthRight(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	public static void voidCenterPINKBG_BorderLeftRightBottom(PdfPCell pCell)
-	{
+
+	public static void voidCenterPINKBG_BorderLeftRightBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -1327,15 +1347,15 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthRight(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
+
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Left-Right-Bottom
-	 * @return 	VOID
-	 * @refer 	contentAddressTitleRowWithBorder
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Left-Right-Bottom
+	 * @return VOID
+	 * @refer contentAddressTitleRowWithBorder
 	 */
-	public static void voidCenter_BorderLeftRightBottom_Colspan2(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderLeftRightBottom_Colspan2(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setColspan(2);
@@ -1348,13 +1368,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Left-Right-Bottom
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Left-Right-Bottom
+	 * @return VOID
 	 */
-	public static void voidRight_BorderLeftRightBottom(PdfPCell pCell)
-	{
+	public static void voidRight_BorderLeftRightBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -1365,14 +1384,14 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthRight(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
+
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right, Colspan=6
-	 * @border 	Left-Right-Bottom
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Right, Colspan=6
+	 * @border Left-Right-Bottom
+	 * @return VOID
 	 */
-	public static void voidRight_BorderLeftRightBottom_Colspan6(PdfPCell pCell)
-	{
+	public static void voidRight_BorderLeftRightBottom_Colspan6(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setColspan(6);
@@ -1384,15 +1403,15 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthRight(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
+
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right, Rowspan=2
-	 * @border 	Left-Right-Bottom
-	 * @return 	VOID
-	 * @refer 	
+	 * @since 01-01-2018
+	 * @align Right, Rowspan=2
+	 * @border Left-Right-Bottom
+	 * @return VOID
+	 * @refer
 	 */
-	public static void voidRight_BorderLeftRightBottom_Rowspan2(PdfPCell pCell) 
-	{
+	public static void voidRight_BorderLeftRightBottom_Rowspan2(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setRowspan(2);
 		pCell.setPaddingRight(2f);
@@ -1404,18 +1423,23 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthRight(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	/* -----------------------------------------  LEFT-RIGHT-BOTTOM BORDER  ------------------------------------------ */
-
-	/* -----------------------------------------  LEFT-TOP-BOTTOM BORDER  ------------------------------------------ */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Left-Top-Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelLeftAlignTopBottomLeftBorderStyle
+	/*
+	 * ----------------------------------------- LEFT-RIGHT-BOTTOM BORDER
+	 * ------------------------------------------
 	 */
-	public static void voidLeft_BorderLeftTopBottom(PdfPCell pCell)
-	{
+
+	/*
+	 * ----------------------------------------- LEFT-TOP-BOTTOM BORDER
+	 * ------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Left-Top-Bottom
+	 * @return VOID
+	 * @refer cellLabelLeftAlignTopBottomLeftBorderStyle
+	 */
+	public static void voidLeft_BorderLeftTopBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -1428,13 +1452,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Left-Top-Bottom
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Left-Top-Bottom
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderLeftTopBottom(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderLeftTopBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -1444,8 +1467,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthTop(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	public static void voidCenterPINKBG_BorderLeftTopBottom(PdfPCell pCell)
-	{
+
+	public static void voidCenterPINKBG_BorderLeftTopBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -1457,14 +1480,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Left-Top-Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelRightAlignTopBottomLeftBorderStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Left-Top-Bottom
+	 * @return VOID
+	 * @refer cellLabelRightAlignTopBottomLeftBorderStyle
 	 */
-	public static void voidRight_BorderLeftTopBottom(PdfPCell pCell)
-	{
+	public static void voidRight_BorderLeftTopBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -1475,17 +1497,22 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthTop(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	/* ----------------------------------------  LEFT-TOP-BOTTOM BORDER  ------------------------------------------- */
-
-	/* ----------------------------------------  RIGHT-TOP-BOTTOM BORDER  ------------------------------------------- */
-	/**
-	 * @since 	01-01-2018
-	 * @align 	Left
-	 * @border 	Right-Top-Bottom
-	 * @return 	VOID
+	/*
+	 * ---------------------------------------- LEFT-TOP-BOTTOM BORDER
+	 * -------------------------------------------
 	 */
-	public static void voidLeft_BorderRightTopBottom(PdfPCell pCell)
-	{
+
+	/*
+	 * ---------------------------------------- RIGHT-TOP-BOTTOM BORDER
+	 * -------------------------------------------
+	 */
+	/**
+	 * @since 01-01-2018
+	 * @align Left
+	 * @border Right-Top-Bottom
+	 * @return VOID
+	 */
+	public static void voidLeft_BorderRightTopBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		pCell.setBorder(0);
 		pCell.setPaddingLeft(2f);
@@ -1498,13 +1525,12 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Center
-	 * @border 	Right-Top-Bottom
-	 * @return 	VOID
+	 * @since 01-01-2018
+	 * @align Center
+	 * @border Right-Top-Bottom
+	 * @return VOID
 	 */
-	public static void voidCenter_BorderRightTopBottom(PdfPCell pCell)
-	{
+	public static void voidCenter_BorderRightTopBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		pCell.setBorder(0);
 		pCell.setPaddingTop(1f);
@@ -1516,14 +1542,13 @@ public class PDFBuilderCommonStylesVoidMethods
 	}
 
 	/**
-	 * @since 	01-01-2018
-	 * @align 	Right
-	 * @border 	Right-Top-Bottom
-	 * @return 	VOID
-	 * @refer 	cellLabelRightAlignTopBottomRightBorderStyle
+	 * @since 01-01-2018
+	 * @align Right
+	 * @border Right-Top-Bottom
+	 * @return VOID
+	 * @refer cellLabelRightAlignTopBottomRightBorderStyle
 	 */
-	public static void voidRight_BorderRightTopBottom(PdfPCell pCell)
-	{
+	public static void voidRight_BorderRightTopBottom(PdfPCell pCell) {
 		pCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pCell.setBorder(0);
 		pCell.setPaddingRight(2f);
@@ -1534,5 +1559,8 @@ public class PDFBuilderCommonStylesVoidMethods
 		pCell.setBorderWidthTop(0.5f);
 		pCell.setBorderWidthBottom(0.5f);
 	}
-	/* -------------------------------------------  RIGHT-TOP-BOTTOM BORDER ---------------------------------------- */
+	/*
+	 * ------------------------------------------- RIGHT-TOP-BOTTOM BORDER
+	 * ----------------------------------------
+	 */
 }

@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 
 public class TokenParser {
 
+	@SuppressWarnings("deprecation")
 	public static String getUserName(String token) {
 		String[] split_string = token.split("\\.");
 		String base64EncodedBody = split_string[1];

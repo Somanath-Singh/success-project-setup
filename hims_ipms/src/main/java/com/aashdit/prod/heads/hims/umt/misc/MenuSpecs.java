@@ -11,19 +11,18 @@ import javax.persistence.criteria.Root;
 public class MenuSpecs {
 
 	public static Specification<Menu> isNotModuleOrSystemEntry() {
-	      return new Specification<Menu>() {
-	          /**
-			 * 
-			 */
+		return new Specification<Menu>() {
+			/**
+			* 
+			*/
 			private static final long serialVersionUID = 7036916678419234664L;
 
 			@Override
-	          public Predicate toPredicate(Root<Menu> root,
-	                                       CriteriaQuery<?> query,
-	                                       CriteriaBuilder cb) {
-	              Predicate pr = cb.and(cb.notEqual(root.get("isModule"), true), cb.notEqual(root.get("isSystemConfigEntry"), true));
-	              return pr;
-	          }
-	      };
-	  }
+			public Predicate toPredicate(Root<Menu> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+				Predicate pr = cb.and(cb.notEqual(root.get("isModule"), true),
+						cb.notEqual(root.get("isSystemConfigEntry"), true));
+				return pr;
+			}
+		};
+	}
 }

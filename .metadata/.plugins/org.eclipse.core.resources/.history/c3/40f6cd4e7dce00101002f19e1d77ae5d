@@ -1,0 +1,163 @@
+package com.aashdit.prod.heads.hims.ipms.utils;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.springframework.stereotype.Component;
+
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Component
+@Slf4j
+public class HelperFunction {
+	
+
+    public static HashMap<String, Object> onSuccess(Object data){
+        HashMap<String, Object> eJsonObject = new HashMap<>();
+        eJsonObject.put("status", true);
+        eJsonObject.put("data", data);
+        return  eJsonObject;
+    }
+    public static HashMap<String, Object> onError(Exception e){
+        e.printStackTrace();
+        HashMap<String, Object> eJsonObject = new HashMap<>();
+        eJsonObject.put("status", false);
+        eJsonObject.put("errorMessage", e.getMessage());
+        log.error("Error: {}", e.getMessage());
+        return  eJsonObject;
+    }
+
+    public static JSONObject onGsonArraySuccess(JsonArray data) throws Exception{
+        JSONObject eJsonObject = new JSONObject();
+        // parse data
+        JSONParser parser = new JSONParser();
+        JSONArray parsedData = (JSONArray) parser.parse(data.toString());
+        eJsonObject.put("status", true);
+        eJsonObject.put("data", parsedData);
+        return  eJsonObject;
+    }
+
+    public static JSONObject onGsonObjectSuccess(JsonObject data) throws Exception{
+        JSONObject eJsonObject = new JSONObject();
+        // parse data
+        JSONParser parser = new JSONParser();
+        JSONObject parsedData = (JSONObject) parser.parse(data.toString());
+        eJsonObject.put("status", true);
+        eJsonObject.put("data", parsedData);
+        return  eJsonObject;
+    }
+
+    //Calculate the distance between two Date in days
+    public static int daysBetween(java.util.Date one, java.util.Date two) {
+        return (int)( (one.getTime() - two.getTime()) / (1000 * 60 * 60 * 24));
+    }
+
+
+    // Helper function to check if the deadline is expired
+    public static boolean isDeadlineExpired(Date appDeadlinDate) {
+        // Convert appDeadlinDate (Date) to LocalDate for comparison
+        LocalDate appDeadlineLocalDate = appDeadlinDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+
+        // Return true if the application deadline has passed
+        return appDeadlineLocalDate.isBefore(currentDate);
+    }
+
+    //DateFormatter
+    public static Date dateFormatter(String inputDate) throws ParseException {
+        Date date = null;
+        //convert string to date
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        if (inputDate != null && !inputDate.isEmpty()) {
+            date = sdf.parse(inputDate);
+         }
+        return date;
+    }
+    
+    
+    public static String createReferenceNo(String unvName, String referenceNo) {
+        String autoCode = null;
+        Long currentSequence = 0L; // Start sequence from 0
+
+        try {
+            // Extract the first three letters of the university name
+            String unvFirstThreeLtr = unvName.toUpperCase().substring(0, Math.min(unvName.length(), 3));
+            
+            // If a reference number is provided
+            if (referenceNo != null && !referenceNo.isEmpty()) {
+                String[] parts = referenceNo.split("-");
+
+                // If the reference number is in the correct format
+                if (parts.length > 2) {
+                    try {
+                        // Parse the sequence number from the reference number
+                        currentSequence = Long.parseLong(parts[2]);
+                        currentSequence++; // Increment the sequence
+                    } catch (NumberFormatException e) {
+                        log.error("Invalid sequence in reference number: " + referenceNo);
+                        currentSequence = 0L; // Reset to 0 if parsing fails
+                    }
+                } else {
+                    currentSequence++; // If the format is incorrect, just increment from 0
+                }
+            } else {
+                currentSequence++; // If no reference number provided, start from 0
+            }
+
+            // Create the formatted reference number
+            autoCode = String.format("%s-%s-%03d", ApplicationConstants.REF_FIRST_NAME, unvFirstThreeLtr, currentSequence);
+
+        } catch (Exception e) {
+            // Catch any other unexpected errors
+            e.printStackTrace();
+            log.error("Error occurred in createReferenceNo() method: " + e.getMessage());
+        }
+
+        return autoCode;
+    }
+	public static Object createAdvertisementNo(String universityName, String advertisementNo) {
+		   String advtCode = null;
+	        Long currentSequence = 0L;
+	        try {
+	            String unvFirstThreeLtr = universityName.toUpperCase().substring(0, Math.min(universityName.length(), 3));
+	            if (advertisementNo != null && !advertisementNo.isEmpty()) {
+	                String[] parts = advertisementNo.split("-");
+	                if (parts.length > 2) {
+	                    try {
+	                        currentSequence = Long.parseLong(parts[2]);
+	                        currentSequence++; 
+	                    } catch (NumberFormatException e) {
+	                        log.error("Invalid sequence in reference number: " + advertisementNo);
+	                        currentSequence = 0L; 
+	                    }
+	                    
+	                }else {
+	                	 currentSequence ++ ; 
+	                }
+	            }else {
+	            	 currentSequence ++ ; 
+	            }
+	            advtCode = String.format("%s-%s-%03d", ApplicationConstants.ADVERTISEMENT, unvFirstThreeLtr, currentSequence);
+	        }catch (Exception e) {
+				e.printStackTrace();
+			}
+		return advtCode;
+	}
+}

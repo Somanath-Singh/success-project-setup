@@ -64,8 +64,6 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 	@Autowired
 	private RoleRepository roleRepository;
 
-
-
 	@Autowired
 	private UserRoleMapRepository userRoleMapRepository;
 
@@ -80,13 +78,12 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	
+
 	@Autowired
 	private UserSpecification userSpecification;
-	
+
 	@Autowired
 	private UserLoginHistoryRepository ulHistoryReporsitory;
-
 
 	@Autowired
 	private UmtNativeQueryRepository umtNativeQueryRepository;
@@ -101,12 +98,10 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 	@Override
 	public ServiceOutcome<User> save(User user) {
 		ServiceOutcome<User> svcOutcome = new ServiceOutcome<User>();
-		try
-		{
+		try {
 			user = userRepository.save(user);
 			svcOutcome.setData(user);
-		}
-		catch(Exception ex){
+		} catch (Exception ex) {
 			svcOutcome.setData(null);
 			svcOutcome.setOutcome(false);
 			svcOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
@@ -161,15 +156,12 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 		ServiceOutcome<Page<User>> serviceOutcome = new ServiceOutcome<Page<User>>();
 		try {
 			Page<User> userList = null;
-			if (searchTerm != null && !searchTerm.equals(""))
-			{
+			if (searchTerm != null && !searchTerm.equals("")) {
 				userList = userRepository.findAll(userSpecification.searchUser(searchTerm), pageRequest);
-			}
-			else
-			{
+			} else {
 				userList = userRepository.findAll(pageRequest);
 			}
-			
+
 			serviceOutcome.setData(userList);
 		} catch (Exception e) {
 			log.error(e);
@@ -254,6 +246,7 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 		return rolelist;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public ServiceOutcome<User> updateUser(Long userId, String userName, String firstName, String lastName,
 			Date dateOfBirth, String mobile, String email, Long[] userRoleHcMapId, Long[] roleId, Long[] isPrimary,
@@ -281,17 +274,17 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 					userRoleMap.setUserId(prvUserDtls.getUserId());
 					userRoleMap.setUpdateBy(curUser.getUserId());
 					userRoleMap.setUpdatedOn(new Date());
-                    userRoleMap.setIsActive(!status[i].equals("0"));
+					userRoleMap.setIsActive(!status[i].equals("0"));
 					userRoleMapRepository.save(userRoleMap);
-				}else {
+				} else {
 					StringBuffer sb = new StringBuffer();
-					
+
 					// 1. Get List of all Roles that can be assigned from the screen. This will
 					// exclude SYSTEM_ADMIN and ADMIN Roles
 					// as these are set from the back end
 					List<Role> lstUIRoles = roleRepository.findByDisplayOnPage(true);
 					log.debug("Pass Step 1");
-					
+
 					final Long currRoleId = roleId[i];
 					log.debug("Current Role Id from UI is " + currRoleId);
 					Integer currentAllocations = userRoleMapRepository.findByRoleId(roleId[i]).size();
@@ -300,8 +293,9 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 					if (currentAllocations == null) {
 						currentAllocations = 0;
 					}
-					
-					Role theRole = lstUIRoles.stream().filter(p -> p.getRoleId().equals(currRoleId)).findAny().orElse(null);
+
+					Role theRole = lstUIRoles.stream().filter(p -> p.getRoleId().equals(currRoleId)).findAny()
+							.orElse(null);
 					if (theRole != null) {
 						log.debug("-- 2.2");
 						if (theRole.getMaxAssignments() == -1) {
@@ -351,10 +345,10 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 						sb.append("A Role could cannot be allocated from the UI. <br/> ");
 						log.error(sb.toString());
 					}
-					
+
 				}
 			}
-				
+
 			outcome.setData(prvUserDtls);
 			outcome.setMessage(messageSource.getMessage("msg.success", null, "User Data Updated Successfully",
 					LocaleContextHolder.getLocale()));
@@ -373,10 +367,12 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 		return userRoleMapRepository.findByUserId(userId);
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	@Transactional
 	public ServiceOutcome<User> addUser(String username, String firstname, String lastname, Date dateOfbirth,
-			String userMobile, String userEmail, Long[] roleId, Long[] isPrimary, String designation,String userType,String level,Long userTypeId,Long[] objectTypeId, String staffCode) {
+			String userMobile, String userEmail, Long[] roleId, Long[] isPrimary, String designation, String userType,
+			String level, Long userTypeId, Long[] objectTypeId, String staffCode) {
 
 		ServiceOutcome<User> outcome = new ServiceOutcome<User>();
 		try {
@@ -386,9 +382,9 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 			// 0. Save the user
 			User userDtls = new User();
 			User byUserName = userRepository.findByUserName(username);
-			if(byUserName != null) {
+			if (byUserName != null) {
 				userDtls = byUserName;
-			}else {
+			} else {
 				userDtls.setPassword(bCryptPasswordEncoder.encode(password));
 			}
 			userDtls.setFirstName(firstname);
@@ -412,7 +408,7 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 			userDtls.setCreatedBy(currUser.getUserId());
 			userDtls.setUpdatedOn(new Date());
 			userDtls.setCreatedBy(currUser.getUserId());
-			
+
 			userDtls.setUserType(userType);
 			userDtls.setUserLevel(level);
 			userDtls.setUserTypeId(userTypeId);
@@ -440,14 +436,16 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 				if (currentAllocations == null) {
 					currentAllocations = 0;
 				}
-				Role theRole = lstUIRoles.stream().filter(p -> Objects.equals(p.getRoleId(), currRoleId)).findAny().orElse(null);
+				Role theRole = lstUIRoles.stream().filter(p -> Objects.equals(p.getRoleId(), currRoleId)).findAny()
+						.orElse(null);
 				if (theRole != null) {
 					log.debug("-- 2.2");
 					if (theRole.getMaxAssignments() == -1) {
 						log.debug("-- No limit on assignments");
 						UserRoleMap userRoleMap = new UserRoleMap();
-						UserRoleMap existingUserRoleMap = userRoleMapRepository.findByUserIdAndRoleId(userDtls.getUserId(), roleId[i]);
-						if(existingUserRoleMap != null) {
+						UserRoleMap existingUserRoleMap = userRoleMapRepository
+								.findByUserIdAndRoleId(userDtls.getUserId(), roleId[i]);
+						if (existingUserRoleMap != null) {
 							userRoleMap = existingUserRoleMap;
 						}
 						userRoleMap.setUserId(userDtls.getUserId());
@@ -470,8 +468,9 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 						if (currentAllocations < theRole.getMaxAssignments()) {
 							log.debug("-- 2.3");
 							UserRoleMap userRoleMap = new UserRoleMap();
-							UserRoleMap existingUserRoleMap = userRoleMapRepository.findByUserIdAndRoleId(userDtls.getUserId(), roleId[i]);
-							if(existingUserRoleMap != null) {
+							UserRoleMap existingUserRoleMap = userRoleMapRepository
+									.findByUserIdAndRoleId(userDtls.getUserId(), roleId[i]);
+							if (existingUserRoleMap != null) {
 								userRoleMap = existingUserRoleMap;
 							}
 							userRoleMap.setUserId(userDtls.getUserId());
@@ -539,9 +538,9 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 
 			userDtls.setIsActive(true);
 			Role role;
-			if(roleCode != null && !roleCode.isEmpty()){
+			if (roleCode != null && !roleCode.isEmpty()) {
 				role = roleRepository.findByRoleCode(roleCode);
-			}else {
+			} else {
 				role = roleRepository.findByRoleCode("ROLE_PUBLIC");
 			}
 			userDtls.setPrimaryRole(role);
@@ -655,10 +654,9 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 	@Override
 	public ServiceOutcome<Boolean> createLoginHistory(User user, HttpServletRequest request) {
 		ServiceOutcome<Boolean> svcOutcome = new ServiceOutcome<>();
-		try
-		{
+		try {
 			UserLoginHistory ulHistory = new UserLoginHistory();
-		
+
 			ulHistory.setBrowserDetails(ClientInfo.getClientBrowser(request));
 			ulHistory.setEmail(user.getEmail());
 			ulHistory.setFirstName(user.getFirstName());
@@ -672,28 +670,25 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 			ulHistory.setUserName(user.getUserName());
 			ulHistory.setUserId(user.getUserId());
 			ulHistory.setIpAddress(ClientInfo.getClientIpAddr(request));
-			
+
 			ulHistoryReporsitory.save(ulHistory);
-			
+
 			svcOutcome.setData(true);
-		}
-		catch(Exception ex)
-		{
+		} catch (Exception ex) {
 			svcOutcome.setOutcome(false);
 			svcOutcome.setData(false);
 			svcOutcome.setMessage(ex.getMessage());
 		}
-		
+
 		return svcOutcome;
 	}
 
 	@Override
 	public ServiceOutcome<Boolean> createLogoutHistory(User user, HttpServletRequest request) {
 		ServiceOutcome<Boolean> svcOutcome = new ServiceOutcome<>();
-		try
-		{
+		try {
 			UserLoginHistory ulHistory = new UserLoginHistory();
-		
+
 			ulHistory.setBrowserDetails(ClientInfo.getClientBrowser(request));
 			ulHistory.setEmail(user.getEmail());
 			ulHistory.setFirstName(user.getFirstName());
@@ -706,22 +701,18 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 			ulHistory.setOsDetails(ClientInfo.getClientOS(request));
 			ulHistory.setUserName(user.getUserName());
 			ulHistory.setUserId(user.getUserId());
-			
+
 			ulHistoryReporsitory.save(ulHistory);
-			
+
 			svcOutcome.setData(true);
-		}
-		catch(Exception ex)
-		{
+		} catch (Exception ex) {
 			svcOutcome.setOutcome(false);
 			svcOutcome.setData(false);
 			svcOutcome.setMessage(ex.getMessage());
 		}
-		
+
 		return svcOutcome;
 	}
-
-
 
 	@Override
 	public CurrentUserVo getCurrentUserVoByUserId(Long userId) {
@@ -732,7 +723,7 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 			currentUserVo.setUserName(user.getUserName());
 			currentUserVo.setPrimaryRole(user.getPrimaryRole());
 			currentUserVo.setRoles(user.getRoles());
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error(e);
 		}
 		return currentUserVo;
@@ -743,8 +734,10 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 		Optional<UserRoleMap> userRoleMap = Optional.empty();
 		try {
 			userRoleMap = userRoleMapRepository.findByUserIdAndRoleIdAndIsActiveTrue(currentUserId, primaryRoleId);
-		}catch (Exception e){
-			log.error("Error while fetching user role map by user id and role id UserServiceImpl::findUserRoleMapByUserIdAndRoleId() : ",e);
+		} catch (Exception e) {
+			log.error(
+					"Error while fetching user role map by user id and role id UserServiceImpl::findUserRoleMapByUserIdAndRoleId() : ",
+					e);
 		}
 		return userRoleMap;
 	}
@@ -754,8 +747,10 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 		List<UserRoleRightLevel> userRoleLevelAccessList = new ArrayList<>();
 		try {
 			userRoleLevelAccessList = userRoleRightLevelRepository.findByUserRoleMapId(userRoleMapId);
-		}catch (Exception e){
-			log.error("Error while fetching user role level access by user role map id UserServiceImpl::findUserRoleLevelAccessByUserRoleMapId() : ",e);
+		} catch (Exception e) {
+			log.error(
+					"Error while fetching user role level access by user role map id UserServiceImpl::findUserRoleLevelAccessByUserRoleMapId() : ",
+					e);
 		}
 		return userRoleLevelAccessList;
 	}
@@ -765,7 +760,8 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 		List<EntityIdAndUserLevel> entityIdAndUserLevelList = new ArrayList<>();
 		try {
 			String tableNameWithSchema = SecurityHelper.getTableNameWithSchema(entityClass);
-			Optional<ActivityLevelMap>  entityList = activityLevelMapRepository.findByTableModuleName(tableNameWithSchema);
+			Optional<ActivityLevelMap> entityList = activityLevelMapRepository
+					.findByTableModuleName(tableNameWithSchema);
 			if (entityList.isPresent()) {
 				ActivityLevelMap lvMap = entityList.get();
 				String queryJsonStr = lvMap.getTableModuleQueryCodes();
@@ -774,8 +770,10 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 				String[] codes = asString.split(",");
 				entityIdAndUserLevelList = prepareEntityIdAndUserType(codes);
 			}
-		}catch (Exception e){
-			log.error("Error while fetching entity id and user level by user id UserServiceImpl::getEntityIdAndUserLevelByUserId() : ",e);
+		} catch (Exception e) {
+			log.error(
+					"Error while fetching entity id and user level by user id UserServiceImpl::getEntityIdAndUserLevelByUserId() : ",
+					e);
 		}
 		return entityIdAndUserLevelList;
 	}
@@ -785,7 +783,8 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 		List<EntityIdAndUserLevel> entityIdAndUserLevelList = new ArrayList<>();
 		try {
 			String tableNameWithSchema = SecurityHelper.getTableNameWithSchema(entityClass);
-			Optional<ActivityLevelMap>  entityList = activityLevelMapRepository.findByTableModuleName(tableNameWithSchema);
+			Optional<ActivityLevelMap> entityList = activityLevelMapRepository
+					.findByTableModuleName(tableNameWithSchema);
 			if (entityList.isPresent()) {
 				ActivityLevelMap lvMap = entityList.get();
 				String queryJsonStr = lvMap.getTableModuleQueryCodes();
@@ -794,12 +793,15 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 				String[] codes = asString.split(",");
 				entityIdAndUserLevelList = prepareEntityIdAndUserType(codes);
 			}
-		}catch (Exception e){
-			log.error("Error while fetching entity id and user level by user id UserServiceImpl::getEntityIdAndUserLevelByUserId() : ",e);
+		} catch (Exception e) {
+			log.error(
+					"Error while fetching entity id and user level by user id UserServiceImpl::getEntityIdAndUserLevelByUserId() : ",
+					e);
 		}
 		return entityIdAndUserLevelList;
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<EntityIdAndUserLevel> prepareEntityIdAndUserType(String[] codes) {
 		List<EntityIdAndUserLevel> entityIdAndUserLevelList = new ArrayList<>();
 		for (String code : codes) {
@@ -825,17 +827,14 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 						entityIdAndUserLevelList.add(map);
 					}
 				}
-			}catch (Exception e){
-				log.error("Error while preparing entity id and user type UserServiceImpl::prepareEntityIdAndUserType() : ",e);
+			} catch (Exception e) {
+				log.error(
+						"Error while preparing entity id and user type UserServiceImpl::prepareEntityIdAndUserType() : ",
+						e);
 			}
 		}
 		return entityIdAndUserLevelList;
 	}
-
-
-
-
-
 
 	@Transactional
 	@Override
@@ -847,18 +846,22 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 			String[] split = objectIdAndType.split("##");
 			Long entityId = Long.parseLong(split[0]);
 			String userLevel = split[1];
-			List<OrganizationStructure> orgStcList = organizationStructureRepository.findByObjectIdAndObjectTypeAll(entityId, userLevel);
+			List<OrganizationStructure> orgStcList = organizationStructureRepository
+					.findByObjectIdAndObjectTypeAll(entityId, userLevel);
 			for (OrganizationStructure orgStc : orgStcList) {
 				orgStc.setIsActive(false);
 				organizationStructureRepository.save(orgStc);
 			}
 			isSaved = true;
-		}catch (Exception e){
-			log.error("Error while re-configuring organization structure UserServiceImpl::reConfigureOrganizationStructure() : ",e);
+		} catch (Exception e) {
+			log.error(
+					"Error while re-configuring organization structure UserServiceImpl::reConfigureOrganizationStructure() : ",
+					e);
 		}
 		return isSaved;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public ServiceOutcome<Boolean> forgotPasswordSendOtp(String username) {
 		ServiceOutcome<Boolean> svcOutcome = new ServiceOutcome<>();
@@ -886,35 +889,29 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 
 				if (email != null && !email.isEmpty()) {
 					// send email
-					//EmailUtil.sendEmail(email, subject, message);
-				}else if (phone != null && !phone.isEmpty()) {
+					// EmailUtil.sendEmail(email, subject, message);
+				} else if (phone != null && !phone.isEmpty()) {
 					// send sms
-					//SmsUtil.sendSms(phone, message);
+					// SmsUtil.sendSms(phone, message);
 				}
 
-
-
 			}
-		}catch (Exception e){
-			log.error("Error while forgot password UserServiceImpl::forgotPassword() : ",e);
+		} catch (Exception e) {
+			log.error("Error while forgot password UserServiceImpl::forgotPassword() : ", e);
 			svcOutcome.setData(false);
 			svcOutcome.setMessage("Error while forgot password");
 		}
 		return svcOutcome;
 	}
 
-
 	@Override
 	public ServiceOutcome<Role> getRoleObjectByRoleCode(String roleCode) {
 		ServiceOutcome<Role> svcOutcome = new ServiceOutcome<>();
-		try
-		{
+		try {
 			Role role = roleRepository.findByRoleCode(roleCode);
 			svcOutcome.setData(role);
 			svcOutcome.setMessage("Data Fetched Successfully");
-		}
-		catch(Exception ex)
-		{
+		} catch (Exception ex) {
 			svcOutcome.setOutcome(false);
 			svcOutcome.setData(null);
 			svcOutcome.setMessage(ex.getMessage());
@@ -922,18 +919,14 @@ public class UserServiceImpl implements UserService, MessageSourceAware {
 		return svcOutcome;
 	}
 
-
 	@Override
 	public ServiceOutcome<Role> getRoleObjectByRoleId(Long roleId) {
 		ServiceOutcome<Role> svcOutcome = new ServiceOutcome<>();
-		try
-		{
+		try {
 			Role role = roleRepository.findById(roleId).get();
 			svcOutcome.setData(role);
 			svcOutcome.setMessage("Data Fetched Successfully");
-		}
-		catch(Exception ex)
-		{
+		} catch (Exception ex) {
 			svcOutcome.setOutcome(false);
 			svcOutcome.setData(null);
 			svcOutcome.setMessage(ex.getMessage());

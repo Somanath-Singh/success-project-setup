@@ -5,11 +5,12 @@ import java.util.List;
 import com.aashdit.prod.heads.common.model.BankBranchMaster;
 
 import lombok.Data;
+
 @Data
 public class BankBranchDTO {
 
-	   private BankBranchMaster bankBranchMaster;
-	   
-	   private List<BankBranchMaster> bankBranchMasterList;
+	private BankBranchMaster bankBranchMaster;
+
+	private List<BankBranchMaster> bankBranchMasterList;
 
 }

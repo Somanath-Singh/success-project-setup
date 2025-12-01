@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GenericDTO {
-	
-    private Long id;
-    
-    private String name;
-    
-    private String  code;
+
+	private Long id;
+
+	private String name;
+
+	private String code;
 
 }

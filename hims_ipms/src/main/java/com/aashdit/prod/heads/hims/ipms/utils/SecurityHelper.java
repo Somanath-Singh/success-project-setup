@@ -4,22 +4,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.aashdit.prod.heads.hims.ipms.dto.UserVO;
-import com.aashdit.prod.heads.hims.umt.model.User;
-
-
-
 
 public class SecurityHelper {
 	public static UserVO getCurrentUser() {
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			// User user =
+			// (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			LoggedInUser currentUser = (LoggedInUser) auth.getPrincipal();
 			return currentUser.getDbUser();
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			return null;
 		}
 	}
 }
-	

@@ -75,13 +75,17 @@ import com.aashdit.prod.heads.hims.umt.service.UserService;
 import com.aashdit.prod.heads.hims.umt.utils.AesUtil;
 import com.aashdit.prod.heads.hims.umt.utils.SecurityHelper;
 
+
 @Controller
 @RequestMapping("/overwrite")
 public class CustomLoginController implements MessageSourceAware {
 
 	private static final Logger logger = Logger.getLogger(CustomLoginController.class);
+	
 	private final EntityManager entityManager;
+	
 	private MessageSource messageSource;
+	
 	@Autowired
 	private UserService userService;
 
@@ -105,14 +109,19 @@ public class CustomLoginController implements MessageSourceAware {
 
 	@Value("${post.login.url}")
 	private String POST_LOGIN_URL;
+	
 	@Value("${captcha.options}")
 	private String CAPTCHA_OPTIONS;
+	
 	@Autowired
 	private MenuRepository menuRepository;
+	
 	@Autowired
 	private UmtNativeQueryRepository umtNativeQueryRepository;
+	
 	@Autowired
 	private RoleService roleService;
+	
 	private List<Menu> m_menus;
 
 	@Autowired
@@ -120,6 +129,7 @@ public class CustomLoginController implements MessageSourceAware {
 		this.entityManager = entityManager;
 	}
 
+	@SuppressWarnings("unused")
 	private static <T> Predicate<T> distinctByKey(java.util.function.Function<? super T, ?> keyExtractor) {
 		Map<Object, Boolean> seen = new HashMap<>();
 		return t -> {
@@ -243,7 +253,7 @@ public class CustomLoginController implements MessageSourceAware {
 						HttpStatus.BAD_REQUEST);
 			} else {
 				User user = svcOutcome.getData();
-
+				logger.info(user.toString());
 			}
 			throw new Exception("User not found");
 		} catch (Exception ex) {

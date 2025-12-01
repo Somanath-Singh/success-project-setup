@@ -1,6 +1,5 @@
 package com.aashdit.prod.heads.hims.ipms.config;
 
-
 import com.aashdit.prod.heads.hims.ipms.security.XSSFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.MessageSource;
@@ -25,12 +24,10 @@ public class WebMvcConfigureAdapter implements WebMvcConfigurer {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/assets/**")
-				.addResourceLocations("/assets/")
+		registry.addResourceHandler("/assets/**").addResourceLocations("/assets/")
 				.setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS));
 
-		registry.addResourceHandler("/loginPage/**")
-				.addResourceLocations("/loginPage/")
+		registry.addResourceHandler("/loginPage/**").addResourceLocations("/loginPage/")
 				.setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS));
 	}
 
@@ -66,7 +63,7 @@ public class WebMvcConfigureAdapter implements WebMvcConfigurer {
 		r.setDefaultLocale(Locale.ENGLISH);
 		r.setCookieName("localeInfo");
 
-		/**if set to -1, the cookie is deleted when browser shuts down*/
+		/** if set to -1, the cookie is deleted when browser shuts down */
 		r.setCookieMaxAge(24 * 60 * 60);
 		return r;
 	}

@@ -19,7 +19,7 @@ public class ClientInfo {
 		return result;
 	}
 
-	//http://stackoverflow.com/a/18030465/1845894
+	// http://stackoverflow.com/a/18030465/1845894
 	public static String getClientIpAddr(HttpServletRequest request) {
 		String ip = request.getHeader("X-Forwarded-For");
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
@@ -40,7 +40,7 @@ public class ClientInfo {
 		return ip;
 	}
 
-	//http://stackoverflow.com/a/18030465/1845894
+	// http://stackoverflow.com/a/18030465/1845894
 	public static String getClientOS(HttpServletRequest request) {
 		final String browserDetails = request.getHeader("User-Agent");
 
@@ -61,7 +61,7 @@ public class ClientInfo {
 		}
 	}
 
-	//http://stackoverflow.com/a/18030465/1845894
+	// http://stackoverflow.com/a/18030465/1845894
 	public static String getClientBrowser(HttpServletRequest request) {
 		final String browserDetails = request.getHeader("User-Agent");
 		final String user = browserDetails.toLowerCase();

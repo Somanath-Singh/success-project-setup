@@ -1,0 +1,253 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<style>
+	.isEntityObjReadOnly {
+		pointer-events: none;
+		background-color: #bebdbd !important;
+	}
+</style>
+
+<div class="form-group col-md-2" id="objectIdAndTypeIdDiv">
+	<label>Organization Name :<span class="requiredStarMark">${isMandatory ? '*' : ''}</span></label>
+	<c:choose>
+		<c:when test="${upperOrDown eq 'upper'}">
+			<div class="col-md-12">
+				<!-- if officeDetails.objectIdAndType is there then readonly  selectedEntityObjectIdAndValue-->
+				<select name="objectIdAndType"  class="form-control form-select thisisRequiredField form-control-sm ${isReadOnly ? 'isEntityObjReadOnly' : ''}  ${isMandatory ? 'thisRequiredField' : ''}" id="orgIdAndTypeId" onchange='${functionList}' >
+					<option value="" disabled>Select Organization</option>
+					<c:forEach items="${organizationList}" var="organization">
+						<option value="${organization.combineTwo}" <c:if test="${organization.combineTwo eq currentCombineIdAndValue}">selected</c:if>>${organization.organizationName}</option>
+					</c:forEach>
+				</select>
+			</div>
+		</c:when>
+		<c:when test="${upperOrDown eq 'down'}">
+			<div class="col-md-12">
+				<select name="objectIdAndType" class="form-control form-select thisisRequiredField form-control-sm ${isReadOnly ? 'isEntityObjReadOnly' : ''}  ${isMandatory ? 'thisRequiredField' : ''}" id="orgIdAndTypeId" onchange='${functionList}' >
+					<option value="">Select Organization</option>
+					<c:forEach items="${organizationList}" var="organization">
+						<option value="${organization.combineTwo}" <c:if test="${organization.combineTwo eq currentCombineIdAndValue}">selected</c:if>>${organization.organizationName}</option>
+					</c:forEach>
+				</select>
+			</div>
+		</c:when>
+	</c:choose>
+</div>
+
+<script>
+
+	function asyncAjaxForData(url, data, method) {
+		return new Promise((resolve, reject) => {
+			$.ajax({
+				url: url,
+				type: method,
+				data: data,
+				success: function(data){
+					resolve(data);
+				},
+				error: function(err){
+					reject(err);
+				}
+			});
+		});
+	}
+
+	var ownFunctions = "${ownFunctions}";
+
+	let classObjectValue = "${classObjectValue}";
+	let organizationValue = "${selectedEntityObjectIdAndValue}";
+	let selectedEntityIdValue = "${entityIdCode}";
+	let upperOrDown = "${upperOrDown}";
+
+	let selectedUpperOrganizationValue = "${selectedOrgEntityObjectIdAndType}";
+	let selectedUpperEntityObjectIdAndType = "${selectedUpperEntityObjectIdAndType}";
+	let selectedOrgEntityObjectIdAndTypeArr = "${selectedOrgEntityObjectIdAndTypeArr}";
+	let isMultiple = "${isMultiple}";
+
+
+	$(document).ready(function(){
+		debugger;
+		if(upperOrDown.toLowerCase() == "upper"){
+			getOrganizationUpperEHL($("#orgIdAndTypeId"), organizationValue, selectedEntityIdValue);
+		}else if(upperOrDown.toLowerCase() == "down"){
+			getOrganizationDwonEHL($("#orgIdAndTypeId"), selectedUpperOrganizationValue, selectedUpperEntityObjectIdAndType);
+		}
+
+	});
+
+
+
+	async function getOrganizationUpperEHL(that, organizationValue = "", selectedEntityIdValue = ""){
+		let value = $(that).val();
+		if(value != ""){
+			let url = "${contextPath}/system/getParentEntityHierarchyList";
+			let data = {
+				"entityId" : btoa(value),
+				"classObjectValue" : btoa(classObjectValue),
+				"currentClassObjectId" : btoa(selectedEntityIdValue)
+			};
+			let method = "GET";
+			let response = await asyncAjaxForData(url, data, method);
+			if(response.outcome){
+				let data = response.data;
+				createSelectElement(that, data, "Upper Level", selectedEntityIdValue, "upper");
+			}
+			
+		}
+		
+		if (ownFunctions) { 
+		 ownFunctions.split(",").forEach(funcName => {
+		        funcName = funcName.trim(); // Remove spaces
+		        if (funcName && typeof window[funcName] === "function") {
+		            window[funcName]();
+		        }
+		    });
+		}
+
+	}
+
+	async function getOrganizationDwonEHL(that, organizationValue = "", selectedEntityIdValue = ""){
+		let value = $(that).val();
+		if(value != ""){
+			let url = "${contextPath}/system/getChildListEntityHierarchyList";
+			let data = {
+				"entityId" : btoa(value),
+				"classObjectValue" : btoa(classObjectValue),
+				"currentClassObjectId" : btoa(selectedEntityIdValue)
+			};
+			let method = "GET";
+			let response = await asyncAjaxForData(url, data, method);
+			if(response.outcome){
+				let data = response.data;
+				createSelectElement(that, data, 'Down Level :',selectedEntityIdValue, "down");
+			}
+		}
+		
+		if (ownFunctions) { 
+		 ownFunctions.split(",").forEach(funcName => {
+		        funcName = funcName.trim(); // Remove spaces
+		        if (funcName && typeof window[funcName] === "function") {
+		            window[funcName]();
+		        } 
+		    });
+		}
+	}
+
+
+	let functionList = "${functionList2}";
+	let secondFunctionListTrigger = "${secondFunctionListTrigger}";
+	let isEditUpperOrDownEHL = "${isEditUpperOrDownEHL}";
+	function createSelectElement(that, data, lebelName = "Upper Level :", selectedEntityIdValue, callFrom = "upper") {
+		var mappingType = '';
+		var html = '<option value="" disabled>-Select-</option>';
+		// Process the data to create the options for the select element
+		let onChangeTrigger = false;
+		if (data && data.length > 0) {
+			$.each(data, function(index, value) {
+				mappingType = value.mappingType;
+				var selected = '';
+				var isReadOnly = '';
+				let v = value.levelIdAndTypeAndName;
+				if(callFrom == "upper"){
+					if (value.isSelected) {
+						selected = 'selected';
+						isReadOnly = 'isEntityObjReadOnly';
+						if(isEditUpperOrDownEHL == "true"){
+							isReadOnly = '';
+						}
+						onChangeTrigger = true;
+					}
+				}else{
+					if(value.levelIdAndType == selectedEntityIdValue){
+						debugger;
+						selected = 'selected';
+						isReadOnly = 'isEntityObjReadOnly';
+						if(isEditUpperOrDownEHL == "true"){
+							isReadOnly = '';
+						}
+						onChangeTrigger = true;
+					}
+
+					if(isMultiple === 'true'){
+						selectedOrgEntityObjectIdAndTypeArr.split(",").forEach(function(item){
+							if(item == value.levelIdAndType){
+								selected = 'selected';
+								isReadOnly = 'isEntityObjReadOnly';
+								if(isEditUpperOrDownEHL == "true"){
+									isReadOnly = '';
+								}
+							}
+						});
+					}
+
+
+					v = value.levelIdAndType;
+				}
+				
+				html += '<option value="' + v + '" ' + selected + ' class="' + isReadOnly + '">' + value.levelName + '</option>';
+			});
+		}
+		var isReadOnly = '';
+		if(selectedEntityIdValue != ""){
+			isReadOnly = 'isEntityObjReadOnly';
+			if(isEditUpperOrDownEHL == "true"){
+				isReadOnly = '';
+			}
+		}
+
+		// Determine select element attributes based on mappingType and currentClassObjectId
+		var selectpicker = '';
+		var multiple = '';
+		var dataLiveSearch = '';
+		debugger;
+		if (mappingType === 'ONE-TO-MANY' || isMultiple === 'true') {
+			selectpicker = 'selectpicker';
+			multiple = 'multiple';
+			dataLiveSearch = 'data-live-search="true"';
+			isReadOnly = '';
+		}
+
+		
+
+		// Create the select element
+// 		var selectTag = '<select onchange="getFacilities(this.value),getRoleListByActualLevel(this.value,0)" name="upperEntityIdAndType" class="form-control thisisRequiredField ' + selectpicker + ' ' + isReadOnly + '" id="upperEntityId" onchange="' + functionList + '" ' + multiple + ' ' + dataLiveSearch + '>' + html + '</select>';
+
+		var selectTag = '<select  name="upperEntityIdAndType" class="form-control thisisRequiredField form-control-sm ' + selectpicker + ' ' + isReadOnly + '" id="upperEntityId" onchange="' + functionList + '" ' + multiple + ' ' + dataLiveSearch + '>' + html + '</select>';
+
+
+		// Create the div container for the select element
+		var divHtml = '<div class="form-group col-md-2" id="upperEntityIdDiv">' +
+					'<label class="required">' + lebelName +
+					'</label>' +
+					'<div class="col-md-12">' + selectTag + '</div>' +
+					'</div>';
+		// Remove the div container if it already exists
+		$('#upperEntityIdDiv').remove();
+		// Append the div container as a sibling of the provided element
+		$(that).parent().parent().after(divHtml);
+
+		// Initialize selectpicker if applicable
+		if (selectpicker) {
+			$('.selectpicker').selectpicker();
+		}
+		if (onChangeTrigger) {
+			$('#upperEntityId').trigger('change');
+		}
+
+		if(secondFunctionListTrigger){
+			$('#upperEntityId').trigger('change');
+		}
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+</script>

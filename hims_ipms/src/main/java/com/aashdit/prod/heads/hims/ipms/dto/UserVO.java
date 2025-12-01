@@ -31,13 +31,13 @@ public class UserVO {
 
 	private String userType;// STAFF OR STUDENT
 
-	private String userLevel;//COLG or UNV or DEPT
+	private String userLevel;// COLG or UNV or DEPT
 
-	private Long userTypeId;//staff or student id
+	private Long userTypeId;// staff or student id
 
 	private Set<GrantedAuthority> grantedAuthorities;
 
-	private Long entityId;//college id or department id or university id
+	private Long entityId;// college id or department id or university id
 
 	private List<MenuDto> menuList;
 

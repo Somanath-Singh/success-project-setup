@@ -1,0 +1,58 @@
+package com.aashdit.prod.heads.hims.ipms.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import com.aashdit.prod.heads.framework.core.model.Auditable;
+import com.aashdit.prod.heads.hims.umt.model.User;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "t_website_slider_image")
+public class WebsiteSliderImage extends Auditable<User> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "	web_slider_id", nullable = false)
+	private Long webSliderId;
+
+	@Column(name = "title_en")
+	private String titleEn;
+
+	@Column(name = "title_od")
+	private String titleInOdia;
+
+	@Column(name = "	hyper_link")
+	private String hyperLink;
+
+	@Column(name = "image_name")
+	private String imageName;
+
+	@Column(name = "image_path")
+	private String imagePath;
+
+	@Column(name = "is_active")
+	private Boolean isActive = true;
+
+	@Transient
+	private MultipartFile imageWeb;
+
+}

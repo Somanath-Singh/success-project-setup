@@ -21,6 +21,7 @@ import java.util.*;
 
 @Slf4j
 public class CommonUtils {
+	
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();
 
@@ -140,16 +141,16 @@ public class CommonUtils {
     public static boolean isFileValid(MultipartFile file, RedirectAttributes message) throws IOException {
 	    String attachment = getFileExtension(new File(file.getOriginalFilename()));
 	    
-//	    if (attachment.equalsIgnoreCase("pdf")) {
-//	        boolean fileSuspicious = (new PdfDocumentDetectorImpl()).isSafe(file.getInputStream());
-//	        if (!fileSuspicious) {
-//	            message.addFlashAttribute(ApplicationConstants.ERROR_MSG, "One or more suspicious files were found. Unable to save data.");
-//	            return false;
-//	        }
-//	    } else if (!(attachment.equalsIgnoreCase("png") || attachment.equalsIgnoreCase("jpg") || attachment.equalsIgnoreCase("jpeg"))) {
-//	        message.addFlashAttribute(ApplicationConstants.ERROR_MSG, "Please upload a pdf, jpg, or png document.");
-//	        return false;
-//	    }
+	    if (attachment.equalsIgnoreCase("pdf")) {
+	        boolean fileSuspicious = (new PdfDocumentDetectorImpl()).isSafe(file.getInputStream());
+	        if (!fileSuspicious) {
+	            message.addFlashAttribute(ApplicationConstants.ERROR_MSG, "One or more suspicious files were found. Unable to save data.");
+	            return false;
+	        }
+	    } else if (!(attachment.equalsIgnoreCase("png") || attachment.equalsIgnoreCase("jpg") || attachment.equalsIgnoreCase("jpeg"))) {
+	        message.addFlashAttribute(ApplicationConstants.ERROR_MSG, "Please upload a pdf, jpg, or png document.");
+	        return false;
+	    }
 	    
 	    return true;
 	}

@@ -1,11 +1,12 @@
 package com.aashdit.prod.heads.hims.umt.dto;
-import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Data;
+
+
 @Data
 public class User implements Serializable {
 	private static final long serialVersionUID = 285701719160134651L;
@@ -28,15 +29,22 @@ public class User implements Serializable {
 
 	@Data
 	public static class AllEntityIdsAndLevel implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private Long entityId;
 		private String entityLevel;
 		private String entityIdAndLevel;
+
 		public AllEntityIdsAndLevel(long entityId, String entityLevel, String entityIdAndLevel) {
 			this.entityId = entityId;
 			this.entityLevel = entityLevel;
 			this.entityIdAndLevel = entityIdAndLevel;
 		}
-		public AllEntityIdsAndLevel() {}
+
+		public AllEntityIdsAndLevel() {
+		}
 	}
 
 }

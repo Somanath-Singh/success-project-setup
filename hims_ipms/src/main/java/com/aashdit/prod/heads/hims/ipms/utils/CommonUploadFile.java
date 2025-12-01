@@ -1,4 +1,4 @@
- package com.aashdit.prod.heads.hims.ipms.utils;
+package com.aashdit.prod.heads.hims.ipms.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,12 +37,12 @@ public class CommonUploadFile {
 	public static String upload(MultipartFile file, String path, String module, String code) throws IOException {
 		String uniqFileName = "";
 		try {
-			String filePath = path + File.separator + module;  
-			if(code.equals("") || code.isEmpty()) {
+			String filePath = path + File.separator + module;
+			if (code.equals("") || code.isEmpty()) {
 				filePath = filePath + File.separator + code;
 			}
 			String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-			String fname = addCurrenDateTimeToDocAndRenameItModified(code,extension);
+			String fname = addCurrenDateTimeToDocAndRenameItModified(code, extension);
 			File checkFolderPath = new File(filePath);
 			if (!checkFolderPath.exists()) {
 				checkFolderPath.mkdirs();
@@ -55,36 +55,34 @@ public class CommonUploadFile {
 		}
 		return uniqFileName;
 	}
-	
-	public static String getUploadedPath(String path, String module, String code,String filename) {
+
+	public static String getUploadedPath(String path, String module, String code, String filename) {
 		String uniqePathName = "";
 		try {
 			String filePath = path + File.separator + module;
-			if(code.equals("") || code.isEmpty()) {
+			if (code.equals("") || code.isEmpty()) {
 				filePath = filePath + File.separator + code;
 			}
 			filePath += File.separator + filename;
 			uniqePathName = filePath;
-		}catch(Exception ex) {
+		} catch (Exception ex) {
 			logger.error(ex.getMessage());
 		}
 		return uniqePathName;
 	}
 
-	
-	public static String uploadDocumentCommon(MultipartFile file, String uploadPathStatic, String module, String code) throws IOException 
-	{
+	public static String uploadDocumentCommon(MultipartFile file, String uploadPathStatic, String module, String code)
+			throws IOException {
 		String uniqFileName = "";
 
-		try 
-		{
+		try {
 			String filePath = uploadPathStatic + File.separator + module;
-			if(code.equals("") || code.isEmpty()) {
+			if (code.equals("") || code.isEmpty()) {
 				filePath = filePath + File.separator + code;
 			}
 
 			String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-			String fname = addCurrenDateTimeToDocAndRenameItModified(code,extension);
+			String fname = addCurrenDateTimeToDocAndRenameItModified(code, extension);
 			File checkFolderPath = new File(filePath);
 			if (!checkFolderPath.exists()) {
 				checkFolderPath.mkdirs();
@@ -93,12 +91,11 @@ public class CommonUploadFile {
 			Path uploadPath = Paths.get(filePath.concat(File.separator + fname));
 			Files.write(uploadPath, file.getBytes());
 			uniqFileName = fname;
-		} 
-		catch (Exception e) {
-			//logger.error("-- Error -- CommonUploadFile -- upload() --->>"+ExceptionUtils.getFullStackTrace(e));
+		} catch (Exception e) {
+			// logger.error("-- Error -- CommonUploadFile -- upload()
+			// --->>"+ExceptionUtils.getFullStackTrace(e));
 		}
 		return uniqFileName;
 	}
-	
-	
+
 }

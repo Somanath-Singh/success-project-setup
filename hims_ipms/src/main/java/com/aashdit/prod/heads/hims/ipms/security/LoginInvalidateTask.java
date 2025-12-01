@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 
 import com.aashdit.prod.heads.hims.umt.model.User;
 import com.aashdit.prod.heads.hims.umt.repository.UserRepository;
-import com.aashdit.prod.heads.hims.umt.service.UserService;
-
 
 @Component(value = "loginInvalidateTask")
 public class LoginInvalidateTask {
@@ -20,14 +18,12 @@ public class LoginInvalidateTask {
 
 	@Autowired
 	private UserRepository userRepository;
-	@Autowired
-	private UserService userService;
 
 	@Scheduled(fixedRate = 300000) // Every 5 Mins
 	private void resetExpiredLoginFlags() {
 		try {
 			Date currentDate = new Date();
-		//	logger.debug("STARTED TASK resetExpiredLoginFlags ->" + currentDate.toLocaleString());
+			logger.debug("STARTED TASK resetExpiredLoginFlags ->" + currentDate.toString());
 			List<User> lstUsers = userRepository.getLoggedInUsers();
 			if (lstUsers != null) {
 				for (User user : lstUsers) {
@@ -36,7 +32,6 @@ public class LoginInvalidateTask {
 						long difference = (currentDate.getTime() - user.getLastRequestTime().getTime()) / 1000;
 						if (Math.abs(difference) > 20 * 60) {
 							// Last request was 20 minutes ago and user is marked as Logged in
-							//userService.closeLoginHistory(user);
 							user.setIsLocked(user.getIsLocked() == true ? false : user.getIsLocked());
 							user.setIsLoggedIn(false);
 							userRepository.save(user);

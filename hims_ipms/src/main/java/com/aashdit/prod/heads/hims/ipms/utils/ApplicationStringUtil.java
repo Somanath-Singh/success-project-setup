@@ -75,7 +75,7 @@ public class ApplicationStringUtil {
 		return totalDedc.toString();
 
 	}
-	
+
 	/**
 	 * @return Value (String) in #,##,##,### sdFormat without any decimal value
 	 * @description Convert value to INR Format i.e. #,##,##,### without any decimal
@@ -90,7 +90,6 @@ public class ApplicationStringUtil {
 		return finalFormattedAmount;
 	}
 
-	
 	/**
 	 * @return Amount (String) in #,##,##,###.## sdFormat
 	 * @description Convert amount to INR Format i.e. #,##,##,###.##

@@ -30,7 +30,7 @@ public class MailQueue implements Serializable {
 
 	@NotNull
 	@Column(name = "is_active")
-	private Boolean isActive=true;
+	private Boolean isActive = true;
 
 	@Column(name = "subject")
 	private String subject;
@@ -46,13 +46,13 @@ public class MailQueue implements Serializable {
 
 	@Column(name = "failure_reason")
 	private String failureReason;
-	
+
 	@Column(name = "created_by")
 	private Long createdBy;
-	
+
 	@Column(name = "created_on")
 	private Date createdOn;
-	
+
 	@Column(name = "last_updated_on")
 	private Date lastUpdatedOn;
 
@@ -60,19 +60,13 @@ public class MailQueue implements Serializable {
 		return mailQueueId;
 	}
 
-	
-
 	public Long getCreatedBy() {
 		return createdBy;
 	}
 
-
-
 	public void setCreatedBy(Long createdBy) {
 		this.createdBy = createdBy;
 	}
-
-
 
 	public Date getCreatedOn() {
 		return createdOn;

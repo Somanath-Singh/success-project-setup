@@ -1,4 +1,5 @@
 package com.aashdit.prod.heads.hims.ipms.dto;
+
 import java.util.List;
 import java.util.Locale;
 
@@ -13,63 +14,57 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties
 public class MenuDto {
-private static final long serialVersionUID = 3929618635035564977L;
 	
 	private Long menuId;
-			
+
 	private String menuTextEN;
-	
+
 	private String menuTextHI;
-	
+
 	@Transient
 	private String menuText;
-	
+
 	private String menuIcon;
-	
+
 	private String menuURL;
-	
-    private MenuDto parent;
-		
-    private List<MenuDto> children;
-	
+
+	private MenuDto parent;
+
+	private List<MenuDto> children;
+
 	private Integer displayOrder;
-	
+
 	private Boolean isActive;
-	
+
 	@Transient
 	public Boolean isParent;
-	
-	private Boolean isDisplay;
-	
-	private Boolean isSystemConfigEntry;
-	
-	private Boolean isModule;
-	
-	/* V 1.0.1 */
-	
-	private String appCode;
-	
-	
 
+	private Boolean isDisplay;
+
+	private Boolean isSystemConfigEntry;
+
+	private Boolean isModule;
+
+	/* V 1.0.1 */
+
+	private String appCode;
 
 	public String getMenuText() {
 		Locale locale = LocaleContextHolder.getLocale();
-		switch (locale.getLanguage())
-		{
-			case "en":
-				return this.getMenuTextEN();
-			case "hi":
-				return this.getMenuTextHI();
-			default:
-				return this.getMenuTextEN();
+		switch (locale.getLanguage()) {
+		case "en":
+			return this.getMenuTextEN();
+		case "hi":
+			return this.getMenuTextHI();
+		default:
+			return this.getMenuTextEN();
 		}
 	}
 
 	public Boolean getIsParent() {
-		//Any Menu that has children or is a module or is a submodule. Submodule URLs are always #
+		// Any Menu that has children or is a module or is a submodule. Submodule URLs
+		// are always #
 		return ((this.children != null && this.children.size() > 0) || this.isModule || this.menuURL.equals("#"));
 	}
 
-	
-	
 }

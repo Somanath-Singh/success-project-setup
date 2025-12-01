@@ -10,4 +10,5 @@ public interface ActivityLevelMapRepository extends JpaRepository<ActivityLevelM
 
     @Query("select a from ActivityLevelMap a where a.tableModuleName = ?1 and a.isActive = true")
     Optional<ActivityLevelMap> findByTableModuleName(String tableModuleName);
+    
 }

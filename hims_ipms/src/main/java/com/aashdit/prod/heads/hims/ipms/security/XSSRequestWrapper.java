@@ -42,7 +42,8 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
 
 	private String stripXSS(String value) {
 		if (value != null) {
-			// System.out.println("escapeHTML work successfully and escapeHTML value is : " + StringEscapeUtils.escapeHtml(value));
+			// System.out.println("escapeHTML work successfully and escapeHTML value is : "
+			// + StringEscapeUtils.escapeHtml(value));
 			// return StringEscapeUtils.escapeHtml(value);
 
 			// Avoid null characters
@@ -90,8 +91,9 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
 
 			value = scriptPattern.matcher(value).replaceAll("");
 
-		//	value = value.replaceAll("[^a-zA-Z1-90_\\- \\.\\@\\#\\/\\,\\==+]*", "").replaceAll("\\s+", " ");
-		} 
+			// value = value.replaceAll("[^a-zA-Z1-90_\\- \\.\\@\\#\\/\\,\\==+]*",
+			// "").replaceAll("\\s+", " ");
+		}
 		return value;
 	}
 }

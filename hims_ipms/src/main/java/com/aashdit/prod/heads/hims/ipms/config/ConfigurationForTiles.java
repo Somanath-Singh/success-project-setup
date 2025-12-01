@@ -1,13 +1,12 @@
 package com.aashdit.prod.heads.hims.ipms.config;
 
-
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles3.TilesView;
 import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
@@ -32,18 +31,20 @@ public class ConfigurationForTiles {
 		return resolver;
 	}
 
-//	@Bean
-//	@Qualifier(value = "entityManager")
-//	public EntityManager entityManager(EntityManagerFactory entityManagerFactory) {
-//		return entityManagerFactory.createEntityManager();
-//	}
-//
-//	@Bean
-//	public Gson gson() {
-//		return new Gson();
-//	}
+	@Bean
+	@Qualifier(value = "entityManager")
+	public EntityManager entityManager(EntityManagerFactory entityManagerFactory) {
+		return entityManagerFactory.createEntityManager();
+	}
 
+	@Bean
+	public Gson gson() {
+		return new Gson();
+	}
 
-
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
 
 }

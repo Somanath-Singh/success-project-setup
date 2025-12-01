@@ -1,6 +1,5 @@
 package com.aashdit.prod.heads.hims.ipms.batch;
 
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -23,68 +22,62 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class SpringBatchConfig<T> {
 
-    private JobBuilderFactory jobBuilderFactory;
-    private StepBuilderFactory stepBuilderFactory;
-    private RepositoryItemWriter<T> writer;
+	private JobBuilderFactory jobBuilderFactory;
+	private StepBuilderFactory stepBuilderFactory;
+	private RepositoryItemWriter<T> writer;
 
-    public static String[] names;
+	public static String[] names;
 
-    @Bean
-    public FlatFileItemReader<T> reader() {
-        FlatFileItemReader<T> itemReader = new FlatFileItemReader<>();
-        itemReader.setResource(new FileSystemResource("src/main/resources/customers.csv"));
-        itemReader.setName("csvReader");
-        itemReader.setLinesToSkip(1);
-        itemReader.setLineMapper(lineMapper());
-        return itemReader;
-    }
+	@Bean
+	public FlatFileItemReader<T> reader() {
+		FlatFileItemReader<T> itemReader = new FlatFileItemReader<>();
+		itemReader.setResource(new FileSystemResource("src/main/resources/customers.csv"));
+		itemReader.setName("csvReader");
+		itemReader.setLinesToSkip(1);
+		itemReader.setLineMapper(lineMapper());
+		return itemReader;
+	}
 
-    private LineMapper<T> lineMapper() {
-        DefaultLineMapper<T> lineMapper = new DefaultLineMapper<>();
+	@SuppressWarnings("unchecked")
+	private LineMapper<T> lineMapper() {
+		DefaultLineMapper<T> lineMapper = new DefaultLineMapper<>();
 
-        DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
-        lineTokenizer.setDelimiter(",");
-        lineTokenizer.setStrict(false);
-        // setNames should be done dynamically
-        lineTokenizer.setNames(names);
+		DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
+		lineTokenizer.setDelimiter(",");
+		lineTokenizer.setStrict(false);
+		// setNames should be done dynamically
+		lineTokenizer.setNames(names);
 
-        BeanWrapperFieldSetMapper<T> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType((Class<? extends T>) determineGenericType());
+		BeanWrapperFieldSetMapper<T> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
+		fieldSetMapper.setTargetType((Class<? extends T>) determineGenericType());
 
-        lineMapper.setLineTokenizer(lineTokenizer);
-        lineMapper.setFieldSetMapper(fieldSetMapper);
-        return lineMapper;
-    }
+		lineMapper.setLineTokenizer(lineTokenizer);
+		lineMapper.setFieldSetMapper(fieldSetMapper);
+		return lineMapper;
+	}
 
-    private Class<?> determineGenericType() {
-        // Logic to determine the generic type dynamically
-        // Replace with your own implementation based on your requirements
-        names = new String[]{"id", "firstName", "lastName", "birthdate"};
-        return null;
-    }
+	private Class<?> determineGenericType() {
+		// Logic to determine the generic type dynamically
+		// Replace with your own implementation based on your requirements
+		names = new String[] { "id", "firstName", "lastName", "birthdate" };
+		return null;
+	}
 
-    @Bean
-    public Step step1() {
-        return stepBuilderFactory.get("csv-step")
-                .<T, T>chunk(10)
-                .reader(reader())
-                .writer(writer)
-                .taskExecutor(taskExecutor())
-                .build();
-    }
+	@Bean
+	public Step step1() {
+		return stepBuilderFactory.get("csv-step").<T, T>chunk(10).reader(reader()).writer(writer)
+				.taskExecutor(taskExecutor()).build();
+	}
 
-    @Bean
-    public Job runJob() {
-        return jobBuilderFactory.get("importDataJob")
-                .flow(step1())
-                .end()
-                .build();
-    }
+	@Bean
+	public Job runJob() {
+		return jobBuilderFactory.get("importDataJob").flow(step1()).end().build();
+	}
 
-    @Bean
-    public TaskExecutor taskExecutor() {
-        SimpleAsyncTaskExecutor asyncTaskExecutor = new SimpleAsyncTaskExecutor();
-        asyncTaskExecutor.setConcurrencyLimit(10);
-        return asyncTaskExecutor;
-    }
+	@Bean
+	public TaskExecutor taskExecutor() {
+		SimpleAsyncTaskExecutor asyncTaskExecutor = new SimpleAsyncTaskExecutor();
+		asyncTaskExecutor.setConcurrencyLimit(10);
+		return asyncTaskExecutor;
+	}
 }

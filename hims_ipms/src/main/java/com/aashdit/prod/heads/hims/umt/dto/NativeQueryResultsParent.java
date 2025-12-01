@@ -5,7 +5,11 @@ import lombok.Data;
 import java.io.Serializable;
 @Data
 public class NativeQueryResultsParent implements Serializable {
-    private Long id;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Long id;
     private String entityName;
     private String entityCode;
     private String idAndEntityCode;

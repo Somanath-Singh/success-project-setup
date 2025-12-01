@@ -18,30 +18,30 @@ import java.util.List;
 @Service
 public class RoleRightLevelServiceImpl implements RoleRightLevelService, MessageSourceAware {
 
-private final Logger log = Logger.getLogger(this.getClass());
-	
+	private final Logger log = Logger.getLogger(this.getClass());
+
 	private MessageSource messageSource;
-	
+
 	@Autowired
 	private EntityManager entityManager;
-	
+
 	@Autowired
 	private RoleRightLevelMasterRepository roleRightLevelMasterRepository;
-	
+
 	@Override
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ServiceOutcome<List<RoleRightLevelMaster>> getRoleRightLevelsByRoleId(Long roleId) {
 		ServiceOutcome<List<RoleRightLevelMaster>> svcOutcome = new ServiceOutcome<>();
-		
-		try
-		{
+
+		try {
 			List<RoleRightLevelMaster> lstLevels = null;
-			
+
 			StringBuilder query = new StringBuilder();
 			query.append("select rrl.* ");
 			query.append("from t_umt_mst_role_right_level rrl ");
@@ -50,56 +50,46 @@ private final Logger log = Logger.getLogger(this.getClass());
 			query.append("  and rlm.role_id = :roleId ");
 			query.append("  and rlm.is_active = true ");
 
-
-			
 			Query rs = entityManager.createNativeQuery(query.toString(), RoleRightLevelMaster.class);
 			rs.setParameter("roleId", roleId);
-			lstLevels =  rs.getResultList();
+			lstLevels = rs.getResultList();
 			lstLevels = new LocaleSpecificSorter<RoleRightLevelMaster>(RoleRightLevelMaster.class).sort(lstLevels);
-			
+
 			svcOutcome.setData(lstLevels);
-		}
-		catch(Exception ex)
-		{
+		} catch (Exception ex) {
 			log.error(ex);
-			
+
 			svcOutcome.setData(null);
 			svcOutcome.setOutcome(false);
 			svcOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
 		}
-		
+
 		return svcOutcome;
 	}
 
 	@Override
 	public ServiceOutcome<List<RoleRightLevelMaster>> getRoleRightLevels(Boolean includeInActive) {
 		ServiceOutcome<List<RoleRightLevelMaster>> svcOutcome = new ServiceOutcome<>();
-		
-		try
-		{
+
+		try {
 			List<RoleRightLevelMaster> lstLevels = null;
-			if (includeInActive != true)
-			{
+			if (includeInActive != true) {
 				lstLevels = roleRightLevelMasterRepository.findByIsActive(true);
-			}
-			else
-			{
-				lstLevels =  roleRightLevelMasterRepository.findAll();
+			} else {
+				lstLevels = roleRightLevelMasterRepository.findAll();
 			}
 
 			lstLevels = new LocaleSpecificSorter<RoleRightLevelMaster>(RoleRightLevelMaster.class).sort(lstLevels);
-			
+
 			svcOutcome.setData(lstLevels);
-		}
-		catch(Exception ex)
-		{
+		} catch (Exception ex) {
 			log.error(ex);
-			
+
 			svcOutcome.setData(null);
 			svcOutcome.setOutcome(false);
 			svcOutcome.setMessage(messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale()));
 		}
-		
+
 		return svcOutcome;
 	}
 

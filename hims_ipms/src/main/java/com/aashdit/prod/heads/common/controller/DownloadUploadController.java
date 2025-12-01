@@ -27,78 +27,78 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DownloadUploadController {
 
-//	Sourava Pattanayak 24-11-2023
 //	function of view the document in another tab
 	@PostMapping(value = "/download", name = "")
-	public void downloadDocument(String docPath,String module ,HttpServletResponse response, HttpServletRequest request) {
-		
+	public void downloadDocument(String docPath, String module, HttpServletResponse response,
+			HttpServletRequest request) {
+
 		String path = GetPropertyValue.getPropertyValue("UPLOAD.FILE.PATH");
-    	String filePath = path + File.separator + module + File.separator + docPath;
-    	Path file = Paths.get(filePath);
-    	try {
+		String filePath = path + File.separator + module + File.separator + docPath;
+		Path file = Paths.get(filePath);
+		try {
 			if (!Files.exists(file)) {
 				return;
 			}
 			String mime = Files.probeContentType(file);
-			if(mime == null || mime.isEmpty()){
+			if (mime == null || mime.isEmpty()) {
 				mime = "application/octet-stream";
 			}
-            switch (mime) {
-                case "application/pdf":
-                    response.setContentType("application/pdf");
-                    break;
-                case "application/vnd.ms-excel":  // .xls
-                    response.setContentType("application/vnd.ms-excel");
-                    break;
-                case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":  // .xlsx
-                    response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-                    break;
-                case "application/vnd.ms-powerpoint":  // .ppt
-                    response.setContentType("application/vnd.ms-powerpoint");
-                    break;
-                case "application/vnd.openxmlformats-officedocument.presentationml.presentation":  // .pptx
-                    response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
-                    break;
-                case "application/msword":  // .doc
-                    response.setContentType("application/msword");
-                    break;
-                case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":  // .docx
-                    response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-                    break;
-                case "application/plain":
-                    response.setContentType("application/plain");
-                    break;
-                case "image/jpg":
-                    response.setContentType("image/jpg");
-                    break;
-                case "image/JPG":
-                    response.setContentType("image/JPG");
-                    break;
-                case "image/jpeg":
-                    response.setContentType("image/jpeg");
-                    break;
-                case "image/png":
-                    response.setContentType("image/png");
-                    break;
-                case "image/PNG":
-                    response.setContentType("image/PNG");
-                    break;
-                case "image/gif":
-                    response.setContentType("image/gif");
-                    break;
-                case "image/GIF":
-                    response.setContentType("image/GIF");
-                    break;
-                case "image/bmp":
-                    response.setContentType("image/bmp");
-                    break;
-                case "application/octet-stream":
-                    response.setContentType("application/octet-stream");
-                    break;
-                default:
-                    response.setContentType("application/octet-stream");
-                    break;
-            }
+			switch (mime) {
+			case "application/pdf":
+				response.setContentType("application/pdf");
+				break;
+			case "application/vnd.ms-excel": // .xls
+				response.setContentType("application/vnd.ms-excel");
+				break;
+			case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": // .xlsx
+				response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+				break;
+			case "application/vnd.ms-powerpoint": // .ppt
+				response.setContentType("application/vnd.ms-powerpoint");
+				break;
+			case "application/vnd.openxmlformats-officedocument.presentationml.presentation": // .pptx
+				response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
+				break;
+			case "application/msword": // .doc
+				response.setContentType("application/msword");
+				break;
+			case "application/vnd.openxmlformats-officedocument.wordprocessingml.document": // .docx
+				response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+				break;
+			case "application/plain":
+				response.setContentType("application/plain");
+				break;
+			case "image/jpg":
+				response.setContentType("image/jpg");
+				break;
+			case "image/JPG":
+				response.setContentType("image/JPG");
+				break;
+			case "image/jpeg":
+				response.setContentType("image/jpeg");
+				break;
+			case "image/png":
+				response.setContentType("image/png");
+				break;
+			case "image/PNG":
+				response.setContentType("image/PNG");
+				break;
+			case "image/gif":
+				response.setContentType("image/gif");
+				break;
+			case "image/GIF":
+				response.setContentType("image/GIF");
+				break;
+			case "image/bmp":
+				response.setContentType("image/bmp");
+				break;
+			case "application/octet-stream":
+				response.setContentType("application/octet-stream");
+				break;
+			default:
+				response.setContentType("application/octet-stream");
+				break;
+			}
 			response.addHeader("Content-Disposition", "inline; filename=");
 			Files.copy(file, response.getOutputStream());
 			response.getOutputStream().flush();
@@ -107,32 +107,32 @@ public class DownloadUploadController {
 			return;
 		}
 	}
-//	Sourava Pattanayak 23-11-2023
-//	function of upload document 
-	public String uploadFile(MultipartFile file,String moduleName,String fileName,String fileExtension) {
-    	String uniqFileName = null;
-    	try {
-    		String path =GetPropertyValue.getPropertyValue("UPLOAD.FILE.PATH");
-        	String filePath = path + File.separator + moduleName;
-        	fileName = addCurrenDateTimeToDocAndRenameItModified(fileName,fileExtension);
-        	File checkFolderPath = new File(filePath);
-    		if (!checkFolderPath.exists()) {
-    			checkFolderPath.mkdirs();
-    		}
-    		Path uploadPath = Paths.get(filePath.concat(File.separator + fileName));
-    		Files.write(uploadPath, file.getBytes());
-           	uniqFileName = fileName;
+
+	// function of upload document
+	public String uploadFile(MultipartFile file, String moduleName, String fileName, String fileExtension) {
+		String uniqFileName = null;
+		try {
+			String path = GetPropertyValue.getPropertyValue("UPLOAD.FILE.PATH");
+			String filePath = path + File.separator + moduleName;
+			fileName = addCurrenDateTimeToDocAndRenameItModified(fileName, fileExtension);
+			File checkFolderPath = new File(filePath);
+			if (!checkFolderPath.exists()) {
+				checkFolderPath.mkdirs();
+			}
+			Path uploadPath = Paths.get(filePath.concat(File.separator + fileName));
+			Files.write(uploadPath, file.getBytes());
+			uniqFileName = fileName;
 		} catch (Exception e) {
 			e.printStackTrace();
-            log.error("Error in DownloadUploadController, method --> uploadFile: " + e.getMessage());
+			log.error("Error in DownloadUploadController, method --> uploadFile: " + e.getMessage());
 		}
-    	return uniqFileName;
-    }
-//	Sourava Pattanayak 23-11-2023
-//	function of rename file name with current date & time
-	public String addCurrenDateTimeToDocAndRenameItModified(String fileName, String extension)throws IOException {
+		return uniqFileName;
+	}
+
+	// function of rename file name with current date & time
+	public String addCurrenDateTimeToDocAndRenameItModified(String fileName, String extension) throws IOException {
 		try {
-			fileName=fileName.replaceAll("\\s+", "");
+			fileName = fileName.replaceAll("\\s+", "");
 			LocalDate dt = LocalDate.now();
 			LocalDateTime tm = LocalDateTime.now();
 			Calendar cal = Calendar.getInstance();
@@ -145,5 +145,5 @@ public class DownloadUploadController {
 			return "";
 		}
 	}
-	
+
 }

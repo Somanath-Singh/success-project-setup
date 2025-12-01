@@ -8,7 +8,6 @@ import lombok.Data;
 @Data
 public class MstZoneDto {
 
-	
 	private Long zoneId;
 
 	private String zoneName;
@@ -20,22 +19,22 @@ public class MstZoneDto {
 	private String locality;
 
 	private Integer pinCode;
-	
-	private String objectType;
-	
-	private Long objectId;
-	
-	private Boolean isActive = true;
-	
-	private Long wardId;
-	
-	@Transient
-    private String objectIdAndType;
 
-    @PostLoad
-    public void setObjectIdAndType() {
-    	this.objectIdAndType = this.objectId + "##" + this.objectType;
-    }
+	private String objectType;
+
+	private Long objectId;
+
+	private Boolean isActive = true;
+
+	private Long wardId;
+
+	@Transient
+	private String objectIdAndType;
+
+	@PostLoad
+	public void setObjectIdAndType() {
+		this.objectIdAndType = this.objectId + "##" + this.objectType;
+	}
+
 	private String[] otherRoleCodes;
 }
-

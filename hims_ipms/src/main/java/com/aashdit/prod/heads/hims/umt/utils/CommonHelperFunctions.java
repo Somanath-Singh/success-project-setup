@@ -9,7 +9,6 @@ import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,440 +28,423 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class CommonHelperFunctions {
-	
+
 	@Value("${UPLOAD.FILE.PATH}")
-    private static String FILE_PATH;
+	private static String FILE_PATH;
 
-    public static HashMap<String, Object> onSuccess(Object data){
-        HashMap<String, Object> eJsonObject = new HashMap<>();
-        eJsonObject.put("status", "success");
-        eJsonObject.put("outcome", true);
-        eJsonObject.put("message", "Success");
-        eJsonObject.put("data", data);
-        return  eJsonObject;
-    }
-    public static HashMap<String, Object> onError(Exception e){
-        e.printStackTrace();
-        HashMap<String, Object> eJsonObject = new HashMap<>();
-        eJsonObject.put("status", "error");
-        eJsonObject.put("outcome", false);
-        eJsonObject.put("message", e.getMessage());
-        eJsonObject.put("errorMessage", e.getMessage());
-        log.error("Error: {}", e.getMessage());
-        return  eJsonObject;
-    }
-
-    public static JSONObject onGsonArraySuccess(JsonArray data) throws Exception{
-        JSONObject eJsonObject = new JSONObject();
-        // parse data
-        JSONParser parser = new JSONParser();
-        JSONArray parsedData = (JSONArray) parser.parse(data.toString());
-        eJsonObject.put("status", true);
-        eJsonObject.put("outcome", true);
-        eJsonObject.put("message", "Success");
-        eJsonObject.put("data", parsedData);
-        return  eJsonObject;
-    }
-
-    public static JSONObject onGsonObjectSuccess(JsonObject data) throws Exception{
-        JSONObject eJsonObject = new JSONObject();
-        // parse data
-        JSONParser parser = new JSONParser();
-        JSONObject parsedData = (JSONObject) parser.parse(data.toString());
-        eJsonObject.put("status", true);
-        eJsonObject.put("outcome", true);
-        eJsonObject.put("message", "Success");
-        eJsonObject.put("data", parsedData);
-        return  eJsonObject;
-    }
-
-    //Calculate the distance between two Date in days
-    public static int daysBetween(Date one, Date two) {
-        return (int)( (one.getTime() - two.getTime()) / (1000 * 60 * 60 * 24));
-    }
-
-    public static HashMap<String, Object> onError(String e){
-        HashMap<String, Object> eJsonObject = new HashMap<>();
-        eJsonObject.put("outcome", false);
-        eJsonObject.put("data", null);
-        eJsonObject.put("message", e);
-        log.error("Error: {}", e);
-        return  eJsonObject;
-    }
-
-    public static String getStringTodayAsDDMMYY() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
-        return sdf.format(new Date());
-    }
-
-    public static String uploadDocumentEF(MultipartFile multipartFile) throws Exception {
-    	log.debug(FILE_PATH);
-        if (multipartFile == null) {
-            throw new Exception("MultipartFile is null");
-        }
-        String originalFilenameForGst = "";
-        String batchid = "";
-        String filePath = null;
-        Timestamp fileIdTimestamp = new Timestamp(System.currentTimeMillis());
-        StringBuffer sb = new StringBuffer(fileIdTimestamp.toString());
-        sb.replace(0, 2, "");
-
-        if (multipartFile.getOriginalFilename().isEmpty()) {
-            throw new Exception("please send both document");
-        }
-        originalFilenameForGst = multipartFile.getOriginalFilename();
-
-        batchid = "FILE" + fileIdTimestamp;
-        batchid = batchid.replaceAll("[^A-Z0-9]", "");
-        filePath = FILE_PATH + File.separator + File.separator + batchid;
-        File destinationFile = new File(filePath);
-        File dirTemp = new File(destinationFile.getAbsolutePath());
-        if (!dirTemp.exists()) {
-            dirTemp.mkdirs();
-        }
-        File destinationForGst = new File(filePath + File.separator + originalFilenameForGst);
-        try {
-        	multipartFile.transferTo(destinationForGst);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        String gstDocPath = (filePath + File.separator + originalFilenameForGst);
-        return gstDocPath;	
-		
+	public static HashMap<String, Object> onSuccess(Object data) {
+		HashMap<String, Object> eJsonObject = new HashMap<>();
+		eJsonObject.put("status", "success");
+		eJsonObject.put("outcome", true);
+		eJsonObject.put("message", "Success");
+		eJsonObject.put("data", data);
+		return eJsonObject;
 	}
 
-    public static String getRandomCode(int i) {
-        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                + "0123456789"
-                + "abcdefghijklmnopqrstuvxyz";
-        StringBuilder sb = new StringBuilder(i);
-        for (int j = 0; j < i; j++) {
-            int index = (int)(AlphaNumericString.length() * Math.random());
-            sb.append(AlphaNumericString.charAt(index));
-        }
-        return sb.toString();
-    }
+	public static HashMap<String, Object> onError(Exception e) {
+		e.printStackTrace();
+		HashMap<String, Object> eJsonObject = new HashMap<>();
+		eJsonObject.put("status", "error");
+		eJsonObject.put("outcome", false);
+		eJsonObject.put("message", e.getMessage());
+		eJsonObject.put("errorMessage", e.getMessage());
+		log.error("Error: {}", e.getMessage());
+		return eJsonObject;
+	}
 
-    public static String encodeBase64(String string) {
-        return Base64.getEncoder().encodeToString(string.getBytes());
-    }
+	@SuppressWarnings("unchecked")
+	public static JSONObject onGsonArraySuccess(JsonArray data) throws Exception {
+		JSONObject eJsonObject = new JSONObject();
+		// parse data
+		JSONParser parser = new JSONParser();
+		JSONArray parsedData = (JSONArray) parser.parse(data.toString());
+		eJsonObject.put("status", true);
+		eJsonObject.put("outcome", true);
+		eJsonObject.put("message", "Success");
+		eJsonObject.put("data", parsedData);
+		return eJsonObject;
+	}
 
-    public boolean isValidURL(String url) {
-        try {
-            new URL(url).toURI();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-    
-    public String uploadFile(MultipartFile file, String applicationName) throws Exception {
-        String filePath;
-        if (file.isEmpty()) {
-            throw new Exception("please send document");
-        }
-        filePath = FILE_PATH + File.separator + applicationName;
-        File destinationFile = new File(filePath);
-        File dirTemp = new File(destinationFile.getAbsolutePath());
-        if (dirTemp.exists()) {
-            dirTemp.delete();
-            dirTemp.mkdirs();
-        }else {
-            dirTemp.mkdirs();
-        }
-        String originalFilename = file.getOriginalFilename();
-        File destinationForGst = new File(filePath + File.separator + originalFilename);
-        try {
-            file.transferTo(destinationForGst);
-        } catch (Exception e) {
-            e.printStackTrace();
+	@SuppressWarnings("unchecked")
+	public static JSONObject onGsonObjectSuccess(JsonObject data) throws Exception {
+		JSONObject eJsonObject = new JSONObject();
+		// parse data
+		JSONParser parser = new JSONParser();
+		JSONObject parsedData = (JSONObject) parser.parse(data.toString());
+		eJsonObject.put("status", true);
+		eJsonObject.put("outcome", true);
+		eJsonObject.put("message", "Success");
+		eJsonObject.put("data", parsedData);
+		return eJsonObject;
+	}
 
-        }
-        return (filePath + File.separator + originalFilename);
-    }
-    
- // Base64 encode a String
-    public static String base64Encode(String data) {
-        byte[] encodedBytes = Base64.getEncoder().encode(data.getBytes());
-        return new String(encodedBytes);
-    }
+	// Calculate the distance between two Date in days
+	public static int daysBetween(Date one, Date two) {
+		return (int) ((one.getTime() - two.getTime()) / (1000 * 60 * 60 * 24));
+	}
 
-    // Base64 decode a String
-    public static String base64Decode(String data) {
-        byte[] decodedBytes = Base64.getDecoder().decode(data.getBytes());
-        return new String(decodedBytes);
-    }
+	public static HashMap<String, Object> onError(String e) {
+		HashMap<String, Object> eJsonObject = new HashMap<>();
+		eJsonObject.put("outcome", false);
+		eJsonObject.put("data", null);
+		eJsonObject.put("message", e);
+		log.error("Error: {}", e);
+		return eJsonObject;
+	}
 
-    // Base64 encode a Long
-    public static String base64EncodeLong(Long data) {
-        byte[] longBytes = new byte[8];
-        for (int i = 7; i >= 0; i--) {
-            longBytes[i] = (byte) (data & 0xFF);
-            data >>= 8;
-        }
-        byte[] encodedBytes = Base64.getEncoder().encode(longBytes);
-        return new String(encodedBytes);
-    }
+	public static String getStringTodayAsDDMMYY() {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
+		return sdf.format(new Date());
+	}
 
-    // Base64 decode a Long
-    public static Long base64DecodeLong(String data) {
-        byte[] decodedBytes = Base64.getDecoder().decode(data.getBytes());
-        long result = 0;
-        for (byte b : decodedBytes) {
-            result = (result << 8) | (b & 0xFF);
-        }
-        return result;
-    }
+	public static String uploadDocumentEF(MultipartFile multipartFile) throws Exception {
+		log.debug(FILE_PATH);
+		if (multipartFile == null) {
+			throw new Exception("MultipartFile is null");
+		}
+		String originalFilenameForGst = "";
+		String batchid = "";
+		String filePath = null;
+		Timestamp fileIdTimestamp = new Timestamp(System.currentTimeMillis());
+		StringBuffer sb = new StringBuffer(fileIdTimestamp.toString());
+		sb.replace(0, 2, "");
 
-    public static final String[] AUTH_WHITELIST = {
-            // -- Swagger UI v3 (OpenAPI)
-            "/v3/api-docs",
-            "/configuration/ui",
-            "/swagger-resources/**",
-            "/configuration/security",
-            "/swagger-ui.html",
-            "/swagger-ui/index.html",
-            "/webjars/**",
-            "/actuator/health",
-            "/swagger-ui/**",
-            "/erp",
-            // other public endpoints of your API may be appended to this array
-            "/api/login",
-            "/api/allow",
-            "/api/allowAll",
-            "/api/core",
-            "/allow/get-role-by-roleCode",
-            "/public/**",
-            "/cmc/api/public/check-app-version",
-            "/stageConfig/public/getStageButtonsOnFormOnFlowCode",
-            "/public/lodgeGrievance"
-    };
+		if (multipartFile.getOriginalFilename().isEmpty()) {
+			throw new Exception("please send both document");
+		}
+		originalFilenameForGst = multipartFile.getOriginalFilename();
 
-    public static boolean isSkipUrl(@NonNull String url) {
-        for (String skipUrl : AUTH_WHITELIST) {
-            if (url.contains(skipUrl)) {
-                return true;
-            }
-        }
-        return false;
-    }
+		batchid = "FILE" + fileIdTimestamp;
+		batchid = batchid.replaceAll("[^A-Z0-9]", "");
+		filePath = FILE_PATH + File.separator + File.separator + batchid;
+		File destinationFile = new File(filePath);
+		File dirTemp = new File(destinationFile.getAbsolutePath());
+		if (!dirTemp.exists()) {
+			dirTemp.mkdirs();
+		}
+		File destinationForGst = new File(filePath + File.separator + originalFilenameForGst);
+		try {
+			multipartFile.transferTo(destinationForGst);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String gstDocPath = (filePath + File.separator + originalFilenameForGst);
+		return gstDocPath;
 
-    public void entityObjectIdAndLevel(HttpServletRequest request, Class<?> classObj, boolean isReadOnly) {
+	}
 
-    }
+	public static String getRandomCode(int i) {
+		String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789" + "abcdefghijklmnopqrstuvxyz";
+		StringBuilder sb = new StringBuilder(i);
+		for (int j = 0; j < i; j++) {
+			int index = (int) (AlphaNumericString.length() * Math.random());
+			sb.append(AlphaNumericString.charAt(index));
+		}
+		return sb.toString();
+	}
 
-    public static int calculateWorkingDays(Calendar start, Calendar end) {
-        int workingDays = 0;
-        while (start.before(end) || start.equals(end)) {
-            int dayOfWeek = start.get(Calendar.DAY_OF_WEEK);
-            if (dayOfWeek != Calendar.SUNDAY) { // Exclude Sundays
-                workingDays++;
-            }
-            start.add(Calendar.DAY_OF_MONTH, 1);
-        }
-        return workingDays;
-    }
+	public static String encodeBase64(String string) {
+		return Base64.getEncoder().encodeToString(string.getBytes());
+	}
 
-    public static String decodeBase64(String string) {
-        String decodedString = "";
+	public boolean isValidURL(String url) {
+		try {
+			new URL(url).toURI();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
-        try {
-            byte[] decodedBytes = Base64.getDecoder().decode(string);
-            decodedString = new String(decodedBytes);
-        } catch (Exception var3) {
-            log.error("Exception in decodeBase64() : ", var3);
-        }
+	public String uploadFile(MultipartFile file, String applicationName) throws Exception {
+		String filePath;
+		if (file.isEmpty()) {
+			throw new Exception("please send document");
+		}
+		filePath = FILE_PATH + File.separator + applicationName;
+		File destinationFile = new File(filePath);
+		File dirTemp = new File(destinationFile.getAbsolutePath());
+		if (dirTemp.exists()) {
+			dirTemp.delete();
+			dirTemp.mkdirs();
+		} else {
+			dirTemp.mkdirs();
+		}
+		String originalFilename = file.getOriginalFilename();
+		File destinationForGst = new File(filePath + File.separator + originalFilename);
+		try {
+			file.transferTo(destinationForGst);
+		} catch (Exception e) {
+			e.printStackTrace();
 
-        return decodedString;
-    }
-    
-    private static String modifyDateAndMonth(int dateOrMonth) {
-        String dayString = "";
-        if (dateOrMonth < 10) {
-            dayString = "0" + dateOrMonth;
-        } else {
-            dayString = "" + dateOrMonth;
-        }
-        return dayString;
-    }
+		}
+		return (filePath + File.separator + originalFilename);
+	}
 
+	// Base64 encode a String
+	public static String base64Encode(String data) {
+		byte[] encodedBytes = Base64.getEncoder().encode(data.getBytes());
+		return new String(encodedBytes);
+	}
 
+	// Base64 decode a String
+	public static String base64Decode(String data) {
+		byte[] decodedBytes = Base64.getDecoder().decode(data.getBytes());
+		return new String(decodedBytes);
+	}
 
-    // convert date to string
-    public static String convertDateToString(Date date) {
-        String dateString = "";
-        try {
-            if (date != null) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(date);
-                int year = cal.get(Calendar.YEAR);
-                int month = cal.get(Calendar.MONTH) + 1;
-                int day = cal.get(Calendar.DAY_OF_MONTH);
-                String dayString = modifyDateAndMonth(day);
-                String monthString = modifyDateAndMonth(month);
-                dateString = dayString + "/" + monthString + "/" + year;
-            }
-        } catch (Exception e) {
-           log.error("Error while converting date to string: " + e);
-        }
+	// Base64 encode a Long
+	public static String base64EncodeLong(Long data) {
+		byte[] longBytes = new byte[8];
+		for (int i = 7; i >= 0; i--) {
+			longBytes[i] = (byte) (data & 0xFF);
+			data >>= 8;
+		}
+		byte[] encodedBytes = Base64.getEncoder().encode(longBytes);
+		return new String(encodedBytes);
+	}
 
-        return dateString;
-    }
+	// Base64 decode a Long
+	public static Long base64DecodeLong(String data) {
+		byte[] decodedBytes = Base64.getDecoder().decode(data.getBytes());
+		long result = 0;
+		for (byte b : decodedBytes) {
+			result = (result << 8) | (b & 0xFF);
+		}
+		return result;
+	}
 
-    public static String convertDateToString(Date date, String format){
-        // format = / or - or .
-        String dateString = "";
-        try {
-            if (date != null) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(date);
-                int year = cal.get(Calendar.YEAR);
-                int month = cal.get(Calendar.MONTH) + 1;
-                int day = cal.get(Calendar.DAY_OF_MONTH);
-                String dayString = modifyDateAndMonth(day);
-                String monthString = modifyDateAndMonth(month);
-                dateString = dayString + format + monthString + format + year;
-            }
-        } catch (Exception e) {
-            log.error("Error while converting date to string: " + e);
-        }
-        return dateString;
-    }
+	public static final String[] AUTH_WHITELIST = {
+			// -- Swagger UI v3 (OpenAPI)
+			"/v3/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/security", "/swagger-ui.html",
+			"/swagger-ui/index.html", "/webjars/**", "/actuator/health", "/swagger-ui/**", "/erp",
+			// other public endpoints of your API may be appended to this array
+			"/api/login", "/api/allow", "/api/allowAll", "/api/core", "/allow/get-role-by-roleCode", "/public/**",
+			"/cmc/api/public/check-app-version", "/stageConfig/public/getStageButtonsOnFormOnFlowCode",
+			"/public/lodgeGrievance" };
 
-    public static String convertDateToStringWithTime(Date date) {
-        String dateString = "";
-        try {
-            if (date != null) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(date);
-                int year = cal.get(Calendar.YEAR);
-                int month = cal.get(Calendar.MONTH) + 1;
-                // date
-                int day = cal.get(Calendar.DAY_OF_MONTH);
-                String dayString = modifyDateAndMonth(day);
-                String monthString = modifyDateAndMonth(month);
-                dateString = dayString + "/" + monthString + "/" + year + " " + cal.get(Calendar.HOUR) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
-            }
-        } catch (Exception e) {
-            log.error("Error while converting date to string: " + e);
-        }
+	public static boolean isSkipUrl(@NonNull String url) {
+		for (String skipUrl : AUTH_WHITELIST) {
+			if (url.contains(skipUrl)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-        return dateString;
-    }
+	public void entityObjectIdAndLevel(HttpServletRequest request, Class<?> classObj, boolean isReadOnly) {
 
-    public static String convertDateToStringWithTime(Date date, String format) {
-        String dateString = "";
-        try {
-            if (date != null) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(date);
-                dateString = cal.get(Calendar.DAY_OF_MONTH) + format + (cal.get(Calendar.MONTH) + 1) + format + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.HOUR) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
-            }
-        } catch (Exception e) {
-            log.error("Error while converting date to string: " + e);
-        }
+	}
 
-        return dateString;
-    }
+	public static int calculateWorkingDays(Calendar start, Calendar end) {
+		int workingDays = 0;
+		while (start.before(end) || start.equals(end)) {
+			int dayOfWeek = start.get(Calendar.DAY_OF_WEEK);
+			if (dayOfWeek != Calendar.SUNDAY) { // Exclude Sundays
+				workingDays++;
+			}
+			start.add(Calendar.DAY_OF_MONTH, 1);
+		}
+		return workingDays;
+	}
 
-    public static Long getCurrentMonth() {
-        Calendar cal = Calendar.getInstance();
-        return Long.parseLong((cal.get(Calendar.MONTH) + 1) + "");
-    }
+	public static String decodeBase64(String string) {
+		String decodedString = "";
 
-    public static String getCurrentYear() {
-        Calendar cal = Calendar.getInstance();
-        return cal.get(Calendar.YEAR) + "";
-    }
+		try {
+			byte[] decodedBytes = Base64.getDecoder().decode(string);
+			decodedString = new String(decodedBytes);
+		} catch (Exception var3) {
+			log.error("Exception in decodeBase64() : ", var3);
+		}
 
+		return decodedString;
+	}
 
+	private static String modifyDateAndMonth(int dateOrMonth) {
+		String dayString = "";
+		if (dateOrMonth < 10) {
+			dayString = "0" + dateOrMonth;
+		} else {
+			dayString = "" + dateOrMonth;
+		}
+		return dayString;
+	}
 
+	// convert date to string
+	public static String convertDateToString(Date date) {
+		String dateString = "";
+		try {
+			if (date != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(date);
+				int year = cal.get(Calendar.YEAR);
+				int month = cal.get(Calendar.MONTH) + 1;
+				int day = cal.get(Calendar.DAY_OF_MONTH);
+				String dayString = modifyDateAndMonth(day);
+				String monthString = modifyDateAndMonth(month);
+				dateString = dayString + "/" + monthString + "/" + year;
+			}
+		} catch (Exception e) {
+			log.error("Error while converting date to string: " + e);
+		}
 
+		return dateString;
+	}
 
-    public static String getCurrentDateStr() {
-        Calendar cal = Calendar.getInstance();
-        Date date = cal.getTime();
-        // like 2020-10-10
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH) + 1;
-        // date
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        String dayString = "";
-        if (day < 10) {
-            dayString = "0" + day;
-        } else {
-            dayString = "" + day;
-        }
-        String monthString = "";
-        if (month < 10) {
-            monthString = "0" + month;
-        } else {
-            monthString = "" + month;
-        }
-        return year + "-" + monthString + "-" + dayString;
-    }
-    public static Date getCurrentDate(){
-        return new Date();
-    }
+	public static String convertDateToString(Date date, String format) {
+		// format = / or - or .
+		String dateString = "";
+		try {
+			if (date != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(date);
+				int year = cal.get(Calendar.YEAR);
+				int month = cal.get(Calendar.MONTH) + 1;
+				int day = cal.get(Calendar.DAY_OF_MONTH);
+				String dayString = modifyDateAndMonth(day);
+				String monthString = modifyDateAndMonth(month);
+				dateString = dayString + format + monthString + format + year;
+			}
+		} catch (Exception e) {
+			log.error("Error while converting date to string: " + e);
+		}
+		return dateString;
+	}
 
-    public static String getCurrentDateStr(String format) {
-        Calendar cal = Calendar.getInstance();
-        Date date = cal.getTime();
-        // like ddformatMMformatyyyy
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH) + 1;
-        // date
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        String dayString = "";
-        if (day < 10) {
-            dayString = "0" + day;
-        } else {
-            dayString = "" + day;
-        }
-        String monthString = "";
-        if (month < 10) {
-            monthString = "0" + month;
-        } else {
-            monthString = "" + month;
-        }
-        return dayString + format + monthString + format + year;
-    }
-    
-    public static Date convertStringToDate(String dateString, String dateFormat) {
-        Date date = null;
-        try {
-            Calendar cal = Calendar.getInstance();
-            String[] dateArray = dateString.split(dateFormat);
-            cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dateArray[0]));
-            cal.set(Calendar.MONTH, Integer.parseInt(dateArray[1]) - 1);
-            cal.set(Calendar.YEAR, Integer.parseInt(dateArray[2]));
-            date = cal.getTime();
-        } catch (Exception e) {
+	public static String convertDateToStringWithTime(Date date) {
+		String dateString = "";
+		try {
+			if (date != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(date);
+				int year = cal.get(Calendar.YEAR);
+				int month = cal.get(Calendar.MONTH) + 1;
+				// date
+				int day = cal.get(Calendar.DAY_OF_MONTH);
+				String dayString = modifyDateAndMonth(day);
+				String monthString = modifyDateAndMonth(month);
+				dateString = dayString + "/" + monthString + "/" + year + " " + cal.get(Calendar.HOUR) + ":"
+						+ cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
+			}
+		} catch (Exception e) {
+			log.error("Error while converting date to string: " + e);
+		}
 
-        }
-        return date;
-    }
+		return dateString;
+	}
 
-    public static String convertLocalDateTimeToString(LocalDateTime time){
-        String dateString = "";
-        try {
-            if (time != null) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(new Date());
-                int year = cal.get(Calendar.YEAR);
-                int month = cal.get(Calendar.MONTH) + 1;
-                int day = cal.get(Calendar.DAY_OF_MONTH);
-                String dayString = modifyDateAndMonth(day);
-                String monthString = modifyDateAndMonth(month);
-                // return as am/pm format 12 hours format
-                dateString = dayString + "/" + monthString + "/" + year + " " + cal.get(Calendar.HOUR) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND) + " " + (cal.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM");
-            }
-        } catch (Exception e) {
-            log.error("Error while converting date to string: " + e);
-        }
+	public static String convertDateToStringWithTime(Date date, String format) {
+		String dateString = "";
+		try {
+			if (date != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(date);
+				dateString = cal.get(Calendar.DAY_OF_MONTH) + format + (cal.get(Calendar.MONTH) + 1) + format
+						+ cal.get(Calendar.YEAR) + " " + cal.get(Calendar.HOUR) + ":" + cal.get(Calendar.MINUTE) + ":"
+						+ cal.get(Calendar.SECOND);
+			}
+		} catch (Exception e) {
+			log.error("Error while converting date to string: " + e);
+		}
 
-        return dateString;
-    }
+		return dateString;
+	}
 
+	public static Long getCurrentMonth() {
+		Calendar cal = Calendar.getInstance();
+		return Long.parseLong((cal.get(Calendar.MONTH) + 1) + "");
+	}
+
+	public static String getCurrentYear() {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.YEAR) + "";
+	}
+
+	public static String getCurrentDateStr() {
+		Calendar cal = Calendar.getInstance();
+		// like 2020-10-10
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH) + 1;
+		// date
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		String dayString = "";
+		if (day < 10) {
+			dayString = "0" + day;
+		} else {
+			dayString = "" + day;
+		}
+		String monthString = "";
+		if (month < 10) {
+			monthString = "0" + month;
+		} else {
+			monthString = "" + month;
+		}
+		return year + "-" + monthString + "-" + dayString;
+	}
+
+	public static Date getCurrentDate() {
+		return new Date();
+	}
+
+	public static String getCurrentDateStr(String format) {
+		Calendar cal = Calendar.getInstance();
+		// like ddformatMMformatyyyy
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH) + 1;
+		// date
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		String dayString = "";
+		if (day < 10) {
+			dayString = "0" + day;
+		} else {
+			dayString = "" + day;
+		}
+		String monthString = "";
+		if (month < 10) {
+			monthString = "0" + month;
+		} else {
+			monthString = "" + month;
+		}
+		return dayString + format + monthString + format + year;
+	}
+
+	public static Date convertStringToDate(String dateString, String dateFormat) {
+		Date date = null;
+		try {
+			Calendar cal = Calendar.getInstance();
+			String[] dateArray = dateString.split(dateFormat);
+			cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dateArray[0]));
+			cal.set(Calendar.MONTH, Integer.parseInt(dateArray[1]) - 1);
+			cal.set(Calendar.YEAR, Integer.parseInt(dateArray[2]));
+			date = cal.getTime();
+		} catch (Exception e) {
+
+		}
+		return date;
+	}
+
+	public static String convertLocalDateTimeToString(LocalDateTime time) {
+		String dateString = "";
+		try {
+			if (time != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(new Date());
+				int year = cal.get(Calendar.YEAR);
+				int month = cal.get(Calendar.MONTH) + 1;
+				int day = cal.get(Calendar.DAY_OF_MONTH);
+				String dayString = modifyDateAndMonth(day);
+				String monthString = modifyDateAndMonth(month);
+				// return as am/pm format 12 hours format
+				dateString = dayString + "/" + monthString + "/" + year + " " + cal.get(Calendar.HOUR) + ":"
+						+ cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND) + " "
+						+ (cal.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM");
+			}
+		} catch (Exception e) {
+			log.error("Error while converting date to string: " + e);
+		}
+
+		return dateString;
+	}
 
 }

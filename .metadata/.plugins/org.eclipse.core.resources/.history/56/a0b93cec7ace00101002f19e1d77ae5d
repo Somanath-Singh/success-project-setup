@@ -1,0 +1,153 @@
+package com.aashdit.prod.heads.hims.ipms.service;
+
+import java.io.StringWriter;
+import java.util.Date;
+import java.util.ResourceBundle;
+
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+import org.jboss.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.MessageSourceAware;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.aashdit.prod.heads.hims.ipms.dto.UserVO;
+import com.aashdit.prod.heads.hims.ipms.model.MailQueue;
+import com.aashdit.prod.heads.hims.ipms.repository.MailQueueRepository;
+import com.aashdit.prod.heads.hims.umt.model.User;
+
+@Service
+public class MailServiceImpl implements MailService, MessageSourceAware {
+	final static Logger logger = Logger.getLogger(MailServiceImpl.class);
+
+	ResourceBundle rb = ResourceBundle.getBundle("application");
+
+	@SuppressWarnings("unused")
+	private MessageSource messageSource;
+
+	@Override
+	public void setMessageSource(MessageSource messageSource) {
+		this.messageSource = messageSource;
+	}
+
+	@Autowired
+	private VelocityEngine velocityEngine;
+
+	@Autowired
+	private MailQueueRepository mailRepository;
+
+	@Override
+	@Transactional
+	public Boolean mailPasswordDetails(String password, String subject, User user) {
+		try {
+			String emailId = rb.getString("mail.username");
+			Template template = velocityEngine.getTemplate("./templates/passwordResetTemplate.vm");
+			VelocityContext velocityContext = new VelocityContext();
+			velocityContext.put("loggerName", user.getFirstName() + " " + user.getLastName());
+			velocityContext.put("password", password);
+			velocityContext.put("deploymentUrl", rb.getString("deploymentUrl"));
+			StringWriter stringWriter = new StringWriter();
+			template.merge(velocityContext, stringWriter);
+			String body = stringWriter.toString();
+			MailQueue mObj = new MailQueue();
+			mObj.setMailFrom(emailId);
+			if (user.getEmail() != null && !user.getEmail().equals("")) {
+				mObj.setMailTo(user.getEmail());
+			} else {
+				mObj.setMailTo(rb.getString("mail.to.send"));
+			}
+
+			mObj.setSubject(subject);
+			mObj.setCreatedBy(user.getUserId());
+			mObj.setCreatedOn(new Date());
+			mObj.setBody(body);
+			mObj.setBodyType("HTML");
+			mObj.setStatus("QUEUED");
+			mObj = mailRepository.save(mObj);
+			if (mObj != null) {
+				return true;
+			} else {
+				logger.error("Mail Object is null in mailPasswordDetails method in MailServiceImpl.......");
+				return false;
+			}
+		} catch (Exception ex) {
+			logger.error("Exception occured in mailPasswordDetails method in MailServiceImpl-->" + ex.getMessage());
+			return false;
+		}
+	}
+
+	@Transactional
+	@Override
+	public Boolean mailLoginCredentials(String password, String subject, User user) {
+		try {
+			String emailId = rb.getString("mail.username");
+			Template template = velocityEngine.getTemplate("./templates/loginCredentials.vm");
+			VelocityContext velocityContext = new VelocityContext();
+			velocityContext.put("loggerName", user.getFirstName());
+			velocityContext.put("password", password);
+			velocityContext.put("userName", user.getUserName());
+			velocityContext.put("url", rb.getString("deploymentUrl"));
+			StringWriter stringWriter = new StringWriter();
+			template.merge(velocityContext, stringWriter);
+			String body = stringWriter.toString();
+			MailQueue mObj = new MailQueue();
+			mObj.setMailFrom(emailId);
+			mObj.setMailTo(user.getEmail());
+			mObj.setSubject(subject);
+			mObj.setCreatedBy(user.getUserId());
+			mObj.setCreatedOn(new Date());
+			mObj.setBody(body);
+			mObj.setBodyType("HTML");
+			mObj.setStatus("QUEUED");
+			mObj = mailRepository.save(mObj);
+			if (mObj != null) {
+				return true;
+			} else {
+				logger.error("Mail Object is null in mailLoginCredentials method in MailServiceImpl.......");
+				return false;
+			}
+		} catch (Exception ex) {
+			logger.error("Exception occured in mailLoginCredentials method in MailServiceImpl-->" + ex.getMessage());
+			return false;
+		}
+	}
+
+	@Transactional
+	@Override
+	public Boolean sendOtp(String otp, String mailId) {
+		try {
+			UserVO user = SecurityHelper.getCurrentUser();
+			String emailId = rb.getString("mail.username");
+			Template template = velocityEngine.getTemplate("./templates/otpMailTemplate.vm");
+			VelocityContext velocityContext = new VelocityContext();
+			velocityContext.put("userName", mailId);
+			velocityContext.put("message", "Your OTP for varification is " + otp);
+			StringWriter stringWriter = new StringWriter();
+			template.merge(velocityContext, stringWriter);
+			String body = stringWriter.toString();
+			MailQueue mObj = new MailQueue();
+			mObj.setMailFrom(emailId);
+			mObj.setMailTo(mailId);
+			mObj.setSubject("YOUR OTP - Govt. of Odisha");
+			mObj.setCreatedBy(user.getUserId());
+			mObj.setCreatedOn(new Date());
+			mObj.setBody(body);
+			mObj.setBodyType("HTML");
+			mObj.setStatus("QUEUED");
+			mObj = mailRepository.save(mObj);
+			if (mObj != null) {
+				return true;
+			} else {
+				logger.error("Mail Object is null in mailLoginCredentials method in MailServiceImpl.......");
+				return false;
+			}
+		} catch (Exception ex) {
+			logger.error("Exception occured in mailLoginCredentials method in MailServiceImpl-->" + ex.getMessage());
+			return false;
+		}
+	}
+
+}
