@@ -1,0 +1,25 @@
+.frezee{
+	pointer-events: none;
+}
+.loader-div {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100vh;
+	background: #000000bd;
+	z-index: 999999999;
+}
+
+#lottie-loader svg {
+	height: 600px !important;
+	width: 600px !important;
+}
+
+.required::after {
+	content: " *" !important;
+	color: red !important;
+}

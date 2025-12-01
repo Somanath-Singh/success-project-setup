@@ -1,0 +1,225 @@
+/*
+Copyright (c) 2025 Aashdit Technologies
+------------------------------------------------------------------
+Version: 
+Project Manager: Bikash Kumar Mishra
+BA: 
+UI Developer: Prasanta Kumar Singh, Pabitra Mohanty
+-------------------------------------------------------------------*/
+
+
+/* 
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+*{
+    font-family: "Roboto Condensed", sans-serif;
+}
+body{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+    flex-wrap: wrap;
+    background: url(../images/loginPage/bgblue.jpg);
+    background-size: cover;
+    height: 100vh;
+}
+.logo-box {
+    display: flex;
+    align-items: center;
+    position: relative;
+    top: 10px;
+    left: -40px;
+    width: auto;
+}
+.main-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 100%;
+}
+.logo-img {
+    width: 80px;
+    margin-right: 0px;
+    padding-right: 12px;
+    margin-left: 0;
+}
+.logo-box h4 {
+    color: #0a0a0a;
+    font-size: 34px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    font-weight: 700;
+    font-family: "Roboto Condensed", sans-serif;
+}
+.logo-box p {
+    margin: 0;
+    color: #69520d;
+    font-size: 16px;
+    font-weight: 600;
+    background: #fcd96b;
+    border-radius: 6px;
+    padding: 5px 15px;
+    font-family: "Roboto Condensed", sans-serif;
+    text-align: center;
+}
+.btmlftbg {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 55%;
+}
+.login-box {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    height: 370px;
+    width: 412px;
+    background-size: 100% 100%;
+    padding: 0 40px 40px 40px;
+    position: fixed;
+    right: 118px;
+    top: 50%;
+    transform: translate(0, -55%);
+    z-index: 9999999;
+    background: #fff;
+    font-family: "Roboto", sans-serif;
+}
+.loginheading {
+    position: relative;
+    top: -30px;
+    background: #fff;
+    padding: 28px 25px 9px;
+    left: -40px;
+    width: 60%;
+    font-size: 20px;
+    font-family: "Roboto", sans-serif;
+}
+h4.loginheading:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 50px solid transparent;
+    border-bottom: 21px solid transparent;
+    border-left: 21px solid #fefffe;
+    right: -20px;
+    top: -1px;
+}
+form {
+    width: 100%;
+}
+.login-fild {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: relative;
+    margin-top: 15px;
+}
+.submit-btn {
+    position: relative;
+    top: 5px;
+}
+.login-fild input[type="text"], .login-fild input[type="password"], select {
+    height: 36px;
+    padding: 0px 0 0 32px;
+    position: relative;
+    border-radius: 0;
+    outline: none;
+    font-size: 15px;
+    border: none;
+    font-weight: 400;
+    letter-spacing: -0.2px;
+    background-color: transparent;
+    border-bottom: #999997 1px solid;
+    font-family: "Roboto", sans-serif;
+}
+.login-fild > i {
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    color: #7b7575;
+    z-index: 999;
+    line-height: 34px;
+    text-align: center;
+    font-size: 18px;
+}
+span.viewpassword {
+    right: 5px;
+    left: auto;
+    position: absolute;
+    top: 12px;
+    cursor: pointer;
+}
+.login-fild > i {
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    color: #7b7575;
+    z-index: 999;
+    line-height: 34px;
+    text-align: center;
+    font-size: 18px;
+}
+.captchaimg {
+    position: absolute;
+    right: 8px;
+    top: 5px;
+    height: 26px;
+    font-size: 20px;
+    background: #fff;
+    font-family: cursive;
+    font-style: italic;
+}
+.button-style-custom {
+    text-align: center;
+    color: #fff;
+    text-decoration: none;
+    text-transform: capitalize;
+    font-weight: 400;
+    font-size: 16px;
+    font-family: "Roboto", sans-serif;
+    background: #854902;
+    border-radius: 8px;
+    padding: 12px 40px;
+    border: none;
+}
+.fp {
+    width: 100%;
+    float: left;
+    text-align: right;
+    color: #1654c0;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    font-family: "Roboto", sans-serif;
+}
+.jcb {
+    position: fixed;
+    bottom: 0;
+    right: -25px;
+    z-index: 9999999;
+    width: 270px;
+}
+.form-group input[type="text"]:focus, .form-group input[type="password"]:focus, .form-group input[type="tel"]:focus, .form-group input[type="email"]:focus, .form-group input[type="search"]:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: #fc5a6d !important;
+}
+.bootbox-alert .modal-dialog {
+    max-width: 400px;
+}
+.bootbox-alert .bootbox-accept{
+	font-size: 14px;
+}
+.bootbox-body{
+	font-size: 16px;
+}
+ */
+
+
+
+
+ 

@@ -1,198 +1,193 @@
 $(document).ready(function(){
-	reDrawDashbaord();
-	$('#btnFilter').click(function(){
-		reDrawDashbaord();
-	});
+	fetchDashboard();
 });
 
-/*$(document).ready(function() {
-
-fetchTopSubjectData();
-loadBottomSubject();
-});*/
-
-	/* Dirty Function copied over from Reporting */
-	
-$(document).ready(function() {
-	var finYr = 0;//${selFinYear};//isPrvCheck
-//	var prvCheck = ${isPrvCheck};
-	/* <c:if test="${not empty incomeReportGrp}">
-	$(".dataCheck").removeAttr("hidden");
-	</c:if> */
-	if (finYr != 0) {
-		$("#prevYear").removeClass("hidden");
-		if (prvCheck) {
-			$('#isPrvCheck').prop('checked', true);
-		} else {
-			$('#isPrvCheck').prop('checked', false);
-		}
-	}
-});
-
-function getFinYearStartEndDates(finYear) {
-
-	var html = "<option value='0'>Select</option>";
-	if (finYear != "0") {
-		var fyear = $("#financialYear option:selected").text().split("-");
-		if ($("#isPrvCheck").prop("checked") == true) {
-			getPrevYrData();
-			return false;
-		}
-		var financiyalYearFromDate = "01/04/" + fyear[0];
-		var financiyalYearToDate = "31/03/" + fyear[1];
-		$("#fromDate").val(financiyalYearFromDate);
-		$("#toDate").val(financiyalYearToDate);
-		$("#prevYear").removeClass("hidden");
-		callForFinYear();
-	} else {
-		$("#monthId").empty().append(html);
-		$('#isPrvCheck').prop('checked', false);
-		/* $("#fromDate").attr("disabled","disabled");
-		$("#toDate").attr("disabled","disabled"); */
-		$("#fromDate").val(fromDateCheck);
-		$("#toDate").val(toDateCheck);
-		$("#prevYear").addClass("hidden");
-		$("#fromDate").removeAttr("disabled", "disabled");
-		$("#toDate").removeAttr("disabled", "disabled");
-		callForFinYear();
-	}
-}
-
-/*function getMonthByfinyr(finYear) {
-	var html = "<option value='0'>Select</option>";
-	var month = "";
-
-	<c:forEach items="${monthList}" var="month">
-	month = month
-			+ '<option value="${month.monthId}">${month.monthNameEn}</option>';
-	</c:forEach>
-
-	$("#monthId").empty().append(html + "" + month);
-
-}*/
-
-function findDateRangeByMonth(month) {
-	var fyear = $("#financialYear option:selected").text().split("-");
-	var monthNo = month;
-	var fromStDate = "";
-	if (monthNo != 0) {
-		if (monthNo == 1 || monthNo == 2 || monthNo == 3) {
-			var fromStDate = "0" + monthNo + "/01/" + fyear[1];
-		} else {
-			var fromStDate = "0" + monthNo + "/01/" + fyear[0];
-
-		}
-		var formatted_date = function(date) {
-			var m = ("0" + (date.getMonth() + 1)).slice(-2); // in javascript month start from 0.
-			var d = ("0" + date.getDate()).slice(-2); // add leading zero 
-			var y = date.getFullYear();
-			return d + '/' + m + '/' + y;
-		};
-		//alert(fromStDate)
-		var cdate = new Date(fromStDate);
-		//alert(cdate)
-
-		var first_day = new Date(cdate.getFullYear(), cdate.getMonth(), 1);
-
-		var last_day = new Date(cdate.getFullYear(), cdate.getMonth() + 1,
-				0);
-
-		var month_start_date = formatted_date(first_day);
-
-		var month_end_date = formatted_date(last_day);
-
-	} else {
-		$('#datepick>input').datepick("destroy");
-		getFinYearStartEndDates($("#financialYear option:selected").val());
-		return false;
-	}
-
-	/*
-	 var month_end_date =formatted_date(new Date()); // limit current month date range upto current day.
-	 */
-	if (month != 0) {
-		$("#fromDate").val(month_start_date);
-		$("#toDate").val(month_end_date);
-	}
-	callForMonth();
-}
-
-function callForMonth() {
-	$('#datepick>input').datepick("destroy");
-	$('#datepick>input').datepick(
-			{
-				onShow : $.datepick.monthOnly,
-				dateFormat : 'dd/mm/yyyy',
-				yearRange : 'c-100:c+5',
-				changeMonth : false,
-				changeYear : false,
-				showOnFocus : true,
-				showTrigger : '<button type="button" class="trigger">'
-						+ '<i class="fa fa-calendar"></i></button>'
-			});
-}
-
-function callForFinYear() {
-	$('#datepick>input').datepick("destroy");
-	$('#datepick>input').datepick(
-			{
-				onShow : $.datepick.monthOnly,
-				dateFormat : 'dd/mm/yyyy',
-				yearRange : 'c-100:c+5',
-				showOnFocus : true,
-				showOnFocus : true,
-				showTrigger : '<button type="button" class="trigger">'
-						+ '<i class="fa fa-calendar"></i></button>'
-			});
-}
-
-
-function reDrawDashbaord()
+function fetchDashboard()
 {
-debugger;
 	window.loadCounter = 0;
+	const REPORTING_API_BASE = "/dashboard/";
 	
-	const REPORTING_API_BASE_1 = "/dashboard/";
-	// const REPORTING_API_BASE = "/app/home/";
+	var finYear = $("#finYearId").val();
+	if(finYear != '0')
+	{
+		var parts = finYear.split("-");
+		var formattedYear = parts[0] + "-" + parts[1].slice(2);
+		$("#finSpanId").text(formattedYear);
 
-	if (!window.subjectWiseChart)
-	{
-		window.subjectWiseChart = new subjectWiseChart(REPORTING_API_BASE_1, window.contextPath);
+		var moduleCode = $("#moduleCode").val();
+
+		if (moduleCode === "IPMS")
+		{
+			$("#ipmsDivId").removeClass("hidden");
+			$("#hrmsDivId").addClass("hidden");
+			$("#grvDivId").addClass("hidden");
+			$("#ecashbookDivId").addClass("hidden");
+			$("#famsDivId").addClass("hidden");
+			$("#hoardingDivId").addClass("hidden");
+			$("#rentClcDivId").addClass("hidden");
+
+
+			// IPMS Box Details
+			window.boxPresenter = new BoxInfoPresenter(REPORTING_API_BASE, window.contextPath, finYear);
+			window.boxPresenter.doFetch();
+		}
+		else if (moduleCode === "CORE")
+		{
+			$("#hrmsDivId").removeClass("hidden");
+			$("#ipmsDivId").addClass("hidden");
+			$("#grvDivId").addClass("hidden");
+			$("#ecashbookDivId").addClass("hidden");
+			$("#famsDivId").addClass("hidden");
+			$("#hoardingDivId").addClass("hidden");
+			$("#rentClcDivId").addClass("hidden");
+
+			// CORE details
+			var employmentType = $("#employmentType").val();
+			window.payrollMgmt = new PayrollMgmt(REPORTING_API_BASE, window.contextPath, finYear, employmentType);
+			window.payrollMgmt.doFetch();
+		}
+		else if (moduleCode === "GRIEVANCE")
+		{
+			$("#grvDivId").removeClass("hidden");
+			$("#hrmsDivId").addClass("hidden");
+			$("#ipmsDivId").addClass("hidden");
+			$("#ecashbookDivId").addClass("hidden");
+			$("#famsDivId").addClass("hidden");
+			$("#hoardingDivId").addClass("hidden");
+			$("#rentClcDivId").addClass("hidden");
+
+			// Status wise grievance details
+			var monthId = $("#stsMonthId").val();
+			window.grievance = new Grievance(REPORTING_API_BASE, window.contextPath, finYear, monthId);
+			window.grievance.doFetch();
+
+			// Category wise grievance details
+			window.grievanceCategory = new GrievanceCategory(REPORTING_API_BASE, window.contextPath, finYear, monthId);
+			window.grievanceCategory.doFetch();
+		}
+		else if (moduleCode === "FDMS")
+		{
+			$("#ecashbookDivId").removeClass("hidden");
+			$("#hrmsDivId").addClass("hidden");
+			$("#ipmsDivId").addClass("hidden");
+			$("#grvDivId").addClass("hidden");
+			$("#famsDivId").addClass("hidden");
+			$("#hoardingDivId").addClass("hidden");
+			$("#rentClcDivId").addClass("hidden");
+
+
+			// Financial year wise budget details
+			window.budgetAllocation = new BudgetAllocation(REPORTING_API_BASE, window.contextPath, finYear);
+			window.budgetAllocation.doFetch();
+
+			// Scheme wise budget allocation
+			window.fundUtilizationAmountScheme = new FundUtilizationAmountScheme(REPORTING_API_BASE, window.contextPath, finYear);
+			window.fundUtilizationAmountScheme.doFetch();
+
+			// Scheme wise budget utilization
+			window.fundUtilizationProjectScheme = new FundUtilizationProjectScheme(REPORTING_API_BASE, window.contextPath, finYear);
+			window.fundUtilizationProjectScheme.doFetch();
+		}
+		else if (moduleCode === "FAMS")
+		{
+			$("#famsDivId").removeClass("hidden");
+			$("#hrmsDivId").addClass("hidden");
+			$("#ipmsDivId").addClass("hidden");
+			$("#grvDivId").addClass("hidden");
+			$("#ecashbookDivId").addClass("hidden");
+			$("#hoardingDivId").addClass("hidden");
+			$("#rentClcDivId").addClass("hidden");
+
+			// Month wise amount utilization
+			window.fundUtilizationAmount = new FundUtilizationAmount(REPORTING_API_BASE, window.contextPath, finYear);
+			window.fundUtilizationAmount.doFetch();
+
+			// Month wise project utilization
+			window.fundUtilizationProject = new FundUtilizationProject(REPORTING_API_BASE, window.contextPath, finYear);
+			window.fundUtilizationProject.doFetch();
+		}
+		else if (moduleCode === "HOARDING")
+		{
+			$("#hoardingDivId").removeClass("hidden");
+			$("#famsDivId").addClass("hidden");
+			$("#hrmsDivId").addClass("hidden");
+			$("#ipmsDivId").addClass("hidden");
+			$("#grvDivId").addClass("hidden");
+			$("#ecashbookDivId").addClass("hidden");
+			$("#rentClcDivId").addClass("hidden");
+
+			// Hoarding information details
+			var areaId=$("#areaId").val();
+			var hoardingId = $("#hoardingId").val();
+			window.hoardingManagement = new HoardingManagement(REPORTING_API_BASE, window.contextPath, finYear, areaId, hoardingId);
+			window.hoardingManagement.doFetch();
+		}
+		else if (moduleCode === "RENT_COLLECTION")
+		{
+			$("#rentClcDivId").removeClass("hidden");
+			$("#hoardingDivId").addClass("hidden");
+			$("#famsDivId").addClass("hidden");
+			$("#hrmsDivId").addClass("hidden");
+			$("#ipmsDivId").addClass("hidden");
+			$("#grvDivId").addClass("hidden");
+			$("#ecashbookDivId").addClass("hidden");
+
+			// Rent collection details
+			window.rentCollection = new RentCollection(REPORTING_API_BASE, window.contextPath, finYear);
+			window.rentCollection.doFetch();
+		}
+		else
+		{
+			$("#rentClcDivId").addClass("hidden");
+			$("#hoardingDivId").addClass("hidden");
+			$("#famsDivId").addClass("hidden");
+			$("#hrmsDivId").addClass("hidden");
+			$("#ipmsDivId").addClass("hidden");
+			$("#grvDivId").addClass("hidden");
+			$("#ecashbookDivId").addClass("hidden");
+		}
 	}
-	if (!window.loadBottomSubject)
-	{
-		window.loadBottomSubject = new loadBottomSubject(REPORTING_API_BASE_1, window.contextPath);
-	}
-	if (!window.postWisePiechart)
-	{
-		window.postWisePiechart = new postWisePiechart(REPORTING_API_BASE_1, window.contextPath);
-	}
-	if (!window.subWiseVacancyPiechart)
-	{
-		window.subWiseVacancyPiechart = new subWiseVacancyPiechart(REPORTING_API_BASE_1, window.contextPath);
-	}
-	if (!window.categoryWiseVacancyChart)
-	{
-		window.categoryWiseVacancyChart = new categoryWiseVacancyChart(REPORTING_API_BASE_1, window.contextPath);
-	}
+}
+
+function fetchStatusWiseGrievance()
+{
+	window.loadCounter = 0;
+	const REPORTING_API_BASE = "/dashboard/";
+	var finYear = $("#finYearId").val();
+	var monthId = $("#stsMonthId").val();
 	
-	// if (!window.boxPresenter)
-	// {
-	// 	window.boxPresenter = new BoxInfoPresenter(REPORTING_API_BASE, window.contextPath);
-	// }
-	// if (!window.beneficiaryChart)
-	// {
-	// 	window.beneficiaryChart = new beneficiaryChart(REPORTING_API_BASE, window.contextPath);
-	// }
-	// if(window.expenditurechart){
-	// 	window.expenditurechart = new expenditurechart(REPORTING_API_BASE, window.contextPath);
-	// }
+	window.grievance = new Grievance(REPORTING_API_BASE, window.contextPath, finYear, monthId);
+	window.grievance.doFetch();
+}
 
-	window.subjectWiseChart.doFetch();
-	window.loadBottomSubject.doFetch();
-	window.postWisePiechart.doFetch();
- 	window.subWiseVacancyPiechart.doFetch();
- 	window.categoryWiseVacancyChart.doFetch();
- 	
-	// window.expenditurechart.doFetch();
+function fetchCategoryWiseGrievance()
+{
+	window.loadCounter = 0;
+	const REPORTING_API_BASE = "/dashboard/";
+	var finYear = $("#finYearId").val();
+	var monthId = $("#stsMonthId").val();
+	
+	window.grievanceCategory = new GrievanceCategory(REPORTING_API_BASE, window.contextPath, finYear, monthId);
+	window.grievanceCategory.doFetch();
+}
+
+function fetchHoardingInfoDetails()
+{
+	window.loadCounter = 0;
+	const REPORTING_API_BASE = "/dashboard/";
+	var finYear = $("#finYearId").val();
+	var areaId=$("#areaId").val();
+	var hoardingId = $("#hoardingId").val();
+	window.hoardingManagement = new HoardingManagement(REPORTING_API_BASE, window.contextPath, finYear, areaId, hoardingId);
+	window.hoardingManagement.doFetch();
+}
+
+function fetchPayrollDetails()
+{
+	window.loadCounter = 0;
+	const REPORTING_API_BASE = "/dashboard/";
+	var finYear = $("#finYearId").val();
+	var employmentType = $("#employmentType").val();
+	window.payrollMgmt = new PayrollMgmt(REPORTING_API_BASE, window.contextPath, finYear, employmentType);
+	window.payrollMgmt.doFetch();
 }

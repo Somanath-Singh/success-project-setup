@@ -2,7 +2,7 @@ var AesUtil = function(keySize, iterationCount) {
   this.keySize = keySize / 32;
   this.iterationCount = iterationCount;
 };
-debugger;
+
 AesUtil.prototype.generateKey = function(salt, passPhrase) {
   var key = CryptoJS.PBKDF2(
       passPhrase, 

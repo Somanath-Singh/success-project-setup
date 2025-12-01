@@ -46,7 +46,7 @@
     </definition>
     
     <definition name="site.module.directory" extends="layout.module">
-        <put-attribute name="body" value="/WEB-INF/views/moduleDirectory.jsp"></put-attribute>
+        <put-attribute name="body" value="/WEB-INF/views/moduleDirectory.jsp" />
     </definition>
     
     

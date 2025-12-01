@@ -9,6 +9,8 @@ the key named as 'encodedData'
 //**************ENCRIPTION OF FORM DATA START****************
 
    /**
+	 * @author Debapriya
+	 * @since  10/02/2024
 	 * @return boolean value with set the encoded data in a hidden field 
 	 * @vs:1.2
    */ 
@@ -77,7 +79,6 @@ the key named as 'encodedData'
 
 
 	function encryptFormData(formId, tableOrTbodyIDS, tableOrTbodyKeys) {
-	debugger;
 	    var formData = new FormData(document.getElementById(formId));
 	    var formDataJson = {};
          debugger
@@ -141,7 +142,7 @@ the key named as 'encodedData'
 	    var formDataString = JSON.stringify(formDataJson);
 	    
         var encryptedData = enc_password(formDataString);
-        /*var encryptedData =AES256.encrypt(formDataString);*/
+        //var encryptedData =AES256.encrypt(formDataString);
         
 	    return encryptedData; 
 	}
