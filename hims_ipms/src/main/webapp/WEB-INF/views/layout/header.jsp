@@ -201,10 +201,9 @@
 			style="width: 100%;">
 	</div>
 	<div class="d-flex flex-column home-content">
-		<span class="text"> Building &amp; Asset Management System</span>
+		<span class="text">Management System</span>
 		<p class="my-0" style="border-top: #ffffff 2px solid;">
-			<small>ST &amp; SC Development, Minorities &amp; Backward
-				Classes Welfare Dept. Govt. of Odisha</small>
+			<small>Govt. of Odisha</small>
 		</p>
 	</div>
 	<a href="javascript:void()" class="expandBtn ms-3 mt-1"
