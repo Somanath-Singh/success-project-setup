@@ -1,0 +1,1751 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+
+<%-- External Resources --%>
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+
+<%-- Inline CSS --%>
+<style>
+    /* .freeze {
+        pointer-events: none;
+    } */
+   .frezz {
+	  pointer-events: none;           /* user can't change */
+	  background-color: #e9ecef !important; /* greyed out like disabled bootstrap */
+	  color: #495057 !important;
+	}
+    .card-title-add {
+        font-size: 14px;
+        margin: 0;
+        color: #000 !important;
+        font-weight: 500;
+    }
+    .btns {
+        border-radius: 0.2rem;
+        line-height: 14px;
+        padding: 6px 7px 6px 6px;
+        font-size: 13px;
+    }
+</style>
+
+<%-- Breadcrumb Navigation --%>
+<div class="breadcrumb_conatiner">
+    <div class="col-md-6">
+        <h4 class="change-color">Add Project</h4>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa-solid fa-house"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Add Building</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<%-- Main Content --%>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <%-- Card Header --%>
+            <div class="card-header">
+                <c:choose>
+                    <c:when test="${not empty project.projectId}">
+                        <h5 class="card-title">Update Building</h5>
+                    </c:when>
+                    <c:otherwise>
+                        <h5 class="card-title">Add Building</h5>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
+            <%-- Card Body --%>
+            <div class="card-body">
+                <form class="form-horizontal" action="${contextPath}/project/saveProjectDetails" method="POST" id="projectMstForm" enctype="multipart/form-data">
+                    <%-- Hidden Inputs --%>
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <input type="hidden" id="cipherText" name="cipherText" value="">
+                    <input type="hidden" name="projectId" id="projectId" value="${project.projectId}">
+                    <input type="hidden" name="projectCode" id="projectCode" value="${project.projectCode}">
+                    <input type="hidden" name="siteInspectionId" id="siteInspectionId" value="${project.siteInspectionId}">
+                    <input type="hidden" id="isUpdateProject" value="${project.isUpdateProject}" />
+                    <input type="hidden" id="maintProjectId" name="maintProjectId" value="${maintProjectId}" />
+                    <input type="hidden" id="isMaintenance" name="isMaintenance" value="${isMaintenance}" />
+                    <input type="hidden" id="buttonCode" name="buttonCode">
+
+                    <%-- Project Details Form --%>
+                    <div class="row">
+                        <%-- Financial Year --%>
+                        <div class="col-md-3 ml-auto">
+                            <div class="form-group">
+                                <label class="smallInput required">Financial Year :</label>
+                                <select class="form-control form-control-sm form-select" id="financialYear" name="financialYearId" onchange="getPlanEstimationNo(this.value)">
+                                    <option value="0" selected disabled>- Select -</option>
+                                    <c:forEach items="${financialYearList}" var="fy">
+                                        <option value="${fy.financialYearId}" ${fy.financialYearId eq project.financialYearId ? 'selected' : ''}>
+                                            ${fy.financialYear}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                        </div>
+                        
+                         <%-- Is Parent Checkbox --%>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="col-md-12 required" for="isParent">Building Category:</label>
+                                <div class="col-md-12">
+                                    <select class="form-control form-control-sm form-select ${project.isUpdateProject ? 'frezz' : ''}" data-live-search="true" id="isParent" name="isParent">
+                                        <option value="">- Select -</option>
+                                        <option value="true" ${project.isParent == true ? 'selected' : ''}>Main Project</option>
+                						<option value="false" ${project.isParent == false ? 'selected' : ''}>Sub Project</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                         <%-- Parent Project --%>
+                        <div class="form-group col-md-3">
+                            <label for="parentprojectId" class="required">Parent Building:</label>
+                            <select id="parentprojectId" name="parentprojectId" class="form-control form-control-sm form-select select2" onchange="loadProjectDetails(this.value);" required>
+                                <option value="0" selected disabled>-- Select Project --</option>
+                                <c:forEach var="projectItem" items="${projectList}">
+                                    <option value="${projectItem.projectId}" ${projectItem.projectId eq project.parentprojectId ? 'selected' : ''}>
+                                        ${projectItem.projectName}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        
+                        <%-- Project Type --%>
+                        <div class="form-group col-md-3" id="ptype">
+                            <label class="required">Building Type :</label>
+                            <div class="col-md-12">
+                                <select id="projectType" name="projectType" class="form-control form-control-sm form-select" required>
+                                    <option value="" selected>- Select -</option>
+                                    <c:forEach var="pt" items="${projectTypeList}">
+                                        <option value="${pt.valueEn}" ${project.projectType == pt.valueEn ? 'selected' : ''}>
+                                            ${pt.valueEn}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <%-- Project Name --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Building Name :</label>
+                            <div class="col-md-12">
+                                <input type="text" id="projectName" name="projectName" placeholder=" " class="form-control form-control-sm" required maxlength="100" value="${project.projectName}">
+                            </div>
+                        </div>
+
+                        <%-- Project Status --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Building Status :</label>
+                            <div class="col-md-12">
+                                <select id="projectSatus" name="projectStatus" class="form-control form-control-sm form-select" required>
+                                    <option value="" selected disabled>- Select -</option>
+                                    <option value="Completed" ${project.projectStatus == 'Completed' ? 'selected' : ''}>Completed</option>
+                                    <option value="Other" ${project.projectStatus == 'Other' ? 'selected' : ''}>Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <%-- Letter No --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Letter No. </label>
+                            <div class="col-md-12">
+                                <input type="text" id="letterNo" name="letterNo" class="form-control form-control-sm" required maxlength="12" value="${project.letterNo}">
+                            </div>
+                        </div>
+
+                        <%-- Letter Date --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Letter Date </label>
+                            <div class="datepicker-box">
+                                <input type="text" id="letterDate" name="letterDate" class="form-control form-control-sm datepicker" required value="${project.letterDate}" readonly>
+                            </div>
+                        </div>
+
+                        <%-- Confirm Letter Date --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Confirm Letter Date </label>
+                            <div class="datepicker-box">
+                                <input type="text" id="confirmLetterDate" name="confirmLetterDate" class="form-control form-control-sm datepicker" required value="${project.confirmLetterDate}" readonly>
+                            </div>
+                        </div>
+
+                        <%-- Start Date --%>
+                        <div class="form-group col-md-3">
+                            <label class="required"> Start Date </label>
+                            <div class="datepicker-box">
+                                <input type="text" id="startDate" name="startDate" class="form-control form-control-sm datepicker" required value="${project.startDate}" readonly>
+                            </div>
+                        </div>
+
+                        <%-- Completion Date --%>
+                        <div class="form-group col-md-3">
+                            <label class="required"> Completion date </label>
+                            <div class="datepicker-box">
+                                <input type="text" id="completionDate" name="completionDate" class="form-control form-control-sm datepicker" required value="${project.completionDate}" readonly>
+                            </div>
+                        </div>
+
+                        <%-- Estimated Cost --%>
+                        <div class="form-group col-md-3">
+                            <label class="required"> Estimated Cost :</label>
+                            <div class="col-md-12">
+                                <input type="text" id="estimatedCost" name="estimatedCost" pattern="^\d*\.?\d{0,8}$" class="form-control form-control-sm NumbersOnlyForAmount" maxlength="12" value="${project.estimatedCost}">
+                            </div>
+                        </div>
+
+                        <%-- Final Cost --%>
+                        <div class="form-group col-md-3">
+                            <label class="required">Final Cost : </label>
+                            <div class="col-md-12">
+                                <input type="text" id="finalCost" name="finalCost" pattern="^\d*\.?\d{0,8}$" class="form-control form-control-sm NumbersOnlyForAmount" maxlength="12" value="${project.finalCost}">
+                            </div>
+                        </div>
+
+                        <%-- Department Name --%>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="col-md-12 required" for="deptId">Scheme Name:</label>
+                                <div class="col-md-12">
+                                    <select class="form-control form-control-sm form-select" data-live-search="true" id="deptId" name="deptId">
+                                        <option value="0" selected disabled>- Select -</option>
+                                        <c:forEach var="department" items="${departmentList}">
+                                            <option value="${department.deptId}" ${department.deptId eq project.deptId ? 'selected' : ''}>
+                                                ${department.deptName}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                      	<%-- Administrative Jurisdiction --%>
+                        <div class="form-group col-md-3" id="adminJurisdictionDiv">
+                            <label>Administrative Jurisdiction :</label>
+                            <div class="col-md-12">
+                                <select id="administrativeJurisdiction" name="administrativeJurisdiction" class="form-control form-control-sm form-select">
+                                    <option value="" selected>--Select--</option>
+                                    <c:forEach var="jur" items="${jurisdiction}">
+                                        <option value="${jur.valueEn}" ${project.administrativeJurisdiction == jur.valueEn ? 'selected' : ''}>
+                                            ${jur.valueEn}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                        	<div class="form-group">
+	                            <label class="required" for="administrativeApprovalNo">Administrative Approval Number :</label>
+	                            <input type="text" id="administrativeApprovalNo" name="administrativeApprovalNo" pattern="^\d*\.?\d{0,8}$" class="form-control form-control-sm " maxlength="12" value="${project.administrativeApprovalNo}">
+	                        </div>
+                        </div>
+                        
+                         <div class="col-md-3">
+                        	<div class="form-group">
+	                        	<label class="required" for="administrativeApprovalDate">Administrative Approval Date :</label>
+	                            <div class="datepicker-box">
+	                                <input type="text" id="administrativeApprovalDate" name="administrativeApprovalDate" class="form-control form-control-sm datepicker" maxlength="12" value="${project.administrativeApprovalDate}" required readonly>
+	                            </div>
+	                        </div>
+                        </div>
+                        
+                        <%-- Asset Ownership Type --%>
+                        <div class="form-group col-md-3" id="assetOwnershipDiv">
+                            <label>Asset Ownership Type :</label>
+                            <div class="col-md-12">
+                                <select id="assetOwnerShipType" name="assetOwnerShipType" class="form-control form-control-sm form-select">
+                                    <option value="" selected>--Select--</option>
+                                    <c:forEach var="own" items="${ownerShip}">
+                                        <option value="${own.valueEn}" ${project.assetOwnerShipType == own.valueEn ? 'selected' : ''}>
+                                            ${own.valueEn}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                        </div>
+
+                        <%-- Legal Document Reference --%>
+                        <div class="form-group col-md-3" id="legalDocumentDiv">
+                            <label>Legal Document Reference :</label>
+                            <div class="col-md-12 position-relative">
+                                <input type="file" id="document" name="uploadDocument" class="form-control form-control-sm" onchange="uploadFileCheck(this)" >
+                                <c:if test="${not empty project.legalDocumentReferencepath}">
+                                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${project.legalDocumentReferencepath}', 'PROJECT_LEGAL_DOCUMENT')" title="View Document">
+                                        <i class="fa-regular fa-eye" title="View Document"></i>
+                                    </button>
+                                </c:if>
+                                <div id="selectedFileName" class="mt-1 text-muted" style="font-size:0.9em;"></div>
+                            </div>
+                        </div>
+
+                        <%-- Structure Safety Certificate --%>
+                        <div class="form-group col-md-3" id="structureSaftyDocDiv">
+                            <label>Structure Safety Certificate :</label>
+                            <div class="col-md-12 position-relative">
+                                <input type="file" id="structureSaftyDoc" name="structureSaftyDoc" class="form-control form-control-sm" onchange="uploadFileCheck(this)" >
+                                <c:if test="${not empty project.structureSafetyCertificatePath}">
+                                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${project.structureSafetyCertificatePath}', 'PROJECT_STRUCTURE_SAFE_DOCUMENT')" title="View">
+                                        <i class="fa-regular fa-eye" title="View"></i>
+                                    </button>
+                                </c:if>
+                                <div id="selectedStructureFileName" class="mt-1 text-muted" style="font-size:0.9em;"></div>
+                            </div>
+                        </div>
+
+                        <%-- Other Supporting Document --%>
+                        <div class="form-group col-md-3" id="otherSupportingDocDiv">
+                            <label>Other Supporting upload :</label>
+                            <div class="col-md-12 position-relative">
+                                <input type="file" id="otherSupportingDoc" name="otherSupportingDoc" class="form-control form-control-sm" onchange="uploadFileCheck(this)" >
+                                <c:if test="${not empty project.otherSupportinguploadPath}">
+                                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${project.otherSupportinguploadPath}', 'PROJECT_OTHER_UPLOAD_DOCUMENT')" title="View">
+                                        <i class="fa-regular fa-eye" title="View"></i>
+                                    </button>
+                                </c:if>
+                                <div id="selectedOtherFileName" class="mt-1 text-muted" style="font-size:0.9em;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="row" id="projectStateFields">
+                        	<%-- District --%>
+	                        <div class="form-group col-md-3">
+	                            <label class="required" for="projectDistrictId">District Name:</label>
+	                            <select class="form-control form-control-sm form-select" data-live-search="true" id="projectDistrictId" name="projectDistrictId" onchange="LoadBlockByDistrict(this.value, 'projectBlockId')">
+	                                <option value="0" disabled selected>- Select -</option>
+	                                <c:forEach var="district" items="${districtList}">
+	                                    <option value="${district.districtId}" ${district.districtId eq project.projectDistrictId ? 'selected' : ''}>
+	                                        ${district.districtName}
+	                                    </option>
+	                                </c:forEach>
+	                            </select>
+	                        </div>
+	
+	                        <%-- Block --%>
+	                        <div class="form-group col-md-3">
+	                            <label class="required" for="projectBlockId">Block Name :</label>
+	                             <select id="projectBlockId" name="projectBlockId" class="form-control form-control-sm form-select" required="required" onchange="LoadGrampanchayatByBlock(this.value, 'projectGpId')">
+	                                 <option value="0" disabled selected>- Select -</option>
+	                             </select>
+	                        </div>
+	
+	                        <%-- Gram Panchayat --%>
+	                        <div class="form-group col-md-3">
+	                            <label class="required" for="projectGpId">GramPanchayat Name :</label>
+	                            <select id="projectGpId" name="projectGpId" class="form-control form-control-sm form-select" required="required" onchange="LoadVillageByGrampanchayat(this.value, 'projectVillageId')">
+	                                <option value="0" disabled selected>- Select -</option>
+	                            </select>
+	                        </div>
+	
+	                        <%-- Village --%>
+	                        <div class="form-group col-md-3">
+	                            <label class="required" for="projectVillageId">Village Name :</label>
+	                            <select id="projectVillageId" name="projectVillageId" class="form-control form-control-sm form-select" required="required">
+	                                <option value="0" selected disabled>- Select -</option>
+	                            </select>
+	                        </div>
+                        </div>
+                        
+                    </div>
+                    
+                     <hr>
+
+                    <%-- Hostel Search Section --%>
+                    <div class="row" id="searchField">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="col-md-12" for="searchBy">Search By :</label>
+                                <div class="col-md-12">
+                                    <select id="searchBy" name="searchBy" class="form-control form-control-sm form-select">
+                                        <option value="0">- Select -</option>
+                                        <option value="uidsce" ${project.searchBy eq 'uidsce' ? 'selected' : ''}>UIDSCE Code</option>
+                                        <option value="demographic" ${project.searchBy eq 'demographic' ? 'selected' : ''}>Demographic ID</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="col-md-12 required" for="uidsceCode">UIDSE Code :</label>
+                                <div class="col-md-12">
+                                    <input type="text" id="uidsceCode" name="uidsceCode" value="${school.uidsceCode}" maxlength="48" class="form-control form-control-sm AlphaNumericOnly disablecopypaste" required="required" onblur="getSchoolDetails(this.value)">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3" id="editSchoolBtn">
+                        	<div class="form-group mt-4">
+                        		<button type="button" class="btns btn-success" onclick="editSchoolDetails()">
+	                                <i class="fa-regular fa-edit" title="Edit school for current project"></i>
+	                            </button>
+                        	</div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+
+                    <%-- Hostel Location Details --%>
+                    <div id="stateFields">
+                        <div class="row">
+                            <%-- District --%>
+                            <div class="form-group col-md-3">
+                                <label class="required" for="districtId">District Name:</label>
+                                <select class="form-control form-control-sm form-select" data-live-search="true" id="districtId" name="districtId" onchange="LoadBlockByDistrict(this.value, 'blockId');LoadSchoolByDistrict(this.value);">
+                                    <option value="0" disabled selected>- Select -</option>
+                                    <c:forEach var="district" items="${districtList}">
+                                        <option value="${district.districtId}" ${district.districtId eq school.districtId ? 'selected' : ''}>
+                                            ${district.districtName}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+
+                            <%-- Block --%>
+                            <div class="form-group col-md-3">
+                                <label class="required" for="blockId">Block Name :</label>
+                                 <select id="blockId" name="blockId" class="form-control form-control-sm form-select" required="required" onchange="LoadGrampanchayatByBlock(this.value, 'gpId');LoadSchoolByBlock(this.value);">
+                                     <option value="0" disabled selected>- Select -</option>
+                                 </select>
+                            </div>
+
+                            <%-- Gram Panchayat --%>
+                            <div class="form-group col-md-3">
+                                <label class="required" for="gpId">GramPanchayat Name :</label>
+                                <select id="gpId" name="gpId" class="form-control form-control-sm form-select" required="required" onchange="LoadVillageByGrampanchayat(this.value, 'villageId');LoadSchoolByGrampanchayat(this.value);">
+                                    <option value="0" disabled selected>- Select -</option>
+                                </select>
+                            </div>
+
+                            <%-- Village --%>
+                            <div class="form-group col-md-3">
+                                <label class="required" for="villageId">Village Name :</label>
+                                <select id="villageId" name="villageId" class="form-control form-control-sm form-select" onchange="LoadSchoolByVillage(this.value);" required="required">
+                                    <option value="0" selected disabled>- Select -</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <%-- Hostel Details --%>
+                    <div id="schoolFields">
+                            <div class="row">
+                                <%-- School Name --%>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="required" for="schoolId">School Name :</label>
+                                        <select id="schoolId" name="schoolId" class="form-control form-control-sm form-select AlphaNumericOnly disablecopypaste" required="required" onchange="getSchoolBySchoolId(this.value);">
+                                            <option value="0" selected disabled>-- Select --</option>
+                                            <c:if test="${not empty school}">
+                                                <c:forEach var="schoolData" items="${schoolList}">
+                                                    <option value="${schoolData.schoolId}" ${schoolData.schoolId eq school.schoolId ? 'selected' : ''}>
+                                                        ${schoolData.schoolName}
+                                                    </option>
+                                                </c:forEach>
+                                            </c:if>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <%-- School Code --%>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="required" for="schoolCode">School Code :</label>
+										<input type="text" id="schoolCode" name="schoolCode" value="${school.schoolCode}" maxlength="48" class="form-control form-control-sm AlphaNumericOnly disablecopypaste" required="required" readonly onkeyup="changeCase(this.value,'schoolCode');">
+                                    </div>
+                                </div>
+
+                                <%-- Class Range --%>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="required" for="classRange">Class Range :</label>
+                                        <input type="text" id="classRange" name="classRange" value="${school.classRange}" maxlength="48" class="form-control form-control-sm AlphaNumericOnly disablecopypaste" required="required" onkeyup="changeCase(this.value,'classRange');">
+                                    </div>
+                                </div>
+
+                                <%-- Head Master --%>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="required" for="headMaster">HeadMaster :</label>
+                                        <input type="text" id="headMaster" name="headMaster" value="${school.headMaster}" maxlength="48" class="form-control form-control-sm AlphaNumericOnly disablecopypaste" required="required" onkeyup="changeCase(this.value,'headMaster');">
+                                    </div>
+                                </div>
+
+                                <%-- Type --%>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="required" for="type">School Type :</label>
+                                        <input type="text" id="type" name="type" value="${school.type}" maxlength="48" class="form-control form-control-sm AlphaNumericOnly disablecopypaste" required="required" onkeyup="changeCase(this.value,'type');">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3 hostel">
+	                                <div class="form-group">
+			                            <label class="required" for="hostelType">Hostel Type :</label>
+		                                <select id="hostelType" name="hostelType" class="form-control form-control-sm form-select" required>
+		                                    <option value="" selected>- Select -</option>
+		                                    <c:forEach var="pt" items="${hostelTypeList}">
+		                                        <option value="${pt.valueEn}" ${project.hostelType == pt.valueEn ? 'selected' : ''}>
+		                                            ${pt.valueEn}
+		                                        </option>
+		                                    </c:forEach>
+		                                </select>
+			                        </div>
+		                        </div>
+		                        
+		                        <div class="col-md-3 hostel">
+		                        	 <div class="form-group">
+			                            <label class="required" for="hostelStrength">Hostel Strength :</label>
+		                                <input type="text" id="hostelStrength" name="hostelStrength" class="form-control form-control-sm" required maxlength="100" value="${project.hostelStrength}">
+			                        </div>
+		                        </div>
+		                        
+		                        <div class="col-md-3 staff" style="display:none">
+		                        	 <div class="form-group">
+			                            <label class="required" for="staffStrength">Staff Strength :</label>
+		                                <input type="text" id="staffStrength" name="staffStrength" class="form-control form-control-sm" required maxlength="100" value="${project.staffStrength}">
+			                        </div>
+		                        </div>
+		                        
+                            </div>
+                    </div>
+
+                    <%-- Site Inspection Details --%>
+                    <c:if test="${not empty project.projectId}">
+                        <c:if test="${not empty siteInspectionDetails and not empty siteInspectionDetails.siteInspectionId}">
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="card-title-add">Site Inspection Details</h5>
+                                    <div class="row g-3 mt-2">
+                                        <%-- Area --%>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="form-label required">Area:</label>
+                                                <input type="text" id="area" name="area" value="${siteInspectionDetails.area}" maxlength="100" class="form-control form-control-sm AlphaNumericOnly disablecopypaste" required="required" readonly>
+                                            </div>
+                                        </div>
+
+                                        <%-- Landmark --%>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="form-label required">Landmark:</label>
+                                                <input type="text" id="landmark" name="landmark" value="${siteInspectionDetails.landmark}" maxlength="100" class="form-control form-control-sm AlphaNumericWithSpace disablecopypaste" required="required" readonly>
+                                            </div>
+                                        </div>
+
+                                        <%-- Site Inspection Date --%>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="form-label required">Site Inspection Date:</label>
+                                                <div class="datepicker-box">
+                                                    <input type="text" id="siteInspectionDate" name="siteInspectionDate" value="<fmt:formatDate value='${siteInspectionDetails.siteInspectionDate}' pattern='dd-MMM-yyyy' />" class="form-control form-control-sm disablecopypaste datepicker" readonly />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <%-- Soil Test Report --%>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="form-label required">Soil Test Report:</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="soilTestReportPath" name="soilTestReportPath" value="${siteInspectionDetails.soilTestReportPath}" readonly class="form-control form-control-sm">
+                                                    <button type="button" class="btns btn-success" onclick="viewDocument('${siteInspectionDetails.soilTestReportPath}', 'SITE_INSPECTION_DOCUMENT')">
+                                                        <i class="fa-regular fa-eye" title="View"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <%-- Land Record --%>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="form-label required">Land Record:</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="lanRecordReportPath" name="lanRecordReportPath" value="${siteInspectionDetails.lanRecordReportPath}" readonly class="form-control form-control-sm">
+                                                    <button type="button" class="btns btn-success" onclick="viewDocument('${siteInspectionDetails.lanRecordReportPath}', 'SITE_INSPECTION_DOCUMENT')">
+                                                        <i class="fa-regular fa-eye" title="View"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <%-- Land Clearance Report --%>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="form-label required">Land Clearance Report:</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="landClearanceReportPath" name="landClearanceReportPath" value="${siteInspectionDetails.landClearanceReportPath}" readonly class="form-control form-control-sm">
+                                                    <button type="button" class="btns btn-success" onclick="viewDocument('${siteInspectionDetails.landClearanceReportPath}', 'SITE_INSPECTION_DOCUMENT')">
+                                                        <i class="fa-regular fa-eye" title="View"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <%-- Environment Clearance Report --%>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="form-label required">Environment Clearance Report:</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="environmentClearanceReportPath" name="environmentClearanceReportPath" value="${siteInspectionDetails.environmentClearanceReportPath}" readonly class="form-control form-control-sm">
+                                                    <button type="button" class="btns btn-success" onclick="viewDocument('${siteInspectionDetails.environmentClearanceReportPath}', 'SITE_INSPECTION_DOCUMENT')">
+                                                        <i class="fa-regular fa-eye" title="View"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <%-- Site Inspection Images --%>
+                                        <c:forEach var="img" items="${siteInspectionImageList}" varStatus="loop">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-label required">Site Image ${loop.index + 1}:</label>
+                                                    <div class="input-group">
+                                                        <input type="text" id="environmentClearanceReportPath" name="environmentClearanceReportPath" value="${img.siteInspectionImagePath}" readonly class="form-control form-control-sm">
+                                                        <button type="button" class="btns btn-success" onclick="viewDocument('${img.siteInspectionImagePath}', 'SITE_INSPECTION_IMAGE')">
+                                                            <i class="fa-regular fa-eye" title="View"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+
+                                        <%-- Remark --%>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="form-label">Remark:</label>
+                                                <textarea id="remark" name="remark" rows="2" class="form-control form-control-sm AlphaNumericWithSpace disablecopypaste" maxlength="250" readonly>${siteInspectionDetails.remark}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:if>
+                    </c:if>
+
+                    <%-- Form Actions --%>
+                    <div class="col-md-12 mt-2 text-center">
+                        <c:set var="dynamicFromId" value="projectMstForm" scope="request" />
+                        <c:set var="wonFunction" value="submitForm()" />
+                        <%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp" %>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%-- Document View Form --%>
+<form action="${contextPath}/project/viewFile" method="get" id="documentFormView" target="_blank">
+    <input type="hidden" name="cipherText" id="cipherTextView">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <input type="hidden" name="fileName" id="fileName" />
+    <input type="hidden" name="moduleName" id="moduleName" />
+</form>
+
+<%-- JavaScript Section --%>
+<c:set var="school" value="${school}" />
+<script>
+<%-- Form Submission --%>
+function submitForm() {
+    event.preventDefault();
+    const buttonCode = $("#hdnButtonCode").val();
+    $("#buttonCode").val(buttonCode);
+    var financialYear = $('#financialYear').val();
+    var parentprojectId = $('#parentprojectId').val();
+    var projectId = $('#projectId').val();
+    var projectName = $('#projectName').val();
+    var projectType = $('#projectType').val();
+    var projectSatus = $('#projectSatus').val();
+    var letterNo = $('#letterNo').val();
+    var letterDate = $('#letterDate').val();
+    var confirmLetterDate = $('#confirmLetterDate').val();
+    var startDate = $('#startDate').val();
+    var completionDate = $('#completionDate').val();
+    var estimatedCost = $('#estimatedCost').val();
+    var finalCost = $('#finalCost').val();
+    var schoolId = $("#schoolId").val();
+    var schoolCode = $("#schoolCode").val();
+    var classRange = $("#classRange").val();
+    var districtId = $("#districtId").val();
+    var blockId = $("#blockId").val();
+    var gpId = $("#gpId").val();
+    var villageId = $("#villageId").val();
+    var headMaster = $("#headMaster").val();
+    var type = $("#type").val();
+    var uidsceCode = $("#uidsceCode").val();
+    var searchBy = $('#searchBy').val();
+    var deptId = $("#deptId").val();
+    var isUpdateProject = $('#isUpdateProject').val() === 'true';
+    var isParent = $('#isParent').val() === 'true';
+    var hostelType = $("#hostelType").val();
+    var hostelStrength = $("#hostelStrength").val();
+    var staffStrength = $("#staffStrength").val();
+    var administrativeApprovalNo = $("#administrativeApprovalNo").val();
+    var administrativeApprovalDate = $("#administrativeApprovalDate").val();
+    var projectDistrictId = $("#projectDistrictId").val();
+    var projectBlockId = $("#projectBlockId").val();
+    var projectGpId = $("#projectGpId").val();
+    var projectVillageId = $("#projectVillageId").val();
+
+    <%-- Validation Checks --%>
+    if (financialYear == "" || financialYear == "0" || financialYear == null) {
+        bootbox.alert("Please enter Financial Year.");
+        return false;
+    } else if (parentprojectId == "" || parentprojectId === "0") {
+        bootbox.alert("Please select Project.");
+        return false;
+    } else if (projectName == "") {
+        bootbox.alert("Please enter project name.");
+        return false;
+    } else if (projectType == "") {
+        bootbox.alert("Please enter Project Type.");
+        return false;
+    } else if (projectSatus == "") {
+        bootbox.alert("Please enter project status.");
+        return false;
+    } else if (letterNo == "") {
+        bootbox.alert("Please enter Letter Number.");
+        return false;
+    } else if (letterDate == "") {
+        bootbox.alert("Please Select Letter Date.");
+        return false;
+    } else if (confirmLetterDate == "") {
+        bootbox.alert("Please Select Confirm Letter Date.");
+        return false;
+    } else if (!isValidDateSequence()) {
+        return false;
+    } else if (startDate == "") {
+        bootbox.alert("Please Select Start Date.");
+        return false;
+    } else if (completionDate == "") {
+        bootbox.alert("Please Select Completion Date.");
+        return false;
+    } else if (estimatedCost == "") {
+        bootbox.alert("Please enter Estimated Cost.");
+        return false;
+    } else if (finalCost == "") {
+        bootbox.alert("Please enter Final Cost.");
+        return false;
+    } else if (deptId === null) {
+        bootbox.alert("Select Department Name");
+        return false;
+    } else if (administrativeApprovalNo.trim() === "") {
+        bootbox.alert("Please Enter Administrative Approval Number");
+        return false;
+    } else if (administrativeApprovalDate == "") {
+        bootbox.alert("Please Select Administrative Approval Date");
+        return false;
+    }  else if (projectDistrictId == "" || projectDistrictId === "0") {
+        bootbox.alert("Please select District.");
+        return false;
+    }else if (projectBlockId == "" || projectBlockId === "0") {
+        bootbox.alert("Please select Block.");
+        return false;
+    }else if (projectGpId == "" || projectGpId === "0") {
+        bootbox.alert("Please select Gramapanchayat.");
+        return false;
+    }else if (projectVillageId == "" || projectVillageId === "0") {
+        bootbox.alert("Please select Village.");
+        return false;
+    } else {
+    	
+    	// Community-Hall â no duplicate check
+        if (projectType === "Community-Hall") {
+        	submitFormWithConfirmation(projectName,projectId);
+            return;
+        }
+
+        // Common validations (for both Hostel & Staff-Quarter)
+        if (projectType === "Hostel" || projectType === "Staff-Quarter" || projectType === "School-Building") {
+            if (uidsceCode.trim() === "") {
+                bootbox.alert("Enter Uidse Code");
+                return false;
+            } else if (schoolId.trim() === "") {
+                bootbox.alert("Enter School Name");
+                return false;
+            } else if (schoolCode.trim() === "") {
+                bootbox.alert("Enter School Code");
+                return false;
+            } else if (classRange.trim() === "") {
+                bootbox.alert("Enter Class Range");
+                return false;
+            } else if (!districtId) {
+                bootbox.alert("Select District Name");
+                return false;
+            } else if (!blockId) {
+                bootbox.alert("Select Block Name");
+                return false;
+            } else if (!gpId) {
+                bootbox.alert("Select Gram Panchayat Name");
+                return false;
+            } else if (!villageId) {
+                bootbox.alert("Select Village Name");
+                return false;
+            } else if (headMaster.trim() === "") {
+                bootbox.alert("Enter Headmaster");
+                return false;
+            } else if (type.trim() === "") {
+                bootbox.alert("Enter School Type");
+                return false;
+            }
+        }
+
+        // Hostel-specific validations
+        if (projectType === "Hostel") {
+            if (hostelType.trim() === "") {
+                bootbox.alert("Enter Hostel Type");
+                return false;
+            } else if (hostelStrength.trim() === "") {
+                bootbox.alert("Enter Hostel Strength");
+                return false;
+            }
+        }
+
+        // Staff-Quarter-specific validations
+        if (projectType === "Staff-Quarter") {
+            if (staffStrength.trim() === "") {
+                bootbox.alert("Enter Staff Strength");
+                return false;
+            }
+        }
+
+     	// Duplicate check (both Hostel & Staff-Quarter)
+       	if (uidsceCode.trim() !== "") {
+       	    if (isParent && !isUpdateProject) {
+       	        $.ajax({
+       	            type: "GET",
+       	            url: "${contextPath}/project/check-exist-project-in-school",
+       	            data: { 
+       	            	uidsceCode: uidsceCode
+       	            	},
+       	            success: function (isDuplicate) {
+       	                if (isDuplicate === true) {
+       	                    bootbox.alert("Currently a project has been running on this school .");
+       	                    return false;
+       	                } else {
+       	                	submitFormWithConfirmation(projectName,projectId);
+       	                }
+       	            },
+       	            error: function (error) {
+       	                console.error("Error while validating project name", error);
+       	             	submitFormWithConfirmation(projectName,projectId); 
+       	            }
+       	        });
+       	    } else {
+       	    	submitFormWithConfirmation(projectName,projectId);
+       	    }
+        }
+    }
+}
+
+function submitFormWithConfirmation(projectName,projectId) {
+    $.ajax({
+           type: "GET",
+           url: "${contextPath}/project/validate-project-name",
+           data: { 
+           	projectName: projectName,
+           	projectId: projectId
+           	},
+           success: function (isDuplicate) {
+               if (isDuplicate === true) {
+                   bootbox.alert("Already a project is present in this name please give another name .");
+                   return false;
+               } else {
+            	   var bizContent = $("#projectMstForm").serializeArray();
+            	    $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+            	    bootbox.confirm("Do You Want To Continue?", function (result) {
+            	        if (result) {
+            	            $('#projectMstForm').submit();
+            	        }
+            	    });
+               }
+           },
+           error: function (error) {
+               console.error("Error while validating project name", error);
+           }
+       });
+}
+
+<%-- Document View --%>
+function viewDocument(fileName, moduleName) {
+    $("#fileName").val(fileName);
+    $("#moduleName").val(moduleName);
+    var bizContent = $("#documentFormView").serializeArray();
+    $("#cipherTextView").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+    $("#documentFormView").submit();
+}
+
+<%-- AJAX Functions for Loading Data --%>
+function LoadSchoolByDistrict(distId) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/project/getAllSchoolByDistrict",
+        data: { districtId: distId },
+        success: function (school) {
+            var schoolId = $('#schoolId');
+            schoolId.empty();
+            schoolId.append('<option value="0" selected>- Select -</option>');
+            $("#headMaster").val("");
+            $("#classRange").val("");
+            $("#type").val("");
+            $("#uidsceCode").val("");
+            $("#blockId").val("");
+            $("#gpId").val("");
+            $("#villageId").val("");
+            $.each(school, function (index, schoolData) {
+                schoolId.append('<option value="' + schoolData.schoolId + '">' + schoolData.schoolName + '</option>');
+            });
+        },
+        error: function (error) {
+            console.error("Error fetching hostels:", error);
+        }
+    });
+}
+
+function LoadSchoolByBlock(blockId) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/project/getAllSchoolByBlock",
+        data: { blockId: blockId },
+        success: function (school) {
+            var schoolId = $('#schoolId');
+            schoolId.empty();
+            schoolId.append('<option value="0" selected>- Select -</option>');
+            $("#headMaster").val("");
+            $("#classRange").val("");
+            $("#type").val("");
+            $("#uidsceCode").val("");
+            $("#gpId").val("");
+            $("#villageId").val("");
+            $.each(school, function (index, schoolData) {
+                schoolId.append('<option value="' + schoolData.schoolId + '">' + schoolData.schoolName + '</option>');
+            });
+        },
+        error: function (error) {
+            console.error("Error fetching hostels:", error);
+        }
+    });
+}
+
+function LoadSchoolByGrampanchayat(gpId) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/project/getAllSchoolByGrampanchayat",
+        data: { gpId: gpId },
+        success: function (school) {
+            var schoolId = $('#schoolId');
+            schoolId.empty();
+            schoolId.append('<option value="0" selected>- Select -</option>');
+            $("#headMaster").val("");
+            $("#classRange").val("");
+            $("#type").val("");
+            $("#uidsceCode").val("");
+            $("#villageId").val("");
+            $.each(school, function (index, schoolData) {
+                schoolId.append('<option value="' + schoolData.schoolId + '">' + schoolData.schoolName + '</option>');
+            });
+        },
+        error: function (error) {
+            console.error("Error fetching hostels:", error);
+        }
+    });
+}
+
+function LoadSchoolByVillage(villageId, clear = true, selectedSchoolId = null) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/project/getAllSchoolByVillage",
+        data: { villageId: villageId },
+        success: function (school) {
+            var schoolId = $('#schoolId');
+            schoolId.empty();
+            schoolId.append('<option value="0" selected>- Select -</option>');
+            if (clear) {
+            	$("#schoolCode").val("");
+                $("#classRange").val("");
+                $("#headMaster").val("");
+                $("#type").val("");
+                $("#uidsceCode").val("");
+            }
+            $.each(school, function (index, schoolData) {
+                schoolId.append('<option value="' + schoolData.schoolId + '">' + schoolData.schoolName + '</option>');
+            });
+            if (selectedSchoolId) {
+                schoolId.val(selectedSchoolId);
+            }
+        },
+        error: function (error) {
+            console.error("Error fetching hostels:", error);
+        }
+    });
+}
+
+function getSchoolBySchoolId(schoolId) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/project/getSchoolBySchoolId",
+        data: { schoolId: schoolId },
+        success: function (school) {
+            if (school) {
+                $("#blockId").val(school.blockId);
+                LoadGrampanchayatByBlock(school.blockId, 'gpId');
+                setTimeout(function () {
+                    $("#gpId").val(school.gpId);
+                    LoadVillageByGrampanchayat(school.gpId, 'villageId');
+                    setTimeout(function () {
+                        $("#villageId").val(school.villageId);
+                        LoadSchoolByVillage(school.villageId, false, school.schoolId);
+                        setTimeout(function () {
+                            $("#schoolId").val(school.schoolId);
+                            $("#schoolCode").val(school.schoolCode);
+                            $("#headMaster").val(school.headMaster);
+                            $("#classRange").val(school.classRange);
+                            $("#type").val(school.type);
+                            $("#uidsceCode").val(school.uidsceCode);
+                        }, 300); // populate school details
+                    }, 300); // wait for village dropdown
+                }, 300); // wait for GP dropdown
+            }
+        },
+        error: function (error) {
+            console.error("Error fetching hostels:", error);
+        }
+    });
+}
+
+function LoadBlockByDistrict(distId, targetId) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/common/fetchBlockByDistrict",
+        data: { districtId: distId },
+        success: function (blocks) {
+            var block = $("#" + targetId);
+            block.empty();
+            block.append('<option value="" selected disabled>- Select -</option>');
+            
+            $.each(blocks, function (index, blockData) {
+                block.append('<option value="' + blockData.blockId + '">' + blockData.blockName + '</option>');
+            });
+        },
+        error: function () {
+            alert("Error loading blocks!");
+        }
+    });
+}
+
+function LoadGrampanchayatByBlock(blockId, targetId) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/common/fetchGrampanchayatByBlock",
+        data: { blockId: blockId },
+        success: function (grampanchayats) {
+            var gp = $("#" + targetId);
+            gp.empty();
+            gp.append('<option value="" selected disabled>- Select -</option>');
+            
+            $.each(grampanchayats, function (index, grampanchayat) {
+                gp.append('<option value="' + grampanchayat.gpId + '">' + grampanchayat.gpName + '</option>');
+            });
+        },
+        error: function () {
+            alert("Error loading Grampanchayat!");
+        }
+    });
+}
+
+function LoadVillageByGrampanchayat(gpId, targetId) {
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/common/fetchVillageByGrampanchayat",
+        data: { gpId: gpId },
+        success: function (villages) {
+            var villageData = $("#" + targetId);
+            villageData.empty();
+            villageData.append('<option value="" selected disabled>- Select -</option>');
+            
+            $.each(villages, function (index, village) {
+                villageData.append('<option value="' + village.villageId + '">' + village.villageName + '</option>');
+            });
+        },
+        error: function () {
+            alert("Error loading Village!");
+        }
+    });
+}
+
+<%-- Load Project Details --%>
+function loadProjectDetails(parentprojectId) {
+	debugger;
+    if (parentprojectId) {
+        $('#parentprojectId').val(parentprojectId);
+        $('#legalDocumentDiv').hide();
+        $('#structureSaftyDocDiv').hide();
+        $('#otherSupportingDocDiv').hide();
+    } else {
+        $('#legalDocumentDiv').show();
+        $('#structureSaftyDocDiv').show();
+        $('#otherSupportingDocDiv').show();
+    }
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/project/getProjectDetailsByParentProjectId",
+        data: { parentprojectId: parentprojectId },
+        success: function (project) {
+            if (project) {
+                $('#isParent').val('false').addClass('frezz');
+                $('#financialYear').val(project.financialYearId);
+                $('#projectType').val(project.projectType).addClass('frezz');
+                $('#projectSatus').val(project.projectStatus);
+                $('#letterNo').val(project.letterNo);
+                $('#letterDate').val(project.letterDate);
+                $('#confirmLetterDate').val(project.confirmLetterDate);
+                $('#startDate').val(project.startDate);
+                $('#completionDate').val(project.completionDate);
+                $('#deptId').val(project.deptId);
+                $('#administrativeJurisdiction').val(project.administrativeJurisdiction);
+                $('#administrativeApprovalNo').val(project.administrativeApprovalNo);
+                $('#administrativeApprovalDate').val(project.administrativeApprovalDate);
+                $('#assetOwnerShipType').val(project.assetOwnerShipType);
+                
+                $('#uidsceCode').val(project.uidsceCode);
+                $('#schoolCode').val(project.schoolCode);
+                $('#headMaster').val(project.headMaster);
+                $('#classRange').val(project.classRange);
+                $('#type').val(project.type);
+                $('#districtId').val(project.districtId);
+                $('#searchBy').val(project.searchBy);
+                $('#hostelType').val(project.hostelType);
+                $('#hostelStrength').val(project.hostelStrength);
+                $('#staffStrength').val(project.staffStrength);
+                $('#isUpdateProject').val(project.isUpdateProject);
+                
+                if(project.projectType == "Hostel"){
+                	$('#schoolFields .staff').hide()  // hide staff section
+                    $('#schoolFields .hostel').show();    // show hostel fields
+                }else if(project.projectType == "Staff-Quarter"){
+                	 $('#schoolFields .staff').show()   // show staff section
+                     $('#schoolFields .hostel').hide();    // hide hostel fields
+                }
+                
+                if (project.projectType === "Community-Hall") {
+                    // Set district first
+                    $('#projectDistrictId').val(project.projectDistrictId);
+                    LoadBlockByDistrict(project.projectDistrictId, 'projectBlockId');
+                    setTimeout(function () {
+                        // Set block and load GP
+                        $('#projectBlockId').val(project.projectBlockId);
+                        LoadGrampanchayatByBlock(project.projectBlockId, 'projectGpId');
+                        setTimeout(function () {
+                            // Set GP and load Village
+                            $('#projectGpId').val(project.projectGpId);
+                            LoadVillageByGrampanchayat(project.projectGpId, 'projectVillageId');
+                            setTimeout(function () {
+                                // Set Village
+                                $('#projectVillageId').val(project.projectVillageId);
+                            }, 300);
+                        }, 300);
+                    }, 300);
+                }else{
+                	//school states fields
+                    LoadBlockByDistrict(project.districtId, 'blockId');
+                    setTimeout(function () {
+                    	// Set block and load GP
+                        $('#blockId').val(project.blockId);
+                        LoadGrampanchayatByBlock(project.blockId, 'gpId');
+                        setTimeout(function () {
+                        	// Set GP and load Village
+                            $('#gpId').val(project.gpId);
+                            LoadVillageByGrampanchayat(project.gpId, 'villageId');
+                            setTimeout(function () {
+                            	 // Set Village
+                                $('#villageId').val(project.villageId);
+                                LoadSchoolByVillage(project.villageId, false, project.schoolId);
+                            }, 300);
+                        }, 300);
+                    }, 300);
+                }
+                
+                handleProjectTypeUI();
+                
+                //frezz the searchBy so it not changable in sub project case
+                $('#searchBy').addClass('frezz'); 
+            }
+        },
+        error: function (error) {
+            console.error("Error fetching projects:", error);
+        }
+    });
+}
+
+<%-- UI Handling for Project Type --%>
+function handleProjectTypeUI() {
+    // Pass projectTypeList to JavaScript as JSON
+    var projectTypeList = [
+        <c:forEach var="pt" items="${projectTypeList}" varStatus="loop">
+            {
+                valueId: ${pt.valueId},
+                valueEn: "${pt.valueEn}",
+                valueCode: "${pt.valueCode}",
+                code: "${pt.code}",
+                isActive: ${pt.isActive}
+            }${loop.last ? '' : ','}
+        </c:forEach>
+    ];
+
+    var projectType = $("#projectType").val();
+    var isHostelType = projectTypeList.some(function(pt) { return pt.valueEn === projectType && pt.valueEn === "Hostel"; });
+    var isStaffType  = projectTypeList.some(function(pt) { return pt.valueEn === projectType && pt.valueEn === "Staff-Quarter"; });
+    var isSchoolType = projectTypeList.some(function(pt) { return pt.valueEn === projectType && pt.valueEn === "School-Building"; });
+    var isHallType = projectTypeList.some(function(pt) { return pt.valueEn === projectType && pt.valueEn === "Community-Hall"; });
+
+    // Initial UI setup based on selected project type
+    if (isHostelType) {
+    	
+        $('#ptype select').addClass('frezz');
+        $('#projectStateFields').hide();
+        $('#searchField').show();
+        $('#editSchoolBtn').hide();
+        
+     	// Force default "demographic" if not already set
+        if (!$("#searchBy").val() || $("#searchBy").val() === "0") {
+            $("#searchBy").val("demographic").trigger("change");
+        }
+     	
+        $('#schoolFields, #stateFields').show();
+        
+    } else if (isStaffType) {
+    	
+        $('#ptype select').addClass('frezz');
+        $('#projectStateFields').hide();
+        $('#searchField').show();
+        $('#editSchoolBtn').hide();
+        
+     	// Force default "demographic" if not already set
+        if (!$("#searchBy").val() || $("#searchBy").val() === "0") {
+            $("#searchBy").val("demographic").trigger("change");
+        }
+     	
+        $('#schoolFields, #stateFields').show();
+        $('#schoolFields .hostel').hide(); // hide hostel fields
+        $('#schoolFields .staff').show();  // show staff fields
+    } else if (isSchoolType) {
+    	
+        $('#ptype select').addClass('frezz');
+        $('#projectStateFields').hide();
+        $('#searchField').show();
+        $('#editSchoolBtn').hide();
+        
+     	// Force default "demographic" if not already set
+        if (!$("#searchBy").val() || $("#searchBy").val() === "0") {
+            $("#searchBy").val("demographic").trigger("change");
+        }
+        $('#schoolFields, #stateFields').show()
+        $('#schoolFields .staff, #schoolFields .hostel').hide()
+        
+    } else if (isHallType) {
+        $('#searchField, #schoolFields, #stateFields').hide();
+        $('#projectStateFields').show();
+    } else {
+        $('#searchField, #schoolFields, #stateFields').hide();
+        $('#projectStateFields').show();
+    }
+
+ 	// Handle project type change
+    $('#projectType').change(function () {
+    	
+        var selectedType = $(this).val();
+        
+        var isHostelSelected = projectTypeList.some(function(pt) { return pt.valueEn === selectedType && pt.valueEn === "Hostel"; });
+        var isStaffSelected  = projectTypeList.some(function(pt) { return pt.valueEn === selectedType && pt.valueEn === "Staff-Quarter"; });
+        var isSchoolType = projectTypeList.some(function(pt) { return pt.valueEn === selectedType && pt.valueEn === "School-Building"; });
+        var isHallSelected  = projectTypeList.some(function(pt) { return pt.valueEn === selectedType && pt.valueEn === "Community-Hall"; });
+
+        if (isHostelSelected) {
+            $('#ptype select').addClass('frezz');
+            $('#projectStateFields').hide();
+            $('#searchField').show();
+            $('#editSchoolBtn').hide();
+
+            // Force default "demographic" if not already set
+            if (!$("#searchBy").val() || $("#searchBy").val() === "0") {
+                $("#searchBy").val("demographic").trigger("change");
+            }
+
+            $('#schoolFields, #stateFields').show();
+
+            $('#schoolFields .staff').hide();  // hide staff section
+            $('#schoolFields .hostel').show();    // show hostel fields
+
+        } else if (isStaffSelected) {
+            $('#ptype select').addClass('frezz');
+            $('#projectStateFields').hide();
+            $('#searchField').show();
+            $('#editSchoolBtn').hide();
+
+            // Force default "demographic" if not already set
+            if (!$("#searchBy").val() || $("#searchBy").val() === "0") {
+                $("#searchBy").val("demographic").trigger("change");
+            }
+
+            $('#schoolFields, #stateFields').show();
+
+            $('#schoolFields .staff').show();   // show staff section
+            $('#schoolFields .hostel').hide();    // hide hostel fields
+
+        }else if (isSchoolType) {
+            $('#ptype select').addClass('frezz');
+            $('#projectStateFields').hide();
+            $('#searchField').show();
+            $('#editSchoolBtn').hide();
+
+            // Force default "demographic" if not already set
+            if (!$("#searchBy").val() || $("#searchBy").val() === "0") {
+                $("#searchBy").val("demographic").trigger("change");
+            }
+
+            $('#schoolFields, #stateFields').show();
+
+            $('#schoolFields .staff').hide();   // hide staff section
+            $('#schoolFields .hostel').hide();    // hide hostel fields
+
+        } else if (isHallSelected) {
+            $('#searchField, #schoolFields, #stateFields').hide(); 
+            $('#projectStateFields').show();
+
+            $("#schoolId").val("");
+            $("#schoolCode").val("");
+            $("#classRange").val("");
+            $("#districtId").val("");
+            $("#blockId").val("");
+            $("#gpId").val("");
+            $("#headMaster").val("");
+            $("#type").val("");
+            $("#uidsceCode").val("");
+            $("#villageId").val("");
+            $('#uidsceCode').addClass('frezz');
+
+        } else {
+            $('#searchField, #schoolFields, #stateFields').hide();
+            $('#projectStateFields').show();
+        }
+    });
+
+    var projectId = $("#projectId").val(); 
+    var isParent = $('#isParent').val();
+    
+    // Handle existing UIDSCE code
+    var uidsceCode = $('#uidsceCode').val();
+    if (uidsceCode !== "") {
+        $('#ptype select').addClass('frezz');
+        $('#searchField input').addClass('frezz');
+        
+        if (!projectId || projectId === "0") {
+            // NEW project â make SearchBy editable
+            $('#searchField select').removeClass('frezz');
+            $('#editSchoolBtn').hide();
+        } else {
+            // EDIT project â keep SearchBy frozen
+            $('#searchField select').addClass('frezz');
+            
+            //if the project is parent project then allow the school to edit
+            if (isParent == "true") {
+                $('#editSchoolBtn').show();
+            }
+        }
+        
+        $('#schoolFields, #stateFields').show();
+        
+     	// Allow hostelStrength (input) to stay editable
+        $('#schoolFields input, #stateFields input').not('#hostelStrength,#staffStrength').addClass('frezz');
+
+        // Allow hostelType (select) to stay editable
+        $('#schoolFields select, #stateFields select').not('#hostelType').addClass('frezz');
+
+    } else {
+        $('#uidsceCode').addClass('frezz');
+    }
+
+    // Handle search by change
+	$('#searchBy').change(function () {
+	    const selected = $(this).val();
+	
+	    if (selected === 'uidsce') {
+	        $('#uidsceCode').val("").removeClass('frezz');
+	        $('#schoolFields, #stateFields').show();
+	
+	        $("#schoolCode").val("").addClass('frezz');
+	        $("#classRange").val("").addClass('frezz');
+	        $("#districtId").val(0).addClass('frezz');
+	        $("#headMaster").val("").addClass('frezz');
+	        $("#type").val("").addClass('frezz');
+	
+	        var blockId = $('#blockId');
+	        blockId.empty().append('<option value="0" selected disabled>- Select -</option>').addClass('frezz');
+	
+	        var gpId = $('#gpId');
+	        gpId.empty().append('<option value="0" selected disabled>- Select -</option>').addClass('frezz');
+	
+	        var villageId = $('#villageId'); 
+	        villageId.empty().append('<option value="0" selected disabled>- Select -</option>').addClass('frezz');
+	        
+	        var schoolId = $('#schoolId');
+	        schoolId.empty().append('<option value="0" selected disabled>- Select -</option>').addClass('frezz');
+	    }
+	
+	    if (selected === 'demographic') {
+	        $('#uidsceCode').val("").addClass('frezz');
+	        $('#schoolFields, #stateFields').show();
+	
+	        $("#schoolCode").val("").addClass('frezz');
+	        $("#classRange").val("").removeClass('frezz');
+	        $('#districtId').val(0).removeClass('frezz');
+	        $("#headMaster").val("").removeClass('frezz');
+	        $("#type").val("").removeClass('frezz');
+	        
+	        var blockId = $('#blockId');
+	        blockId.empty().append('<option value="0" selected disabled>- Select -</option>').removeClass('frezz');
+	
+	        var gpId = $('#gpId');
+	        gpId.empty().append('<option value="0" selected disabled>- Select -</option>').removeClass('frezz');
+	
+	        var villageId = $('#villageId'); 
+	        villageId.empty().append('<option value="0" selected disabled>- Select -</option>').removeClass('frezz');
+	        
+	        var schoolId = $('#schoolId');
+	        schoolId.empty().append('<option value="0" selected disabled>- Select -</option>').removeClass('frezz');
+	    }
+	});
+}
+
+function editSchoolDetails() {
+    bootbox.confirm("Do you want to edit the school details for this project?", function(result) {
+        if (result) { 
+            const searchByVal = $('#searchBy').val();
+
+            if (searchByVal === "uidsce") {
+                $("#searchBy").val("uidsce").trigger("change");
+            } else if (searchByVal === "demographic") {
+                $("#searchBy").val("demographic").trigger("change");
+            }
+
+            // Remove freeze class while editing
+            $('#searchField select').removeClass('frezz');
+
+            // Force validation of duplicate project when editing school details
+            $('#isUpdateProject').val("false");
+        }
+    });
+}
+
+
+$(document).ready(function () {
+    handleProjectTypeUI();
+
+    // Collect JSP data in one place
+    const project = {
+        projectType: '${project.projectType}',
+        projectDistrictId: '${project.projectDistrictId}',
+        projectBlockId: '${project.projectBlockId}',
+        projectGpId: '${project.projectGpId}',
+        projectVillageId: '${project.projectVillageId}',
+        districtId: '${school.districtId}',
+        blockId: '${school.blockId}',
+        gpId: '${school.gpId}',
+        villageId: '${school.villageId}',
+        schoolId: '${school.schoolId}'
+    };
+
+    // COMMUNITY HALL PROJECT FLOW
+    if (project.projectType === "Community-Hall") {
+        const districtId = $("#projectDistrictId").val();
+
+        if (districtId && districtId !== "") {
+            LoadBlockByDistrict(project.projectDistrictId, 'projectBlockId');
+            setTimeout(function () {
+                $('#projectBlockId').val(project.projectBlockId);
+                LoadGrampanchayatByBlock(project.projectBlockId, 'projectGpId');
+                setTimeout(function () {
+                    $('#projectGpId').val(project.projectGpId);
+                    LoadVillageByGrampanchayat(project.projectGpId, 'projectVillageId');
+                    setTimeout(function () {
+                        $('#projectVillageId').val(project.projectVillageId);
+                    }, 300);
+                }, 300);
+            }, 300);
+        }
+
+    // OTHER PROJECT TYPES FLOW
+    } else {
+        const districtId = $("#districtId").val();
+
+        if (districtId && districtId !== "") {
+            LoadBlockByDistrict(project.districtId, 'blockId');
+            setTimeout(function () {
+                $('#blockId').val(project.blockId);
+                LoadGrampanchayatByBlock(project.blockId, 'gpId');
+                setTimeout(function () {
+                    $('#gpId').val(project.gpId);
+                    LoadVillageByGrampanchayat(project.gpId, 'villageId');
+                    setTimeout(function () {
+                        $('#villageId').val(project.villageId);
+                        LoadSchoolByVillage(project.villageId, false, project.schoolId);
+                    }, 300);
+                }, 300);
+            }, 300);
+        }
+    }
+});
+
+
+<%-- Document Ready Initializations --%>
+$(document).ready(function () {
+	
+    <%-- Order Number Validation --%>
+    $('#letterNo').on('input', function () {
+        let val = $(this).val();
+        val = val.replace(/[^a-zA-Z0-9]/g, '');
+        if (val.length > 12) {
+            val = val.substring(0, 12);
+        }
+        $(this).val(val);
+    });
+
+    <%-- Maintenance Mode Handling --%>
+    var isMaintenance = $('#isMaintenance').val();
+    if (isMaintenance === 'true') {
+        var parentprojectId = $('#maintProjectId').val();
+        loadProjectDetails(parentprojectId);
+        $('#parentprojectId').val(parentprojectId);
+        $('#legalDocumentDiv').hide();
+        $('#structureSaftyDocDiv').hide();
+        $('#otherSupportingDocDiv').hide();
+    } else {
+        $('#legalDocumentDiv').show();
+        $('#structureSaftyDocDiv').show();
+        $('#otherSupportingDocDiv').show();
+    }
+
+    <%-- Parent Project Handling --%>
+    var parentprojectId = $('#parentprojectId').val();
+    if (isUpdateProject && parentprojectId !== '0' && parentprojectId !== '' && parentprojectId !== null) {
+        $('#legalDocumentDiv').hide();
+        $('#structureSaftyDocDiv').hide();
+        $('#otherSupportingDocDiv').hide();
+    } else {
+        $('#legalDocumentDiv').show();
+        $('#structureSaftyDocDiv').show();
+        $('#otherSupportingDocDiv').show();
+    }
+});
+
+<%-- Hostel Details by UIDSCE Code --%>
+function getSchoolDetails(uidsceCode) {
+    if (!uidsceCode) {
+        return;
+    }
+    $.ajax({
+        type: "GET",
+        url: "${contextPath}/project/getSchoolDetailsByCode",
+        data: { uidsceCode: uidsceCode },
+        success: function (school) {
+            if (school) {
+                $("#districtId").val(school.districtId);
+                LoadBlockByDistrict(school.districtId, 'blockId');
+                setTimeout(function () {
+                    $("#blockId").val(school.blockId);
+                    LoadGrampanchayatByBlock(school.blockId, 'gpId');
+                    setTimeout(function () {
+                        $("#gpId").val(school.gpId);
+                        LoadVillageByGrampanchayat(school.gpId, 'villageId');
+                        setTimeout(function () {
+                            $("#villageId").val(school.villageId);
+                            LoadSchoolByVillage(school.villageId, false, school.schoolId);
+                            setTimeout(function () {
+                                $("#schoolId").val(school.schoolId);
+                                $("#schoolCode").val(school.schoolCode);
+                                $("#headMaster").val(school.headMaster);
+                                $("#classRange").val(school.classRange);
+                                $("#type").val(school.type);
+                                $("#uidsceCode").val(school.uidsceCode);
+                            }, 300); // populate school details
+                        }, 300); // wait for village dropdown
+                    }, 300); // wait for GP dropdown
+                }, 300); // wait for block dropdown
+            } else {
+                console.warn("No hostel found for:", uidsceCode);
+            }
+        },
+        error: function (error) {
+            console.error("AJAX error:", error);
+        }
+    });
+}
+
+<%-- Datepicker Initialization --%>
+$(document).ready(function () {
+    $(".datepicker").datepick({
+        onShow: $.datepick.monthOnly,
+        dateFormat: "dd-mm-yyyy",
+        yearRange: "c-20:c+10",
+        showOnFocus: true,
+        showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+        onSelect: function () {
+            applyDateLimits();
+        }
+    });
+
+    function parseDate(str) {
+        if (!str) return null;
+        var parts = str.split("-");
+        return new Date(parts[2], parts[1] - 1, parts[0]); 
+    }
+
+    function formatDate(date) {
+        let dd = String(date.getDate()).padStart(2, '0');
+        let mm = String(date.getMonth() + 1).padStart(2, '0');
+        let yyyy = date.getFullYear();
+        return dd + '-' + mm + '-' + yyyy;
+    }
+
+    function applyDateLimits() {
+        const letterDate = parseDate($('#letterDate').val());
+        const confirmDate = parseDate($('#confirmLetterDate').val());
+        const startDate = parseDate($('#startDate').val());
+        const completionDate = parseDate($('#completionDate').val());
+
+        if (letterDate) {
+            $('#confirmLetterDate').datepick('option', 'minDate', letterDate);
+        }
+        if (confirmDate) {
+            $('#startDate').datepick('option', 'minDate', confirmDate);
+        }
+        if (startDate) {
+            $('#completionDate').datepick('option', 'minDate', startDate);
+        }
+    }
+    // Run initially if values are pre-filled
+    applyDateLimits();
+    // Re-apply limits on date change
+    $('#letterDate, #confirmLetterDate, #startDate').on('change', function () {
+        applyDateLimits();
+    });
+}); 
+
+<%-- Date Sequence Validation --%>
+function isValidDateSequence() {
+    var letterDateStr = $('#letterDate').val();
+    var confirmLetterDateStr = $('#confirmLetterDate').val();
+    var startDateStr = $('#startDate').val();
+    var completionDateStr = $('#completionDate').val();
+    function parseDate(str) {
+        if (!str) return null;
+        var parts = str.split('-');
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+    }
+    var letterDate = parseDate(letterDateStr);
+    var confirmDate = parseDate(confirmLetterDateStr);
+    var startDate = parseDate(startDateStr);
+    var completionDate = parseDate(completionDateStr);
+
+    if (letterDate && confirmDate && letterDate > confirmDate) {
+        bootbox.alert("Order Date must be before or equal to Confirm Order Date.");
+        $('#confirmLetterDate').val('');
+        return false;
+    } else if (confirmDate && startDate && confirmDate > startDate) {
+        bootbox.alert("Confirm Order Date must be before or equal to Start Date.");
+        $('#startDate').val('');
+        return false;
+    } else if (startDate && completionDate && startDate > completionDate) {
+        bootbox.alert("Start Date must be before or equal to Completion Date.");
+        $('#completionDate').val('');
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function toggleProjectDropdown() {
+    const isParent = $('#isParent').val();
+    const parentProject = $('#parentprojectId');
+    
+    if (isParent === "true") {
+        parentProject.addClass('frezz').prop('disabled', true);
+    } 
+    else if (isParent === "false") {
+        parentProject.removeClass('frezz').prop('disabled', false);
+    } 
+    else {
+        parentProject.addClass('frezz').prop('disabled', true);
+    }
+}
+
+function toggleDocuments() {
+    const isParent = $('#isParent').val();
+
+    if (isParent === "true") {
+        // Show required documents
+        $('#legalDocumentDiv, #structureSaftyDocDiv, #otherSupportingDocDiv').show();
+    } else {
+        // Hide documents
+        $('#legalDocumentDiv, #structureSaftyDocDiv, #otherSupportingDocDiv').hide();
+    }
+}
+
+<%-- Project Dropdown Toggle --%>
+$(document).ready(function () {
+	
+	// Always ensure default is set, then run toggle
+    if (!$('#isParent').val()) {
+        $('#isParent').val('true');
+        $('#parentprojectId').addClass('frezz').prop('disabled', true);
+    }
+	
+    // Run once on page load (whether defaulted or existing)
+    toggleProjectDropdown();
+    toggleDocuments();
+
+    // Re-check on change
+    $('#isParent').change(function () {
+        toggleProjectDropdown();
+        toggleDocuments();
+    });
+});
+
+//Destroy Select2 instance if active
+/* if (parentProject.hasClass("select2-hidden-accessible")) {
+	parentProject.select2('destroy');
+} */
+
+function uploadFileCheck(that){
+	var ValidFileExtension = ['pdf','jpg', 'jpeg', 'png'];
+
+	if($(that).val().split('.').length == 2 ) {
+		  if ($.inArray($(that).val().split('.').pop().toLowerCase(), ValidFileExtension) == -1) {
+				bootbox.alert("Please upload only .pdf, .jpg/.jpeg/.png files.");
+				$(that).val("");
+				return false;
+			}
+		  if ((that.files[0].size) > 512000) {//500KB
+				bootbox.alert("File size exceeds maximum file size of 500 KB!");
+				$(that).val("");
+				return false;
+			}
+		}else{
+		   bootbox.alert("Unsupported file format,Please check your file extension");
+		   $(that).val("");
+	 }
+}
+
+</script>

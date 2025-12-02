@@ -1,0 +1,20 @@
+#=================================  DEV PROFILES  =================================
+
+spring.datasource.url=jdbc:postgresql://localhost:5433/bams_ipms_cross_table
+spring.datasource.username=postgres
+spring.datasource.password=root
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

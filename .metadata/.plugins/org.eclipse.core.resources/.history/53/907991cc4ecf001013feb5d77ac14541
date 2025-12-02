@@ -1,0 +1,81 @@
+package com.aashdit.prod.heads.common.utils;
+
+import com.aashdit.prod.heads.common.dto.LookupValueDTO;
+import com.aashdit.prod.heads.common.model.CommonLookupValue;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = "org.mapstruct.ap.MappingProcessor",
+    date = "2025-12-02T12:38:02+0530",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 15.0.2 (Oracle Corporation)"
+)
+@Component
+public class LookupValueMapperImpl implements LookupValueMapper {
+
+    @Override
+    public LookupValueDTO toDTO(CommonLookupValue entity) {
+        if ( entity == null ) {
+            return null;
+        }
+
+        LookupValueDTO lookupValueDTO = new LookupValueDTO();
+
+        lookupValueDTO.setValueId( entity.getLookupValueId() );
+        lookupValueDTO.setValueCode( entity.getLookupValueCode() );
+        lookupValueDTO.setCode( entity.getLookupCode() );
+        lookupValueDTO.setValueEn( entity.getLookupValueEn() );
+        lookupValueDTO.setValueHi( entity.getLookupValueHi() );
+        lookupValueDTO.setIsActive( entity.getIsActive() );
+
+        return lookupValueDTO;
+    }
+
+    @Override
+    public List<LookupValueDTO> toDTOList(List<CommonLookupValue> entities) {
+        if ( entities == null ) {
+            return null;
+        }
+
+        List<LookupValueDTO> list = new ArrayList<LookupValueDTO>( entities.size() );
+        for ( CommonLookupValue commonLookupValue : entities ) {
+            list.add( toDTO( commonLookupValue ) );
+        }
+
+        return list;
+    }
+
+    @Override
+    public CommonLookupValue toEntity(LookupValueDTO dto) {
+        if ( dto == null ) {
+            return null;
+        }
+
+        CommonLookupValue commonLookupValue = new CommonLookupValue();
+
+        commonLookupValue.setLookupValueId( dto.getValueId() );
+        commonLookupValue.setLookupValueCode( dto.getValueCode() );
+        commonLookupValue.setLookupCode( dto.getCode() );
+        commonLookupValue.setLookupValueEn( dto.getValueEn() );
+        commonLookupValue.setLookupValueHi( dto.getValueHi() );
+        commonLookupValue.setIsActive( dto.getIsActive() );
+
+        return commonLookupValue;
+    }
+
+    @Override
+    public List<CommonLookupValue> toEntityList(List<LookupValueDTO> dtos) {
+        if ( dtos == null ) {
+            return null;
+        }
+
+        List<CommonLookupValue> list = new ArrayList<CommonLookupValue>( dtos.size() );
+        for ( LookupValueDTO lookupValueDTO : dtos ) {
+            list.add( toEntity( lookupValueDTO ) );
+        }
+
+        return list;
+    }
+}

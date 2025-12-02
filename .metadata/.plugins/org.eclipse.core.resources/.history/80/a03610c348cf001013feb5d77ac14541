@@ -1,0 +1,167 @@
+package com.aashdit.construction.service;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import com.aashdit.common.model.District;
+import com.aashdit.common.model.FinancialYear;
+import com.aashdit.construction.dto.AgencyBankDetailsDTO;
+import com.aashdit.construction.dto.AgencyDropDownDto;
+import com.aashdit.construction.dto.AgencyMasterDropDownDto;
+import com.aashdit.construction.dto.AssetDropDownDto;
+import com.aashdit.construction.dto.BAMSMunicipalityDto;
+import com.aashdit.construction.dto.BankBranchDropDownDto;
+import com.aashdit.construction.dto.BlockDropDownDto;
+import com.aashdit.construction.dto.BuildingDto;
+import com.aashdit.construction.dto.DepartmentDropDownDto;
+import com.aashdit.construction.dto.DistrictDropDownDto;
+import com.aashdit.construction.dto.FinancialYearDropDown;
+import com.aashdit.construction.dto.GramPanchayatDropDownDto;
+import com.aashdit.construction.dto.LookupValueDTO;
+import com.aashdit.construction.dto.MstSchemeDto;
+import com.aashdit.construction.dto.MunicipalityDropDownDto;
+import com.aashdit.construction.dto.PlanningDetailsDTO;
+import com.aashdit.construction.dto.ProjectDropDownDto;
+import com.aashdit.construction.dto.ProjectDto;
+import com.aashdit.construction.dto.ProjectEstimationDropDownDto;
+import com.aashdit.construction.dto.SchoolDto;
+import com.aashdit.construction.dto.StateDropDownDto;
+import com.aashdit.construction.dto.VillageDropDownDto;
+import com.aashdit.construction.dto.WardDropDownDto;
+import com.aashdit.construction.dto.WorkInspectionDto;
+import com.aashdit.construction.dto.WorkOrderSCSTCodeDto;
+import com.aashdit.construction.dto.WorkOrderSCSTDTO;
+import com.aashdit.construction.model.MessageTemplate;
+import com.aashdit.construction.model.OtpForUser;
+import com.aashdit.framework.core.ServiceOutcome;
+import com.aashdit.umt3.model.User;
+
+public interface MasterCommonService {
+	
+	ServiceOutcome<List<ProjectDropDownDto>> getAllActiveProject();
+	
+	ServiceOutcome<List<ProjectDropDownDto>> getAllActiveApprovedProject();
+	
+	ServiceOutcome<List<ProjectDropDownDto>> getAllActiveApprovedProjectWithWorkOrderApproved();
+	
+	ServiceOutcome<List<ProjectDropDownDto>> getAllActiveApprovedParentProject();
+	
+	ServiceOutcome<List<ProjectEstimationDropDownDto>> getAllActiveProjectEstimationIdAndNameByProject(Long projectId);
+	
+	ServiceOutcome<List<ProjectEstimationDropDownDto>> getAllActiveApprovedProjectEstimationIdAndNameByProject(Long projectId);
+	
+	ServiceOutcome<WorkOrderSCSTCodeDto> getWorkOrderCodeByProjectEstimationId(Long id);
+	
+    ServiceOutcome<List<StateDropDownDto>> getAllActiveStatesIdAndName();
+    
+    ServiceOutcome<List<DistrictDropDownDto>> getAllActiveDistrictIdAndName();
+    
+    ServiceOutcome<List<DistrictDropDownDto>> getAllActiveDistrictsIdAndNameByState(Long stateId);
+	
+	ServiceOutcome<List<BlockDropDownDto>> getAllActiveBlockIdAndNameByDistrict(Long districtId);
+	
+	ServiceOutcome<List<GramPanchayatDropDownDto>> getAllActiveGramPanchayatIdAndNameByBlock(Long blockId);
+	
+	ServiceOutcome<List<VillageDropDownDto>> getAllActiveVillageIdAndNameByGramPanchayat(Long gpId);
+	
+	ServiceOutcome<List<MunicipalityDropDownDto>> getAllActiveMunicipalityIdAndNameByDistrict(Long districtId);
+	
+	ServiceOutcome<List<WardDropDownDto>> getAllActiveWardIdAndNameByMunicipalityId(Long municipalityId);
+	
+	ServiceOutcome<List<FinancialYearDropDown>> getAllActiveFinancialYear();
+	
+	ServiceOutcome<List<ProjectDropDownDto>> getAllActiveProjectByFinancialYearId(Long financialYearId);
+	
+	ServiceOutcome<List<ProjectDropDownDto>> getAllActiveApprovedProjectByFinancialYearId(Long financialYearId);
+	
+	ServiceOutcome<List<DepartmentDropDownDto>> getAllActiveDepartmentIdAndName();
+	
+	ServiceOutcome<List<LookupValueDTO>> getLookupValuesByLookupCode(String lookupCode);
+	
+	ServiceOutcome<List<AssetDropDownDto>> getAllActiveAsset();
+	
+	ServiceOutcome<WorkOrderSCSTDTO> getApprovedWorkOrderByProjectEstimationId(Long projectEstimationId);
+	
+	ServiceOutcome<List<FinancialYear>> getAllActiveFinancialYears();
+
+	ServiceOutcome<ProjectDto> getProjectCodeByProjectId(Long projectId);
+	
+    ServiceOutcome<List<ProjectDto>> getProjectsByFinancialYear(Long financialYearId);
+    
+    ServiceOutcome<AgencyBankDetailsDTO> getAccountDetailsByAccountNo(Long agencyBankId);
+    
+    ServiceOutcome<List<AgencyBankDetailsDTO>> getAgencyBankAccountNoByAgencyId(Long agencyId);
+    
+    ServiceOutcome<List<WorkInspectionDto>> getWorkInspectionByWorkOrderId(Long workOrderId);
+    
+    ServiceOutcome<List<DistrictDropDownDto>> getAllDistrictByFinancialYear(Long financialYearId);
+    
+    ServiceOutcome<List<ProjectDropDownDto>> getAllApprovedProjectsByFinancialYearAndDistrict(Long financialYearId, Long districtId);
+    
+    ServiceOutcome<List<SchoolDto>> getAllSchoolsByDistrict(Long districtId);
+    
+    ServiceOutcome<List<SchoolDto>> getAllSchoolsByBlock(Long blockId);
+    
+    ServiceOutcome<List<SchoolDto>> getAllSchoolsByGrampanchayat(Long grampanchayatId);
+    
+    ServiceOutcome<List<SchoolDto>> getAllSchoolsByVillage(Long villageId);
+    
+    ServiceOutcome<SchoolDto> getSchoolByschoolUidsceCode(String uidsceCode);
+    
+    ServiceOutcome<List<ProjectDropDownDto>> getAllActiveProjectsWithFinalPhaseApprovedOrdered();
+    
+    ServiceOutcome<List<SchoolDto>> getSchooIsActiveTrueByDistrictId(Long districtId);
+    
+    ServiceOutcome<List<District>> getAllActiveDistrict();
+    
+    ServiceOutcome<Long> getACtiveFinancialYearId();
+    
+    String generateProjectCode(Long districtId, Long departmentId, String projectType);
+    
+    String generateCode(String input, int length);
+    
+    String generateLegacyProjectCode(String districtName, String departmentName, String projectType,String OrderNo);
+    
+    ServiceOutcome<List<AgencyDropDownDto>> getAllActiveAgencyList();
+    
+    ServiceOutcome<List<MstSchemeDto>> getAllActiveSchemeList();
+    
+    String handleFileUpload(MultipartFile file, String basePath, String folderName);
+    
+    ServiceOutcome<List<AgencyMasterDropDownDto>> getAllActiveAgencyMasters();
+    
+    ServiceOutcome<List<BankBranchDropDownDto>> getAllActiveBankBranches();
+
+	ServiceOutcome<String> checkOtpAccessForUser(User user, boolean isActive, boolean isOtpAccess);
+
+	ServiceOutcome<String> generateOTP(String mobielNumber);
+
+	MessageTemplate findByTemplateName(String templateName);
+
+	OtpForUser findByUserAndisActiveTrueOrderByOtpIdDescLimit1(String mobileNumber);
+
+	List<String> getMobileUserAccessListByIsActiveAndIsMobileAccess(boolean isActive, boolean isMobileAccess);
+
+	ServiceOutcome<Boolean> setOtpIsValidFlag(String mobielNumber, Boolean isValid);
+
+	ServiceOutcome<List<BAMSMunicipalityDto>> getAllActiveMunicipalityByDistrict(Long districtId);
+
+	Object findByIsActiveTrueOrderByFinYear();
+
+	Map<String, Object> getExecutionDropdowns();
+
+	ServiceOutcome<List<BuildingDto>> getBuildingNameByFinancialYear(Long financialYearId);
+
+	ServiceOutcome<PlanningDetailsDTO> getLocationCode(Long buildingId);
+	
+	ServiceOutcome<List<BuildingDto>> getAllActiveBuildingDetails(String bamsbuildingType);
+
+    
+//    ServiceOutcome<List<AgencyTypeDTO>> getAllActiveAgencyTypes();
+//    ServiceOutcome<List<AgencyTemplateDTO>> getAllActiveAgencyTemplates();
+//    ServiceOutcome<List<AgencyTemplateDTO>> getAllActiveAgencyTemplatesByTypeId(Long typeId);
+    
+
+}

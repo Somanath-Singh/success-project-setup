@@ -1,0 +1,11 @@
+package com.aashdit.prod.heads.common.service;
+
+import com.aashdit.prod.heads.common.utils.ModuleType;
+
+public interface GenericCodeStrategy {
+	
+	void validateModuleHierarchy(ModuleType moduleType);
+	
+	String findMaxCode(String prefix,ModuleType moduleType);
+	
+}

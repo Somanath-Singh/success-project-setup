@@ -1,0 +1,53 @@
+package com.aashdit.prod.heads.common.service;
+
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import com.aashdit.prod.heads.common.dto.LookupValueDTO;
+import com.aashdit.prod.heads.common.model.FinancialYear;
+import com.aashdit.prod.heads.framework.core.ServiceOutcome;
+import com.aashdit.prod.heads.hims.umt.model.User;
+
+public interface MasterCommonService {
+	
+    ServiceOutcome<List<StateDropDownDto>> getAllActiveStatesIdAndName();
+    
+    ServiceOutcome<List<DistrictDropDownDto>> getAllActiveDistrictIdAndName();
+    
+    ServiceOutcome<List<DistrictDropDownDto>> getAllActiveDistrictsIdAndNameByState(Long stateId);
+	
+	ServiceOutcome<List<BlockDropDownDto>> getAllActiveBlockIdAndNameByDistrict(Long districtId);
+	
+	ServiceOutcome<List<GramPanchayatDropDownDto>> getAllActiveGramPanchayatIdAndNameByBlock(Long blockId);
+	
+	ServiceOutcome<List<VillageDropDownDto>> getAllActiveVillageIdAndNameByGramPanchayat(Long gpId);
+	
+	ServiceOutcome<List<MunicipalityDropDownDto>> getAllActiveMunicipalityIdAndNameByDistrict(Long districtId);
+	
+	ServiceOutcome<List<WardDropDownDto>> getAllActiveWardIdAndNameByMunicipalityId(Long municipalityId);
+	
+	ServiceOutcome<List<FinancialYearDropDown>> getAllActiveFinancialYear();
+	
+	ServiceOutcome<List<LookupValueDTO>> getLookupValuesByLookupCode(String lookupCode);
+	
+	ServiceOutcome<List<FinancialYear>> getAllActiveFinancialYears();
+
+    String generateCode(String input, int length);
+    
+    String handleFileUpload(MultipartFile file, String basePath, String folderName);
+    
+	ServiceOutcome<String> checkOtpAccessForUser(User user, boolean isActive, boolean isOtpAccess);
+
+	ServiceOutcome<String> generateOTP(String mobielNumber);
+
+	MessageTemplate findByTemplateName(String templateName);
+
+	OtpForUser findByUserAndisActiveTrueOrderByOtpIdDescLimit1(String mobileNumber);
+
+	List<String> getMobileUserAccessListByIsActiveAndIsMobileAccess(boolean isActive, boolean isMobileAccess);
+
+	ServiceOutcome<Boolean> setOtpIsValidFlag(String mobielNumber, Boolean isValid);
+
+
+}

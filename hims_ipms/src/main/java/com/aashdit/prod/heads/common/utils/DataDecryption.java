@@ -1,0 +1,134 @@
+package com.aashdit.prod.heads.common.utils;
+
+import java.util.Base64;
+import java.util.Iterator;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class DataDecryption {
+
+	@SuppressWarnings("unused")
+	private static final String ALGORITHM = "AES";
+	private static final String CHARSET = "UTF-8";
+	@SuppressWarnings("unused")
+	private static final String key = "69";
+
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+
+	/* decript the data by Base64 Or with AES for any type of Return Type */
+
+	@SuppressWarnings("unchecked")
+	public static <T> T decryptData(String encryptedData, Class<T> clazz, boolean doByAESKey, int decryptionRounds) {
+		try {
+			byte[] decodedBytes = Base64.getDecoder().decode(encryptedData);
+
+			String decodedString = "";
+			if (doByAESKey) {
+				decodedString = decryptWithAESKey(encryptedData, getCurrentRequest());
+			} else {
+				decodedString = new String(decodedBytes, CHARSET);
+			}
+			if (clazz == String.class) {
+				return clazz.cast(decodedString);
+			} else if (clazz == JSONObject.class) {
+				JSONParser parser = new JSONParser();
+				Object obj = parser.parse(decodedString);
+				return clazz.cast(obj);
+			} else {
+				JSONObject formDataJson = new JSONObject();
+				JSONParser parser = new JSONParser();
+				Object obj = parser.parse(decodedString);
+				JSONObject jsonObject = (JSONObject) obj;
+				for (Object key : jsonObject.keySet()) {
+					formDataJson.put(key, jsonObject.get(key));
+				}
+				String modifiedDecodedString = removeKeysNotPresent(formDataJson, clazz).toString();
+				return objectMapper.readValue(modifiedDecodedString, clazz);
+			}
+		} catch (Exception e) {
+//	        throw new Exception("Error decrypting data: " + e.getMessage());
+			log.error("Error occurs in DataDecryption -->decryptData->" + e);
+		}
+		return null;
+	}
+
+	/*
+	 * remove the key from the JSONObject which variables are not present in the
+	 * modelClass or DtoClass
+	 */
+	@SuppressWarnings("unchecked")
+	private static JSONObject removeKeysNotPresent(JSONObject jsonObject, Class<?> clazz) {
+		JSONObject modifiedJsonObject = new JSONObject();
+		Iterator<String> keys = jsonObject.keySet().iterator();
+		while (keys.hasNext()) {
+			String key = keys.next();
+			try {
+				clazz.getDeclaredField(key);
+				modifiedJsonObject.put(key, jsonObject.get(key));
+			} catch (NoSuchFieldException e) {
+				log.info("DataDecryption -->removed the Key: Field not found for key: " + key);
+			}
+		}
+		return modifiedJsonObject;
+	}
+
+	/* decryptBy AES returns encoded String (Converted JSon ) */
+	public static String decryptWithAESKey(String encodedData, HttpServletRequest request) {
+		// Security.addProvider(new BouncyCastleProvider());
+		String formData = "";
+		try {
+			String encFormData = new String(java.util.Base64.getDecoder().decode(encodedData));
+			AesUtil formAesUtil = new AesUtil(128, 1000);
+
+			CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+			String formPsk = csrfToken.getToken();
+			// String formPsk = request.getParameter("_csrf");
+			formPsk = formPsk.substring(0, 16);
+			if (encFormData != null && encFormData.split("::").length == 3) {
+				formData = formAesUtil.decrypt(encFormData.split("::")[1], encFormData.split("::")[0], formPsk,
+						encFormData.split("::")[2]);
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		return formData;
+	}
+
+	public static HttpServletRequest getCurrentRequest() {
+		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
+				.getRequestAttributes();
+		return requestAttributes.getRequest();
+	}
+
+	public static <T> T getValueFromJson(JSONObject json, String key, Class<T> type) {
+		if (json != null && json.get(key) != null && !json.get(key).toString().isEmpty()) {
+			if (type == Long.class) {
+				return type.cast(Long.valueOf(json.get(key).toString()));
+			} else if (type == String.class) {
+				return type.cast(json.get(key).toString());
+			} else if (type == Boolean.class) {
+				return type.cast(Boolean.valueOf(json.get(key).toString()));
+			} else if (type == Double.class) {
+				return type.cast(Double.valueOf(String.format("%.2f", Double.parseDouble(json.get(key).toString()))));
+			} else if (type == Integer.class) {
+				return type.cast(Integer.valueOf(json.get(key).toString()));
+			}
+
+		}
+		return null;
+	}
+
+}

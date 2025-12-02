@@ -1,0 +1,245 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>  
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>  
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}"/> 
+<sec:authentication var="principal" property="principal" />
+<c:set var="userDynamicEntityIdAndLvl" value="${principal.currentUserVo.currentUserEntityIdAndUserLevel}"/>
+<style>
+    .fa-unlock{
+        color: #003a7a;
+    }
+
+</style>
+			<div class="breadcrumb_conatiner">
+              <div class="col-md-6">
+                <h4 class="change-color">Manage Office</h4>
+              </div>
+              <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+	                <li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+					<li class="breadcrumb-item active" aria-current="page">Management</li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+
+			<div class="row">
+			
+			 	<div class="col-md-12">
+
+                  <div class="card">
+                    <div class="card-header">
+                    <h5 class="card-title">Add Office</h5>
+                         
+                  
+                  	
+					</div>
+                   <div class="card-body">
+
+	<form class="form-horizontal" action="${contextPath}/office/saveOfficeMaster" method="POST" id="officeForm">
+		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+		<input type="hidden" name="id" value="${officeDetails.id}"/>
+		<div class="row">
+			
+				
+				<c:set var="functionList" value="getRoleList(this)"/>
+				<%@ include file="/WEB-INF/views/masters/entityAndUser/entityIdAndUserLevelListForMst.jsp"%>
+				
+				<div class="form-group col-md-3">
+					<label class="required">Office Name :</label>
+					<div class="col-md-12">
+						<input type="text" id="officeName" name="officeName" value="${officeDetails.officeName}" maxlength="30" class="form-control form-control-sm thisisRequiredField" >
+					</div>
+				</div>
+				<div class="form-group col-md-3">
+					<label class="required" >Address :</label>
+					<div class="col-md-12">
+						<input type="text" name="officeAddress" id="officeAddress" class="form-control form-control-sm thisisRequiredField"  maxlength="30" value="${officeDetails.officeAddress}" >  
+					</div>
+				</div>
+				<div class="form-group col-md-3">
+					<label class="" >Office Phone. No :</label>
+					<div class="col-md-12">
+						<input type="text" name="officePhone" id="office" class="form-control nonFractionalNumber validPhoneNo form-control-sm"  maxlength="15" value="${officeDetails.officePhone}" min="6">
+					</div>
+				</div>
+				<div class="form-group col-md-3">
+					<label class="required" >Email :</label>
+					<div class="col-md-12">
+						<input type="text" name="officeEmail" id="officeEmail" class="form-control validEmail form-control-sm thisisRequiredField"  maxlength="30" value="${officeDetails.officeEmail}">
+					</div>
+				</div>
+				<%@ include file="/WEB-INF/views/masters/roleEntityMap.jsp"%>
+				<%@ include file="/WEB-INF/views/masters/appEntityMap.jsp"%>
+			</div>
+			<div class="form-group col-md-12 text-center mt-3">
+					<input type="button" class="btn btn-success btn-sm" value="Save" onclick="submitForm()">
+				 <a href="${contextPath}/office/officeMasterList" class="btn btn-danger btn-sm">Cancel</a>
+			</div>
+		</form>
+	</div>
+	</div>
+	
+	
+	
+			<div class="row mt-3">
+			<div class="col-md-12">
+
+                  <div class="card">
+                    <div class="card-header">
+                    <h5 class="card-title">Office List</h5>
+                         
+                  
+                  	
+					</div>
+               <div class="card-body">
+			<div class="col-md-12">
+				<!-- Filter Dropdwon -->
+				<div class="row">
+					<%@ include file="/WEB-INF/views/masters/entityAndUser/entityIdAndUserLevelListDrpForMst.jsp"%>
+				</div>
+				 
+				<div class="table-responsive">
+					<table id="basic-datatables" class="datatable table table-striped table-bordered exportbtn mt-5" >
+						<thead>
+							<tr>
+								<th style="width: 60px; text-align:center;">Sl No.</th>
+								<th>Office Name</th>
+								<th>Address</th>
+								<th>Phone No</th>
+								<th style="width: 190px;"><spring:message code="site.common.action"></spring:message></th> 													
+							</tr>
+						</thead>
+						<tbody id="tbd">
+					 	   <c:forEach items="${officeMasterList}" var="office" varStatus="officeCnt"> 
+								<tr>
+									<td style="text-align:center;">${officeCnt.count}</td>
+									<td>${office.officeName}</td>
+									<td>${office.officeAddress}</td>
+									<td>${office.officePhone}</td>
+									<td>
+									<button class="btn btn-primary btn-sm" onclick="editApplicationById('${office.id}')" title="Edit Role">
+										<i class="fa fa-edit" ></i>
+									</button>
+
+									<button class="btn btn-success btn-sm" onclick="activateDeactivateRole('${office.id}')" title="${office.active ? 'Lock' : 'Unlock'} Office">
+										<i class="${!office.active ? 'fa fa-lock text-white' : 'fa fa-unlock text-white'}"></i>
+									</button>
+									
+									</td>
+								</tr>
+					     	</c:forEach> 
+						</tbody>
+					</table>
+				</div>
+			</div> 
+		</div>
+	</div>
+	</div>
+	</div>
+					
+<form  method="GET" id="formId">
+</form>
+<form action="${contextPath}/admin/role/isActive" method="POST" id="lockNunlockForm">
+		<input type="hidden" name="roleId" id="roleId" />
+		<input type="hidden" name="isActive" id="isActive" /> 
+		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+</form>
+
+
+<form action="${contextPath}/department/add" method="get" id="viewDepartmentForm">
+    <input type="hidden" id="encodedOfficeId" name="encodedOfficeId"/>
+</form>
+	
+	<script>
+
+function viewDepartment(departmentId){
+        if(departmentId==''){
+            bootbox.alert('Department id empty'); 
+        }else{
+            $('#encodedOfficeId').val(btoa(departmentId));
+            $('#viewDepartmentForm').submit();
+        }
+    }
+	 
+		function editApplicationById(id){
+			$("#formId").attr('action','${contextPath}/office/officeMasterList');
+			// request param officeId
+			$("#formId").append('<input type="hidden" name="officeIdStr" value="'+btoa(id)+'">');
+			$("#formId").submit();
+		}
+
+		function viewApplicationById(id){
+			$("#formId").attr('action','${contextPath}/admin/role/view/'+ id +'');
+			$("#formId").submit();
+		 }
+
+		function unlockUser(roleId){
+			$("#isActive").val(true);
+			$("#roleId").val(roleId);
+			bootbox.confirm("Do you want to unlock this role?",
+				function(result) {
+					if (result == true) {
+							$("#lockNunlockForm").submit();
+					}
+			});
+		}
+		function lockUser(roleId){
+			 $("#isActive").val(false);
+			 $("#roleId").val(roleId);
+			    bootbox.confirm("Do you want to lock this role?",
+			            function(result) {
+			                    if (result == true) {
+			                            $("#lockNunlockForm").submit();
+			                    }
+			            });
+				 }
+		
+		function mapRoleLevel(roleId){
+			window.location = "${contextPath}/admin/role/roleLevelMap/" + roleId;
+		}
+
+
+		function submitForm(){
+			let otherRoleCodes = $('#otherRoleCodes').val();
+			if(otherRoleCodes == null || otherRoleCodes.length == 0){
+				bootbox.alert('Please select at least one role');
+				return;
+			}
+			let entityAppsId = $('#entityAppsId').val();
+			if(entityAppsId == null || entityAppsId.length == 0){
+				bootbox.alert('Please select at least one module');
+				return;
+			}
+			if(!validateRequiredFields("thisisRequiredField", "officeForm")){
+				return;
+			}
+
+			// if check otherRoleCodes value is not empty like [""] then set empty
+			let isContainEmpty = otherRoleCodes.includes("");
+			if(isContainEmpty){
+				bootbox.alert("Role can not be empty");
+				return;
+			} 
+
+
+			bootbox.confirm("Do you want to save this office?",
+				function(result) {
+						if (result == true) {
+							$("#officeForm").submit();
+						}
+				});
+		}
+
+		function activateDeactivateRole(id){
+			$("#formId").attr('action','${contextPath}/office/activateDeactivateOffice');
+			$("#formId").append('<input type="hidden" name="officeIdStr" value="'+btoa(id)+'">');
+			$("#formId").submit();
+		}
+
+		
+
+	</script>
+	

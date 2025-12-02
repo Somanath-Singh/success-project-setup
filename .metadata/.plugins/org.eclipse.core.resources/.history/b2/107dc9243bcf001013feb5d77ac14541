@@ -1,0 +1,478 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Add Legacy Maintenance</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa-solid fa-house"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">Add Legacy Maintenance</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header">
+				<c:choose>
+					<c:when test="${not empty ongoingProject}">
+						<h4 class="card-title">Update Legacy Maintenance</h4>
+					</c:when>
+					<c:otherwise>
+						<h4 class="card-title">Add Legacy Maintenance</h4>
+					</c:otherwise>
+				</c:choose>
+			</div>
+			<div class="card-body">
+				<form method="POST" action="${contextPath}/ongoing-project/save" id="onGoingProjectForm" enctype="multipart/form-data">
+					<input type="hidden" id="cipherText" name="cipherText" value="">
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+					<input type="hidden" id="onGoingProjectId" name="onGoingProjectId" value="${ongoingProject.onGoingProjectId}" />
+					<input type="hidden" id="buttonCode" name="buttonCode">	
+					<div class="row">
+						<div class="col-md-3">
+							<div class="form-group">
+								<label class="smallInput required" for="financialYear">Financial Year :</label>
+								<select class="form-control form-control-sm form-select" id="financialYear" name="financialYearId" onchange="getProjectByFinancialYear(this.value);">
+									<option value="0" selected disabled>- Select -</option>
+									<c:forEach items="${financialYearList}" var="fy" varStatus="index">
+										<option value="${fy.financialYearId}" ${ fy.financialYearId eq ongoingProject.financialYearId ? 'selected' : ''}>${fy.financialYear}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="form-group">
+								<label class="smallInput required" for="projectId">Building :</label>
+								<select class="form-control form-control-sm select2 form-select select2" id="projectId" name="projectId" >
+									<option value="0" selected disabled>- Select -</option>
+									<c:if test="${not empty ongoingProject}">
+										<c:forEach items="${projectList}" var="project">
+											<option value="${project.projectId}" ${ project.projectId eq ongoingProject.projectId ? 'selected' : ''}>
+												${project.projectName}
+											</option>
+										</c:forEach>
+									</c:if>
+								</select>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="form-group">
+								<label class="smallInput required" for="schemeId">Scheme :</label>
+								<select class="form-control form-control-sm select2 form-select" id="schemeId" name="schemeId">
+									<option value="0" selected disabled>- Select -</option>
+									<c:forEach items="${schemeList}" var="scheme" varStatus="index">
+										<option value="${scheme.schemeId}" ${ scheme.schemeId eq ongoingProject.schemeId ? 'selected' : ''}>${scheme.schemeName}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="form-group">
+								<label class="smallInput required" for="sanctionedYearId">Sanctioned Year :</label>
+								<select class="form-control form-control-sm select2 form-select" id="sanctionedYearId" name="sanctionedYearId" >
+									<option value="0" selected disabled>- Select -</option>
+									<c:forEach items="${financialYearList}" var="fy" varStatus="index">
+										<option value="${fy.financialYearId}" ${ fy.financialYearId eq ongoingProject.financialYearId ? 'selected' : ''}>${fy.financialYear}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="form-group">
+								<label class="smallInput required" for="agencyId">Agency :</label>
+								<select class="form-control form-control-sm select2 form-select" id="agencyId" name="agencyId">
+									<option value="0" selected disabled>- Select -</option>
+									<c:forEach items="${agencyList}" var="agency" varStatus="index">
+										<option value="${agency.agencyId}" ${ agency.agencyId eq ongoingProject.agencyId ? 'selected' : ''}>${agency.agencyName}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label class="required" for="dateOfCommencement">Date Of Commencement</label>
+							<div class="datepicker-box">
+								<input type="text" id="dateOfCommencement" name="dateOfCommencement" class="form-control form-control-sm datepicker" required value="${ongoingProject.dateOfCommencement}" readonly>
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label class="required" for="dueDateOfCompletion">Due Date Of Completion</label>
+							<div class="datepicker-box">
+								<input type="text" id="dueDateOfCompletion" name="dueDateOfCompletion" class="form-control form-control-sm datepicker" required value="${ongoingProject.dueDateOfCompletion}" readonly>
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label for="uploadDocuments">Upload Documents :</label>
+							<div class="col-md-12 position-relative">
+								<input type="file" id="uploadDocuments" name="uploadDocuments" class="form-control form-control-sm" onchange="uploadFileCheck(this)" >
+								<c:if test="${not empty ongoingProject.uploadDocumentsName}">
+									<button type="button" class="btn btn-sm btn-primary position-absolute" style="right:1px;top:1px;" onclick="viewDocument('${ongoingProject.uploadDocumentsName}', 'ONGOING_PROJECT_DOCUMENT')" title="View">
+										<i class="fa-regular fa-eye" title="View"></i>
+									</button>
+								</c:if>
+							</div>
+						</div>
+					</div>
+					<div class="row mt-1" id="additionalFields">
+						<div class="col-md-12">
+							<table class="table table-bordered">
+								<thead>
+									<tr>
+										<th class="text-center" style="width: 60px;">Sl No</th>
+										<th class="required" style="width: 25%;">Letter Number</th>
+										<th class="required" style="width: 25%;">Letter Date</th>
+										<th class="required" style="width: 25%;">Administrative Approval (Amount)</th>
+										<th class="text-center" style="width: 100px;">
+											<button type="button" class="btn btn-sm btn-success apend-btn-onGoingProjectData">
+												<i class="fa fa-plus"></i>
+											</button>
+										</th>
+									</tr>
+								</thead>
+								<tbody id="itemTableBody">
+									<c:if test="${empty ongoingProjectDataList}">
+										<tr>
+											<td class="text-center">
+												1
+												<input type="hidden" class="form-control form-control-sm onGoingProjectDataId"
+													   name="onGoingProjectDataList[0].onGoingProjectDataId"/>
+											</td>
+											<td>
+												<input type="text" class="form-control letterNo form-control-sm" maxlength="12"
+													   name="onGoingProjectDataList[0].letterNo"/>
+											</td>
+											<td>
+												<div class="datepicker-box">
+													<input type="text" class="form-control letterDate form-control-sm datepicker" 
+														   name="onGoingProjectDataList[0].letterDate" readonly/>
+												</div>
+											</td>
+											<td>
+												<input type="text" pattern="^\d+(\.\d{0,8})?$" class="form-control form-control-sm NumbersOnlyForAmount administrativeApprovalAmount" maxlength="12"
+													   name="onGoingProjectDataList[0].administrativeApprovalAmount"/>
+											</td>
+											<td class="text-center">
+												<button type="button" class="btn btn-sm btn-danger remove-row">
+													<i class="fa fa-minus"></i>
+												</button>
+											</td>
+										</tr>
+									</c:if>
+									<c:if test="${not empty ongoingProjectDataList}">
+										<c:forEach items="${ongoingProjectDataList}" var="details" varStatus="count">
+											<tr>
+												<td class="text-center">
+													${count.index + 1}
+													<input type="hidden" class="form-control form-control-sm onGoingProjectDataId"
+														   name="onGoingProjectDataList[${count.index}].onGoingProjectDataId"
+														   value="${details.onGoingProjectDataId}"/>
+												</td>
+												<td>
+													<input type="text" class="form-control letterNo form-control-sm"
+														   name="onGoingProjectDataList[${count.index}].letterNo"
+														   value="${details.letterNo}"/>
+												</td>
+												<td>
+													<div class="datepicker-box">
+														<input type="text" class="form-control letterDate form-control-sm datepicker" 
+															   name="onGoingProjectDataList[${count.index}].letterDate" 
+															   value="${details.letterDate}" readonly/>
+													</div>
+												</td>
+												<td>
+													<input type="text" pattern="^\d+(\.\d{0,8})?$" class="form-control form-control-sm NumbersOnlyForAmount administrativeApprovalAmount"
+														   name="onGoingProjectDataList[${count.index}].administrativeApprovalAmount"
+														   value="${details.administrativeApprovalAmount}"/>
+												</td>
+												<td class="text-center">
+													<button type="button" class="btn btn-sm btn-danger remove-row">
+														<i class="fa fa-minus"></i>
+													</button>
+												</td>
+											</tr>
+										</c:forEach>
+									</c:if>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="row">
+						<div class="text-center">
+							<c:set var="dynamicFromId" value="onGoingProjectForm" scope="request" />
+							<c:set var="wonFunction" value="submitOnGoingProjectForm()" />
+							<%@ include file="/WEB-INF/views/stageConfig/stageButton.jsp" %>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	function submitOnGoingProjectForm() {
+		var financialYear = $("#financialYear").val();
+		var projectId = $("#projectId").val();
+		var schemeId = $("#schemeId").val();
+		var sanctionedYearId = $("#sanctionedYearId").val();
+		var agencyId = $("#agencyId").val();
+		var dateOfCommencement = $("#dateOfCommencement").val();
+		var dueDateOfCompletion = $("#dueDateOfCompletion").val();
+		var uploadDocuments = $("#uploadDocuments").val();
+		const buttonCode = $("#hdnButtonCode").val();
+		$("#buttonCode").val(buttonCode);
+		
+		if (!financialYear || financialYear === "0") {
+			bootbox.alert("Please select Financial Year");
+			return false;
+		} else if (!projectId || projectId === "0") {
+			bootbox.alert("Please select Project");
+			return false;
+		} else if (!schemeId || schemeId === "0") {
+			bootbox.alert("Please select Scheme");
+			return false;
+		} else if (!sanctionedYearId || sanctionedYearId === "0") {
+			bootbox.alert("Please select Sanctioned Year");
+			return false;
+		} else if (!agencyId || agencyId === "0") {
+			bootbox.alert("Please select Agency");
+			return false;
+		} else if (!dateOfCommencement || dateOfCommencement.trim() === "") {
+			bootbox.alert("Please enter Date Of Commencement");
+			return false;
+		} else if (!dueDateOfCompletion || dueDateOfCompletion.trim() === "") {
+			bootbox.alert("Please enter Due Date Of Completion");
+			return false;
+		} else if (!validateOnGoingProject()) {
+			return false;
+		} else {
+			$("#cipherText").val(enc_password(collectOnGoingProjectData()));
+			bootbox.confirm("Do you want to submit the form?", function (result) {
+				if (result === true) {
+					showLoader();
+					$("#onGoingProjectForm").submit();
+				}
+			});
+		}
+	}
+	
+	function collectOnGoingProjectData() {
+		const onGoingProjectDataList = [];
+	
+		$("#itemTableBody tr").each(function () {
+			const row = $(this);
+			const data = {
+				onGoingProjectDataId: parseInt(row.find("input[name*='onGoingProjectDataId']").val()) || null,
+				letterDate: row.find("input[name*='letterDate']").val() || null,
+				letterNo: row.find("input[name*='letterNo']").val() || null,
+				administrativeApprovalAmount: parseFloat(row.find("input[name*='administrativeApprovalAmount']").val()) || 0
+			};
+			onGoingProjectDataList.push(data);
+		});
+	
+		const fullData = {
+			onGoingProjectId: $("#onGoingProjectId").val() || null,
+			financialYearId: $("#financialYear").val() || null,
+			projectId: $("#projectId").val() || null,
+			schemeId: $("#schemeId").val() || null,
+			sanctionedYearId: $("#sanctionedYearId").val() || null,
+			agencyId: $("#agencyId").val() || null,
+			dateOfCommencement: $("#dateOfCommencement").val() || null,
+			dueDateOfCompletion: $("#dueDateOfCompletion").val() || null,
+			buttonCode: $("#buttonCode").val() || null,
+			onGoingProjectDataList: onGoingProjectDataList
+		};
+	
+		return JSON.stringify(fullData);
+	}
+	
+	function getProjectByFinancialYear(finYearId) {
+		$.ajax({
+			url: "${contextPath}/common/fetch-approved-project-by-financialYear",
+			type: "GET",
+			data: {
+				financialYearId: finYearId
+			},
+			success: function (projects) {
+				var projectSelect = $("#projectId");
+				projectSelect.empty(); 
+				projectSelect.append('<option value="0" selected disabled>- Select -</option>');
+				$.each(projects, function(index, project) {
+					projectSelect.append('<option value="' + project.projectId + '">' + project.projectName + '</option>');
+				});
+			},
+			error: function (error) {
+				bootbox.alert("Error fetching projects: " + error);
+			}
+		});
+	}
+	
+	function validateOnGoingProject() {
+		let isValid = true;
+		let rowIndex = 1;
+	
+		$("#itemTableBody tr").each(function () {
+			const $row = $(this);
+			const letterNo = $row.find(".letterNo").val();
+			const letterDate = $row.find(".letterDate").val();
+			const administrativeApprovalAmount = $row.find(".administrativeApprovalAmount").val();
+	
+			// Debugging: Log values to verify
+			console.log(`Row ${rowIndex} - Letter No: ${letterNo}, Letter Date: ${letterDate}, Approval Amount: ${administrativeApprovalAmount}`);
+	
+			// Validate Letter Number
+			if (!letterNo || letterNo.trim() === "") {
+				bootbox.alert("Please enter letter number in row " + rowIndex);
+				isValid = false;
+				return false;
+			}
+	
+			// Validate Letter Date
+			if (!letterDate || letterDate.trim() === "") {
+				bootbox.alert("Please enter letter date in row " + rowIndex);
+				isValid = false;
+				return false;
+			}
+	
+			// Validate Administrative Approval Amount
+			const amount = administrativeApprovalAmount ? administrativeApprovalAmount.trim() : "";
+			if (!amount) {
+				bootbox.alert("Please enter administrative approval amount in row " + rowIndex);
+				isValid = false;
+				return false;
+			}
+	
+			// Check if the amount is a valid positive number
+			const parsedAmount = parseFloat(amount);
+			if (isNaN(parsedAmount) || parsedAmount <= 0) {
+				bootbox.alert("Please enter a valid positive administrative approval amount in row " + rowIndex);
+				isValid = false;
+				return false;
+			}
+	
+			rowIndex++;
+		});
+	
+		console.log("Validation result:", isValid);
+		return isValid;
+	}
+	
+	$(document).ready(function () {
+		// Initial datepicker
+		$(".datepicker").datepick({
+			onShow: $.datepick.monthOnly,
+			dateFormat: "dd-mm-yyyy",
+			yearRange: "c-20:c+10",
+			showOnFocus: true,
+			showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+			onSelect: function () {
+				applyDateLimits();
+			}
+		});
+	
+		// Append new row
+		$(document).on('click', '.apend-btn-onGoingProjectData', function () {
+			if (!validateOnGoingProject()) {
+				return false;
+			}
+	
+			const newIndex = $('#itemTableBody tr').length;
+	
+			const newRow = '<tr>' +
+				'<td class="text-center">' + (newIndex + 1) +
+					'<input type="hidden" class="form-control form-control-sm onGoingProjectDataId" ' +
+					'name="onGoingProjectDataList[' + newIndex + '].onGoingProjectDataId"/>' +
+				'</td>' +
+				'<td>' +
+					'<input type="text" class="form-control letterNo form-control-sm" maxlength="12" ' +
+					'name="onGoingProjectDataList[' + newIndex + '].letterNo">' +
+				'</td>' +
+				'<td>' +
+					'<div class="datepicker-box">' +
+						'<input type="text" class="form-control letterDate form-control-sm datepicker" ' +
+						'name="onGoingProjectDataList[' + newIndex + '].letterDate" readonly>' +
+					'</div>' +
+				'</td>' +
+				'<td>' +
+					'<input type="text" pattern="^\\d+(\\.\\d{0,8})?$" class="form-control form-control-sm NumbersOnlyForAmount administrativeApprovalAmount" maxlength="12" ' +
+					'name="onGoingProjectDataList[' + newIndex + '].administrativeApprovalAmount">' +
+				'</td>' +
+				'<td class="text-center">' +
+					'<button type="button" class="btn btn-sm btn-danger remove-row"><i class="fa fa-minus"></i></button>' +
+				'</td>' +
+			'</tr>';
+	
+			$('#itemTableBody').append(newRow);
+	
+			// Re-initialize datepicker for the newly added input
+			$('#itemTableBody tr:last .datepicker').datepick({
+				onShow: $.datepick.monthOnly,
+				dateFormat: "dd-mm-yyyy",
+				yearRange: "c-20:c+10",
+				showOnFocus: true,
+				showTrigger: '<button type="button" class="trigger"><i class="fa fa-calendar"></i></button>',
+				onSelect: function () {
+					applyDateLimits();
+				}
+			});
+		});
+	
+		// Remove row
+		$(document).on('click', '.remove-row', function () {
+			const $row = $(this).closest('tr');
+			if ($('#itemTableBody tr').length > 1) {
+				$row.remove();
+				reindexRows();
+			}
+		});
+	
+		// Restrict input to numbers and one decimal point
+		$(document).on('input', '.NumbersOnlyForAmount', function() {
+			this.value = this.value.replace(/[^0-9.]/g, ''); // Allow digits and decimal point
+			const parts = this.value.split('.');
+			if (parts.length > 2) {
+				this.value = parts[0] + '.' + parts[1]; // Allow only one decimal point
+			}
+			if (parts[1] && parts[1].length > 8) {
+				this.value = parts[0] + '.' + parts[1].substring(0, 8); // Limit to 8 decimal places
+			}
+		});
+	
+		function reindexRows() {
+			$('#itemTableBody tr').each(function(index) {
+				$(this).find('td:first').contents().filter(function () {
+					return this.nodeType === 3; 
+				}).first().replaceWith((index + 1) + ' ');
+			});
+		}
+	});
+	
+	function uploadFileCheck(that) {
+		var ValidFileExtension = ['pdf', 'jpg', 'jpeg', 'png'];
+	
+		if ($(that).val().split('.').length == 2) {
+			if ($.inArray($(that).val().split('.').pop().toLowerCase(), ValidFileExtension) == -1) {
+				bootbox.alert("Please upload only .pdf, .jpg/.jpeg/.png files.");
+				$(that).val("");
+				return false;
+			}
+			if ((that.files[0].size) > 512000) { // 500KB
+				bootbox.alert("File size exceeds maximum file size of 500 KB!");
+				$(that).val("");
+				return false;
+			}
+		} else {
+			bootbox.alert("Unsupported file format, please check your file extension");
+			$(that).val("");
+		}
+	}
+</script>

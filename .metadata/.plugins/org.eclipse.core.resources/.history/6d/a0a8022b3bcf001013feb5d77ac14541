@@ -1,0 +1,654 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userDetails" value="${serviceOutcome.data}" />
+<script type="text/javascript" src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+.freeze {
+    pointer-events: none;      /* Prevent clicking */
+    opacity: 0.6;              /* Dim the button */
+    cursor: not-allowed;       /* Change cursor */
+}
+
+  .rounded-box {
+    padding: 20px;
+   /*  margin: 20px 0; */
+ 
+  }
+  .rounded-box h5 {
+    margin-bottom: 20px;
+}
+
+</style>
+
+<div class="breadcrumb_conatiner">
+	<div class="col-md-6">
+		<h4 class="change-color">Building Details</h4>
+	</div>
+	<div class="col-md-6">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="${contextPath}/home"><i
+						class="fa-solid fa-house"></i></a></li>
+				<li class="breadcrumb-item active" aria-current="page">View Building Details</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+
+<div class="card">
+	<div class="card-header">
+		<h5 class="card-title">View Building Details</h5>
+	</div>
+	<div class="card-body">
+			<div class="row">						
+				<%-- <div class="col-md-3 ml-auto">
+					<div class="form-group">
+						<label class="smallInput required">Financial Year :</label> <select
+							class="form-control form-control-sm form-select"
+							id="financialYear" name="financialYearId"
+							onchange="getProjectCode(this.value)">
+							<option value="0" selected disabled>- Select -</option>
+							<c:forEach items="${financialYearList}" var="fy">
+								<option value="${fy.financialYearId}"
+									${ fy.financialYearId eq project.financialYearId? 'selected' : ''}>${fy.financialYear}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</div>	 --%>
+				
+				<div class="col-md-3 ml-auto">
+					<div class="form-group">
+						<label class="smallInput required">Financial Year :</label> <select
+							class="form-control form-control-sm form-select"
+							id="financialYear" name="financialYearId"
+							onchange="getProjectName(this.value)">
+							<option value="0" selected disabled>- Select -</option>
+							<c:forEach items="${financialYearList}" var="fy">
+								<option value="${fy.financialYearId}">${fy.financialYear}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</div>	
+				
+				<div class="col-md-3 ml-auto">
+					<div class="form-group">
+						<label class="smallInput required">Building Name :</label> <select
+							class="form-control form-control-sm form-select"
+							id="projectId" name="projectName"
+							onchange="getProjectCode(this.value)">
+							<option value="0" selected disabled>- Select -</option>
+							<%-- <c:forEach items="${financialYearList}" var="fy">
+								<option value="${fy.financialYearId}"
+									${ fy.financialYearId eq project.financialYearId? 'selected' : ''}>${fy.financialYear}</option>
+							</c:forEach> --%>
+						</select>
+					</div>
+				</div>
+			<div class="form-group col-md-3">
+				<label class="required">Building Code :</label>
+				<div class="col-md-12">
+					<input type="text" name="projectCode" id="projectCode" 
+						class="form-control form-control-sm" onchange="getProjectDetails(this.value);" readonly>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+<div class="card  mt-3" id="projectSection" style="display: none;">
+	<h5 class="mb-5">Building Details</h5>
+	<table class="table table-bordered table-sm">
+		<tbody id="projectTableBody">
+		
+        </tbody>
+	</table>
+</div>
+
+<!-- Sub Building Details -->
+<div class="card mt-3 py-3 px-3" id="subBuildingSection" style="display: none;">
+  <h5 class="mb-4 fw-semibold text-secondary">Sub Building Details</h5>
+  <div id="subBuildingContainer"></div>
+</div>
+
+
+<div class="card mt-3 py-3 px-3" id="estimationSection" style="display:none;">
+  <div id="estimationContainer" class="row"></div>
+</div>
+
+<div class="card  mt-3 py-3 px-3" id="workOrderSection" style="display:none;" class="mt-4">
+    <div id="workOrderContainer"></div>
+</div>
+
+<div class="card  mt-3 py-3 px-3" id="inspectionSection" style="display:none;" class="mt-4">
+	<h4 class='mb-4'>Inspection Details</h4>
+    <div id="inspectionContainer" class="row">
+    </div>
+</div>
+
+<div class="card  mt-3 py-3 px-3" id="maintainanceSection" style="display:none;" class="mt-4">
+    <div id="maintainanceContainer" class="row">
+    </div>
+</div>
+
+<script>
+		
+	function getProjectCode(projectId) {
+	    $.ajax({
+	        type: "GET",
+	        url: "${contextPath}/project/getProjectCode",
+	        data: { projectId: projectId },
+	        success: function (project) {
+	            if (project) {
+	                $("#projectCode").val(project.projectCode);
+	                $("#projectCode").trigger("change");
+
+	            } else {
+	                $("#projectCode").val("");
+	                console.warn("No project code found for projectId:", projectId);
+	            }
+	        },
+	        error: function (error) {
+	            console.error("Error fetching project code:", error);
+	        }
+	    });
+	}
+
+	
+function getProjectName(financialYearId) {
+	debugger;
+	$.ajax({
+	    type: "GET",
+	    url: "${contextPath}/project/getProjectName",
+	    data: {
+	    	financialYearId: financialYearId,
+	    },
+	    success: function (projects) {
+	        var projectId = $('#projectId'); 
+	        projectId.empty();
+	        projectId.append('<option value="0" selected>- Select -</option>');
+	        $.each(projects, function(index, project) {
+	        	projectId.append('<option value="' + project.projectId + '">' +  project.projectName + '</option>');
+	        	
+	        });
+	    },
+	    error: function (error) {
+	        console.error("Error fetching project code:", error);
+	    }
+	});
+	}
+	
+	
+function getProjectDetails(projectCode) {
+    debugger;
+    $.ajax({
+        type: "GET",
+        url: contextPath + "/project/getProjectDetailsByCode",  // Existing call for main project details (keep unchanged)
+        data: { projectCode: projectCode },
+        success: function (project) {
+            // === Existing main building display logic (unchanged, uses single ProjectDto) ===
+            const section = $('#projectSection');
+            section.empty();
+
+            if (project && project.projectCode) {
+                let html = "<div class='rounded-box'><h5>Building Details</h5><div class='row'>";
+
+                html += "<div class='col-md-4'><table>";
+                html += "<tr><th>Building Name</th><td>:</td><td>" + (project.projectName || 'NA') + "</td></tr>";
+                html += "<tr><th>Building Type</th><td>:</td><td>" + (project.projectType || 'NA') + "</td></tr>";
+                html += "<tr><th>Building Status</th><td>:</td><td>" + (project.projectStatus || 'NA') + "</td></tr>";
+                html += "<tr><th>Letter No.</th><td>:</td><td>" + (project.letterNo || 'NA') + "</td></tr>";
+                html += "</table></div>";
+
+                html += "<div class='col-md-4'><table>";
+                html += "<tr><th>Letter Date</th><td>:</td><td>" + (project.letterDate || 'NA') + "</td></tr>";
+                html += "<tr><th>Confirm Letter Date</th><td>:</td><td>" + (project.confirmLetterDate || 'NA') + "</td></tr>";
+                html += "<tr><th>Start Date</th><td>:</td><td>" + (project.startDate || 'NA') + "</td></tr>";
+                html += "<tr><th>Completion Date</th><td>:</td><td>" + (project.completionDate || 'NA') + "</td></tr>";
+                html += "</table></div>";
+
+                html += "<div class='col-md-4'><table>";
+                html += "<tr><th>Estimated Cost</th><td>:</td><td>" + (project.estimatedCost || 'NA') + "</td></tr>";
+                html += "<tr><th>Final Cost</th><td>:</td><td>" + (project.finalCost || 'NA') + "</td></tr>";
+                html += "</table></div>";
+
+                html += "</div></div>";
+
+                section.append(html);
+                section.show();
+            } else {
+                section.html('<div class="text-center text-muted">No data found</div>').show();
+            }
+            // === End existing logic ===
+        },
+        error: function (err) {
+            console.error("Error loading project details:", err);
+            $('#projectSection').html('<div class="text-center text-danger">Error loading data</div>').show();
+        }
+    });
+
+    // NEW: Separate AJAX for sub-buildings using new endpoint
+    $.ajax({
+        type: "GET",
+        url: contextPath + "/project/getProjectWithSubsByCode",
+        data: { projectCode: projectCode },
+        success: function (response) {
+            const subBuildings = response.subBuildings || [];
+
+            // Sub buildings accordion (same simplified fields)
+            const subSection = $('#subBuildingSection');
+            const subContainer = $('#subBuildingContainer');
+            subContainer.empty();
+            subSection.hide();
+
+            if (subBuildings.length > 0) {
+                let accordionHtml = "<div class='accordion' id='subAccordion'>";
+
+                subBuildings.forEach(function(sub, index) {
+                    const collapseId = "subCollapse" + index;
+                    const headingId = "subHeading" + index;
+
+                    accordionHtml += "<div class='accordion-item'>";
+                    accordionHtml += "<h2 class='accordion-header' id='" + headingId + "'>";
+                    accordionHtml += "<button class='accordion-button " + (index === 0 ? "" : "collapsed") + "' type='button' data-bs-toggle='collapse' data-bs-target='#" + collapseId + "' aria-expanded='" + (index === 0 ? "true" : "false") + "' aria-controls='" + collapseId + "'>";
+                    accordionHtml += "Sub Building: " + (sub.projectName || 'NA') + " (Code: " + (sub.projectCode || 'NA') + ")";
+                    accordionHtml += "</button></h2>";
+                    accordionHtml += "<div id='" + collapseId + "' class='accordion-collapse collapse " + (index === 0 ? "show" : "") + "' aria-labelledby='" + headingId + "' data-bs-parent='#subAccordion'>";
+                    accordionHtml += "<div class='accordion-body'>";
+                    accordionHtml += "<div class='row'>";
+
+                    accordionHtml += "<div class='col-md-4'><table>";
+                    accordionHtml += "<tr><th>Building Name</th><td>:</td><td>" + (sub.projectName || 'NA') + "</td></tr>";
+                    accordionHtml += "<tr><th>Building Type</th><td>:</td><td>" + (sub.projectType || 'NA') + "</td></tr>";
+                    accordionHtml += "<tr><th>Building Status</th><td>:</td><td>" + (sub.projectStatus || 'NA') + "</td></tr>";
+                    accordionHtml += "<tr><th>Letter No.</th><td>:</td><td>" + (sub.letterNo || 'NA') + "</td></tr>";
+                    accordionHtml += "</table></div>";
+
+                    accordionHtml += "<div class='col-md-4'><table>";
+                    accordionHtml += "<tr><th>Letter Date</th><td>:</td><td>" + (sub.letterDate || 'NA') + "</td></tr>";
+                    accordionHtml += "<tr><th>Confirm Letter Date</th><td>:</td><td>" + (sub.confirmLetterDate || 'NA') + "</td></tr>";
+                    accordionHtml += "<tr><th>Start Date</th><td>:</td><td>" + (sub.startDate || 'NA') + "</td></tr>";
+                    accordionHtml += "<tr><th>Completion Date</th><td>:</td><td>" + (sub.completionDate || 'NA') + "</td></tr>";
+                    accordionHtml += "</table></div>";
+
+                    accordionHtml += "<div class='col-md-4'><table>";
+                    accordionHtml += "<tr><th>Estimated Cost</th><td>:</td><td>" + (sub.estimatedCost || 'NA') + "</td></tr>";
+                    accordionHtml += "<tr><th>Final Cost</th><td>:</td><td>" + (sub.finalCost || 'NA') + "</td></tr>";
+                    accordionHtml += "</table></div>";
+
+                    accordionHtml += "</div>";
+                    accordionHtml += "</div></div></div>";
+                });
+
+                accordionHtml += "</div>";
+                subContainer.append(accordionHtml);
+                subSection.show();
+            }
+        },
+        error: function (err) {
+            console.error("Error loading sub buildings:", err);
+        }
+    });
+
+    getEstimationDetails(projectCode);
+    getWorkOrderDetails(projectCode);
+    getMaintainanceDetails(projectCode);
+}
+
+function getEstimationDetails(projectCode) {
+    debugger;
+    $.ajax({
+        type: "GET",
+        url: contextPath + "/project/getEstimationByCode",
+        data: { projectCode: projectCode },
+        success: function (estimations) {
+            const container = $('#estimationContainer');
+            const section = $('#estimationSection');
+            container.empty();
+            $('#totalEstimations').remove(); 
+            $('#estimationHeader').remove(); 
+
+            if (Array.isArray(estimations) && estimations.length > 0) {
+                container.before(
+                    "<div id='estimationHeader' class='d-flex justify-content-between align-items-center mb-3'>" +
+                        "<h4 class='m-0'>Estimation Details</h4>" +
+                        "<p id='totalEstimations'><strong>Total Estimations:</strong> " + estimations.length + "</p>" +
+                    "</div>"
+                );
+
+
+                var accordionHtml = "<div class='accordion' id='estimationAccordion'>";
+
+                estimations.forEach(function (est, index) {
+                    var estId = "collapseEst" + index;
+                    var headingId = "headingEst" + index;
+
+                    var html = "<div class='accordion-item'>";
+                    html += "<h2 class='accordion-header' id='" + headingId + "'>";
+                    html += "<button class='accordion-button " + (index === 0 ? "" : "collapsed") + "' type='button' data-bs-toggle='collapse' data-bs-target='#" + estId + "' aria-expanded='" + (index === 0 ? "true" : "false") + "' aria-controls='" + estId + "'>";
+                    html += "Estimation No: " + (est.planEstimationNo || 'NA');
+                    html += "</button></h2>";
+
+                    html += "<div id='" + estId + "' class='accordion-collapse collapse " + (index === 0 ? "show" : "") + "' aria-labelledby='" + headingId + "' data-bs-parent='#estimationAccordion'>";
+                    html += "<div class='accordion-body'>";
+
+                    html += "<div class='row'>";
+
+                    html += "<div class='col-md-4'><table>";
+                    html += "<tr><th>Estimation Amount</th><td>:</td><td>" + (est.estimationAmount || 'NA') + "</td></tr>";
+                    html += "<tr><th>CGST %</th><td>:</td><td>" + (est.cgstPercentage || 'NA') + "</td></tr>";
+                    html += "<tr><th>SGST %</th><td>:</td><td>" + (est.sgstPercentage || 'NA') + "</td></tr>";
+                    html += "</table></div>";
+
+                    html += "<div class='col-md-4'><table>";
+                    html += "<tr><th>CGST Amount</th><td>:</td><td>" + (est.cgstAmount || 'NA') + "</td></tr>";
+                    html += "<tr><th>SGST Amount</th><td>:</td><td>" + (est.sgstAmount || 'NA') + "</td></tr>";
+                    html += "<tr><th>Total GST</th><td>:</td><td>" + (est.totalGst || 'NA') + "</td></tr>";
+                    html += "</table></div>";
+
+                    html += "<div class='col-md-4'><table>";
+                    html += "<tr><th>Other Amount</th><td>:</td><td>" + (est.otherAmount || 'NA') + "</td></tr>";
+                    html += "<tr><th>Total Amount</th><td>:</td><td>" + (est.totalAmount || 'NA') + "</td></tr>";
+                    html += "<tr><th>Available Cost</th><td>:</td><td>" + (est.projectAvailableCost || 'NA') + "</td></tr>";
+                    html += "</table></div>";
+
+                    html += "</div>"; 
+                    html += "</div></div></div>"; 
+
+                    accordionHtml += html;
+                });
+
+                accordionHtml += "</div>"; 
+
+                container.append(accordionHtml);
+                section.show();
+            } else {
+            	$('#estimationHeader').remove();
+
+            	container.before(
+            	    "<div id='estimationHeader' class='d-flex justify-content-between align-items-center mb-3'>" +
+            	        "<h4 class='m-0'>Estimation Details</h4>" +
+            	        "<p id='totalEstimations'><strong>Total Estimations:</strong> 0</p>" +
+            	    "</div>"
+            	);
+
+            	container.append("<div class='col-md-12 text-center text-muted'>No estimation data found</div>");
+            	section.show();
+
+            }
+        },
+        error: function (err) {
+            console.error("Error fetching estimation details:", err);
+            $('#estimationContainer').html('<div class="text-center text-danger">Error loading data</div>');
+            $('#estimationSection').show();
+        }
+    });
+}
+
+	
+	function getWorkOrderDetails(projectCode) {
+	    debugger;
+	    $.ajax({
+	        type: "GET",
+	        url: contextPath + "/project/getWorkOrdersByCode",
+	        data: { projectCode: projectCode },
+	        success: function (workOrders) {
+	            const container = $('#workOrderContainer');
+	            const section = $('#workOrderSection');
+	            const inspectionContainer = $('#inspectionContainer');
+
+	            container.empty();
+	            $('#totalWorkOrder').remove();
+	            $('#workOrderHeader').remove();
+
+	            if (Array.isArray(workOrders) && workOrders.length > 0) {
+	                container.before(
+	                    "<div id='workOrderHeader' class='d-flex justify-content-between align-items-center mb-3'>" +
+	                        "<h4 class='m-0'>Work Order Details</h4>" +
+	                        "<p id='totalWorkOrder'><strong>Total Work Orders:</strong> " + workOrders.length + "</p>" +
+	                    "</div>"
+	                );
+
+	                let accordionHtml = "<div class='accordion' id='workOrderAccordion'>";
+
+	                workOrders.forEach(function (wo, index) {
+	                    const estId = "collapseWork" + index;
+	                    const headingId = "headingWork" + index;
+
+	                    let html = "<div class='accordion-item'>";
+	                    html += "<h2 class='accordion-header' id='" + headingId + "'>";
+	                    html += "<button class='accordion-button " + (index === 0 ? "" : "collapsed") + "' type='button' data-bs-toggle='collapse' data-bs-target='#" + estId + "' aria-expanded='" + (index === 0 ? "true" : "false") + "' aria-controls='" + estId + "'>";
+	                    html += "Work Order Name: " + (wo.workOrderName || 'NA');
+	                    html += "</button></h2>";
+
+	                    html += "<div id='" + estId + "' class='accordion-collapse collapse " + (index === 0 ? "show" : "") + "' aria-labelledby='" + headingId + "' data-bs-parent='#workOrderAccordion'>";
+	                    html += "<div class='accordion-body'><div class='row'>";
+
+	                    html += "<div class='col-md-4'><table>";
+	                    html += "<tr><th>Agency Name</th><td>:</td><td>" + (wo.agencyName || 'NA') + "</td></tr>";
+	                    html += "<tr><th>Primary Bank Name</th><td>:</td><td>" + (wo.bankName || 'NA') + "</td></tr>";
+	                    html += "<tr><th>Branch Name</th><td>:</td><td>" + (wo.branchName || 'NA') + "</td></tr>";
+	                    html += "</table></div>";
+
+	                    html += "<div class='col-md-4'><table>";
+	                    html += "<tr><th>Work Order Name</th><td>:</td><td>" + (wo.workOrderName || 'NA') + "</td></tr>";
+	                    html += "<tr><th>Work Order Code</th><td>:</td><td>" + (wo.workOrderCode || 'NA') + "</td></tr>";
+	                    html += "<tr><th>Amount</th><td>:</td><td>" + (wo.workOrderAmt || 'NA') + "</td></tr>";
+	                    html += "</table></div>";
+
+	                    html += "<div class='col-md-4'><table>";
+	                    html += "<tr><th>Start Date</th><td>:</td><td>" + (wo.startDate || 'NA') + "</td></tr>";
+	                    html += "<tr><th>End Date</th><td>:</td><td>" + (wo.endDate || 'NA') + "</td></tr>";
+	                    html += "</table></div>";
+
+	                    html += "</div></div></div></div>"; 
+
+	                    accordionHtml += html;
+
+	                    if (wo.prjEstId) {
+	                        fetchLatestInspectionDetails(wo.prjEstId);
+	                    }
+	                });
+
+	                accordionHtml += "</div>"; 
+	                container.append(accordionHtml);
+	                section.show();
+
+	            } else {
+	                container.before(
+	                    "<div id='workOrderHeader' class='d-flex justify-content-between align-items-center mb-3'>" +
+	                        "<h4 class='m-0'>Work Order Details</h4>" +
+	                        "<p id='totalWorkOrder'><strong>Total Work Orders:</strong> 0</p>" +
+	                    "</div>"
+	                );
+
+	                container.append("<div class='col-md-12 text-center text-muted'>No work order data found</div>");
+	                section.show();
+
+	                inspectionContainer.empty();
+	                inspectionContainer.append("<div class='col-md-12 text-center text-muted'>No inspection data found</div>");
+	                $('#inspectionSection').show();
+	            }
+	        },
+	        error: function (err) {
+	            console.error("Error fetching work order details:", err);
+	            $('#workOrderContainer').html('<div class="text-center text-danger">Error loading data</div>');
+	            $('#workOrderSection').show();
+	        }
+	    });
+	}
+
+
+	function fetchLatestInspectionDetails(prjEstId) {
+	    debugger;
+	    $.ajax({
+	        type: "GET",
+	        url: contextPath + "/project/getLatestInspectionPhase",
+	        data: { prjEstId: prjEstId },
+	        success: function (inspectionData) {
+	            const container = $('#inspectionContainer');
+	            const section = $('#inspectionSection');
+	            
+	            container.empty();
+	            $('#inspectionHeader').remove();
+
+	            if (inspectionData) {
+	                let accordionHtml = "<div class='accordion' id='inspectionAccordion'>";
+	                const itemId = "collapseInspect" + prjEstId;
+	                const headingId = "headingInspect" + prjEstId;
+
+	                accordionHtml += "<div class='accordion-item'>";
+	                accordionHtml += "<h2 class='accordion-header' id='" + headingId + "'>";
+	                accordionHtml += "<button class='accordion-button' type='button' data-bs-toggle='collapse' data-bs-target='#" + itemId + "' aria-expanded='true' aria-controls='" + itemId + "'>";
+	                accordionHtml += "Phase State: " + (inspectionData.phaseCode || 'NA');
+	                accordionHtml += "</button></h2>";
+
+	                accordionHtml += "<div id='" + itemId + "' class='accordion-collapse collapse show' aria-labelledby='" + headingId + "' data-bs-parent='#inspectionAccordion'>";
+	                accordionHtml += "<div class='accordion-body'><div class='row'>";
+
+	                accordionHtml += "<div class='col-md-4'><table>";
+	                accordionHtml += "<tr><th>Work Order</th><td>:</td><td>" + (inspectionData.workOrderName || 'NA') + "</td></tr>";
+	                accordionHtml += "<tr><th>Work Order Code</th><td>:</td><td>" + (inspectionData.workOrderCode || 'NA') + "</td></tr>";
+	                accordionHtml += "<tr><th>Phase Name</th><td>:</td><td>" + (inspectionData.phaseName || 'NA') + "</td></tr>";
+	                accordionHtml += "<tr><th>Phase Code</th><td>:</td><td>" + (inspectionData.phaseCode || 'NA') + "</td></tr>";
+	                accordionHtml += "</table></div>";
+
+	                accordionHtml += "<div class='col-md-4'><table>";
+	                accordionHtml += "<tr><th>MB From Page</th><td>:</td><td>" + (inspectionData.mbFromPage || 'NA') + "</td></tr>";
+	                accordionHtml += "<tr><th>MB To Page</th><td>:</td><td>" + (inspectionData.mbToPage || 'NA') + "</td></tr>";
+	                accordionHtml += "<tr><th>Inspection Image</th><td>:</td><td>";
+
+	                if (inspectionData.inspectionImagePath) {
+	                	/* accordionHtml += "<a onclick=\"viewFile('" + inspectionData.inspectionImagePath + "', 'inspection')\" target='_blank'>" +
+	                    "<i class='bi bi-file-earmark-text'></i> View Inspection Image</a>"; */
+	                	accordionHtml += "<button type='button' class='btn btn-sm btn-outline-primary' " +
+	                    "onclick=\"viewFile('" + inspectionData.inspectionImagePath + "', 'inspection')\">" +
+	                    "<i class='bi bi-eye'></i></button>";
+	                } else {
+	                    accordionHtml += "NA";
+	                }
+
+	                accordionHtml += "</td></tr></table></div>"; 
+	                accordionHtml += "</div></div></div></div>"; 
+	                accordionHtml += "</div>"; 
+
+	                container.append(accordionHtml);
+	            } else {
+	                container.append("<div class='col-md-12 text-center text-muted'>No inspection data found.</div>");
+	            }
+
+	            section.show();
+	        },
+	        error: function (err) {
+	            console.error("Error fetching inspection details:", err);
+	            $('#inspectionContainer').html('<div class="text-danger text-center">Error loading inspections</div>');
+	            $('#inspectionSection').show();
+	        }
+	    });
+	}
+	
+	function getMaintainanceDetails(projectCode) {
+	    debugger;
+	    $.ajax({
+	        type: "GET",
+	        url: contextPath + "/project/getMaintainanceByCode",
+	        data: { projectCode: projectCode },
+	        success: function (maintainance) {
+	            const container = $('#maintainanceContainer');
+	            const section = $('#maintainanceSection');
+	            container.empty();
+	            $('#totalMaintainance').remove();
+	            $('#maintainanceHeader').remove();
+
+	            if (Array.isArray(maintainance) && maintainance.length > 0) {
+	                container.before(
+	                    "<div id='maintainanceHeader' class='d-flex justify-content-between align-items-center mb-3'>" +
+	                        "<h4 class='m-0'>Maintenance Details</h4>" +
+	                        "<p id='totalMaintainance'><strong>Total Maintenance:</strong> " + maintainance.length + "</p>" +
+	                    "</div>"
+	                );
+
+	                let accordionHtml = "<div class='accordion' id='maintenanceAccordion'>";
+
+	                maintainance.forEach(function (mo, index) {
+	                    const itemId = "collapseMain" + index;
+	                    const headingId = "headingMain" + index;
+
+	                    let html = "<div class='accordion-item'>";
+	                    html += "<h2 class='accordion-header' id='" + headingId + "'>";
+	                    html += "<button class='accordion-button " + (index === 0 ? "" : "collapsed") + "' type='button' data-bs-toggle='collapse' data-bs-target='#" + itemId + "' aria-expanded='" + (index === 0 ? "true" : "false") + "' aria-controls='" + itemId + "'>";
+	                    html += "Maintenance Name: " + (mo.mainName || 'NA');
+	                    html += "</button></h2>";
+	                    html += "<div id='" + itemId + "' class='accordion-collapse collapse " + (index === 0 ? "show" : "") + "' aria-labelledby='" + headingId + "' data-bs-parent='#maintenanceAccordion'>";
+	                    html += "<div class='accordion-body'><div class='row'>";
+	                    html += "<div class='col-md-4'><table>";
+	                    html += "<tr><th>Maintenance Name</th><td>:</td><td>" + (mo.mainName || 'NA') + "</td></tr>";
+	                    html += "<tr><th>Maintenance Code</th><td>:</td><td>" + (mo.mainCode || 'NA') + "</td></tr>";
+	                    html += "<tr><th>Building Name</th><td>:</td><td>" + (mo.projectName || 'NA') + "</td></tr>";
+	                    html += "<tr><th>Remarks</th><td>:</td><td>" + (mo.remarks || 'NA') + "</td></tr>";
+	                    html += "<tr><th>Document</th><td>:</td><td>";
+	                    
+	                    if (mo.uploadDocumentPath) {
+	                    	/* html += "<a onclick=\"viewFile('" + mo.uploadDocumentName + "', 'MAINTENANCE_REQUEST')\" target='_blank'>" +
+		                    "<i class='bi bi-file-earmark-text'></i>View PDF</a>"; */
+	                    	html += "<button type='button' class='btn btn-sm btn-outline-primary' " +
+	                        "onclick=\"viewFile('" + mo.uploadDocumentName + "', 'MAINTENANCE_REQUEST')\">" +
+	                        "<i class='bi bi-eye'></i></button>";
+
+		                } else {
+		                	html += "NA";
+		                }
+	                    
+	                    html += "</td></tr>";
+
+	                    html += "</table></div>"; 
+	                    html += "</div></div></div></div>"; 
+
+	                    accordionHtml += html;
+	                });
+
+	                accordionHtml += "</div>";
+	                container.append(accordionHtml);
+	                section.show();
+
+	            } else {
+	                container.before(
+	                    "<div id='maintainanceHeader' class='d-flex justify-content-between align-items-center mb-3'>" +
+	                        "<h4 class='m-0'>Maintenance Details</h4>" +
+	                        "<p id='totalMaintainance'><strong>Total Maintenance:</strong> 0</p>" +
+	                    "</div>"
+	                );
+
+	                container.append("<div class='col-md-12 text-center text-muted'>No maintenance data found</div>");
+	                section.show();
+	            }
+	        },
+	        error: function (err) {
+	            console.error("Error fetching maintenance details:", err);
+	            $('#maintainanceContainer').html('<div class="text-center text-danger">Error loading data</div>');
+	            $('#maintainanceSection').show();
+	        }
+	    });
+	}
+	
+	function viewFile(fileName,moduleName){
+		  $("#fileName").val(fileName);
+		  $("#moduleName").val(moduleName);
+		  var bizContent = $("#viewFile").serializeArray();
+		  $("#cipherText").val(enc_password(JSON.stringify(convertFormToJSONArray(bizContent))));
+		  $("#viewFile").submit();
+	}
+	
+</script>
+
+<form action="${contextPath}/project/viewFile" method="GET" id="viewFile" target="_blank">
+ <input type="hidden" name="cipherText" id="cipherText">
+ <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+ <input type="hidden" name="fileName" id="fileName" />
+ <input type="hidden" name="moduleName" id="moduleName" />
+</form>

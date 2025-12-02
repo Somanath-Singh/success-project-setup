@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="Auditable"/>
+		<item key="selection" value="background-color"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="NewAuditable"/>
-			<item value="login-window"/>
-			<item value="org.springframework.boot"/>
-			<item value="List"/>
-			<item value="&lt;% List&lt;String&gt; something = new ArrayList&lt;String&gt;(); %&gt;"/>
-			<item value="tomcat"/>
-			<item value="dev"/>
-			<item value="resources"/>
-			<item value="webXml"/>
-			<item value="assetss"/>
-			<item value="assets"/>
-			<item value="faq"/>
-			<item value="http://localhost:3131/heads-ipms/"/>
-			<item value="faqList"/>
+			<item value="background-color"/>
+			<item value="signout"/>
+			<item value="Role"/>
+			<item value="isFullscreen"/>
+			<item value="fullscreenchange"/>
+			<item value="toggle-password"/>
+			<item value="password"/>
+			<item value="toggleIcon"/>
+			<item value="fa-eye"/>
 			<item value="layout.blank"/>
+			<item value="login"/>
+			<item value="generateAndSentOTP"/>
+			<item value="body"/>
+			<item value="app.home"/>
+			<item value="coming-soon"/>
 		</list>
 		<list key="replacehistory">
 			<item value="Auditable"/>
@@ -31,8 +31,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="70"/>
-		<item key="DIALOG_Y_ORIGIN" value="331"/>
+		<item key="DIALOG_X_ORIGIN" value="1068"/>
+		<item key="DIALOG_Y_ORIGIN" value="337"/>
 		<item key="DIALOG_WIDTH" value="284"/>
 		<item key="DIALOG_HEIGHT" value="391"/>
 		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>

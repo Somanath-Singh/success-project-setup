@@ -1,0 +1,79 @@
+#----------------------------------------
+#spring.profiles.active=prod
+#spring.profiles.active=test
+spring.profiles.active=dev
+#spring.profiles.active=local
+
+server.port=3131
+server.servlet.context-path=/heads-ipms
+
+auto.login=system
+post.login.url=/home
+captcha.options=i
+app.code=IPMS
+springdoc.packagesToScan=com.aashdit
+
+spring.main.allow-bean-definition-overriding=true
+server.error.include-stacktrace=always
+logging.level.org.springframework=WARN
+logging.level.com.aashdit=DEBUG
+
+# Enable custom error pages
+server.error.whitelabel.enabled=false
+# Define the custom error page for 404 errors
+error.path=/error
+
+# set max header size to 10MB
+server.max-http-header-size=10485760
+spring.servlet.multipart.max-file-size=20MB
+spring.servlet.multipart.max-request-size=20MB
+
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# HikariCP Properties
+spring.datasource.hikari.connection-timeout=30000
+spring.datasource.hikari.maximum-pool-size=30
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.idle-timeout=600000
+spring.datasource.hikari.pool-name=CMCHikariCP
+spring.datasource.hikari.auto-commit=false
+
+# Enable Spring Boot's JPA Auditing
+spring.data.jpa.auditing.enabled=true
+spring.jpa.show-sql=false
+#spring.jpa.open-in-view=false
+#spring.jpa.hibernate.ddl-auto=update
+
+OTP.IN.MINS=10
+OTP.IN.MINS.FORGOT=20
+
+application.title=Enterprise Resource Planning System
+application.version=1.0.0
+
+#------------- SMTP Configuration----------------------
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+mail.smtp.host=smtp.gmail.com
+mail.smtp.ssl.trust=smtp.gmail.com
+mail.smtp.port=587
+mail.smtp.ssl.protocols=TLSv1.2
+mail.username=atmosphere.oppro@gmail.com
+mail.password=etnpkzqipiqbfqfb
+
+# 1 minute
+mail.priority.immediate=60000
+# 3 minutes
+mail.priority.high=180000
+# 5 minutes
+mail.priority.medium=300000
+# 10 minutes
+mail.priority.low=600000
+
+
+UPLOAD.FILE.PATH=D://CMC-SWP-UPLOAD//UPLOADED_FILES//
+UPLOAD.JASPER.FILE.PATH=D:\\ERP_JASPER_REPORT
+
+
+
+

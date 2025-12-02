@@ -1,0 +1,1582 @@
+package com.aashdit.construction.service;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.aashdit.common.model.Block;
+import com.aashdit.common.model.District;
+import com.aashdit.common.model.FinancialYear;
+import com.aashdit.common.model.Grampanchayat;
+import com.aashdit.common.model.Village;
+import com.aashdit.common.repository.BlockRepository;
+import com.aashdit.common.repository.DistrictRepository;
+import com.aashdit.common.repository.FinancialYearRepository;
+import com.aashdit.common.repository.GrampanchayatRepository;
+import com.aashdit.common.repository.StateRepository;
+import com.aashdit.common.repository.VillageRepository;
+import com.aashdit.construction.dto.AgencyBankDetailsDTO;
+import com.aashdit.construction.dto.AgencyDropDownDto;
+import com.aashdit.construction.dto.AgencyMasterDropDownDto;
+import com.aashdit.construction.dto.AssetDropDownDto;
+import com.aashdit.construction.dto.BAMSMunicipalityDto;
+import com.aashdit.construction.dto.BankBranchDropDownDto;
+import com.aashdit.construction.dto.BlockDropDownDto;
+import com.aashdit.construction.dto.BuildingDto;
+import com.aashdit.construction.dto.DepartmentDropDownDto;
+import com.aashdit.construction.dto.DistrictDropDownDto;
+import com.aashdit.construction.dto.FinancialYearDropDown;
+import com.aashdit.construction.dto.GramPanchayatDropDownDto;
+import com.aashdit.construction.dto.LookupValueDTO;
+import com.aashdit.construction.dto.MstSchemeDto;
+import com.aashdit.construction.dto.MunicipalityDropDownDto;
+import com.aashdit.construction.dto.PlanningDetailsDTO;
+import com.aashdit.construction.dto.ProjectDropDownDto;
+import com.aashdit.construction.dto.ProjectDto;
+import com.aashdit.construction.dto.ProjectEstimationDropDownDto;
+import com.aashdit.construction.dto.SchoolDto;
+import com.aashdit.construction.dto.StateDropDownDto;
+import com.aashdit.construction.dto.VillageDropDownDto;
+import com.aashdit.construction.dto.WardDropDownDto;
+import com.aashdit.construction.dto.WorkInspectionDto;
+import com.aashdit.construction.dto.WorkOrderSCSTCodeDto;
+import com.aashdit.construction.dto.WorkOrderSCSTDTO;
+import com.aashdit.construction.model.AgencyBankDetails;
+import com.aashdit.construction.model.AgencyMaster;
+import com.aashdit.construction.model.AssetBams;
+import com.aashdit.construction.model.BAMSMunicipality;
+import com.aashdit.construction.model.CommonLookupValue;
+import com.aashdit.construction.model.Department;
+import com.aashdit.construction.model.MessageTemplate;
+import com.aashdit.construction.model.Municipality;
+import com.aashdit.construction.model.OtpForUser;
+import com.aashdit.construction.model.PlanningDetails;
+import com.aashdit.construction.model.Project;
+import com.aashdit.construction.model.ProjectEstimation;
+import com.aashdit.construction.model.SanctionWork;
+import com.aashdit.construction.model.School;
+import com.aashdit.construction.model.Ward;
+import com.aashdit.construction.model.WorkOrderSCST;
+import com.aashdit.construction.repository.AgencyBankDetailsRepository;
+import com.aashdit.construction.repository.AgencyMasterRepository;
+import com.aashdit.construction.repository.AgencyRepository;
+import com.aashdit.construction.repository.AssetBamsRepository;
+import com.aashdit.construction.repository.BAMSMunicipalityRepository;
+import com.aashdit.construction.repository.BankBranchAgencyMasterRepository;
+import com.aashdit.construction.repository.CommonLookupValueRepository;
+import com.aashdit.construction.repository.DepartmentRepository;
+import com.aashdit.construction.repository.MessageTemplateRepository;
+import com.aashdit.construction.repository.MunicipalityRepository;
+import com.aashdit.construction.repository.OtpForUserRepository;
+import com.aashdit.construction.repository.PlanningDetailsRepository;
+import com.aashdit.construction.repository.ProjectEstimationRepository;
+import com.aashdit.construction.repository.ProjectRepository;
+import com.aashdit.construction.repository.SanctionWorkRepository;
+import com.aashdit.construction.repository.SchoolRepository;
+import com.aashdit.construction.repository.UserAccessRepository;
+import com.aashdit.construction.repository.WardRepository;
+import com.aashdit.construction.repository.WorkInspectionRepository;
+import com.aashdit.construction.repository.WorkOrderSCSTRepository;
+import com.aashdit.construction.utils.ApplicationConstant;
+import com.aashdit.construction.utils.LookupValueMapper;
+import com.aashdit.construction.utils.RandomNumberGenerate;
+import com.aashdit.construction.utils.UploadFile;
+import com.aashdit.ecashbook.repository.MstSchemeRepository;
+import com.aashdit.framework.core.ServiceOutcome;
+import com.aashdit.umt3.model.User;
+import com.aashdit.workFlowEngine.model.StageForwardedRule;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class MasterCommonServiceImpl implements MasterCommonService {
+
+	@Autowired
+	private ProjectRepository projectRepository;
+
+	@Autowired
+	private ProjectEstimationRepository projectEstimationRepository;
+
+	@Autowired
+	private  WorkOrderSCSTRepository workOrderSCSTRepository;
+	
+	@Autowired
+	private DistrictRepository districtRepository;
+
+	@Autowired
+	private BlockRepository blockRepository;
+
+	@Autowired
+	private GrampanchayatRepository grampanchayatRepository;
+	
+	@Autowired
+	private VillageRepository villageRepository;
+	
+	@Autowired
+	private MunicipalityRepository municipalityRepository;
+	
+	@Autowired
+	private WardRepository wardRepository;
+	
+	@Autowired
+	private FinancialYearRepository financialYearRepository;
+	
+	@Autowired
+	private SchoolRepository schoolRepository;
+	
+	@Autowired
+	private DepartmentRepository departmentRepository;
+	
+	@Autowired
+    private LookupValueMapper lookupValueMapper;
+	
+	@Autowired
+	private CommonLookupValueRepository commonLookupValueRepository;
+	
+	@Autowired
+	private AssetBamsRepository assetRepository;
+	
+	@Autowired
+	private AgencyBankDetailsRepository agencyBankDetailsRepository;
+	
+	@Autowired
+	private WorkInspectionRepository workInspectionRepository;
+	
+	@Autowired
+	private AgencyRepository agencyRepository;
+	
+	@Autowired
+	private MstSchemeRepository mstSchemeRepository;
+	
+	@Autowired
+    private AgencyMasterRepository agencyMasterRepository;
+
+    @Autowired
+    private BankBranchAgencyMasterRepository bankBranchAgencyMasterRepository;
+
+    @Autowired
+    private StateRepository stateRepository;
+    
+    @Autowired
+    private UserAccessRepository userAccessRepository;
+    
+    @Autowired
+	private OtpForUserRepository otpForUserRepository;
+    
+    @Autowired
+	private MessageTemplateRepository messageTemplateRepository;
+    
+    @Autowired
+	private SmsService smsService;
+    
+    @Autowired
+   	private SanctionWorkRepository sanctionWorkRepository;
+    
+    @Autowired
+	private BAMSMunicipalityRepository bamsMunicipalityRepository;
+    
+    
+    @Autowired
+   	private PlanningDetailsRepository planningDetailsRepository;
+    
+    ResourceBundle rb = ResourceBundle.getBundle("application");
+	
+	@Override
+	public ServiceOutcome<List<ProjectDropDownDto>> getAllActiveProject() {
+
+		ServiceOutcome<List<ProjectDropDownDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<Project> projectList = projectRepository.findAll().stream()
+					.filter(p -> Boolean.TRUE.equals(p.getIsActive())).collect(Collectors.toList());
+
+			List<ProjectDropDownDto> projectDropdownList = projectList.stream().map(project -> {
+				ProjectDropDownDto dto = new ProjectDropDownDto();
+				dto.setProjectId(project.getProjectId());
+				dto.setProjectName(project.getProjectName());
+				return dto;
+			}).collect(Collectors.toList());
+
+			outcome.setData(projectDropdownList);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveProject() of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<ProjectDropDownDto>> getAllActiveApprovedProject() {
+	    ServiceOutcome<List<ProjectDropDownDto>> outcome = new ServiceOutcome<>();
+	    try {
+			List<Project> projectList = projectRepository.findAll().stream()
+					.filter(p -> Boolean.TRUE.equals(p.getIsActive())).collect(Collectors.toList());
+
+	        List<ProjectDropDownDto> projectDropdownList = projectList.stream()
+	            .filter(project -> {
+	                StageForwardedRule rule = project.getStageForwardedRule();
+	                return rule != null 
+	                    && rule.getActionType() != null 
+	                    && "APPROVE".equalsIgnoreCase(rule.getActionType().getActionCode());
+	            })
+	            .map(project -> {
+	                ProjectDropDownDto dto = new ProjectDropDownDto();
+	                dto.setProjectId(project.getProjectId());
+	                dto.setProjectName(project.getProjectName());
+	                return dto;
+	            }).collect(Collectors.toList());
+
+	        outcome.setData(projectDropdownList);
+	    } catch (Exception e) {
+	        outcome.setData(null);
+	        log.error("Exception occurred in getAllActiveApprovedProject() of MasterCommonServiceImpl: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<ProjectDropDownDto>> getAllActiveApprovedProjectWithWorkOrderApproved() {
+	    ServiceOutcome<List<ProjectDropDownDto>> outcome = new ServiceOutcome<>();
+	    try {
+	        List<ProjectDropDownDto> projectDropdownList = projectRepository.getApprovedProjectWithApprovedWorkOrder().stream()
+	            .map(project -> {
+	                ProjectDropDownDto dto = new ProjectDropDownDto();
+	                dto.setProjectId(project.getProjectId());
+	                dto.setProjectName(project.getProjectName());
+	                return dto;
+	            }).collect(Collectors.toList());
+
+	        outcome.setData(projectDropdownList);
+	    } catch (Exception e) {
+	        outcome.setData(null);
+	        log.error("Exception occurred in getAllActiveApprovedProjectWithWorkOrderApproved() of MasterCommonServiceImpl: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<ProjectDropDownDto>> getAllActiveApprovedParentProject() { 
+	    ServiceOutcome<List<ProjectDropDownDto>> outcome = new ServiceOutcome<>();
+	    try {
+	    	List<Project> projectList = projectRepository.findAll().stream()
+					.filter(p -> Boolean.TRUE.equals(p.getIsActive())).collect(Collectors.toList());
+
+	        List<ProjectDropDownDto> projectDropdownList = projectList.stream()
+	            .filter(project -> {
+	                StageForwardedRule rule = project.getStageForwardedRule();
+	                return rule != null 
+	                    && rule.getActionType() != null 
+	                    && "APPROVE".equalsIgnoreCase(rule.getActionType().getActionCode())
+	                    && project.getIsParent() == true;
+	            })
+	            .map(project -> {
+	                ProjectDropDownDto dto = new ProjectDropDownDto();
+	                dto.setProjectId(project.getProjectId());
+	                dto.setProjectName(project.getProjectName());
+	                return dto;
+	            }).collect(Collectors.toList());
+
+	        outcome.setData(projectDropdownList);
+	    } catch (Exception e) {
+	        outcome.setData(null);
+	        log.error("Exception occurred in getAllActiveApprovedProject() of MasterCommonServiceImpl: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<ProjectEstimationDropDownDto>> getAllActiveProjectEstimationIdAndNameByProject(Long projectId) {
+		ServiceOutcome<List<ProjectEstimationDropDownDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<ProjectEstimation> estimationDropDownList = projectEstimationRepository.findProjectEstimationByProjectId(projectId);
+			List<ProjectEstimationDropDownDto> estimationDropDownDtoList = estimationDropDownList.stream().map(estimation -> {
+				ProjectEstimationDropDownDto dto = new ProjectEstimationDropDownDto();
+				dto.setEstimationId(estimation.getPrjEstId());
+				dto.setEstimationNo(estimation.getPlanEstimationNo());
+				return dto;
+			}).collect(Collectors.toList());
+
+			outcome.setData(estimationDropDownDtoList);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveProjectEstimationIdAndNameByProject() of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<ProjectEstimationDropDownDto>> getAllActiveApprovedProjectEstimationIdAndNameByProject(Long projectId) {
+		ServiceOutcome<List<ProjectEstimationDropDownDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<ProjectEstimation> estimationList = projectEstimationRepository.findProjectEstimationByProjectId(projectId);
+
+			List<ProjectEstimationDropDownDto> filteredList = estimationList.stream()
+				.filter(estimation -> {
+					StageForwardedRule sfr = estimation.getStageForwardedRule();
+					return sfr != null &&
+						   sfr.getActionType() != null &&
+						   "APPROVE".equalsIgnoreCase(sfr.getActionType().getActionCode());
+				})
+				.map(estimation -> {
+					ProjectEstimationDropDownDto dto = new ProjectEstimationDropDownDto();
+					dto.setEstimationId(estimation.getPrjEstId());
+					dto.setEstimationNo(estimation.getPlanEstimationNo());
+					return dto;
+				})
+				.collect(Collectors.toList());
+
+			outcome.setData(filteredList);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occurred in getAllActiveApprovedProjectEstimationIdAndNameByProject() of MasterCommonServiceImpl: " + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+
+	@Override
+	public ServiceOutcome<WorkOrderSCSTCodeDto> getWorkOrderCodeByProjectEstimationId(Long projectEstimationId) {
+		ServiceOutcome<WorkOrderSCSTCodeDto> outcome = new ServiceOutcome<>();
+		try {
+			WorkOrderSCST workOrder = workOrderSCSTRepository.findWorkOrderByProjectEstimationId(projectEstimationId);
+			WorkOrderSCSTCodeDto dto = new WorkOrderSCSTCodeDto();
+			dto.setWorkOrderId(workOrder.getWorkOrderId());
+			dto.setWorkOrderCode(workOrder.getWorkOrderCode());
+
+			outcome.setData(dto);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getWorkOrderCodeByProjectEstimationId() of MasterCommonServiceImpl"+ e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+	
+	@Override
+    public ServiceOutcome<List<StateDropDownDto>> getAllActiveStatesIdAndName() {
+        ServiceOutcome<List<StateDropDownDto>> outcome = new ServiceOutcome<>();
+        try {
+            List<StateDropDownDto> states = stateRepository.findAllByIsActiveTrue()
+                    .stream()
+                    .map(entity -> {
+                        StateDropDownDto dto = new StateDropDownDto();
+                        dto.setStateId(entity.getStateId());
+                        dto.setStateName(entity.getStateName());
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
+            outcome.setData(states);
+            outcome.setOutcome(true);
+            outcome.setMessage("States fetched successfully");
+        } catch (Exception e) {
+        	log.error("Exception occured in getAllActiveStatesIdAndName() of MasterCommonServiceImpl" + e.getMessage());
+        	e.printStackTrace();
+        	outcome.setData(List.of());
+            outcome.setOutcome(false);
+            outcome.setMessage("Failed to fetch states: " + e.getMessage());
+        }
+        return outcome;
+    }
+  
+  	@Override
+	public ServiceOutcome<List<DistrictDropDownDto>> getAllActiveDistrictIdAndName() {
+		ServiceOutcome<List<DistrictDropDownDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<District> districtDropDownList = districtRepository.findAllByIsActiveTrue();
+			List<DistrictDropDownDto> districtDropDownDtoList = districtDropDownList.stream().map(district -> {
+				DistrictDropDownDto dto = new DistrictDropDownDto();
+				dto.setDistrictId(district.getDistrictId());
+				dto.setDistrictName(district.getDistrictName());
+				return dto;
+			}).collect(Collectors.toList());
+
+			outcome.setData(districtDropDownDtoList);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveDistrictIdAndName() of MasterCommonServiceImpl"+ e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+  
+    @Override
+    public ServiceOutcome<List<DistrictDropDownDto>> getAllActiveDistrictsIdAndNameByState(Long stateId) {
+        ServiceOutcome<List<DistrictDropDownDto>> outcome = new ServiceOutcome<>();
+        try {
+        	List<District> districtsList = districtRepository.findAllByStateIdStateIdAndIsActiveTrue(stateId);
+            List<DistrictDropDownDto> districtDropDownList = districtsList.stream()
+                    .map(entity -> {
+                    	DistrictDropDownDto dto = new DistrictDropDownDto();
+                        dto.setDistrictId(entity.getDistrictId());
+                        dto.setDistrictName(entity.getDistrictName());
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
+            outcome.setData(districtDropDownList);
+            outcome.setOutcome(true);
+            outcome.setMessage("Districts fetched successfully");
+        } catch (Exception e) {
+        	log.error("Exception occured in getAllActiveDistrictsIdAndNameByState() of MasterCommonServiceImpl" + e.getMessage());
+        	e.printStackTrace();
+            outcome.setData(List.of());
+            outcome.setOutcome(false);
+            outcome.setMessage("Failed to fetch districts: " + e.getMessage());
+        }
+        return outcome;
+    }
+
+	@Override
+	public ServiceOutcome<List<BlockDropDownDto>> getAllActiveBlockIdAndNameByDistrict(Long districtId) {
+		ServiceOutcome<List<BlockDropDownDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<Block> blockDropDownList = blockRepository.findAllByDistrictDistrictIdAndIsActiveTrue(districtId);
+			List<BlockDropDownDto> blockDropDownDtoList = blockDropDownList.stream().map(block -> {
+				BlockDropDownDto dto = new BlockDropDownDto();
+				dto.setBlockId(block.getBlockId());
+				dto.setBlockName(block.getBlockNameEN());
+				return dto;
+			}).collect(Collectors.toList());
+
+			outcome.setData(blockDropDownDtoList);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveBlockIdAndNameByDistrict of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<MunicipalityDropDownDto>> getAllActiveMunicipalityIdAndNameByDistrict(Long districtId) {
+		ServiceOutcome<List<MunicipalityDropDownDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<Municipality> municipalityDropDownList = municipalityRepository.findAllByDistrictDistrictIdAndIsActiveTrue(districtId);
+			List<MunicipalityDropDownDto> municipalityDownDtoList = municipalityDropDownList.stream().map(municipality -> {
+				MunicipalityDropDownDto dto = new MunicipalityDropDownDto();
+				dto.setMunicipalityId(municipality.getMunicipalityId());
+				dto.setMunicipalityName(municipality.getMunicipalityName());
+				return dto;
+			}).collect(Collectors.toList());
+
+			outcome.setData(municipalityDownDtoList);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveMunicipalityIdAndNameByDistrict of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<WardDropDownDto>> getAllActiveWardIdAndNameByMunicipalityId(Long municipalityId) {
+		ServiceOutcome<List<WardDropDownDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<Ward> wardDropDownList = wardRepository.findAllByMunicipalityMunicipalityIdAndIsActiveTrue(municipalityId);
+			List<WardDropDownDto> wardDropDownDtoList = wardDropDownList.stream().map(ward -> {
+				WardDropDownDto dto = new WardDropDownDto();
+				dto.setWardId(ward.getWardId());
+				dto.setWardName(ward.getWardName());
+				return dto;
+			}).collect(Collectors.toList());
+
+			outcome.setData(wardDropDownDtoList);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveWardIdAndNameByMunicipalityId of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<GramPanchayatDropDownDto>> getAllActiveGramPanchayatIdAndNameByBlock(Long blockId) {
+		ServiceOutcome<List<GramPanchayatDropDownDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<Grampanchayat> grampanchayatDropDownList = grampanchayatRepository.findAllByBlockId(blockId, true);
+			List<GramPanchayatDropDownDto> grampanchayatDropDownDtoList = grampanchayatDropDownList.stream()
+					.map(grampanchayat -> {
+						GramPanchayatDropDownDto dto = new GramPanchayatDropDownDto();
+						dto.setGpId(grampanchayat.getGpId());
+						dto.setGpName(grampanchayat.getGpNameEN());
+						return dto;
+					}).collect(Collectors.toList());
+
+			outcome.setData(grampanchayatDropDownDtoList);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveGramPanchayatIdAndNameByBlock of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+
+	@Override
+	public ServiceOutcome<List<VillageDropDownDto>> getAllActiveVillageIdAndNameByGramPanchayat(Long gpId) {
+		ServiceOutcome<List<VillageDropDownDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<Village> villageDropDownList = villageRepository.findAllByGpIdGpIdAndIsActiveTrue(gpId);
+			List<VillageDropDownDto> villageDropDownDtoList = villageDropDownList.stream()
+					.map(village -> {
+						VillageDropDownDto dto = new VillageDropDownDto();
+						dto.setVillageId(village.getVillageId());
+						dto.setVillageName(village.getVillageNameEn());
+						return dto;
+					}).collect(Collectors.toList());
+
+			outcome.setData(villageDropDownDtoList);
+
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveVillageIdAndNameByGramPanchayat of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+
+	@Override
+	public ServiceOutcome<List<FinancialYearDropDown>> getAllActiveFinancialYear() {
+		ServiceOutcome<List<FinancialYearDropDown>> outcome = new ServiceOutcome<>();
+		try {
+			List<FinancialYear> finYearList = financialYearRepository.findByIsActiveTrueOrderByFinYear();
+
+			List<FinancialYearDropDown> finYearDropDownList = finYearList.stream().map(finYear -> {
+				FinancialYearDropDown dto = new FinancialYearDropDown();
+				dto.setFinancialYearId(finYear.getFinyearId());
+				dto.setFinancialYear(finYear.getFinYear());
+				return dto;
+			}).collect(Collectors.toList());
+
+			outcome.setData( finYearDropDownList);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveFinancialYear() of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<ProjectDropDownDto>> getAllActiveProjectByFinancialYearId(Long financialYearId) {
+	    ServiceOutcome<List<ProjectDropDownDto>> outcome = new ServiceOutcome<>();
+	    try {
+	        List<Project> projectList = projectRepository.findProjectByFinancialYearId(financialYearId);
+
+	        List<ProjectDropDownDto> projectDropdownList = projectList.stream()
+	            .map(project -> {
+	                ProjectDropDownDto dto = new ProjectDropDownDto();
+	                dto.setProjectId(project.getProjectId());
+	                dto.setProjectName(project.getProjectName());
+	                return dto;
+	            })
+	            .collect(Collectors.toList());
+	        
+	        outcome.setData(projectDropdownList);
+	    } catch (Exception e) {
+	        outcome.setData(null);
+	        log.error("Exception occurred in getAllActiveProjectByFinancialYearId() of MasterCommonServiceImpl: " + e.getMessage(), e);
+	        e.printStackTrace();
+	    }
+	    return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<ProjectDropDownDto>> getAllActiveApprovedProjectByFinancialYearId(Long financialYearId) {
+	    ServiceOutcome<List<ProjectDropDownDto>> outcome = new ServiceOutcome<>();
+	    try {
+	        List<Project> projectList = projectRepository.findProjectByFinancialYearId(financialYearId);
+
+	        List<ProjectDropDownDto> projectDropdownList = projectList.stream()
+	            .filter(project -> {
+	                StageForwardedRule rule = project.getStageForwardedRule();
+	                return rule != null 
+	                    && rule.getActionType() != null 
+	                    && "APPROVE".equalsIgnoreCase(rule.getActionType().getActionCode());
+	            })
+	            .map(project -> {
+	                ProjectDropDownDto dto = new ProjectDropDownDto();
+	                dto.setProjectId(project.getProjectId());
+	                dto.setProjectName(project.getProjectName());
+	                return dto;
+	            })
+	            .collect(Collectors.toList());
+	        
+	        outcome.setData(projectDropdownList);
+	    } catch (Exception e) {
+	        outcome.setData(null);
+	        log.error("Exception occurred in getAllActiveApprovedProjectByFinancialYearId() of MasterCommonServiceImpl: " + e.getMessage(), e);
+	        e.printStackTrace();
+	    }
+	    return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<DepartmentDropDownDto>> getAllActiveDepartmentIdAndName() {
+
+		ServiceOutcome<List<DepartmentDropDownDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<Department> departmentdropDownList = departmentRepository.findAllByIsActiveTrue();
+
+			List<DepartmentDropDownDto> departmentdropDowndtoList = departmentdropDownList.stream().map(dept -> {
+				DepartmentDropDownDto dto = new DepartmentDropDownDto();
+				dto.setDeptId(dept.getDeptId());
+				dto.setDeptName(dept.getDeptName());
+				return dto;
+			}).collect(Collectors.toList());
+
+			outcome.setData(departmentdropDowndtoList);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveDepartmentIdAndName of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<LookupValueDTO>> getLookupValuesByLookupCode(String lookupCode) {
+        ServiceOutcome<List<LookupValueDTO>> outcome = new ServiceOutcome<>();
+        try {
+        	List<CommonLookupValue> entities = commonLookupValueRepository.findByCommonLookup_LookupCodeAndIsActive(lookupCode, true);
+        	 
+            if (entities == null || entities.isEmpty()) {
+                outcome.setData(Collections.emptyList());
+                outcome.setOutcome(false);
+                outcome.setMessage("No data found for lookup code: " + lookupCode);
+            } else {
+                List<LookupValueDTO> dtos = lookupValueMapper.toDTOList(entities);
+                outcome.setData(dtos);
+                outcome.setOutcome(true);
+                outcome.setMessage("Data Retrieved Successfully.");
+            }
+        } catch (Exception e) {
+            log.error("Exception occurred in getLookupValuesByLookupCode() for lookupCode: {}", lookupCode, e);
+            outcome.setData(Collections.emptyList());
+            outcome.setOutcome(false);
+            outcome.setMessage("Error retrieving data: " + e.getMessage());
+        }
+        return outcome;
+    }
+
+	@Override
+	public ServiceOutcome<List<AssetDropDownDto>> getAllActiveAsset() {
+	    ServiceOutcome<List<AssetDropDownDto>> outcome = new ServiceOutcome<>();
+	    try {
+	        List<AssetBams> assetList = assetRepository.findByIsActiveTrue();
+
+	        List<AssetDropDownDto> assetDropdownList = assetList.stream().map(asset -> {
+	            AssetDropDownDto dto = new AssetDropDownDto();
+	            dto.setAssetId(asset.getAssetId());       
+	            dto.setAssetName(asset.getAssetName()); 
+	            return dto;
+	        }).collect(Collectors.toList());
+
+	        outcome.setData(assetDropdownList);
+	        outcome.setOutcome(true);
+	    } catch (Exception e) {
+	        log.error("Exception occurred in getAllActiveAsset() of MasterCommonServiceImpl : {}", e.getMessage(), e);
+	        outcome.setData(null);
+	        outcome.setOutcome(false);
+	    }
+	    return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<WorkOrderSCSTDTO> getApprovedWorkOrderByProjectEstimationId(Long projectEstimationId) {
+		ServiceOutcome<WorkOrderSCSTDTO> outcome = new ServiceOutcome<>();
+		WorkOrderSCSTDTO workOrderDto = new WorkOrderSCSTDTO();
+		try {
+			WorkOrderSCST workOrder = workOrderSCSTRepository.findWorkOrderByProjectEstimationId(projectEstimationId);
+			
+			if(workOrder != null && workOrder.getStageForwardedRule().getActionType().getActionCode().equalsIgnoreCase("APPROVE")) {
+				workOrderDto.setWorkOrderId(workOrder.getWorkOrderId());;
+				workOrderDto.setWorkOrderCode(workOrder.getWorkOrderCode());
+				workOrderDto.setWorkOrderName(workOrder.getWorkOrderName());
+			}
+			
+			outcome.setData(workOrderDto);
+			outcome.setOutcome(true);
+			outcome.setMessage("WorkOrder fetched successsfully .");
+		}catch (Exception e) {
+			outcome.setData(workOrderDto);
+			outcome.setOutcome(false);
+			outcome.setMessage("Something went wrong please try again");
+			log.error("Exception occured in getApprovedWorkOrderByProjectEstimationId()  MasterCommonServiceImpl :",e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+
+	@Override
+	public ServiceOutcome<ProjectDto> getProjectCodeByProjectId(Long projectId) {
+	    ServiceOutcome<ProjectDto> outcome = new ServiceOutcome<>();
+	    try {
+	        Project project = projectRepository.findByProjectIdAndIsActiveTrue(projectId);
+	        ProjectDto dto = new ProjectDto();
+	        dto.setProjectCode(project.getProjectCode());
+	        outcome.setData(dto);
+	    } catch (Exception e) {
+	    	log.error("Exception occured in getProjectCodeByProjectId()  MasterCommonServiceImpl :",e.getMessage());
+			e.printStackTrace();
+	        throw new RuntimeException("Failed to fetch project code", e);
+	    }
+	    return outcome;
+	}
+
+	@Override
+	public ServiceOutcome<List<ProjectDto>> getProjectsByFinancialYear(Long financialYearId) {
+	    ServiceOutcome<List<ProjectDto>> outcome = new ServiceOutcome<>();
+	    try {
+	        List<Project> projects = projectRepository.findByFinancialYearIdAndIsActiveTrue(financialYearId);
+	        List<ProjectDto> dtoList = projects.stream().map(project -> {
+	            ProjectDto dto = new ProjectDto();
+	            dto.setProjectId(project.getProjectId());
+	            dto.setProjectCode(project.getProjectCode());
+	            dto.setProjectName(project.getProjectName());
+	            dto.setProjectStatus(project.getProjectStatus());
+	            dto.setEstimatedCost(project.getEstimatedCost());
+	            dto.setFinalCost(project.getFinalCost());
+	            dto.setLetterNo(project.getLetterNo());
+	            dto.setIsActive(project.getIsActive());
+	            dto.setProjectType(project.getProjectType());
+	            if (project.getFinancialYear() != null) {
+	                dto.setFinancialYearId(project.getFinancialYear().getFinyearId());
+	            }
+	            return dto;
+	        }).collect(Collectors.toList());
+	        outcome.setData(dtoList);
+	    } catch (Exception e) {
+	    	log.error("Exception occured in getProjectsByFinancialYear()  MasterCommonServiceImpl :",e.getMessage());
+			e.printStackTrace();
+	        throw new RuntimeException("Failed to fetch projects for financial year", e);
+	    }
+	    return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<AgencyBankDetailsDTO> getAccountDetailsByAccountNo(Long  agencyBankId) {
+		ServiceOutcome<AgencyBankDetailsDTO> outcome = new ServiceOutcome<>();
+		try {
+			AgencyBankDetails data = agencyBankDetailsRepository.findByAgencyBankId(agencyBankId);
+			AgencyBankDetailsDTO dto = new AgencyBankDetailsDTO();
+			
+			dto.setAccHldName(data.getAccHldName());
+			dto.setBankName(data.getBank().getBankName());
+			dto.setBranchName(data.getBranchName());
+			dto.setIfscCode(data.getIfscCode());
+			
+			outcome.setData(dto);
+			outcome.setOutcome(true);
+		} catch (Exception e) {
+			outcome.setData(null);
+			outcome.setOutcome(false);
+			log.error("Exception occured in getAccountDetailsByAccountNo()  MasterCommonServiceImpl :",e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+
+	@Override
+	public ServiceOutcome<List<AgencyBankDetailsDTO>> getAgencyBankAccountNoByAgencyId(Long id) {
+		ServiceOutcome<List<AgencyBankDetailsDTO>> outcome = new ServiceOutcome<>();
+		try {
+			List<AgencyBankDetailsDTO> agencyBankList = agencyBankDetailsRepository.findByAgencyId(id)
+					.stream().map(data -> {
+						AgencyBankDetailsDTO dto = new AgencyBankDetailsDTO();
+						dto.setAgencyBankId(data.getAgencyBankId());
+						dto.setAccountNo(data.getAccNo());
+						return dto;
+					}).collect(Collectors.toList());
+			outcome.setData(agencyBankList);
+			outcome.setOutcome(true);
+		} catch (Exception e) {
+			outcome.setData(null);
+			outcome.setOutcome(false);
+			log.error("Exception occured in getAgencyBankAccountNoByAgencyId() of MasterCommonServiceImpl"+ e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<WorkInspectionDto>> getWorkInspectionByWorkOrderId(Long id) {
+		ServiceOutcome<List<WorkInspectionDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<WorkInspectionDto> inspectionList = workInspectionRepository.findByWorkOrderSCSTWorkOrderIdAndIsActiveTrue(id)
+					.stream().filter(dto -> {
+						StageForwardedRule rule = dto.getStageForwardedRule();
+						return rule != null && rule.getActionType() != null && "APPROVE".equalsIgnoreCase(rule.getActionType().getActionCode());
+					}).filter(inspection -> {
+						return inspection.getPhase().getPhaseId() == 3;
+					}).map(data -> {
+						WorkInspectionDto dto = new WorkInspectionDto();
+						dto.setInspectionId(data.getInspectionId());
+						dto.setPhaseCode(data.getPhase().getPhaseCode());
+						return dto;
+					}).collect(Collectors.toList());
+
+			outcome.setData(inspectionList);
+			outcome.setOutcome(true);
+		} catch (Exception e) {
+			outcome.setData(null);
+			outcome.setOutcome(false);
+			log.error("Exception occured in getWorkInspectionByWorkOrderId() of MasterCommonServiceImpl"+ e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<DistrictDropDownDto>> getAllDistrictByFinancialYear(Long financialYearId) {
+		ServiceOutcome<List<DistrictDropDownDto>> outcome = new ServiceOutcome<>();
+		List<DistrictDropDownDto> districtDropDownData = new ArrayList<>();
+		try {
+			districtDropDownData = projectRepository.findDistrictsByFinancialYear(financialYearId).stream()
+					.map(district -> {
+						DistrictDropDownDto dto = new DistrictDropDownDto();
+						dto.setDistrictId(((Number)district[0]).longValue());
+						dto.setDistrictName((String) district[1]);
+						return dto;
+					}).collect(Collectors.toList());
+			
+			outcome.setData(districtDropDownData);
+			outcome.setOutcome(true);
+		} catch (Exception e) {
+			log.error("Exception occured in getAllDistrictByFinancialYear() in MasterCommonServiceImpl", e.getMessage());
+			e.printStackTrace();
+			outcome.setData(districtDropDownData);
+			outcome.setOutcome(false);
+		}
+		return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<FinancialYear>> getAllActiveFinancialYears() {
+        ServiceOutcome<List<FinancialYear>> outcome = new ServiceOutcome<>();
+        try {
+            List<FinancialYear> finYearList = financialYearRepository.findByIsActiveTrueOrderByFinYear();
+
+            if (finYearList != null && !finYearList.isEmpty()) {
+                outcome.setData(finYearList);
+                outcome.setMessage("Active financial years fetched successfully.");
+                outcome.setOutcome(true);
+            } else {
+                outcome.setData(null);
+                outcome.setMessage("No active financial years found.");
+                outcome.setOutcome(false);
+            }
+        } catch (Exception e) {
+            log.error("Error while fetching active financial years", e);
+            outcome.setData(null);
+            outcome.setMessage("Error occurred while fetching active financial years: " + e.getMessage());
+            outcome.setOutcome(false);
+        }
+        return outcome;
+    }
+	
+	@Override
+	public ServiceOutcome<List<ProjectDropDownDto>> getAllApprovedProjectsByFinancialYearAndDistrict(Long financialYearId,Long districtId) {
+		ServiceOutcome<List<ProjectDropDownDto>> outcome = new ServiceOutcome<>();
+		List<ProjectDropDownDto> projectDropDownData = new ArrayList<>();
+		try {
+			projectDropDownData = projectRepository.findProjectsByFinancialYearAndDistrict(financialYearId,districtId).stream()
+					.filter(project -> {
+		                StageForwardedRule rule = project.getStageForwardedRule();
+		                return rule != null 
+		                    && rule.getActionType() != null 
+		                    && "APPROVE".equalsIgnoreCase(rule.getActionType().getActionCode());
+		            })
+					.map(project -> {
+						ProjectDropDownDto dto = new ProjectDropDownDto();
+						dto.setProjectId(project.getProjectId());
+						dto.setProjectName(project.getProjectName());
+						return dto;
+					}).collect(Collectors.toList());
+			
+			outcome.setData(projectDropDownData);
+			outcome.setOutcome(true);
+		} catch (Exception e) {
+			log.error("Exception occured in getAllApprovedProjectsByFinancialYearAndDistrict() in MasterCommonServiceImpl", e.getMessage());
+			e.printStackTrace();
+			outcome.setData(projectDropDownData);
+			outcome.setOutcome(false);
+		}
+		return outcome;
+	}
+   
+    private SchoolDto mapToDto(School schoolData) {
+        if (schoolData == null) return null;
+
+        SchoolDto schoolDto = new SchoolDto();
+        schoolDto.setSchoolId(schoolData.getSchoolId());
+        schoolDto.setSchoolName(schoolData.getSchoolName());
+        schoolDto.setSchoolCode(schoolData.getSchoolCode());
+        schoolDto.setClassRange(schoolData.getClassRange());
+        schoolDto.setDistrictId(schoolData.getDistrict().getDistrictId());
+        schoolDto.setBlockId(schoolData.getBlock().getBlockId());
+        schoolDto.setGpId(schoolData.getGramPanchayat().getGpId());
+        schoolDto.setVillageId(schoolData.getVillage().getVillageId());
+        schoolDto.setHeadMaster(schoolData.getHeadMaster());
+        schoolDto.setType(schoolData.getType());
+        schoolDto.setUidsceCode(schoolData.getUidsceCode());
+        schoolDto.setIsActive(schoolData.getIsActive());
+        if (schoolData.getProject() != null && schoolData.getProject().getProjectId() != null) {
+            schoolDto.setProjectId(schoolData.getProject().getProjectId());
+        }
+        return schoolDto;
+    }
+
+    @Override
+    public ServiceOutcome<List<SchoolDto>> getAllSchoolsByDistrict(Long districtId) {
+        ServiceOutcome<List<SchoolDto>> outcome = new ServiceOutcome<>();
+        List<SchoolDto> schoolDtoList = new ArrayList<>();
+        try {
+            List<School> schools = schoolRepository.findAllSchoolByIsActiveTrueAndDistrictId(districtId);
+            schoolDtoList = schools.stream()
+                                                   .map(this::mapToDto)
+                                                   .collect(Collectors.toList());
+            outcome.setData(schoolDtoList);
+            outcome.setOutcome(true);
+        } catch (Exception e) {
+        	 outcome.setData(schoolDtoList);
+             outcome.setOutcome(false);
+             log.error("Exception occured in getAllSchoolsByDistrict() in MasterCommonServiceImpl", e.getMessage());
+             e.printStackTrace();
+        }
+        return outcome;
+    }
+
+    @Override
+    public ServiceOutcome<List<SchoolDto>> getAllSchoolsByBlock(Long blockId) {
+        ServiceOutcome<List<SchoolDto>> outcome = new ServiceOutcome<>();
+        List<SchoolDto> schoolDtoList = new ArrayList<>();
+        try {
+            List<School> schools = schoolRepository.findAllSchoolByIsActiveTrueAndBlockId(blockId);
+            schoolDtoList = schools.stream()
+                                   .map(this::mapToDto)
+                                   .collect(Collectors.toList());
+            outcome.setData(schoolDtoList);
+            outcome.setOutcome(true);
+        } catch (Exception e) {
+            outcome.setData(schoolDtoList);
+            outcome.setOutcome(false);
+            log.error("Exception occured in getAllSchoolsByBlock() in MasterCommonServiceImpl: {}", e.getMessage());
+            e.printStackTrace();
+        }
+        return outcome;
+    }
+
+    @Override
+    public ServiceOutcome<List<SchoolDto>> getAllSchoolsByGrampanchayat(Long gpId) {
+        ServiceOutcome<List<SchoolDto>> outcome = new ServiceOutcome<>();
+        List<SchoolDto> schoolDtoList = new ArrayList<>();
+        try {
+            List<School> schools = schoolRepository.findAllSchoolByIsActiveTrueAndGrampanchayatId(gpId);
+            schoolDtoList = schools.stream()
+                                   .map(this::mapToDto)
+                                   .collect(Collectors.toList());
+            outcome.setData(schoolDtoList);
+            outcome.setOutcome(true);
+        } catch (Exception e) {
+            outcome.setData(schoolDtoList);
+            outcome.setOutcome(false);
+            log.error("Exception occured in getAllSchoolsByGrampanchayat() in MasterCommonServiceImpl: {}", e.getMessage());
+            e.printStackTrace();
+        }
+        return outcome;
+    }
+
+    @Override
+    public ServiceOutcome<List<SchoolDto>> getAllSchoolsByVillage(Long villageId) {
+        ServiceOutcome<List<SchoolDto>> outcome = new ServiceOutcome<>();
+        List<SchoolDto> schoolDtoList = new ArrayList<>();
+        try {
+            List<School> schools = schoolRepository.findAllSchoolByIsActiveTrueAndByVillageId(villageId);
+            schoolDtoList = schools.stream()
+                                   .map(this::mapToDto)
+                                   .collect(Collectors.toList());
+            outcome.setData(schoolDtoList);
+            outcome.setOutcome(true);
+        } catch (Exception e) {
+            outcome.setData(schoolDtoList);
+            outcome.setOutcome(false);
+            log.error("Exception occured in getAllSchoolsByVillage() in MasterCommonServiceImpl: {}", e.getMessage());
+            e.printStackTrace();
+        }
+        return outcome;
+    }
+    
+    @Override
+	public ServiceOutcome<SchoolDto> getSchoolByschoolUidsceCode(String uidsceCode) {
+		ServiceOutcome<SchoolDto> outcome = new ServiceOutcome<>();
+		SchoolDto schoolDto = new SchoolDto();
+		try {
+			School school = schoolRepository.findByUidsceCode(uidsceCode);
+			schoolDto = this.mapToDto(school);
+			
+			outcome.setData(schoolDto);
+            outcome.setOutcome(true);
+        } catch (Exception e) {
+            outcome.setData(schoolDto);
+            outcome.setOutcome(false);
+            log.error("Exception occured in getSchoolByschoolUidsceCode() in MasterCommonServiceImpl: {}", e.getMessage());
+            e.printStackTrace();
+        }
+        return outcome;
+    }
+
+	@Override
+	public ServiceOutcome<List<ProjectDropDownDto>> getAllActiveProjectsWithFinalPhaseApprovedOrdered() {
+	    ServiceOutcome<List<ProjectDropDownDto>> outcome = new ServiceOutcome<>();
+	    try {
+	        List<ProjectDropDownDto> projectDropdownList = projectRepository.getAllFinalPhaseApprovedProjectsOrdered()
+	            .stream()
+	            .map(project -> {
+	                ProjectDropDownDto dto = new ProjectDropDownDto();
+	                dto.setProjectId(project.getProjectId());
+	                dto.setProjectName(project.getProjectName());
+	                return dto;
+	            }).collect(Collectors.toList());
+
+	        outcome.setData(projectDropdownList);
+	    } catch (Exception e) {
+	        outcome.setData(null);
+	        log.error("Exception occurred in getAllActiveProjectsWithFinalPhaseApprovedOrdered() of MasterCommonServiceImpl: " + e.getMessage(), e);
+	    }
+	    return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<List<SchoolDto>> getSchooIsActiveTrueByDistrictId(Long districtId) {
+		ServiceOutcome<List<SchoolDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<School> schools = schoolRepository.findAllByIsActiveTrue();
+
+			List<SchoolDto> schoolDtoList = schools.stream()
+					.filter(school -> school.getDistrict() != null
+							&& school.getDistrict().getDistrictId().equals(districtId))
+					.sorted(Comparator.comparing(School::getSchoolId).reversed()) 
+					.map(school -> {
+						SchoolDto dto = new SchoolDto();
+						dto.setSchoolId(school.getSchoolId());
+						dto.setSchoolName(school.getSchoolName());
+						return dto;
+					}).collect(Collectors.toList());
+
+			outcome.setData(schoolDtoList);
+			outcome.setOutcome(true);
+
+		} catch (Exception e) {
+			log.error("Exception occurred in getSchooIsActiveTrueByDistrictId of MasterCommonServiceImpl", e.getMessage());
+			outcome.setData(null);
+			outcome.setOutcome(false);
+		}
+		return outcome;
+	}
+
+	@Override
+	public ServiceOutcome<List<District>> getAllActiveDistrict() {
+		ServiceOutcome<List<District>> outcome = new ServiceOutcome<>();
+		List<District> districtList = new ArrayList<>();
+		try {
+			districtList = districtRepository.findAllByIsActiveOrderByDistrictNameAsc(true);
+			
+			outcome.setData(districtList);
+            outcome.setOutcome(true);
+        } catch (Exception e) {
+            outcome.setData(districtList);
+            outcome.setOutcome(false);
+            log.error("Exception occured in getAllActiveDistrict() in MasterCommonServiceImpl: {}", e.getMessage());
+            e.printStackTrace();
+        }
+        return outcome;
+	}
+	
+	@Override
+	public ServiceOutcome<Long> getACtiveFinancialYearId() {
+		ServiceOutcome<Long> outcome = new ServiceOutcome<>();
+		Long finanacialYearId = null;
+		try {
+			List<FinancialYear> finanacialYear = financialYearRepository.findAllByIsActiveIsTrue();
+			
+			int year = LocalDateTime.now().getYear() % 100;
+			String fyShort = "FY" + year;
+			
+			finanacialYearId = finanacialYear.stream()
+			.filter(fy -> fy.getFyShort().equals(fyShort))
+			.map(fy -> fy.getFinyearId())
+			.findFirst()
+			.orElse(null);
+			
+			outcome.setData(finanacialYearId);
+            outcome.setOutcome(true);
+        } catch (Exception e) {
+            outcome.setData(finanacialYearId);
+            outcome.setOutcome(false);
+            log.error("Exception occured in getACtiveFinancialYearId() in MasterCommonServiceImpl: {}", e.getMessage());
+            e.printStackTrace();
+        }
+        return outcome;
+	}
+	
+	@Override
+	public String generateProjectCode(Long districtId, Long departmentId, String projectType) {
+		String MaxCode = null;
+		try {
+			MaxCode = projectRepository.findProjectCodeByDistrictId(districtId);
+			District district = districtRepository.findByDistrictId(districtId);
+			Department department = departmentRepository.findByDeptId(departmentId);
+
+			String districtCode = generateCode(district.getDistrictName(), 5);
+			String departmentCode = generateCode(department.getDeptName(), 3);
+			String projectTypeCode = this.getProjectTypeCode(projectType);
+
+			if (MaxCode == null) {
+				MaxCode = districtCode + "-" + departmentCode + "-" + projectTypeCode + "-" + "0001";
+			} else {
+				// Split the code by dash
+				String[] parts = MaxCode.split("-");
+				String number = parts[3];
+				int projectCodeNo = Integer.parseInt(number);
+				projectCodeNo++;
+				// Format the number with leading zeros
+				String projectCode = String.format("%04d", projectCodeNo);
+				MaxCode = districtCode + "-" + departmentCode + "-" + projectTypeCode + "-" + projectCode;
+			}
+		} catch (Exception e) {
+			log.error("Exception occured in generateProjectCode() of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return MaxCode;
+	}
+	
+	@Override
+	public String generateLegacyProjectCode(String districtName, String departmentName, String projectType,String OrderNo) {
+		String MaxCode = null;
+		try {
+			String districtCode = generateCode(districtName, 5);
+			String departmentCode = generateCode(departmentName, 3);
+			String projectTypeCode = this.getProjectTypeCode(projectType);
+			MaxCode = "LG" + "-" + districtCode + "-" + departmentCode + "-" + projectTypeCode + "-" + OrderNo;
+		} catch (Exception e) {
+			log.error("Exception occured in generateLegacyProjectCode() of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return MaxCode;
+	}
+
+	@Override
+	public String generateCode(String input, int length) {
+		if (input == null || input.isEmpty()) {
+			return "";
+		}
+		input = input.replaceAll("\\s+", ""); 
+		return input.substring(0, Math.min(length, input.length())).toUpperCase();
+	}
+
+	private String getProjectTypeCode(String projectType) {
+		if (projectType == null || projectType.isEmpty()) {
+			return "";
+		}
+
+		switch (projectType.trim().toUpperCase()) {
+		case "HOSTEL":
+			return "HOSTEL"; 
+		case "STAFF-QUARTER":
+			return "STAFF";
+		case "SCHOOL_BUILDING":
+			return "SCHBUILDING";
+		case "COMMUNITY_HALL":
+			return "HALL";
+		default:
+			return projectType.toUpperCase(); 
+		}
+	}
+	
+	@Override
+	public ServiceOutcome<List<AgencyDropDownDto>> getAllActiveAgencyList() {
+		ServiceOutcome<List<AgencyDropDownDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<AgencyDropDownDto> agencyDropdownList = agencyRepository.findAllByIsActiveTrue().stream().map(agency -> {
+				AgencyDropDownDto dto = new AgencyDropDownDto();
+				dto.setAgencyId(agency.getAgencyId());
+				dto.setAgencyName(agency.getAgencyName());
+				return dto;
+			}).collect(Collectors.toList());
+
+			outcome.setOutcome(true);
+			outcome.setData(agencyDropdownList);
+		} catch (Exception e) {
+			outcome.setOutcome(false);
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveAgencyList() of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+
+	@Override
+	public ServiceOutcome<List<MstSchemeDto>> getAllActiveSchemeList() {
+		ServiceOutcome<List<MstSchemeDto>> outcome = new ServiceOutcome<List<MstSchemeDto>>();
+		List<MstSchemeDto> schemeList = new ArrayList<>();
+		try {
+			schemeList = mstSchemeRepository.findAllByIsActiveTrue().stream().map(scheme -> {
+				MstSchemeDto dto = new MstSchemeDto();
+				dto.setSchemeId(scheme.getSchemeId());
+				dto.setSchemeName(scheme.getSchemeName());
+				return dto;
+			}).collect(Collectors.toList());
+
+			outcome.setData(schemeList);
+			outcome.setOutcome(true);
+		} catch (Exception e) {
+			outcome.setData(schemeList);
+			outcome.setOutcome(false);
+			log.error("Exception occurred in getAllActiveSchemeList() of MasterCommonServiceImpl: " + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+	
+	//handle file upload 
+	@Override
+	public String handleFileUpload(MultipartFile file, String basePath, String folderName) {
+		try {
+			if (file == null || file.isEmpty()) {
+				return null;
+			}
+			return UploadFile.uploadSCSTFile(file, basePath, folderName,"DOC" + RandomNumberGenerate.getRandomNumber());
+		} catch (IOException e) {
+			log.error("Exception occured in handleFileUpload() of MasterCommonServiceImpl" , folderName, e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+    @Override
+    public ServiceOutcome<List<AgencyMasterDropDownDto>> getAllActiveAgencyMasters() {
+        ServiceOutcome<List<AgencyMasterDropDownDto>> outcome = new ServiceOutcome<>();
+        try {
+            List<AgencyMasterDropDownDto> agencyMasters = agencyMasterRepository.findAll().stream()
+                    .filter(AgencyMaster::getIsActive)
+                    .map(entity -> {
+                        AgencyMasterDropDownDto dto = new AgencyMasterDropDownDto();
+                        dto.setAgencyId(entity.getAgencyId());
+                        dto.setAgencyNameEn(entity.getAgencyNameEn());
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
+            outcome.setData(agencyMasters);
+            outcome.setOutcome(true);
+            outcome.setMessage("Agency masters fetched successfully");
+        } catch (Exception e) {
+        	log.error("Exception occured in getAllActiveAgencyMasters() of MasterCommonServiceImpl" + e.getMessage());
+        	e.printStackTrace();
+            outcome.setData(List.of());
+            outcome.setOutcome(false);
+            outcome.setMessage("Failed to fetch agency masters: " + e.getMessage());
+        }
+        return outcome;
+    }
+
+    @Override
+    public ServiceOutcome<List<BankBranchDropDownDto>> getAllActiveBankBranches() {
+        ServiceOutcome<List<BankBranchDropDownDto>> outcome = new ServiceOutcome<>();
+        try {
+            List<BankBranchDropDownDto> bankBranches = bankBranchAgencyMasterRepository.findAllByIsActiveIsTrue()
+                    .stream()
+                    .map(entity -> {
+                        BankBranchDropDownDto dto = new BankBranchDropDownDto();
+                        dto.setBankBranchId(entity.getBankBranchId());
+                        dto.setBranchName(entity.getBranchName());
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
+            outcome.setData(bankBranches);
+            outcome.setOutcome(true);
+            outcome.setMessage("Bank branches fetched successfully");
+        } catch (Exception e) {
+        	log.error("Exception occured in getAllActiveBankBranches() of MasterCommonServiceImpl" + e.getMessage());
+        	e.printStackTrace();
+            outcome.setData(List.of());
+            outcome.setOutcome(false);
+            outcome.setMessage("Failed to fetch bank branches: " + e.getMessage());
+        }
+        return outcome;
+    }
+    
+    @Override
+	public ServiceOutcome<String> checkOtpAccessForUser(User user,boolean isActive, boolean isOtpAccess) {
+		ServiceOutcome<String> outcome = new ServiceOutcome<>();
+		try {
+			List<String> roleCodes = userAccessRepository.findUserAccessListByIsActiveAndIsOtpAccess(isActive,isOtpAccess);
+			
+			if(roleCodes != null && roleCodes.size() > 0 && roleCodes.contains(user.getPrimaryRole().getRoleCode())) {
+				outcome.setData("Access Granted");
+				outcome.setMessage("Success.");
+				outcome.setOutcome(true);
+			}else {
+				outcome.setData(null);
+				outcome.setMessage("Login via otp is forbidden for you.");
+				outcome.setOutcome(false);
+			}
+			
+		} catch (Exception ex) {
+			log.error("Exception occured in getOtpAccessRoles method in CommonServiceImpl-->",ex);
+			outcome.setData(null);
+			outcome.setMessage("Unable generate otp.");
+			outcome.setOutcome(false);
+		}
+		return outcome;
+	}
+    
+    @Transactional
+	@Override
+	public ServiceOutcome<String> generateOTP(String mobielNumber) {
+	    ServiceOutcome<String> outcome = new ServiceOutcome<>();
+	    //User user= SecurityHelper.getCurrentUser();
+	    try {
+	        LocalDateTime dateTime = LocalDateTime.now().plus(Duration.of(Long.parseLong(rb.getString("OTP.IN.MINS")), ChronoUnit.MINUTES));
+	        Date validTill = Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
+
+	        //RandomString rs = new RandomString(6, new SecureRandom(), "123456789");
+	       // String newOTP = rs.nextString();
+	        String newOTP="123456";
+	        OtpForUser request;
+	            Optional<OtpForUser> optionalRequest = otpForUserRepository.findByMobileNumber(mobielNumber);
+	            if (optionalRequest.isPresent()) {
+	                request = optionalRequest.get();
+	            } else {
+	                request = new OtpForUser();
+	                request.setMobileNumber(mobielNumber);
+	            }
+	            
+	            request.setIsValid(true);
+	            request.setValidTill(validTill);
+	            request.setRequestTime(new Date());
+	            request.setOtpNumber(newOTP);
+	            request = otpForUserRepository.save(request);
+
+	   //         String mobileNumber = user.getMobile();
+	            MessageTemplate msgg = findByTemplateName("SKS_001");
+	            String getSms = smsService.sendSMS(msgg.getSmsContent().replace("XXXX", newOTP), mobielNumber, msgg);
+
+	            if(getSms !="") {
+	            	if (request.getId() != null) {
+		                outcome.setData(newOTP);
+		                outcome.setMessage("OTP has been successfully sent to your mobile number.");
+		                outcome.setOutcome(true);
+		            } else {
+		                outcome.setData("Failure");
+		                outcome.setMessage("Unable to send OTP.");
+		                outcome.setOutcome(false);
+		            }
+	            }else {
+	            	    outcome.setData("Failure");
+		                outcome.setMessage("Unable to send OTP.");
+		                outcome.setOutcome(false);
+	            }
+	            
+
+	     
+	    } catch (Exception ex) {
+	        log.error("Exception occurred in generateOTP method in CommonServiceImpl-->", ex);
+	        outcome.setData(null);
+	        outcome.setMessage("Unable to generate OTP.");
+	        outcome.setOutcome(false);
+	    }
+	    return outcome;
+	}
+    
+    @Override
+	public MessageTemplate findByTemplateName(String templateName) {
+		MessageTemplate msgTemp=new MessageTemplate();
+		try {
+			msgTemp =messageTemplateRepository.findByTemplateName(templateName);
+		} catch (Exception e) {
+			log.error("Exception occured in findByTemplateName method in CommonServiceImpl in cms-->",e);
+		}
+		return msgTemp;
+	}
+    
+	@Override
+	public OtpForUser findByUserAndisActiveTrueOrderByOtpIdDescLimit1(String mobileNumber) {
+		OtpForUser otp = otpForUserRepository.findByMobileNumberAndisActiveTrueOrderByOtpIdDescLimit1(mobileNumber);
+		if(otp!=null) {
+			Long milliseconds = otp.getValidTill().getTime() - otp.getRequestTime().getTime();
+			Long mins = milliseconds/60000;
+			if(mins > Long.parseLong(rb.getString("OTP.IN.MINS"))) {
+				otp.setIsValid(false);
+				otpForUserRepository.save(otp);
+				return null;
+			}else {
+				return otp;
+			}
+		}
+		return otp;
+	}
+	
+	@Override
+	public ServiceOutcome<Boolean> setOtpIsValidFlag(String mobielNumber, Boolean isValid) {
+		ServiceOutcome<Boolean> outcome = new ServiceOutcome<>();
+		try {
+			otpForUserRepository.updateRecordsByMobileNumberAndIsValid(mobielNumber,isValid);
+			outcome.setData(true);
+			outcome.setMessage("Success.");
+			outcome.setOutcome(true);
+		} catch (Exception ex) {
+			log.error("Exception occured in setOtpIsValidFlag method in CommonServiceImpl-->",ex);
+			outcome.setData(null);
+			outcome.setMessage("Unable to check otp.");
+			outcome.setOutcome(false);
+		}
+		return outcome;
+	}
+	
+	@Override
+	public List<String> getMobileUserAccessListByIsActiveAndIsMobileAccess(boolean isActive,boolean isMobileAccess) {
+		List<String> accessList = new ArrayList<>();
+		try {
+			accessList=userAccessRepository.findUserAccessListByIsActiveAndIsMobileAccess(isActive,isMobileAccess);
+		}
+		catch (Exception e) {
+			log.error("Exception occurred in getMobileUserAccessListByIsActiveAndIsMobileAccess method in commonserviceImpl-->",e);
+		}
+		return accessList;
+	}
+
+	@Override
+	public ServiceOutcome<List<BAMSMunicipalityDto>> getAllActiveMunicipalityByDistrict(Long districtId) {
+		ServiceOutcome<List<BAMSMunicipalityDto>> outcome = new ServiceOutcome<>();
+		try {
+			List<BAMSMunicipality> bamsList = bamsMunicipalityRepository.findByDistrict_DistrictId(districtId);
+			List<BAMSMunicipalityDto> municipalityList = bamsList.stream().map(municipality -> {
+				BAMSMunicipalityDto municipalityDto = new BAMSMunicipalityDto();
+				municipalityDto.setMunicipalityId(municipality.getMunicipalityId());
+				municipalityDto.setMunicipalityName(municipality.getMunicipalityName());
+				return municipalityDto;
+			}).collect(Collectors.toList());
+
+			outcome.setData(municipalityList);
+		} catch (Exception e) {
+			outcome.setData(null);
+			log.error("Exception occured in getAllActiveMunicipalityByDistrict of MasterCommonServiceImpl" + e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+
+	@Override
+	public Object findByIsActiveTrueOrderByFinYear() {
+		return financialYearRepository.findByIsActiveTrueOrderByFinYear();
+	}
+
+	@Override
+	public Map<String, Object> getExecutionDropdowns() {
+	    Map<String, Object> dropdowns = new HashMap<>();
+	    dropdowns.put("yearList", findByIsActiveTrueOrderByFinYear());
+	    dropdowns.put("districtList", getAllActiveDistrict().getData());
+	    dropdowns.put("buildingTypeList", getLookupValuesByLookupCode(ApplicationConstant.BAMS_BUILDING_TYPE).getData());
+	    dropdowns.put("subCategoryList", getLookupValuesByLookupCode(ApplicationConstant.RESIDENTIAL_SUB_CATEGORY).getData());
+	    dropdowns.put("schoolList", getLookupValuesByLookupCode(ApplicationConstant.STANDALONE_SCHOOL).getData());
+	    dropdowns.put("schoolcatList", getLookupValuesByLookupCode(ApplicationConstant.BAMS_HOSTEL_TYPE).getData());
+	    dropdowns.put("hostelCapacityList", getLookupValuesByLookupCode(ApplicationConstant.HOSTEL_CAPACITY).getData());
+	    dropdowns.put("hostelCategoryList", getLookupValuesByLookupCode(ApplicationConstant.HOSTEL_CATEGORY).getData());
+	    dropdowns.put("staffList", getLookupValuesByLookupCode(ApplicationConstant.STAFF_QUARTER).getData());
+	    dropdowns.put("agencyList", getAgencyNameList());
+	    return dropdowns;
+	}
+
+	private List<String> getAgencyNameList() {
+	    try {
+	        return sanctionWorkRepository.findAllAgencyContName();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return Collections.emptyList();
+	    }
+	}
+	
+	@Override
+	public ServiceOutcome<List<BuildingDto>> getBuildingNameByFinancialYear(Long financialYearId) {
+		ServiceOutcome<List<BuildingDto>> outcome = new ServiceOutcome<List<BuildingDto>>();
+		
+		try {
+			List<PlanningDetails> planningData = planningDetailsRepository.findByFinancialYearIdAndIsActiveTrue(financialYearId);
+			List<BuildingDto> dtoList = planningData.stream().map(planning -> {
+				BuildingDto dto = new BuildingDto();
+				dto.setBuildingId(planning.getBuildingMaster().getBuildingId());
+				dto.setBuildingName(planning.getBuildingName());
+				return dto;
+			}).collect(Collectors.toList());
+			outcome.setData(dtoList);
+		} catch (Exception e) {
+			log.error("Exception occured in getBuildingNameByFinancialYear() of MasterCommonServiceImpl",e.getMessage());
+			e.printStackTrace();
+		}
+		return outcome;
+	}
+
+	@Override
+	public ServiceOutcome<PlanningDetailsDTO> getLocationCode(Long buildingId) {
+		ServiceOutcome<PlanningDetailsDTO> outcome = new ServiceOutcome<PlanningDetailsDTO>();
+		try {
+			PlanningDetails planningDetails = planningDetailsRepository.findByBuildingMaster_BuildingIdAndIsActiveTrue(buildingId);
+			PlanningDetailsDTO dto = new PlanningDetailsDTO();
+			dto.setLocationCode(planningDetails.getLocationCode());
+			outcome.setData(dto);
+		} catch (Exception e) {
+			log.error("Exception occured in  getLocationCode() of MasterCommonServiceImpl", e.getMessage());
+			e.printStackTrace();
+			throw new RuntimeException("Failed to fetch getLocationCode() for the given buildingId", e);
+		}
+		return outcome;
+	}
+	
+	
+
+	@Override
+	  public ServiceOutcome<List<BuildingDto>> getAllActiveBuildingDetails(String bamsbuildingType) {
+	         ServiceOutcome<List<BuildingDto>> outcome = new ServiceOutcome<>();
+
+	   try {
+	    List<BuildingDto> buildingList = planningDetailsRepository.findAllActiveBamsBuildingsByType(bamsbuildingType);
+	    if (buildingList != null && !buildingList.isEmpty()) {
+	     outcome.setData(buildingList);
+	     outcome.setOutcome(true);
+	     outcome.setMessage("Active building details fetched successfully.");
+	    } else {
+	     outcome.setOutcome(false);
+	     outcome.setMessage("No active buildings found for type: " + bamsbuildingType);
+	    }
+	   } catch (Exception e) {   
+	             e.printStackTrace();
+	             log.error("Error in getAllActiveBuildingDetails() => {}", e.getMessage(), e);
+
+	   }
+	         return outcome;
+	     }
+
+	
+ }

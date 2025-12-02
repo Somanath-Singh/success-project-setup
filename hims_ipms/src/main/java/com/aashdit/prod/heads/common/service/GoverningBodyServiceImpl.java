@@ -29,9 +29,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class GoverningBodyServiceImpl implements GoverningBodyService {
-	
-	private final  GoverningBodyRepository governingBodyRepository;
-	private final ApplicationModuleMstRepository  applicationModuleMstRepository;
+
+	private final GoverningBodyRepository governingBodyRepository;
+	private final ApplicationModuleMstRepository applicationModuleMstRepository;
 	private final EntityModuleMapService entityModuleMapService;
 	private final EntityLevelService entityLevelService;
 	private final DownloadUploadController downloadUploadController;
@@ -41,30 +41,30 @@ public class GoverningBodyServiceImpl implements GoverningBodyService {
 	@Override
 	public Map<String, Object> getGoverningBodyLoadingData() {
 		Map<String, Object> map = new HashMap<>();
-		 try {
-			 
-			List<GoverningBody> governingBodies= getAllGoverningBodies(null);
-			List<ApplicationModuleMst> modulList=applicationModuleMstRepository.findAllByIsActiveTrue();
+		try {
+
+			List<GoverningBody> governingBodies = getAllGoverningBodies(null);
+			List<ApplicationModuleMst> modulList = applicationModuleMstRepository.findAllByIsActiveTrue();
 			map.put("governingBodies", governingBodies);
 			map.put("modulList", modulList);
-			
+
 		} catch (Exception e) {
 			LoggingUtil.logError(e);
 			e.printStackTrace();
 		}
-			
-			return map;
+
+		return map;
 	}
 
 	@Override
 	public List<GoverningBody> getAllGoverningBodies(Boolean isActive) {
-		List<GoverningBody>  governingBodies= new ArrayList<>();
+		List<GoverningBody> governingBodies = new ArrayList<>();
 		try {
-			
+
 			if (isActive == null) {
-				governingBodies= governingBodyRepository.findAll();
+				governingBodies = governingBodyRepository.findAll();
 			} else {
-				governingBodies= governingBodyRepository.findAllByIsActive(isActive);
+				governingBodies = governingBodyRepository.findAllByIsActive(isActive);
 			}
 		} catch (Exception e) {
 			LoggingUtil.logError(e);
@@ -77,7 +77,7 @@ public class GoverningBodyServiceImpl implements GoverningBodyService {
 	public Boolean checkDuplicateEmail(String email) throws Exception {
 		try {
 			Optional<GoverningBody> governingBody = governingBodyRepository.findByEmailId(email);
-            return governingBody.isPresent();
+			return governingBody.isPresent();
 		} catch (Exception e) {
 			LoggingUtil.logError(e);
 		}
@@ -87,103 +87,106 @@ public class GoverningBodyServiceImpl implements GoverningBodyService {
 	@Override
 	@Transactional
 	public ServiceOutcome<GoverningBody> addOrUpdateGoverningBody(GoverningBodyVo governingBodyVo, MultipartFile icon) {
-		 ServiceOutcome<GoverningBody> outcome = new ServiceOutcome<>();
-		 boolean isForUserUpdate = false;
-	        try {
-	        	GoverningBody governingBody = new GoverningBody();
-	            if (governingBodyVo.getGoverningBodyId() != null) {
-	            	governingBody = getGoverningBodyById(governingBodyVo.getGoverningBodyId());
-					isForUserUpdate = true;
-	            }
-	            if (governingBody == null) {
-	                outcome.setOutcome(false);
-	                outcome.setMessage("GoverningBody not found");
-	                return outcome;
-	            }
-	            governingBody.setGoverningBodyName(governingBodyVo.getGoverningBodyName());
-	            governingBody.setGoverningBodyCode(governingBodyVo.getGoverningBodyCode());
-	            governingBody.setIsActive(governingBodyVo.getIsActive());
-	            governingBody.setRemarks(governingBodyVo.getRemarks());
-	            governingBody.setAddressLine(governingBodyVo.getAddressLine());
-	            governingBody.setEmailId(governingBodyVo.getEmailId());
-	            governingBody.setPincode(governingBodyVo.getPincode());
-	            governingBody.setPhoneNo(governingBodyVo.getPhoneNo());
-	            governingBody.setWebsite(governingBodyVo.getWebsite());
-	            governingBody.setPrimaryRoleCode(governingBodyVo.getPrimaryRoleCode());
-				if (icon != null && icon.getSize() > 0 && !icon.isEmpty()){
-					int lastDotIndex = icon.getOriginalFilename() == null ? -1 : icon.getOriginalFilename().lastIndexOf('.');
-					String fileName = icon.getOriginalFilename().substring(0, lastDotIndex);
-					String fileExtension = icon.getOriginalFilename().substring(lastDotIndex + 1);
-					String filePath = downloadUploadController.uploadFile(icon, "ICON", fileName, fileExtension);
-					governingBody.setIcon(filePath);
-				}
-	            governingBody = governingBodyRepository.save(governingBody);
+		ServiceOutcome<GoverningBody> outcome = new ServiceOutcome<>();
+		boolean isForUserUpdate = false;
+		try {
+			GoverningBody governingBody = new GoverningBody();
+			if (governingBodyVo.getGoverningBodyId() != null) {
+				governingBody = getGoverningBodyById(governingBodyVo.getGoverningBodyId());
+				isForUserUpdate = true;
+			}
+			if (governingBody == null) {
+				outcome.setOutcome(false);
+				outcome.setMessage("GoverningBody not found");
+				return outcome;
+			}
+			governingBody.setGoverningBodyName(governingBodyVo.getGoverningBodyName());
+			governingBody.setGoverningBodyCode(governingBodyVo.getGoverningBodyCode());
+			governingBody.setIsActive(governingBodyVo.getIsActive());
+			governingBody.setRemarks(governingBodyVo.getRemarks());
+			governingBody.setAddressLine(governingBodyVo.getAddressLine());
+			governingBody.setEmailId(governingBodyVo.getEmailId());
+			governingBody.setPincode(governingBodyVo.getPincode());
+			governingBody.setPhoneNo(governingBodyVo.getPhoneNo());
+			governingBody.setWebsite(governingBodyVo.getWebsite());
+			governingBody.setPrimaryRoleCode(governingBodyVo.getPrimaryRoleCode());
+			if (icon != null && icon.getSize() > 0 && !icon.isEmpty()) {
+				int lastDotIndex = icon.getOriginalFilename() == null ? -1
+						: icon.getOriginalFilename().lastIndexOf('.');
+				String fileName = icon.getOriginalFilename().substring(0, lastDotIndex);
+				String fileExtension = icon.getOriginalFilename().substring(lastDotIndex + 1);
+				String filePath = downloadUploadController.uploadFile(icon, "ICON", fileName, fileExtension);
+				governingBody.setIcon(filePath);
+			}
+			governingBody = governingBodyRepository.save(governingBody);
 
-				roleService.roleEntityMap(governingBodyVo.getOtherRoleCodes(), GoverningBody.class, governingBody.getGoverningBodyId());
+			roleService.roleEntityMap(governingBodyVo.getOtherRoleCodes(), GoverningBody.class,
+					governingBody.getGoverningBodyId());
 
+			entityModuleMapService.entityModuleMap(governingBodyVo.getModuleIds(), governingBody.getGoverningBodyId(),
+					GoverningBody.class);
 
-	            entityModuleMapService.entityModuleMap(governingBodyVo.getModuleIds(), governingBody.getGoverningBodyId(), GoverningBody.class);
+			// userService.addUser
+			entityLevelService.createUserAsPerNewEntityLevel(governingBody.getPrimaryRoleCode(),
+					ApplicationConstants.LVL_CODE_GOVERNING, governingBody.getEmailId(),
+					governingBody.getGoverningBodyName(), "N/A", governingBody.getPhoneNo(),
+					governingBody.getGoverningBodyId(), GoverningBody.class.getSimpleName() + ".class",
+					new Long[] { 1L }, governingBody.getGoverningBodyCode());
 
-				//userService.addUser
-				entityLevelService.createUserAsPerNewEntityLevel(governingBody.getPrimaryRoleCode(), ApplicationConstants.LVL_CODE_GOVERNING,
-						governingBody.getEmailId(), governingBody.getGoverningBodyName(), "N/A", governingBody.getPhoneNo(), governingBody.getGoverningBodyId(),
-						GoverningBody.class.getSimpleName()+".class", new Long[]{1L}, governingBody.getGoverningBodyCode());
-
-	            outcome.setOutcome(true);
-	            outcome.setData(governingBody);
-	            outcome.setMessage(isForUserUpdate ? messageSource.getMessage("corporate.msg.update", null, LocaleContextHolder.getLocale()) : messageSource.getMessage("corporate.msg.success", null, LocaleContextHolder.getLocale()));
-	        } catch (Exception e) {
-	        	LoggingUtil.logError(e);
-	            outcome.setOutcome(false);
-	            outcome.setMessage("Error saving Corporate");
-	        }
-	        return outcome;
+			outcome.setOutcome(true);
+			outcome.setData(governingBody);
+			outcome.setMessage(isForUserUpdate
+					? messageSource.getMessage("corporate.msg.update", null, LocaleContextHolder.getLocale())
+					: messageSource.getMessage("corporate.msg.success", null, LocaleContextHolder.getLocale()));
+		} catch (Exception e) {
+			LoggingUtil.logError(e);
+			outcome.setOutcome(false);
+			outcome.setMessage("Error saving Corporate");
+		}
+		return outcome;
 	}
-
-
 
 	@Override
 	public GoverningBody getGoverningBodyById(Long governingBodyId) {
-		 try {
-	            return governingBodyRepository.findById(governingBodyId).orElseThrow(()-> new IllegalArgumentException("GoverningBody not available for this given Id"));
-	        } catch (Exception e) {
-	        	LoggingUtil.logError(e);
-	            return null;
-	        }
+		try {
+			return governingBodyRepository.findById(governingBodyId)
+					.orElseThrow(() -> new IllegalArgumentException("GoverningBody not available for this given Id"));
+		} catch (Exception e) {
+			LoggingUtil.logError(e);
+			return null;
+		}
 	}
 
 	@Override
 	public ServiceOutcome<Boolean> updateActiveStatusGoverningBody(Long governingBodyId, Boolean status) {
-		 String msg = "";
-		 ServiceOutcome<Boolean> svc = new ServiceOutcome<>();
-	        try {
-	            if (governingBodyId != null && status!=null) {
-	            	GoverningBody   governingBody = getGoverningBodyById(governingBodyId);
-	            	governingBody.setIsActive(status);
-	            	governingBody = governingBodyRepository.save(governingBody);
-	            	if(status) {
-	            		msg="GoverningBody activated sucessfully";
-	            	}else {
-	            		msg="GoverningBody DeActivated sucessfully";
-	            	}
-	            	svc.setData(true);
-	            	svc.setOutcome(true);
-	            } else {
-	            	svc.setData(false);
-	            	svc.setOutcome(false);
-	            	
-	            }
-	            
-	        } catch (Exception e) {
-	        	svc.setData(false);
-            	svc.setOutcome(false);
-	        	msg="Unable to update  GoverningBody status";
-	        	LoggingUtil.logError(e);
-	        }
-	        svc.setMessage(msg);
+		String msg = "";
+		ServiceOutcome<Boolean> svc = new ServiceOutcome<>();
+		try {
+			if (governingBodyId != null && status != null) {
+				GoverningBody governingBody = getGoverningBodyById(governingBodyId);
+				governingBody.setIsActive(status);
+				governingBody = governingBodyRepository.save(governingBody);
+				if (status) {
+					msg = "GoverningBody activated sucessfully";
+				} else {
+					msg = "GoverningBody DeActivated sucessfully";
+				}
+				svc.setData(true);
+				svc.setOutcome(true);
+			} else {
+				svc.setData(false);
+				svc.setOutcome(false);
+
+			}
+
+		} catch (Exception e) {
+			svc.setData(false);
+			svc.setOutcome(false);
+			msg = "Unable to update  GoverningBody status";
+			LoggingUtil.logError(e);
+		}
+		svc.setMessage(msg);
 		return svc;
 	}
-
-
 
 }

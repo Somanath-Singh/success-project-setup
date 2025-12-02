@@ -207,14 +207,14 @@
 			<version>5.5.8</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.49</version>
-		</dependency>
-		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>html2pdf</artifactId>
 			<version>5.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.49</version>
 		</dependency>
 		<dependency>
 			<groupId>com.openhtmltopdf</groupId>
@@ -231,24 +231,6 @@
 			<artifactId>openhtmltopdf-jsoup-dom-converter</artifactId>
 			<version>${openhtml.version}</version>
 		</dependency>
-
-
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>3.9</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>3.9</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml-schemas</artifactId>
-			<version>3.9</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
@@ -260,7 +242,6 @@
 			<version>1.18.22</version>
 			<optional>true</optional>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>
 			<artifactId>xmlbeans</artifactId>
@@ -286,6 +267,33 @@
 			<groupId>javax.mail</groupId>
 			<artifactId>javax.mail-api</artifactId>
 		</dependency>
+		<dependency>
+	      <groupId>org.apache.poi</groupId>
+	      <artifactId>poi-ooxml</artifactId>
+	      <version>5.2.2</version>
+	    </dependency>
+	    <dependency>
+	         <groupId>org.apache.poi</groupId>
+	         <artifactId>poi-ooxml-schemas</artifactId>
+	         <version>4.1.2</version>
+	     </dependency>
+	     <dependency>
+	         <groupId>org.apache.xmlbeans</groupId>
+	         <artifactId>xmlbeans</artifactId>
+	         <version>5.1.1</version>
+	     </dependency>
+	     <!-- MapStruct Dependencies (ADD THESE) -->
+	    <dependency>
+	        <groupId>org.mapstruct</groupId>
+	        <artifactId>mapstruct</artifactId>
+	        <version>1.5.5.Final</version>
+	    </dependency>
+	    <dependency>
+	        <groupId>org.mapstruct</groupId>
+	        <artifactId>mapstruct-processor</artifactId>
+	        <version>1.5.5.Final</version>
+	        <scope>provided</scope>
+	    </dependency>
 
 
     </dependencies>

@@ -1,0 +1,44 @@
+package com.aashdit.prod.heads.common.service;
+
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import com.aashdit.prod.heads.common.dto.LookupValueDTO;
+import com.aashdit.prod.heads.common.model.Block;
+import com.aashdit.prod.heads.common.model.District;
+import com.aashdit.prod.heads.common.model.FinancialYear;
+import com.aashdit.prod.heads.common.model.Grampanchayat;
+import com.aashdit.prod.heads.common.model.Municipality;
+import com.aashdit.prod.heads.common.model.State;
+import com.aashdit.prod.heads.common.model.Village;
+import com.aashdit.prod.heads.common.model.Ward;
+import com.aashdit.prod.heads.framework.core.ServiceOutcome;
+
+public interface MasterCommonService {
+	
+    ServiceOutcome<List<State>> getAllActiveStatesIdAndName();
+    
+    ServiceOutcome<List<District>> getAllActiveDistrictIdAndName();
+    
+    ServiceOutcome<List<District>> getAllActiveDistrictsIdAndNameByState(Long stateId);
+	
+	ServiceOutcome<List<Block>> getAllActiveBlockIdAndNameByDistrict(Long districtId);
+	
+	ServiceOutcome<List<Grampanchayat>> getAllActiveGrampanchayatIdAndNameByBlock(Long blockId);
+	
+	ServiceOutcome<List<Village>> getAllActiveVillageIdAndNameByGrampanchayat(Long gpId);
+	
+	ServiceOutcome<List<Municipality>> getAllActiveMunicipalityIdAndNameByDistrict(Long districtId);
+	
+	ServiceOutcome<List<Ward>> getAllActiveWardIdAndNameByMunicipalityId(Long municipalityId);
+	
+	ServiceOutcome<List<FinancialYear>> getAllActiveFinancialYear();
+	
+	ServiceOutcome<List<LookupValueDTO>> getLookupValuesByLookupCode(String lookupCode);
+	
+    String generateCode(String input, int length);
+    
+    String handleFileUpload(MultipartFile file, String basePath, String folderName);
+    
+}

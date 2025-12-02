@@ -1,0 +1,60 @@
+package com.aashdit.prod.heads.common.model;
+
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Entity
+@Table(name = "code_generation_config", schema = "public")
+@Data
+public class CodeGenerationConfig {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "code_generation_config_id")
+	private Long codeGenerationConfigId;
+
+	@Column(name = "module_type")
+	private String moduleType;
+
+	@Column(name = "table_name")
+	private String tableName;
+
+	@Column(name = "column_name")
+	private String columnName;
+
+	@Column(name = "schema_name")
+	private String schemaName = "public";
+
+	@Column(name = "is_parent_module")
+	private Boolean isParentModule = false;
+	
+	@Column(name = "parent_module_type")
+	private String parentModuleType;
+	
+	@Column(name = "child_module_type")
+	private String childModuleType;
+	
+	@Column(name = "created_on")
+	private LocalDateTime createdOn;
+
+	@Column(name = "created_by")
+	private Long createdBy;
+
+	@Column(name = "last_updated_on")
+	private LocalDateTime lastUpdatedOn;
+
+	@Column(name = "last_updated_by")
+	private Long lastUpdatedBy;
+
+	@Column(name = "is_active")
+	private Boolean isActive = true;
+
+}

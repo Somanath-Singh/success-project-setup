@@ -14,7 +14,6 @@ import org.springframework.context.MessageSourceAware;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.aashdit.prod.heads.hims.ipms.dto.UserVO;
 import com.aashdit.prod.heads.hims.ipms.model.MailQueue;
 import com.aashdit.prod.heads.hims.ipms.repository.MailQueueRepository;
 import com.aashdit.prod.heads.hims.ipms.utils.SecurityHelper;
@@ -121,7 +120,7 @@ public class MailServiceImpl implements MailService, MessageSourceAware {
 	@Override
 	public Boolean sendOtp(String otp, String mailId) {
 		try {
-			UserVO user = SecurityHelper.getCurrentUser();
+			User user = SecurityHelper.getCurrentUser();
 			String emailId = rb.getString("mail.username");
 			Template template = velocityEngine.getTemplate("./templates/otpMailTemplate.vm");
 			VelocityContext velocityContext = new VelocityContext();

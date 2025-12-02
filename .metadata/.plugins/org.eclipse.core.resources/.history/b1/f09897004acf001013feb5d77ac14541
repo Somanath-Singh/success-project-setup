@@ -1,0 +1,76 @@
+package com.aashdit.construction.model;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import lombok.Data;
+
+
+@Entity
+@Data
+@Table(name = "t_mst_ward", schema = "public")
+public class Ward implements Serializable {
+
+    private static final long serialVersionUID = -1509707394914520208L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ward_id")
+    private Long wardId;
+
+    @NotNull
+    @Column(name = "ward_name", nullable = false, length = 255)
+    private String wardName;
+
+    @NotNull
+    @Column(name = "ward_code", nullable = false, length = 255)
+    private String wardCode;
+
+    @Column(name = "remarks", length = 255)
+    private String remarks;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "municipality_id", referencedColumnName = "municipality_id")
+    private Municipality municipality;
+
+    @Column(name = "object_id")
+    private Long objectId;
+
+    @Column(name = "object_type", columnDefinition = "varchar")
+    private String objectType;
+
+    @Column(name = "parent_object_id")
+    private Long parentObjectId;
+
+    @Column(name = "parent_object_type", columnDefinition = "varchar")
+    private String parentObjectType;
+
+    @Column(name = "primary_role_code", length = 255)
+    private String primaryRoleCode;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
+
+    @Column(name = "created_on")
+    private LocalDateTime createdOn;
+
+    @Column(name = "created_by")
+    private Long createdBy;
+
+    @Column(name = "updated_on")
+    private LocalDateTime updatedOn;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
+}

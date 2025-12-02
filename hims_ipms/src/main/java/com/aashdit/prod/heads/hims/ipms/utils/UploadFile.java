@@ -96,6 +96,7 @@ public class UploadFile {
 	/**
 	 * ADD CURRENT DATE TIME TO AVOID DUCUMENT NAME DUBLICACY
 	 */
+	@SuppressWarnings("deprecation")
 	public static String addCurrenDateTimeToDocAndRenameIt(String docname, String uploadPath, String filePath)
 			throws IOException {
 
@@ -113,6 +114,7 @@ public class UploadFile {
 		return filePath;
 	}
 
+	@SuppressWarnings("deprecation")
 	public static String newChangeFileName(String docname) throws IOException {
 
 		String newName = "";
@@ -166,7 +168,7 @@ public class UploadFile {
 		}
 	}
 
-	public static String uploadHrms(MultipartFile file, String path, String module, String code) throws IOException {
+	public static String uploadFileIntoDb(MultipartFile file, String path, String module, String code) throws IOException {
 		String uniqFileName = "";
 		try {
 			String filePath = path + File.separator + module;

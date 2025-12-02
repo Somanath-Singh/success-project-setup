@@ -1,0 +1,523 @@
+package com.aashdit.construction.controller;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.aashdit.common.model.BankBranchMaster;
+import com.aashdit.common.service.CommonService;
+import com.aashdit.common.utils.DownloadFile;
+import com.aashdit.common.utils.GetPropertyValue;
+import com.aashdit.construction.dto.AgencyBankDetailsDTO;
+import com.aashdit.construction.dto.BAMSMunicipalityDto;
+import com.aashdit.construction.dto.BlockDropDownDto;
+import com.aashdit.construction.dto.BuildingDto;
+import com.aashdit.construction.dto.DistrictDropDownDto;
+import com.aashdit.construction.dto.FileEncryptDto;
+import com.aashdit.construction.dto.GramPanchayatDropDownDto;
+import com.aashdit.construction.dto.MunicipalityDropDownDto;
+import com.aashdit.construction.dto.PlanningDetailsDTO;
+import com.aashdit.construction.dto.ProjectDropDownDto;
+import com.aashdit.construction.dto.ProjectDto;
+import com.aashdit.construction.dto.ProjectEstimationDropDownDto;
+import com.aashdit.construction.dto.SchoolDto;
+import com.aashdit.construction.dto.StateDropDownDto;
+import com.aashdit.construction.dto.VillageDropDownDto;
+import com.aashdit.construction.dto.WardDropDownDto;
+import com.aashdit.construction.dto.WorkInspectionDto;
+import com.aashdit.construction.dto.WorkOrderSCSTCodeDto;
+import com.aashdit.construction.dto.WorkOrderSCSTDTO;
+import com.aashdit.construction.service.MasterCommonService;
+import com.aashdit.construction.utils.FormDecryptionUtil;
+import com.aashdit.framework.core.ServiceOutcome;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@Slf4j
+@RequestMapping("/common")
+public class MasterCommonController {
+	
+	@Autowired
+	private MasterCommonService masterCommonService;
+	
+    @Autowired
+    private CommonService commonERPService;
+	
+    /**
+	 * Handles common logic.
+	 *
+	 * @author Somanath Singh
+	 * @since 2/06/2025
+	 */
+    
+	@ResponseBody
+	@GetMapping(path = "/fetchProjectEstimationByProject", name = "Fetch Project Estimation By Project Id")
+	public ResponseEntity<List<ProjectEstimationDropDownDto>> fetchProjectEstimationByProject(@RequestParam Long projectId) {
+		try {
+			ServiceOutcome<List<ProjectEstimationDropDownDto>> outcome = masterCommonService.getAllActiveProjectEstimationIdAndNameByProject(projectId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchProjectEstimationByProject() of CommonMasterController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@ResponseBody
+	@GetMapping(path = "/fetchApprovedProjectEstimationByProject", name = "Fetch Approved Project Estimation By Project Id")
+	public ResponseEntity<List<ProjectEstimationDropDownDto>> fetchApprovedProjectEstimationByProject(@RequestParam Long projectId) {
+		try {
+			ServiceOutcome<List<ProjectEstimationDropDownDto>> outcome = masterCommonService.getAllActiveApprovedProjectEstimationIdAndNameByProject(projectId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchApprovedProjectEstimationByProject() of CommonMasterController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@ResponseBody
+	@GetMapping(path = "/fetchWorkOrderCodeByProjectEstimation", name = "Fetch Work Order By Project Estimation Id")
+	public ResponseEntity<WorkOrderSCSTCodeDto> fetchWorkOrderCodeByProjectEstimation(@RequestParam Long projectEstimationId) {
+		try {
+			ServiceOutcome<WorkOrderSCSTCodeDto> outcome = masterCommonService.getWorkOrderCodeByProjectEstimationId(projectEstimationId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchWorkOrderCodeByProjectEstimation() of CommonMasterController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@GetMapping(path = "/fetchState", name = "Fetch All State")
+	@ResponseBody
+	public ResponseEntity<List<StateDropDownDto>> fetchState() {
+		try {
+			ServiceOutcome<List<StateDropDownDto>> outcome = masterCommonService.getAllActiveStatesIdAndName();
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchState of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@GetMapping(path = "/fetchDistrict", name = "Fetch All District")
+	@ResponseBody
+	public ResponseEntity<List<DistrictDropDownDto>> fetchDistrict() {
+		try {
+			ServiceOutcome<List<DistrictDropDownDto>> outcome = masterCommonService.getAllActiveDistrictIdAndName();
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchDistrict of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@GetMapping(path = "/fetchDistrictsByState", name = "Fetch District By State Id")
+	@ResponseBody
+	public ResponseEntity<List<DistrictDropDownDto>> fetchDistrictsByState(@RequestParam Long stateId) {
+		try {
+			ServiceOutcome<List<DistrictDropDownDto>> districtList = masterCommonService
+					.getAllActiveDistrictsIdAndNameByState(stateId);
+			return ResponseEntity.ok(districtList.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchDistrictsByState of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+
+	@GetMapping(path = "/fetchBlockByDistrict", name = "Fetch Block By District Id")
+	@ResponseBody
+	public ResponseEntity<List<BlockDropDownDto>> fetchBlockByDistrict(@RequestParam Long districtId) {
+		try {
+			ServiceOutcome<List<BlockDropDownDto>> outcome = masterCommonService
+					.getAllActiveBlockIdAndNameByDistrict(districtId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchBlockByDistrict of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+
+	@GetMapping(path = "/fetchGrampanchayatByBlock", name = "Fetch Grampanchayat By Block Id")
+	@ResponseBody
+	public ResponseEntity<List<GramPanchayatDropDownDto>> fetchGrampanchayatByBlock(@RequestParam Long blockId) {
+		try {
+			ServiceOutcome<List<GramPanchayatDropDownDto>> outcome = masterCommonService
+					.getAllActiveGramPanchayatIdAndNameByBlock(blockId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchGrampanchayatByBlock of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@GetMapping(path = "/fetchVillageByGrampanchayat", name = "Fetch Village By Grampanchayat Id")
+	@ResponseBody
+	public ResponseEntity<List<VillageDropDownDto>> fetchVillageByGrampanchayat(@RequestParam Long gpId) {
+		try {
+			ServiceOutcome<List<VillageDropDownDto>> outcome = masterCommonService.getAllActiveVillageIdAndNameByGramPanchayat(gpId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchVillageByGrampanchayat of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@GetMapping(path = "/fetchMunicipalityByDistrict")
+	@ResponseBody
+	public ResponseEntity<List<MunicipalityDropDownDto>> fetchMunicipalityByDistrict(@RequestParam Long districtId) {
+		try {
+			ServiceOutcome<List<MunicipalityDropDownDto>> outcome = masterCommonService.getAllActiveMunicipalityIdAndNameByDistrict(districtId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchMunicipalityByDistrict of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@GetMapping(path = "/fetchWardByMunicipality")
+	@ResponseBody
+	public ResponseEntity<List<WardDropDownDto>> fetchWardByMunicipality(@RequestParam Long municipalityId) {
+		try {
+			ServiceOutcome<List<WardDropDownDto>> outcome = masterCommonService.getAllActiveWardIdAndNameByMunicipalityId(municipalityId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchWardByMunicipality of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@GetMapping(path = "/getMuniciplaityByDistrict")
+	@ResponseBody
+	public ResponseEntity<List<BAMSMunicipalityDto>> getMuniciplaityByDistrict(@RequestParam Long districtId) {
+		try {
+			ServiceOutcome<List<BAMSMunicipalityDto>> outcome = masterCommonService
+					.getAllActiveMunicipalityByDistrict(districtId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in getMuniciplaityByDistrict of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@ResponseBody
+	@GetMapping("/fetchBranchByBank")
+	public String fetchBranchByBank(@RequestParam Long bankId) {
+	    JSONObject response = new JSONObject();
+	    try {
+	        ServiceOutcome<List<BankBranchMaster>> outcome = commonERPService.findByBankId(bankId);
+	        if (outcome != null && outcome.getData() != null && !outcome.getData().isEmpty()) {
+	            JSONArray branchArray = new JSONArray();
+	            for (BankBranchMaster branch : outcome.getData()) {
+	                JSONObject branchObj = new JSONObject();
+	                branchObj.put("bankBranchId", branch.getBankBranchId());
+	                branchObj.put("branchName", branch.getBranchName());
+	                branchArray.add(branchObj);
+	            }
+	            response.put("status", "success");
+	            response.put("data", branchArray);
+	        } else {
+	            response.put("status", "empty");
+	            response.put("message", "No branches found for the given bank.");
+	        }
+	    } catch (Exception e) {
+	        response.put("status", "error");
+	        response.put("message", "An error occurred while fetching branches: " + e.getMessage());
+	    }
+	    return response.toString();
+	}
+	
+	@GetMapping(path = "/fetch-project-by-financialYear")
+	@ResponseBody
+	public ResponseEntity<List<ProjectDropDownDto>> fetchProjectByFinancialYearId(@RequestParam Long financialYearId) {
+		try {
+			ServiceOutcome<List<ProjectDropDownDto>> outcome = masterCommonService.getAllActiveProjectByFinancialYearId(financialYearId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchProjectByFinancialYearId() of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@GetMapping(path = "/fetch-approved-project-by-financialYear")
+	@ResponseBody
+	public ResponseEntity<List<ProjectDropDownDto>> fetchApprovedProjectByFinancialYearId(@RequestParam Long financialYearId) {
+		try {
+			ServiceOutcome<List<ProjectDropDownDto>> outcome = masterCommonService.getAllActiveApprovedProjectByFinancialYearId(financialYearId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchApprovedProjectByFinancialYearId() of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@GetMapping(path = "/fetch-approved-workOrder-by-projectEstimation")
+	@ResponseBody
+	public ResponseEntity<WorkOrderSCSTDTO> fetchApprovedWorkOrderByProjectEstimationId(@RequestParam Long projectEstimationId) {
+		try {
+			ServiceOutcome<WorkOrderSCSTDTO> outcome = masterCommonService.getApprovedWorkOrderByProjectEstimationId(projectEstimationId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in fetchApprovedWorkOrderByProjectEstimationId() of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@ResponseBody
+	@GetMapping("/getProjectCode")
+	public ResponseEntity<ProjectDto> getProjectCodeProjectId(@RequestParam("projectId") Long projectId) {
+	    try {
+	        ServiceOutcome<ProjectDto> outcome = masterCommonService.getProjectCodeByProjectId(projectId);
+	        return ResponseEntity.ok(outcome.getData());
+	    } catch (Exception e) {
+	    	log.error("Exception occured in getProjectCodeProjectId() of MasterCommonController" + e.getMessage());
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	    }
+	}
+
+	@ResponseBody
+	@GetMapping("/getProjectDataByFinancialYear")
+	public ResponseEntity<List<ProjectDto>> getProjectDataByFinanacialYear(@RequestParam Long financialYearId) {
+	    try {
+	        ServiceOutcome<List<ProjectDto>> outcome = masterCommonService.getProjectsByFinancialYear(financialYearId);
+	        return ResponseEntity.ok(outcome.getData());
+	    } catch (Exception e) {
+	    	log.error("Exception occured in getProjectDataByFinanacialYear() of MasterCommonController" + e.getMessage());
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	    }
+	}
+	
+	@ResponseBody
+	@GetMapping(path = "/getAccountDetailsByAccountNo", name = "Fetch Account Details By AccountNo")
+	public ResponseEntity<AgencyBankDetailsDTO> getAccountDetailsByAccountNo(@RequestParam(required = false) Long agencyBankId) {
+		try {
+			ServiceOutcome<AgencyBankDetailsDTO> outcome = masterCommonService.getAccountDetailsByAccountNo(agencyBankId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in getAccountDetailsByAccountNo() of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@ResponseBody
+	@GetMapping(path = "/getAgencyBankDetailsByAgencyId", name = "Fetch Agency BankDetails By AgencyId")
+	public ResponseEntity<List<AgencyBankDetailsDTO>> getAgencyBankDetailsByAgencyId(@RequestParam(required = false) Long agencyId) {
+		try {
+			ServiceOutcome<List<AgencyBankDetailsDTO>> outcome = masterCommonService.getAgencyBankAccountNoByAgencyId(agencyId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in getAgencyBankDetailsByAgencyId() of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+
+	@ResponseBody
+	@GetMapping(path = "/getWorkInspectionByWorkOrderId", name = "Fetch Work Inspection By WorkOrderId")
+	public ResponseEntity<List<WorkInspectionDto>> getWorkInspectionByWorkOrderId(@RequestParam(required = false) Long workOrderId) {
+		try {
+			ServiceOutcome<List<WorkInspectionDto>> outcome = masterCommonService.getWorkInspectionByWorkOrderId(workOrderId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in getWorkInspectionByWorkOrderId() of MasterCommonController" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+
+	@ResponseBody
+	@GetMapping("/get-district-by-financialYear")
+	public ResponseEntity<List<DistrictDropDownDto>> getDistrictDatByFinancialYear(@RequestParam("financialYearId") Long financialYearId){
+		ServiceOutcome<List<DistrictDropDownDto>> districtList = new ServiceOutcome<List<DistrictDropDownDto>>();
+		try {
+			districtList = masterCommonService.getAllDistrictByFinancialYear(financialYearId);
+			
+			if(districtList.getOutcome() && districtList.getData() != null) {
+				return new ResponseEntity<List<DistrictDropDownDto>>(districtList.getData(),HttpStatus.OK);
+			}else {
+				return new ResponseEntity<List<DistrictDropDownDto>>(districtList.getData(),HttpStatus.NOT_FOUND);
+			}
+		}catch (Exception e) {
+			log.error("Exception occured in getDistrictDatByFinancialYear() in MasterCommonController", e.getMessage());
+			e.printStackTrace();
+			return new ResponseEntity<List<DistrictDropDownDto>>(districtList.getData(),HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@ResponseBody
+	@GetMapping("/get-projects-by-financialyear-and-district")
+	public ResponseEntity<List<ProjectDropDownDto>> getProjectsDatByDistrict(@RequestParam("financialYearId") Long financialYearId,@RequestParam("districtId") Long districtId){
+		ServiceOutcome<List<ProjectDropDownDto>> projectList = new ServiceOutcome<>();
+		try {
+			projectList = masterCommonService.getAllApprovedProjectsByFinancialYearAndDistrict(financialYearId, districtId);
+			
+			if(projectList.getOutcome() && projectList.getData() != null) {
+				return new ResponseEntity<List<ProjectDropDownDto>>(projectList.getData(),HttpStatus.OK);
+			}else {
+				return new ResponseEntity<List<ProjectDropDownDto>>(projectList.getData(),HttpStatus.NOT_FOUND);
+			}
+		}catch (Exception e) {
+			log.error("Exception occured in getDistrictDatByFinancialYear() in MasterCommonController", e.getMessage());
+			e.printStackTrace();
+			return new ResponseEntity<List<ProjectDropDownDto>>(projectList.getData(),HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}	
+
+	@ResponseBody
+	@GetMapping("/schools/by-district")
+	public ResponseEntity<List<SchoolDto>> getSchoolsByDistrict(@RequestParam("districtId") Long districtId) {
+	    try {
+	        ServiceOutcome<List<SchoolDto>> outcome = masterCommonService.getAllSchoolsByDistrict(districtId);
+	        if (outcome.getOutcome() && outcome.getData() != null) {
+	            return ResponseEntity.ok(outcome.getData());
+	        } else {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(outcome.getData());
+	        }
+	    } catch (Exception e) {
+	        log.error("Exception occured in getSchoolsByDistrict() in MasterCommonController: {}", e.getMessage());
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	    }
+	}
+
+	@ResponseBody
+	@GetMapping("/schools/by-block")
+	public ResponseEntity<List<SchoolDto>> getSchoolsByBlock(@RequestParam("blockId") Long blockId) {
+	    try {
+	        ServiceOutcome<List<SchoolDto>> outcome = masterCommonService.getAllSchoolsByBlock(blockId);
+	        if (outcome.getOutcome() && outcome.getData() != null) {
+	            return ResponseEntity.ok(outcome.getData());
+	        } else {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(outcome.getData());
+	        }
+	    } catch (Exception e) {
+	        log.error("Exception occured in getSchoolsByBlock() in MasterCommonController: {}", e.getMessage());
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	    }
+	}
+
+	@ResponseBody
+	@GetMapping("/schools/by-grampanchayat")
+	public ResponseEntity<List<SchoolDto>> getSchoolsByGrampanchayat(@RequestParam("gpId") Long gpId) {
+	    try {
+	        ServiceOutcome<List<SchoolDto>> outcome = masterCommonService.getAllSchoolsByGrampanchayat(gpId);
+	        if (outcome.getOutcome() && outcome.getData() != null) {
+	            return ResponseEntity.ok(outcome.getData());
+	        } else {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(outcome.getData());
+	        }
+	    } catch (Exception e) {
+	        log.error("Exception occured in getSchoolsByGrampanchayat() in MasterCommonController: {}", e.getMessage());
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	    }
+	}
+
+	@ResponseBody
+	@GetMapping("/schools/by-village")
+	public ResponseEntity<List<SchoolDto>> getSchoolsByVillage(@RequestParam("villageId") Long villageId) {
+	    try {
+	        ServiceOutcome<List<SchoolDto>> outcome = masterCommonService.getAllSchoolsByVillage(villageId);
+	        if (outcome.getOutcome() && outcome.getData() != null) {
+	            return ResponseEntity.ok(outcome.getData());
+	        } else {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(outcome.getData());
+	        }
+	    } catch (Exception e) {
+	        log.error("Exception occured in getSchoolsByVillage() in MasterCommonController: {}", e.getMessage());
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	    }
+	}
+	
+	
+	@GetMapping("/getBuildingNameByFinancialYear")
+	public ResponseEntity<List<BuildingDto>> getBuildingNameByFinancialYear(@RequestParam Long financialYearId) {
+		try {
+			ServiceOutcome<List<BuildingDto>> outcome = masterCommonService.getBuildingNameByFinancialYear(financialYearId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occurred in getBuildingNameByFinancialYear() MasterCommonController: " + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	
+	@GetMapping("/getLocationCodeByBuildingId")
+	public ResponseEntity<PlanningDetailsDTO> getLocationCodeByBuildingId(@RequestParam("buildingId") Long buildingId) {
+		try {
+			ServiceOutcome<PlanningDetailsDTO> outcome = masterCommonService.getLocationCode(buildingId);
+			return ResponseEntity.ok(outcome.getData());
+		} catch (Exception e) {
+			log.error("Exception occured in getProjectCodeProjectId() of ProjectController :" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	
+	@GetMapping("/viewFile")
+	@ResponseBody
+	public ResponseEntity<?> viewFile(String cipherText, HttpServletRequest request,HttpServletResponse response) {
+		try {
+			String uploadedPath = GetPropertyValue.getPropertyValue("UPLOAD.FILE.PATH");
+			FileEncryptDto fileDto = FormDecryptionUtil.decryptAndDeserializeForm(cipherText, request,FileEncryptDto.class);
+			
+			if(fileDto == null) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("fileDto is null");
+			}
+			
+			String path = uploadedPath + File.separator + fileDto.getModuleName() + File.separator + fileDto.getFileName();
+			Path file = Paths.get(path);
+			
+			if(!Files.exists(file) && !Files.isReadable(file)) {
+	        	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found :" + fileDto.getFileName());
+	        }
+			
+			DownloadFile.viewUploadedDocument(file, request, response);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			log.error("Exception occured in viewFile() of ProjectController :" + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Request File Not Found .");
+		}
+	}
+	
+
+	
+}

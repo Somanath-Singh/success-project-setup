@@ -1,0 +1,17 @@
+package com.aashdit.prod.heads.hims.ipms.config;
+
+import java.util.Optional;
+
+import org.springframework.data.domain.AuditorAware;
+
+import com.aashdit.prod.heads.hims.ipms.utils.SecurityHelper;
+import com.aashdit.prod.heads.hims.umt.model.User;
+
+public class AuditorAwareImpl implements AuditorAware<User> {
+
+	@Override
+	public Optional<User> getCurrentAuditor() {
+		return Optional.ofNullable(SecurityHelper.getCurrentUser());
+	}
+
+}

@@ -1,0 +1,414 @@
+package com.aashdit.prod.heads.common.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.aashdit.construction.model.Ward;
+import com.aashdit.construction.repository.WardRepository;
+import com.aashdit.prod.heads.common.dto.GenerateTopCodeDTO;
+import com.aashdit.prod.heads.common.dto.LookupValueDTO;
+import com.aashdit.prod.heads.common.model.Block;
+import com.aashdit.prod.heads.common.model.District;
+import com.aashdit.prod.heads.common.model.Grampanchayat;
+import com.aashdit.prod.heads.common.model.Municipality;
+import com.aashdit.prod.heads.common.model.Village;
+import com.aashdit.prod.heads.common.repository.BlockRepository;
+import com.aashdit.prod.heads.common.repository.DistrictRepository;
+import com.aashdit.prod.heads.common.repository.GrampanchayatRepository;
+import com.aashdit.prod.heads.common.repository.MunicipalityRepository;
+import com.aashdit.prod.heads.common.repository.VillageRepository;
+import com.aashdit.prod.heads.common.utils.LookupCodeConstants;
+import com.aashdit.prod.heads.common.utils.ModuleType;
+import com.aashdit.prod.heads.framework.core.ServiceOutcome;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class CodeGeneratorImpl implements CodeGenerator {
+
+    @Autowired
+    private GenericCodeStrategy genericCodeStrategy;
+    
+    @Autowired
+    private MasterCommonService masterCommonService;
+    
+    @Autowired
+	private DistrictRepository districtRepository;
+
+    @Autowired
+	private BlockRepository blockRepository;
+
+    @Autowired
+	private GrampanchayatRepository gpRepository;
+
+    @Autowired
+	private VillageRepository villageRepository;
+    
+    @Autowired
+    private MunicipalityRepository municipalityRepository;
+    
+    @Autowired
+    private WardRepository wardRepository;
+    
+    /**
+     * Generates a clean, fixed-length alphabetic abbreviation from a given name.
+     *
+     * <p><b>Purpose:</b><br>
+     * Used to derive standardized short codes (e.g., for districts, blocks, or villages)
+     * from full entity names to ensure consistent and readable project codes.
+     *
+     * <p><b>Process:</b>
+     * <ol>
+     *   <li>If the input name is {@code null} or empty, returns a placeholder string of 'A's
+     *       with the specified length (e.g., "AAAAA" for length 5).</li>
+     *   <li>Converts the input name to uppercase and removes all non-alphabetic characters.</li>
+     *   <li>If the cleaned string exceeds the target length, it is truncated.</li>
+     *   <li>If shorter, it is returned as-is (no extra padding beyond fallback handling).</li>
+     * </ol>
+     *
+     * <p><b>Examples:</b>
+     * <ul>
+     *   <li>{@code createAbbreviatedCode("Angul District", 5)} → {@code ANGUL}</li>
+     *   <li>{@code createAbbreviatedCode("TAL@CHER", 3)} → {@code TAL}</li>
+     *   <li>{@code createAbbreviatedCode("", 4)} → {@code AAAA}</li>
+     * </ul>
+     *
+     * @param name   The original name to abbreviate (e.g., "Angul District").
+     * @param length The desired maximum length of the resulting code.
+     * @return A standardized uppercase alphabetic code of the specified length.
+     */
+    private String createAbbreviatedCode(String name, int length) {
+        if (name == null || name.trim().isEmpty()) {
+            // Return padded 'A's for empty names to ensure consistent length
+            return String.format("%" + length + "s", "").toUpperCase().replace(' ', 'A');
+        }
+        // Clean: uppercase + remove non-alphabetic chars, then truncate/pad
+        String clean = name.toUpperCase().replaceAll("[^A-Z]", "");
+        return clean.length() > length ? clean.substring(0, length) : clean;
+    }
+
+    /**
+     * Generates the next sequential code for a given module based on its prefix and existing max code.
+     *
+     * Code format:
+     *   {PREFIX}{SEQUENCE}
+     * Example:
+     *   PREFIX = "WO-ANGUL-TAL-DHA-BHO-0001-"
+     *   maxExistingCode = "WO-ANGUL-TAL-DHA-BHO-0001-0003"
+     *   Output = "WO-ANGUL-TAL-DHA-BHO-0001-0004"
+     *
+     * Rules:
+     * - If no existing code is found, sequence starts at 0001 (or as per sequenceLength).
+     * - If sequence exceeds max allowed digits, throws exception.
+     * - Automatically reads `sequenceLength` from ModuleType enum.
+     */
+    private String generateNextSequentialCode(ModuleType moduleType, String expectedPrefix, String maxExistingCode) {
+        int seqLen = moduleType.getSequenceLength() != null ? moduleType.getSequenceLength() : 4;
+
+        // Case 1: No previous code or mismatched prefix → start fresh
+        if (maxExistingCode == null || !maxExistingCode.startsWith(expectedPrefix)) {
+            return expectedPrefix + String.format("%0" + seqLen + "d", 1);
+        }
+
+        // Case 2: Extract numeric suffix after the last dash
+        int lastDashIndex = maxExistingCode.lastIndexOf('-');
+        if (lastDashIndex == -1) {
+            throw new IllegalArgumentException("Invalid code format - missing numeric suffix: " + maxExistingCode);
+        }
+
+        String numericPart = maxExistingCode.substring(lastDashIndex + 1);
+        try {
+            int currentNumber = Integer.parseInt(numericPart);
+            int next = currentNumber + 1;
+
+            // Validate sequence length to avoid overflow (e.g., beyond 9999 for 4-digit)
+            if (String.valueOf(next).length() > seqLen) {
+                throw new IllegalStateException("Sequence overflow for prefix " + expectedPrefix +
+                    " (exceeded " + seqLen + " digits)");
+            }
+
+            // Format new code with zero-padded sequence
+            return expectedPrefix + String.format("%0" + seqLen + "d", next);
+
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid numeric suffix in existing code: " + numericPart, e);
+        }
+    }
+
+    /**
+     * Resolves a short project type code from master lookup data based on the project type name.
+     *
+     * <p><b>Purpose:</b><br>
+     * Converts a human-readable project type name (e.g., "Road Construction") into its
+     * corresponding short code (e.g., "RC") for use in code generation.
+     *
+     * <p><b>Process:</b>
+     * <ol>
+     *   <li>Fetches all project type entries from the master lookup service.</li>
+     *   <li>Validates that the lookup was successful and contains data.</li>
+     *   <li>Performs a case-insensitive match on the project type name.</li>
+     *   <li>Returns the associated short code if found.</li>
+     *   <li>If not found, throws an {@link IllegalArgumentException}.</li>
+     * </ol>
+     *
+     * <p><b>Example:</b>
+     * <ul>
+     *   <li>{@code resolveProjectTypeCode("Road Construction")} → {@code "RC"}</li>
+     * </ul>
+     *
+     * @param projectType Human-readable project type name to resolve.
+     * @return Short project type code corresponding to the input name.
+     * @throws IllegalArgumentException if the lookup fails or no matching project type is found.
+     */
+    private String resolveProjectTypeCode(String projectType) {
+        // Fetch all project type lookup values from master data
+        ServiceOutcome<List<LookupValueDTO>> outcome = masterCommonService
+                .getLookupValuesByLookupCode(LookupCodeConstants.PROJECT_TYPE);
+        
+        // Validate lookup operation success and data availability
+        if (!outcome.getOutcome() || outcome.getData() == null || outcome.getData().isEmpty()) {
+            throw new IllegalArgumentException("Failed to fetch project types from master data: " + outcome.getMessage());
+        }
+        
+        // Find matching project type by case-insensitive name comparison
+        return outcome.getData().stream()
+        	    .filter(dto -> projectType != null && projectType.equalsIgnoreCase(dto.getValueEn()))
+        	    .map(dto -> dto.getValueCode()) 
+        	    .findFirst()
+        	    .orElseThrow(() -> new IllegalArgumentException(
+        	        String.format("Project type '%s' not found in master lookup data", projectType)));
+    }
+
+    /**
+     * Generates a new unique top-level project code based on the provided geographic hierarchy
+     * and optional project type configuration.
+     *
+     * <p><b>Code Format:</b><br>
+     * {@code {MODULE_PREFIX}-{PROJECT_TYPE}-{DISTRICT}-{BLOCK}-{GP}-{VILLAGE}-{SEQUENCE}}<br>
+     * Example: {@code PRO-RC-ANGUL-TAL-DHA-BHO-0001}
+     *
+     * <p><b>Behavior:</b>
+     * <ul>
+     *   <li>Validates that the given {@link ModuleType} is a top-level parent module (e.g., PROJECT, SCHOOL).</li>
+     *   <li>Fetches the geographic entities (District, Block, Gram Panchayat, Village) from their repositories, if IDs are provided.</li>
+     *   <li>Generates standardized short codes (abbreviations) for each geographic level.</li>
+     *   <li>Includes the module prefix only if {@code isPrefixAllowed} is {@code true} for the module.</li>
+     *   <li>Optionally appends a project type prefix when applicable.</li>
+     *   <li>Dynamically builds a hierarchical prefix string using available codes.</li>
+     *   <li>Fetches the latest existing project code with this prefix from the database and increments its numeric suffix sequentially.</li>
+     * </ul>
+     *
+     * <p><b>Example Workflow:</b><br>
+     * If the latest generated code for a project under district <b>Angul</b> and block <b>Talcher</b>
+     * is {@code PRO-RC-ANGUL-TAL-DHA-BHO-0009}, the next generated code will be:
+     * {@code PRO-RC-ANGUL-TAL-DHA-BHO-0010}.
+     *
+     * <p><b>Throws:</b>
+     * <ul>
+     *   <li>{@link IllegalArgumentException} if any required entity (District, Block, GP, Village) is missing or invalid.</li>
+     *   <li>{@link RuntimeException} for unexpected failures during code generation.</li>
+     * </ul>
+     *
+     * @param codeDto a validated {@link GenerateTopCodeDTO} containing all required inputs and dependencies
+     *                (repositories, module type, geographic identifiers, and project type)
+     * @return a complete unique top-level project code, e.g. {@code PRO-RC-ANGUL-TAL-DHA-BHO-0010}
+     */
+    @Override
+    public String generateTopLevelProjectCode(@Valid GenerateTopCodeDTO codeDto) {
+        try {
+        	ModuleType moduleType = codeDto.getModuleType();
+        	
+            // Validate that only Parent module is supported for top-level generation
+        	genericCodeStrategy.validateModuleHierarchy(moduleType);
+        	
+        	// Step 1: Fetch available geographic entities (optional)
+        	District district = null;
+        	Block block = null;
+        	Grampanchayat gp = null;
+        	Village village = null;
+        	Municipality municipalaty = null;
+        	Ward ward = null;
+        	String projectTypeCode = null;
+        	
+        	if (codeDto.getDistrictId() != null) {
+        	    district = districtRepository.findById(codeDto.getDistrictId())
+        	            .orElseThrow(() -> new IllegalArgumentException(
+        	                    "District not found with ID: " + codeDto.getDistrictId()));
+        	}
+
+        	if (codeDto.getBlockId() != null) {
+        	    block = blockRepository.findById(codeDto.getBlockId())
+        	            .orElseThrow(() -> new IllegalArgumentException(
+        	                    "Block not found with ID: " + codeDto.getBlockId()));
+        	}
+
+        	if (codeDto.getGpId() != null) {
+        	    gp = gpRepository.findById(codeDto.getGpId())
+        	            .orElseThrow(() -> new IllegalArgumentException(
+        	                    "Gram Panchayat not found with ID: " + codeDto.getGpId()));
+        	}
+
+        	if (codeDto.getVillageId() != null) {
+        	    village = villageRepository.findById(codeDto.getVillageId())
+        	            .orElseThrow(() -> new IllegalArgumentException(
+        	                    "Village not found with ID: " + codeDto.getVillageId()));
+        	}
+        	
+        	if (codeDto.getMunicipalatyId() != null) {
+        		municipalaty = municipalityRepository.findById(codeDto.getMunicipalatyId())
+        	            .orElseThrow(() -> new IllegalArgumentException(
+        	                    "Municipalaty not found with ID: " + codeDto.getMunicipalatyId()));
+        	}
+        	
+        	if (codeDto.getWardId() != null) {
+        	    ward = wardRepository.findById(codeDto.getWardId())
+        	            .orElseThrow(() -> new IllegalArgumentException(
+        	                    "Ward not found with ID: " + codeDto.getWardId()));
+        	}
+
+        	// Step 2: Generate abbreviated codes for available entities
+        	String districtCode = district != null ? createAbbreviatedCode(district.getDistrictName(), codeDto.getCodeLength()) : null;
+        	String blockCode = block != null ? createAbbreviatedCode(block.getBlockNameEN(), codeDto.getCodeLength()) : null;
+        	String gpCode = gp != null ? createAbbreviatedCode(gp.getGpNameEN(), codeDto.getCodeLength()) : null;
+        	String villageCode = village != null ? createAbbreviatedCode(village.getVillageNameEn(), codeDto.getCodeLength()) : null;
+        	String municipalatyCode = municipalaty != null ? createAbbreviatedCode(municipalaty.getMunicipalityName(), codeDto.getCodeLength()) : null;
+        	String wardCode = ward != null ? createAbbreviatedCode(ward.getWardName(), codeDto.getCodeLength()) : null;
+
+        	// Step 3: Project type is optional for non-project entities (like schools)
+        	if (codeDto.getProjectType() != null && !codeDto.getProjectType().trim().isEmpty()) {
+        	    projectTypeCode = resolveProjectTypeCode(codeDto.getProjectType());
+        	}
+
+        	// Step 4: Build prefix dynamically, only include non-null codes
+        	List<String> prefixParts = new ArrayList<>();
+        	
+        	// Include module type prefix if allowed
+        	if (Boolean.TRUE.equals(moduleType.getIsPrefixAllowed()) && moduleType.getPrefix() != null) {
+        	    prefixParts.add(moduleType.getPrefix());
+        	}
+        	if (projectTypeCode != null) prefixParts.add(projectTypeCode);
+        	if (districtCode != null) prefixParts.add(districtCode);
+        	if (blockCode != null) prefixParts.add(blockCode);
+        	if (gpCode != null) prefixParts.add(gpCode);
+        	if (villageCode != null) prefixParts.add(villageCode);
+        	if (municipalatyCode != null) prefixParts.add(municipalatyCode);
+        	if (wardCode != null) prefixParts.add(wardCode);
+
+//        	String codePrefix = String.join("-", prefixParts).toUpperCase() + "-";
+        	String codePrefix = String.join("", prefixParts).toUpperCase() + "-";
+        	
+        	log.debug("Generated flexible codePrefix: {}", codePrefix);
+
+            // Step 5: Find the maximum existing code with this prefix from database
+            String maxExistingCode = genericCodeStrategy.findMaxCode(codePrefix, moduleType);
+            
+            // Step 6: Generate next sequential code
+            return generateNextSequentialCode(moduleType, codePrefix, maxExistingCode);
+            
+        } catch (Exception e) {
+            log.error("Failed to generate top-level project code for module {}: {}", codeDto.getModuleType(), e.getMessage(), e);
+            throw new RuntimeException(String.format("Failed to generate top-level code for module %s", codeDto.getModuleType()), e);
+        }
+    }
+
+    /**
+     * Generates a new unique sub-module code that extends an existing parent project code.
+     *
+     * <p><b>Code Format:</b><br>
+     * {@code {MODULE_PREFIX}-{PARENT_PROJECT_CODE}-{SEQUENCE}}<br>
+     * Example: {@code EST-ANGUL-TAL-DHA-BHO-0001-0001}
+     *
+     * <p><b>Behavior:</b>
+     * <ul>
+     *   <li>Validates that the given {@link ModuleType} is eligible for sub-module code generation
+     *       based on the configured lookup list {@code SUPPORTED_SUB_MODULES}.</li>
+     *   <li>Ensures a valid non-empty parent project code is provided.</li>
+     *   <li>Builds a prefix dynamically using the module’s prefix (if allowed) and the parent project code.</li>
+     *   <li>Retrieves the maximum existing sub-module code that matches this prefix from the data source.</li>
+     *   <li>Increments the numeric suffix sequentially to generate a new unique sub-module code.</li>
+     * </ul>
+     *
+     * <p><b>Example Workflow:</b><br>
+     * If the latest sub-module code for project {@code ANGUL-TAL-DHA-BHO-0001} is
+     * {@code EST-ANGUL-TAL-DHA-BHO-0001-0005}, the next generated code will be
+     * {@code EST-ANGUL-TAL-DHA-BHO-0001-0006}.
+     *
+     * <p><b>Throws:</b>
+     * <ul>
+     *   <li>{@link IllegalArgumentException} if the module type is not supported or the parent code is invalid.</li>
+     *   <li>{@link RuntimeException} for unexpected failures during code generation.</li>
+     * </ul>
+     *
+     * @param moduleType the sub-module type for which the code is to be generated
+     * @param parentProjectCode the parent project’s unique code
+     * @return the newly generated sub-module code (e.g. {@code EST-ANGUL-TAL-DHA-BHO-0001-0006})
+     */
+	@Override
+	public String generateSubModuleCode(ModuleType moduleType, String parentProjectCode) {
+		try {
+			// Fetch supported sub-modules from master lookup
+	        ServiceOutcome<List<LookupValueDTO>> outcome = masterCommonService
+	            .getLookupValuesByLookupCode(LookupCodeConstants.SUPPORTED_SUB_MODULES);
+	        
+	        // Validate lookup success
+	        if (!outcome.getOutcome() || outcome.getData() == null || outcome.getData().isEmpty()) {
+	            throw new IllegalStateException("Failed to fetch supported sub-modules configuration: " + outcome.getMessage());
+	        }
+	        //get the supported modules list
+	        List<LookupValueDTO> supportedModules = outcome.getData();
+	        
+	        //Compare moduleType.name() with lookup value codes
+	        boolean isSupported = supportedModules.stream()
+	        		.anyMatch(dto -> moduleType.name().equalsIgnoreCase(dto.getValueCode()));
+	        
+	        if(!isSupported) {
+	        	String supportedModulesList = supportedModules.stream()
+	        			.map(module -> module.getValueCode())
+	        			.collect(Collectors.joining(","));
+	        	throw new IllegalArgumentException(String.format("Sub-module code generation is only supported for: [%s]. Requested module: %s",
+                supportedModulesList, moduleType));
+	        }
+
+			// Validate parent project code
+			if (parentProjectCode == null || parentProjectCode.trim().isEmpty()) {
+				throw new IllegalArgumentException(
+						String.format("Valid parent project code is required for %s module generation", moduleType));
+			}
+
+			genericCodeStrategy.validateModuleHierarchy(moduleType);
+
+			// Step 1: Construct prefix using module prefix + parent project code
+			StringBuilder prefixBuilder =  new StringBuilder();
+			
+			if(Boolean.TRUE.equals(moduleType.getIsPrefixAllowed()) && moduleType.getPrefix() != null) {
+				prefixBuilder.append(moduleType.getPrefix()).append("-");
+			}
+			
+			// Always include parent project code if available
+			if (parentProjectCode != null && !parentProjectCode.trim().isEmpty()) {
+			    prefixBuilder.append(parentProjectCode.trim()).append("-");
+			}
+			
+			// Final formatted prefix (always upper case, always ends with "- ")
+			String codePrefix = prefixBuilder.length() > 0 ? prefixBuilder.toString().toUpperCase() : "";
+
+			// Step 3: Find maximum existing sub-module code with this prefix
+			String maxExistingCode = genericCodeStrategy.findMaxCode(codePrefix, moduleType);
+
+			// Step 4: Generate next sequential sub-module code
+			return generateNextSequentialCode(moduleType, codePrefix, maxExistingCode);
+
+		} catch (Exception e) {
+			log.error("Failed to generate sub-module code for {} with parent {}: {}", moduleType, parentProjectCode,e.getMessage());
+			throw new RuntimeException(String.format("Failed to generate sub-module code for %s", moduleType), e);
+		}
+	}
+    
+}

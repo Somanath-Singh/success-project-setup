@@ -1,0 +1,198 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<script src="${contextPath}/assets/appJs/validation/common-utils.js"></script>
+<script src="${contextPath}/assets/appJs/validation/commonMaster.js"></script>
+<sec:authentication var="principal" property="principal" />
+<c:set var="roleCode" value="${principal.primaryRole.roleCode}"/>
+    
+<div class="cardcontainer">
+	<div class="breadcrumb_conatiner">
+		<div class="col-md-6">
+			<h4 class="change-color">Add Or Update Section</h4>
+		</div>
+	
+		<div class="col-md-6">
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="${contextPath}/home"><i class="fa fa-home"></i></a></li>
+					<li class="breadcrumb-item active" aria-current="page">Add And Update Section</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card">
+				<div class="card-header">
+					<h6 class="card-title">Add Or Update Section</h6>
+				</div>
+
+				<div class="card-body">
+				    <form action="${contextPath}/section/save" method="post" id="saveFormId" class="row">
+				        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+				        <input type="hidden" name="sectionId" value="${section.sectionId}" id="sectionId" />
+				
+						<c:set var="functionList" value="getRoleList(this)"/>
+						<%@ include file="/WEB-INF/views/entityIdAndUserLevelListForMst.jsp"%>
+				        <div class="form-group col-md-3">
+				            <label class="required">Section Name :</label>
+				            <input type="text" class="form-control form-control-sm require" id="sectionName" name="sectionName" maxlength="20" value="${section.sectionName}">
+				        </div>
+				
+				        <div class="form-group col-md-3">
+				            <label class="required">Section Code :</label>
+				            <input type="text" class="form-control form-control-sm capitalizeEachLetter require" id="sectionCode" name="sectionCode" maxLength="20" value="${section.sectionCode}" <c:if test="${!empty section.sectionCode}">readonly</c:if> />
+				        </div>
+				
+						<div class="form-group col-md-3">
+							<label class="required" for="departmentId">Department Description :</label>
+							<textarea class="form-control form-control-sm require" id="sectionDescription" name="sectionDescription" maxLength="100">${section.sectionDescription}</textarea>
+						</div>
+				
+						<%@ include file="/WEB-INF/views/masters/roleEntityMap.jsp"%>
+						<%@ include file="/WEB-INF/views/masters/appEntityMap.jsp"%>
+				        
+				        <div class="form-group col-md-12 text-center" style="margin-top: 7px;">
+				            <button type="button" class="btn btn-submit" onclick="submitForm()">
+				                ${empty section.sectionId ? 'Submit' : 'Update'}
+				            </button>
+				            <button type="button" class="btn btn-warning" onclick="history.back()">Back</button>
+				        </div>
+				    </form>
+				</div> 
+			</div> 
+		</div> 
+	</div> 
+	<div class="cardcontainer cardContainerNotFirst">
+		 <div class="row mt-3">
+		 	<div class="col-md-12">
+				<div class="card">
+					<div class="card-header">
+		  				<h6 class="card-title">Section List</h6>
+					</div>
+					<div class="card-body">
+						<%@ include file="/WEB-INF/views/entityIdAndUserLevelListDrpForMst.jsp"%>
+						<table class="datatable table table-striped table-bordered mt-5 exportbtn">
+					    	<thead>
+						        <tr>
+						            <th style="width: 60px; text-align:center;">Sl.No.</th>
+						            <th>Section Name</th>
+						            <th>Section Code</th>
+						            <th>Action</th>
+						            
+						        </tr>
+					    	</thead>
+					    	<tbody>
+						        <c:forEach items="${sectionMasterList}" var="sect" varStatus="count">
+						            <tr>
+						                <td style="text-align:center;">${count.count}</td>
+						                <td>${sect.sectionName}</td>
+						                 <td>${sect.sectionCode}</td>
+						                
+						                <td><a href="#" onclick="editSection('${sect.sectionId}')" class="btn btn-primary btn-xs" title="Edit">
+				                                    <i class="fa fa-edit"></i>
+				                                </a>
+				                                <button type="button" class="btn ${!sect.isActive ? 'btn-danger' : 'btn-success'} btn-xs" data-toggle="tooltip" onclick="updateStatus(${sect.sectionId},${sect.isActive ?false:true})" title="${sect.isActive ? 'Activate' : 'Deactivate'}">
+				                                    <i class="${!sect.isActive ? 'fa fa-lock' : 'fa fa-unlock'}"></i>
+				                                </button></td>
+						                
+						            </tr>
+						        </c:forEach>
+					    	</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<form action="${contextPath}/section/edit" method="get" id="editForm">
+    <input type="hidden" name="sectionIdHd" id="sectionIdHd" />
+</form>
+
+<form action="${contextPath}/section/update-status" method="post" id="updateStatusForm">   
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+    <input type="hidden" id="sectionIdd" name="sectionIdd"/>
+    <input type="hidden" name="status" id="isActiveStatus" />  
+</form>
+
+<script>
+
+
+
+	function submitForm(){
+		let otherRoleCodes = $('#otherRoleCodes').val();
+	if(otherRoleCodes == null || otherRoleCodes.length == 0){
+		bootbox.alert('Please select at least one role');
+		return;
+	}
+	let entityAppsId = $('#entityAppsId').val();
+	if(entityAppsId == null || entityAppsId.length == 0){
+		bootbox.alert('Please select at least one module');
+		return;
+	}
+		if(validateForm() ){
+		if(encryptFormData('saveFormId', tableOrTbodyIDS,tableOrTbodyKeys)){
+			confirmation('saveFormId');
+		}
+	   else{
+			
+			bootbox.alert('SomeThing error happens');
+		}
+		}
+	} 
+
+	function editSection(sectionId){
+		if(sectionId==''){
+			bootbox.alert('Section id empty');	
+		}else{
+			$('#sectionIdHd').val(sectionId);
+			if(encryptFormData('editForm', tableOrTbodyIDS,tableOrTbodyKeys)){
+				$('#editForm').submit();
+			}else{
+				bootbox.alert('Something error happens');
+			}
+			
+		}
+		
+	}
+	function updateStatus(sectionId,isActive){
+		debugger
+		
+			$("#isActiveStatus").val(isActive);
+			$("#sectionIdd").val(sectionId);
+			if(encryptFormData('updateStatusForm', tableOrTbodyIDS,tableOrTbodyKeys)){
+			$("#updateStatusForm").submit();
+			}else{
+				bootbox.alert('Something error happens');
+			}
+		
+		 
+	}
+
+
+	document.addEventListener('DOMContentLoaded', function() {
+	    var elements = document.getElementsByClassName('capitalizeEachLetter');
+	    for (var i = 0; i < elements.length; i++) {
+	        elements[i].addEventListener('input', function() {
+	            this.value = capitalizeEachLetter(this.value);
+	        });
+	    }
+	});
+	
+	function capitalizeEachLetter(value) {
+	    return value.toUpperCase();
+	}
+
+
+
+</script>
+
+

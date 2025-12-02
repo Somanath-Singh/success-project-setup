@@ -20,14 +20,13 @@ public class UploadFile {
 	private static final String UPLOAD_DIRECTORY = rb.getString("UPLOAD.FILE.PATH");
 
 	public static String getPathToStoreDocument(String purpose, String id, String module) {
-		String rootpath = UPLOAD_DIRECTORY;
+		String rootpath = UPLOAD_DIRECTORY; 
 		File rootDir = new File(rootpath);
 		if (!rootDir.exists()) {
 			rootDir.mkdir();
 		}
-		// String uploadPath = rootpath + File.separator + module + File.separator +
-		// purpose + File.separator + id;
-		String uploadPath = rootpath + File.separator + module + "_" + purpose + "_" + id;
+		//String uploadPath = rootpath + File.separator + module + File.separator + purpose + File.separator + id; 
+		String uploadPath = rootpath + File.separator + module + "_" + purpose + "_" + id; 
 		File uploadDir = new File(uploadPath);
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
@@ -35,8 +34,7 @@ public class UploadFile {
 		return uploadPath;
 	}
 
-	public static String upload(MultipartFile multipartFile, String purpose, String id, String module)
-			throws IOException {
+	public static String upload(MultipartFile multipartFile, String purpose, String id, String module) throws IOException {
 		BufferedOutputStream stream = null;
 		boolean bool = false;
 		String uploadPath = getPathToStoreDocument(purpose, id, module);
@@ -58,8 +56,7 @@ public class UploadFile {
 		return filePath;
 	}
 
-	public static String uploadVideo(MultipartFile multipartFile, String purpose, String id, String module)
-			throws IOException {
+	public static String uploadVideo(MultipartFile multipartFile, String purpose, String id, String module) throws IOException {
 		BufferedOutputStream stream = null;
 		boolean bool = false;
 		String uploadPath = getPathToStoreDocument(purpose, id, module);
@@ -86,7 +83,8 @@ public class UploadFile {
 
 		String extension = FilenameUtils.getExtension(docname);
 		String newFileName = java.util.UUID.randomUUID().toString();
-		if (extension.equals("")) {
+		if (extension.equals(""))
+		{
 			extension = "file";
 		}
 		String filePathNew = uploadPath + File.separator + newFileName + "." + extension;
@@ -99,7 +97,8 @@ public class UploadFile {
 
 		String extension = FilenameUtils.getExtension(docname);
 		String newFileName = java.util.UUID.randomUUID().toString();
-		if (extension.equals("")) {
+		if (extension.equals(""))
+		{
 			extension = "file";
 		}
 		return newFileName + "." + extension;
@@ -126,7 +125,7 @@ public class UploadFile {
 			}
 		} finally {
 			if (bSucceeded) {
-				// srcFile.delete();
+				//srcFile.delete();
 			}
 		}
 		return null;
@@ -139,5 +138,6 @@ public class UploadFile {
 			out.write(buffer, 0, read);
 		}
 	}
-
+	
 }
+	
