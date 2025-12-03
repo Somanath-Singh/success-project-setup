@@ -10685,3 +10685,392 @@ Caused by: java.lang.NullPointerException: Cannot invoke "org.eclipse.jdt.intern
 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1665)
 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1598)
 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:183)
+!SESSION 2025-12-03 13:00:32.130 -----------------------------------------------
+eclipse.buildId=4.10.0.202103111225
+java.version=15.0.2
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product org.springframework.boot.ide.branding.sts4
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.springframework.boot.ide.branding.sts4
+
+!ENTRY com.atlassian.connector.eclipse.bamboo.core 4 0 2025-12-03 13:00:34.585
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: com.atlassian.connector.eclipse.bamboo.core [758]
+  Unresolved requirement: Import-Package: org.eclipse.mylyn.tasks.core.data
+    -> Export-Package: org.eclipse.mylyn.tasks.core.data; bundle-symbolic-name="org.eclipse.mylyn.tasks.core"; bundle-version="3.11.0.v20140304-2222"; version="0.0.0"
+       org.eclipse.mylyn.tasks.core [800]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="3.8.0"
+  Unresolved requirement: Import-Package: org.eclipse.mylyn.tasks.core
+    -> Export-Package: org.eclipse.mylyn.tasks.core; bundle-symbolic-name="org.eclipse.mylyn.tasks.core"; bundle-version="3.11.0.v20140304-2222"; version="0.0.0"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY com.atlassian.connector.eclipse.bamboo.ui 4 0 2025-12-03 13:00:34.590
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: com.atlassian.connector.eclipse.bamboo.ui [759]
+  Unresolved requirement: Require-Bundle: com.atlassian.connector.commons
+    -> Bundle-SymbolicName: com.atlassian.connector.commons; bundle-version="4.0.0.v20150427"; singleton:="true"
+       com.atlassian.connector.commons [757]
+         Unresolved requirement: Require-Bundle: org.apache.commons.httpclient
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.tasks.core; bundle-version="[3.2.0,4.0.0)"
+    -> Bundle-SymbolicName: org.eclipse.mylyn.tasks.core; bundle-version="3.11.0.v20140304-2222"; singleton:="true"
+       org.eclipse.mylyn.tasks.core [800]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="3.8.0"
+  Unresolved requirement: Require-Bundle: com.atlassian.connector.eclipse.bamboo.core
+    -> Bundle-SymbolicName: com.atlassian.connector.eclipse.bamboo.core; bundle-version="3.2.5.v20150427"; singleton:="true"
+       com.atlassian.connector.eclipse.bamboo.core [758]
+         Unresolved requirement: Import-Package: org.eclipse.mylyn.tasks.core.data
+           -> Export-Package: org.eclipse.mylyn.tasks.core.data; bundle-symbolic-name="org.eclipse.mylyn.tasks.core"; bundle-version="3.11.0.v20140304-2222"; version="0.0.0"
+         Unresolved requirement: Import-Package: org.eclipse.mylyn.tasks.core
+           -> Export-Package: org.eclipse.mylyn.tasks.core; bundle-symbolic-name="org.eclipse.mylyn.tasks.core"; bundle-version="3.11.0.v20140304-2222"; version="0.0.0"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY com.atlassian.connector.eclipse.commons.core 4 0 2025-12-03 13:00:34.593
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: com.atlassian.connector.eclipse.commons.core [761]
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY com.atlassian.connector.eclipse.commons.ui 4 0 2025-12-03 13:00:34.597
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: com.atlassian.connector.eclipse.commons.ui [762]
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY com.atlassian.connector.eclipse.core 4 0 2025-12-03 13:00:34.601
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: com.atlassian.connector.eclipse.core [763]
+  Unresolved requirement: Import-Package: org.eclipse.mylyn.commons.net
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY com.atlassian.connector.eclipse.directclickthrough.ui 4 0 2025-12-03 13:00:34.614
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: com.atlassian.connector.eclipse.directclickthrough.ui [764]
+  Unresolved requirement: Require-Bundle: com.atlassian.connector.eclipse.ui
+    -> Bundle-SymbolicName: com.atlassian.connector.eclipse.ui; bundle-version="3.2.5.v20150427"; singleton:="true"
+       com.atlassian.connector.eclipse.ui [770]
+         Unresolved requirement: Require-Bundle: com.atlassian.connector.commons
+           -> Bundle-SymbolicName: com.atlassian.connector.commons; bundle-version="4.0.0.v20150427"; singleton:="true"
+              com.atlassian.connector.commons [757]
+                Unresolved requirement: Require-Bundle: org.apache.commons.httpclient
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.tasks.ui
+    -> Bundle-SymbolicName: org.eclipse.mylyn.tasks.ui; bundle-version="3.11.0.v20140304-0241"; singleton:="true"
+       org.eclipse.mylyn.tasks.ui [804]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="3.8.0"
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.discovery.ui; bundle-version="3.8.0"; x-installation:="greedy"; resolution:="optional"
+           -> Bundle-SymbolicName: org.eclipse.mylyn.discovery.ui; bundle-version="3.11.0.v20131021-1909"; singleton:="true"
+              org.eclipse.mylyn.discovery.ui [797]
+                Unresolved requirement: Require-Bundle: org.eclipse.mylyn.discovery.core; bundle-version="[3.8.0,4.0.0)"
+                  -> Bundle-SymbolicName: org.eclipse.mylyn.discovery.core; bundle-version="3.11.0.v20131021-1909"; singleton:="true"
+                     org.eclipse.mylyn.discovery.core [796]
+                       Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="3.8.0"
+  Unresolved requirement: Require-Bundle: com.atlassian.connector.commons
+    -> Bundle-SymbolicName: com.atlassian.connector.commons; bundle-version="4.0.0.v20150427"; singleton:="true"
+  Unresolved requirement: Require-Bundle: com.atlassian.connector.eclipse.core
+    -> Bundle-SymbolicName: com.atlassian.connector.eclipse.core; bundle-version="3.2.5.v20150427"; singleton:="true"
+       com.atlassian.connector.eclipse.core [763]
+         Unresolved requirement: Import-Package: org.eclipse.mylyn.commons.net
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.tasks.core
+    -> Bundle-SymbolicName: org.eclipse.mylyn.tasks.core; bundle-version="3.11.0.v20140304-2222"; singleton:="true"
+       org.eclipse.mylyn.tasks.core [800]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="3.8.0"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY com.atlassian.connector.eclipse.jira.core 4 0 2025-12-03 13:00:34.621
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: com.atlassian.connector.eclipse.jira.core [766]
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="[3.0.0,4.0.0)"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY com.atlassian.connector.eclipse.jira.ui 4 0 2025-12-03 13:00:34.629
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: com.atlassian.connector.eclipse.jira.ui [767]
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="[3.0.0,4.0.0)"
+  Unresolved requirement: Require-Bundle: com.atlassian.connector.eclipse.commons.core
+    -> Bundle-SymbolicName: com.atlassian.connector.eclipse.commons.core; bundle-version="3.2.5.v20150427"; singleton:="true"
+       com.atlassian.connector.eclipse.commons.core [761]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.tasks.ui; bundle-version="[3.0.0,4.0.0)"
+    -> Bundle-SymbolicName: org.eclipse.mylyn.tasks.ui; bundle-version="3.11.0.v20140304-0241"; singleton:="true"
+       org.eclipse.mylyn.tasks.ui [804]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="3.8.0"
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.discovery.ui; bundle-version="3.8.0"; x-installation:="greedy"; resolution:="optional"
+           -> Bundle-SymbolicName: org.eclipse.mylyn.discovery.ui; bundle-version="3.11.0.v20131021-1909"; singleton:="true"
+              org.eclipse.mylyn.discovery.ui [797]
+                Unresolved requirement: Require-Bundle: org.eclipse.mylyn.discovery.core; bundle-version="[3.8.0,4.0.0)"
+                  -> Bundle-SymbolicName: org.eclipse.mylyn.discovery.core; bundle-version="3.11.0.v20131021-1909"; singleton:="true"
+                     org.eclipse.mylyn.discovery.core [796]
+                       Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="3.8.0"
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.tasks.core; bundle-version="[3.0.0,4.0.0)"
+    -> Bundle-SymbolicName: org.eclipse.mylyn.tasks.core; bundle-version="3.11.0.v20140304-2222"; singleton:="true"
+       org.eclipse.mylyn.tasks.core [800]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="3.8.0"
+  Unresolved requirement: Require-Bundle: com.atlassian.connector.eclipse.jira.core
+    -> Bundle-SymbolicName: com.atlassian.connector.eclipse.jira.core; bundle-version="3.2.5.v20150427"; singleton:="true"
+       com.atlassian.connector.eclipse.jira.core [766]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="[3.0.0,4.0.0)"
+  Unresolved requirement: Require-Bundle: com.atlassian.connector.eclipse.commons.ui
+    -> Bundle-SymbolicName: com.atlassian.connector.eclipse.commons.ui; bundle-version="3.2.5.v20150427"; singleton:="true"
+       com.atlassian.connector.eclipse.commons.ui [762]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY com.atlassian.connector.eclipse.monitor.core 4 0 2025-12-03 13:00:34.636
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: com.atlassian.connector.eclipse.monitor.core [768]
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="[3.0.0,4.0.0)"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY com.atlassian.connector.eclipse.monitor.ui 4 0 2025-12-03 13:00:34.643
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: com.atlassian.connector.eclipse.monitor.ui [769]
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="[3.0.0,4.0.0)"
+  Unresolved requirement: Require-Bundle: com.atlassian.connector.eclipse.monitor.core
+    -> Bundle-SymbolicName: com.atlassian.connector.eclipse.monitor.core; bundle-version="3.2.5.v20150427"; singleton:="true"
+       com.atlassian.connector.eclipse.monitor.core [768]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="[3.0.0,4.0.0)"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY com.atlassian.connector.eclipse.ui 4 0 2025-12-03 13:00:34.649
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: com.atlassian.connector.eclipse.ui [770]
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net
+  Unresolved requirement: Require-Bundle: com.atlassian.connector.commons
+    -> Bundle-SymbolicName: com.atlassian.connector.commons; bundle-version="4.0.0.v20150427"; singleton:="true"
+       com.atlassian.connector.commons [757]
+         Unresolved requirement: Require-Bundle: org.apache.commons.httpclient
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY org.eclipse.mylyn.tasks.index.core 4 0 2025-12-03 13:00:34.662
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: org.eclipse.mylyn.tasks.index.core [801]
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.tasks.core; bundle-version="3.8.0"
+    -> Bundle-SymbolicName: org.eclipse.mylyn.tasks.core; bundle-version="3.11.0.v20140304-2222"; singleton:="true"
+       org.eclipse.mylyn.tasks.core [800]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="3.8.0"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY org.eclipse.mylyn.tasks.ui 4 0 2025-12-03 13:00:34.668
+!MESSAGE FrameworkEvent ERROR
+!STACK 0
+org.osgi.framework.BundleException: Could not resolve module: org.eclipse.mylyn.tasks.ui [804]
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="3.8.0"
+  Unresolved requirement: Require-Bundle: org.eclipse.mylyn.discovery.ui; bundle-version="3.8.0"; x-installation:="greedy"; resolution:="optional"
+    -> Bundle-SymbolicName: org.eclipse.mylyn.discovery.ui; bundle-version="3.11.0.v20131021-1909"; singleton:="true"
+       org.eclipse.mylyn.discovery.ui [797]
+         Unresolved requirement: Require-Bundle: org.eclipse.mylyn.discovery.core; bundle-version="[3.8.0,4.0.0)"
+           -> Bundle-SymbolicName: org.eclipse.mylyn.discovery.core; bundle-version="3.11.0.v20131021-1909"; singleton:="true"
+              org.eclipse.mylyn.discovery.core [796]
+                Unresolved requirement: Require-Bundle: org.eclipse.mylyn.commons.net; bundle-version="3.8.0"
+
+	at org.eclipse.osgi.container.Module.start(Module.java:463)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel$2.run(ModuleContainer.java:1845)
+	at org.eclipse.osgi.internal.framework.EquinoxContainerAdaptor$1$1.execute(EquinoxContainerAdaptor.java:136)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1838)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1779)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1743)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1665)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:234)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:345)
+
+!ENTRY org.eclipse.jface 2 0 2025-12-03 13:01:24.533
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2025-12-03 13:01:24.533
+!MESSAGE A conflict occurred for CTRL+SHIFT+T:
+Binding(CTRL+SHIFT+T,
+	ParameterizedCommand(Command(org.eclipse.jdt.ui.navigate.open.type,Open Type,
+		Open a type in a Java editor,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@4678ec43,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(CTRL+SHIFT+T,
+	ParameterizedCommand(Command(org.eclipse.lsp4e.symbolinworkspace,Go to Symbol in Workspace,
+		,
+		Category(org.eclipse.lsp4e.category,Language Servers,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@694f0655,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2025-12-03 13:01:24.533
+!MESSAGE A conflict occurred for ALT+CTRL+T:
+Binding(ALT+CTRL+T,
+	ParameterizedCommand(Command(org.eclipse.tm.terminal.connector.local.command.launch,Open Local Terminal on Selection,
+		,
+		Category(org.eclipse.tm.terminal.view.ui.commands.category,Terminal Commands,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@3b11deb6,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+CTRL+T,
+	ParameterizedCommand(Command(org.eclipse.team.svn.ui.command.EditPropertiesCommand,Show Properties,
+		,
+		Category(org.eclipse.team.svn.ui.command.category,SVN,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@5d08a65c,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+
+!ENTRY org.eclipse.egit.ui 2 0 2025-12-03 13:01:33.551
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\User'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.ui 2 2 2025-12-03 17:15:22.694
+!MESSAGE Invalid property category path: org.springframework.ide.eclipse.beans.ui.properties.ProjectPropertyPage (bundle: org.springframework.ide.eclipse.xml.namespaces, propertyPage: org.springframework.ide.eclipse.beans.ui.namespaces.projectPropertyPage)
+
+!ENTRY org.eclipse.jface 2 0 2025-12-03 17:15:30.532
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2025-12-03 17:15:30.532
+!MESSAGE A conflict occurred for CTRL+SHIFT+C:
+Binding(CTRL+SHIFT+C,
+	ParameterizedCommand(Command(org.eclipse.tm4e.languageconfiguration.togglelinecommentcommand,Toggle Line Comment,
+		,
+		Category(org.eclipse.tm4e.languageconfiguration.category,TM4E Language Configuration,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@225398f0,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.textEditorScope,,,system)
+Binding(CTRL+SHIFT+C,
+	ParameterizedCommand(Command(org.springframework.tooling.boot.ls.ToggleComment,Toggle Comment,
+		,
+		Category(org.springframework.ide.eclipse.commands,Spring Generic Text Editor,Spring Language Server Commands,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@51fd249d,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.textEditorScope,,,system)

@@ -7,7 +7,7 @@
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <sec:authentication var="principal" property="principal" />
 
-<style>
+<!-- <style>
 	.fa-signout-inmenu:before {
 		margin-left: 2px !important;
 	}
@@ -55,17 +55,9 @@ a.sidebar-link.active {
     font-weight: 700;
     min-height: 30px;
 }
-.logoName{
-	background-color: #36a2eb;
-    color: white;
-    font-weight: bold;
-    font-size: 36px;
-    width: 100%;
-    line-height: 50px;
-    padding: 18px 0;
-}
-</style>
 
+</style>
+ -->
 <!-- Sidebar -->
     <aside id="sidebar" class="style-3">
          <div class="">

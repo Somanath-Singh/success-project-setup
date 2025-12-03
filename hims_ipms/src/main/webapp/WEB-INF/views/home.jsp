@@ -11,6 +11,7 @@
 	type="text/css" />
 <sec:authentication var="principal" property="principal" />
 <c:set var="moduleCodes" value="" />
+
 <style>
 .coming-soon {
 	text-align: center;
@@ -31,7 +32,7 @@
 
 <div class="container-fluid">
 	<div class="card  coming-soon mt-5">
-		<h1>Dash board Coming Soon khbjh</h1>
+		<h1>Dash board Coming Soon</h1>
 	</div>
 </div>
 

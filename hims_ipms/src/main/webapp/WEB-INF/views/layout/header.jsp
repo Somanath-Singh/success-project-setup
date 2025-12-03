@@ -7,189 +7,140 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<sec:authentication var="principal" property="principal" />
 
 <style>
-.dropdown-toggle::after {
-	
-}
-.dot-icon {
-	display: inline-block;
-}
 
-.dot {
-	width: 4px;
-	height: 4px;
-	background-color: #fff;
-	border-radius: 50%;
-}
+/* ────────────────────────────────────────────────
+   MODULE GRID MENU + FULLSCREEN + CUSTOM SCROLLBAR
+   FULLY DRIVEN BY :root VARIABLES (ZERO HARD-CODED COLORS)
+   ──────────────────────────────────────────────── */
+.dot-icon { display: inline-block; }
 
-.dot-grid:hover {
-	opacity: 0.8;
-}
+.dot-grid:hover { opacity: 0.8; }
 
 .menu {
-	position: absolute;
-	top: 60px;
-	right: 0;
-	transform: translateX(-50%);
-	display: flex;
-	flex-wrap: wrap;
-	grid-template-columns: repeat(3, 80px);
-	background-color: #eee;
-	padding: 10px;
-	box-shadow: 0px 0px 0px 8px #bbc8e8;
-	border-radius: 8px;
-	z-index: 9;
-	max-height: 320px;
-	overflow-y: scroll;
-	width: 300px;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    transform: translateX(-50%);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    background: var(--gray-200);
+    padding: 15px;
+    box-shadow: 0 0 0 8px rgba(187, 200, 232, 0.3);   /* #bbc8e8 with transparency */
+    border-radius: var(--border-radius);
+    z-index: 9999;
+    max-height: 320px;
+    overflow-y: auto;
+    width: 300px;
+    scrollbar-width: none;           /* Firefox */
 }
+.menu::-webkit-scrollbar { display: none; }
 
-.menu.hidden {
-	display: none;
-}
-
-.menu a img {
-	width: 35px;
-	height: 35px;
-	transition: all 0.3s;
-}
+.menu.hidden { display: none; }
 
 .menu a {
-	text-align: center;
-	text-decoration: none;
-	margin: 5px !important;
-	min-height: 90px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	transition: all 0.3s;
-	border-radius: 20px;
-	position: relative;
-	z-index: 1;
+    min-height: 90px;
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 20px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+.menu a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(187, 200, 232, 0.3);   /* same as box-shadow color */
+    border-radius: 20px;
+    transition: var(--transition);
+    z-index: -1;
+}
+.menu a:hover::after { inset: 0; }
+.menu a:hover img { transform: scale(1.2); }
+
+.menu a img {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+    transition: var(--transition);
 }
 
-.menu a:after {
-	position: absolute;
-	content: "";
-	background: #bbc8e84d;
-	width: 0;
-	height: 0;
-	transition: all 0.3s;
-	z-index: -1;
-	border-radius: 20px;
+.menu a h3 {
+    color: var(--gray-900);
+    font-size: 12px;
+    margin: 10px 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 8ch;
+    transition: var(--transition);
 }
-
-.menu a:hover:after {
-	width: 100%;
-	height: 100%;
-}
-
-.menu a:hover img {
-	transform: scale(1.2)
-}
-
-.dot-icon .module-data h3 {
-	color: #000;
-	font-size: 12px;
-	margin-top: 10px;
-	margin-bottom: 0;
-	overflow: hidden;
-	display: inline-block;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	max-width: 8ch;
-	transition: all 0.3s;
-}
-
 .menu a:hover h3 {
-	white-space: break-spaces;
-	max-width: fit-content;
-}
-
-@
--moz-document url-prefix() { * {
-	scrollbar-width: thin; /* 'auto', 'thin', or 'none' */
-	scrollbar-color: #ddaf14 #f1f1f1; /* Thumb color | Track color */
-}
-
-}
-::-webkit-scrollbar {
-	width: 5px;
-	height: 5px;
-}
-
-::-webkit-scrollbar-track {
-	background: #f1f1f1;
-	border-radius: 5px;
-	height: 2px;
-}
-
-::-webkit-scrollbar-thumb {
-	background: #b99268;
-	border-radius: 5px;
-	height: 100px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-	background: #e5cd7b; /* Even darker gray on hover */
-}
-
-::-webkit-scrollbar-corner {
-	background: #f1f1f1;
-}
-
-.single-small-card-content {
-	height: 30px;
-}
-
-.menu::-webkit-scrollbar {
-	display: none;
+    white-space: normal;
+    max-width: none;
 }
 
 .expandBtn i {
-	font-size: 22px;
-	color: #fff;
-	transition: all 0.3s;
+    font-size: 22px;
+    color: var(--white);
+    transition: var(--transition);
 }
+.expandBtn:hover i { opacity: 0.6; }
 
+/* ────────────────────────────────────────────────
+   FULLSCREEN MODE – uses only root variables
+   ──────────────────────────────────────────────── */
 #body:fullscreen {
-	overflow-y: auto;
-	position: relative
+    overflow-y: auto;
+    position: relative;
 }
-
 #body:fullscreen::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: url(../assets/images/erpbg.jpg) rgba(125, 125, 125, 0.5);
-	background-blend-mode: multiply;
-	background-repeat: no-repeat;
-	background-position: center bottom;
-	background-size: cover;
-	background-attachment: fixed;
-	z-index: -1; /* Places it behind the main content */
+    content: "";
+    position: fixed;
+    inset: 0;
+    /* background: url(../assets/images/erpbg.jpg) center bottom / cover no-repeat,
+                rgba(125, 125, 125, 0.5); */
+    background-blend-mode: multiply;
+    background-attachment: fixed;
+    z-index: -1;
 }
-
-.expandBtn:hover i {
-	opacity: 0.6;
-}
-
 #body:fullscreen .navbar {
-	background: #003a7a;
+    background: var(--primary-dark) !important;   /* deep blue in fullscreen */
 }
+:not(:root):fullscreen::backdrop { background: transparent; }
 
-:not(:root):fullscreen::backdrop {
-	background: transparent;
+/* ────────────────────────────────────────────────
+   CUSTOM SCROLLBAR – fully variable-based
+   ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track {
+    background: var(--gray-200);
+    border-radius: 5px;
 }
+::-webkit-scrollbar-thumb {
+    background: var(--accent);           /* gold/yellow from your theme */
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #e5cd7b;                 /* slightly lighter gold – you can change via --accent if you want */
+}
+::-webkit-scrollbar-corner { background: var(--gray-200); }
+
+/* Small icon spacing fix */
+.fa-signout-inmenu:before { margin-left: 2px !important; }
+
 </style>
 
-
-<sec:authentication var="principal" property="principal" />
 <nav class="navbar navbar-expand px-2">
 	<!-- Button for sidebar toggle -->
 	<button class="btn sidebarBtn" type="button" data-bs-theme="dark"

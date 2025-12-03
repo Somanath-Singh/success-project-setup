@@ -5,5 +5,20 @@
     <fullyQualifiedTypeName name="lombok.Setter"/>
     <fullyQualifiedTypeName name="lombok.AllArgsConstructor"/>
     <fullyQualifiedTypeName name="lombok.NoArgsConstructor"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.hims.umt.model.Role"/>
     <fullyQualifiedTypeName name="com.aashdit.prod.heads.hims.ipms.utils.SecurityHelper"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.hims.umt.utils.SecurityHelper"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.framework.core.model.Auditable"/>
+    <fullyQualifiedTypeName name="org.mapstruct.Mapping"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.hims.umt.model.User"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.framework.core.util.UploadFile"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.framework.core.util.RandomString"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.common.utils.UploadFile"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.common.utils.DownloadFile"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.framework.core.ServiceOutcome"/>
+    <fullyQualifiedTypeName name="org.springframework.beans.factory.annotation.Autowired"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.common.model.State"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.common.model.Block"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.hims.umt.utils.Auditable"/>
+    <fullyQualifiedTypeName name="com.aashdit.prod.heads.common.utils.ModuleType"/>
 </qualifiedTypeNameHistroy>
