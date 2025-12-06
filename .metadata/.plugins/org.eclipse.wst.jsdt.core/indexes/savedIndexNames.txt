@@ -2,9 +2,6 @@ INDEX VERSION 1.4+D:\Somanath-Singh\IPMS-SETUP\.metadata\.plugins\org.eclipse.ws
 470049569.index
 3759077845.index
 3198777721.index
-1887747926.index
-1887747926.index
 1664827901.index
 1360233375.index
 2086510513.index
-1981898015.index

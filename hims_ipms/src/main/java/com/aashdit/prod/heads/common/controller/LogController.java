@@ -1,0 +1,161 @@
+package com.aashdit.prod.heads.common.controller;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import com.aashdit.prod.heads.common.utils.LogUtils;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller                                      
+@RequestMapping("/log")                    
+public class LogController {
+
+    @Autowired
+    private LogUtils logUtils;
+
+    @Autowired
+    private ConfigurableApplicationContext configurableApplicationContext;
+
+    @GetMapping("/logView")
+    public String logView(HttpServletRequest request, Model model) {
+        String contextPath = request.getContextPath();
+        if (contextPath != null && !contextPath.isEmpty()) {
+            contextPath = contextPath.substring(1, 2).toUpperCase() + contextPath.substring(2);
+        }
+
+        String activeProfile = getActiveProfile();
+        if (activeProfile != null && !activeProfile.isEmpty()) {
+            activeProfile = activeProfile.toUpperCase();
+        }
+
+        model.addAttribute("appLogName", contextPath + " " + activeProfile);
+        model.addAttribute("activeProfile", activeProfile);
+
+        return "site.view.logView";
+    }
+
+    private String getActiveProfile() {
+        String activeProfile = "";
+        try {
+            ConfigurableEnvironment configurableEnvironment = this.configurableApplicationContext.getEnvironment();
+            String[] activeProfiles = configurableEnvironment.getActiveProfiles();
+            if (activeProfiles.length > 0)
+                activeProfile = activeProfiles[0];
+
+        } catch (Exception e) {
+            log.error("Error in getActiveProfile", e);
+        }
+        return activeProfile;
+    }
+
+    @GetMapping(value = "/fetchLog", produces = "application/json")
+    public ResponseEntity<String> getLogContent() throws IOException {
+        String logFilePath = getLogFilePathFromLogBack();
+        log.info("LOG FILE PATH ==> " + logFilePath);
+        Path logFile = Paths.get(logFilePath);
+        log.info("LOG FILE NAME ==> " + logFile.getFileName());
+
+        String logContent = Files.readAllLines(logFile).stream().collect(Collectors.joining("\n"));
+        return ResponseEntity.ok(logContent);
+    }
+
+    @GetMapping(value = "/fetch-cat-log", produces = "application/json")
+    public ResponseEntity<String> getCatLogContent() throws IOException {
+        String logFilePath = this.logUtils.getCatLinaFilePath();
+        log.info("CATELINA LOG FILE PATH ==> {}", logFilePath);
+
+        Path logFile = Paths.get(logFilePath);
+        log.info("CATELINA LOG FILE NAME ==> {}", logFile.getFileName());
+
+        String logContent = Files.readAllLines(logFile).stream().collect(Collectors.joining("\n"));
+        return ResponseEntity.ok(logContent);
+    }
+
+    @GetMapping("/downloadLog")
+    public void downloadLogFile(HttpServletResponse response) throws IOException {
+        String logFilePath = getLogFilePathFromLogBack();
+        Path logFile = Paths.get(logFilePath);
+
+        response.setContentType("text/plain");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + logFile.getFileName().toString() + "\"");
+        response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+
+        Files.copy(logFile, response.getOutputStream());
+        response.getOutputStream().flush();
+    }
+
+    @GetMapping("/download-cat-log")
+    public void downloadCatLogFile(HttpServletResponse response) throws IOException {
+        String logFilePath = this.logUtils.getCatLinaFilePath();
+        Path logFile = Paths.get(logFilePath);
+
+        response.setContentType("text/plain");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + logFile.getFileName().toString() + "\"");
+        response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+
+        Files.copy(logFile, response.getOutputStream());
+        response.getOutputStream().flush();
+    }
+
+    public String getLogFilePathFromLogBack() {
+        String logFilePath = "";
+        String logFile = "";
+
+        try {
+            ClassPathResource classPathResource = new ClassPathResource("logback-spring.xml");
+            InputStream inputStream = classPathResource.getInputStream();
+
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(inputStream);
+
+            String activeProfile = getActiveProfile();
+            NodeList nList = doc.getElementsByTagName("property");
+
+            for (int temp = 0; temp < nList.getLength(); temp++) {
+                Node nNode = nList.item(temp);
+
+                if (Objects.equals(nNode.getParentNode().getAttributes().getNamedItem("name").getNodeValue(), activeProfile)) {
+
+                    if ("LOG_HOME".equals(nNode.getAttributes().getNamedItem("name").getNodeValue()))
+                        logFilePath = nNode.getAttributes().getNamedItem("value").getNodeValue();
+
+                    if ("LOG_FILE".equals(nNode.getAttributes().getNamedItem("name").getNodeValue()))
+                        logFile = nNode.getAttributes().getNamedItem("value").getNodeValue();
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("Error in getLogFilePathFromLogBack", e);
+        }
+
+        logFilePath = logFilePath.endsWith("/") ? logFilePath : (logFilePath + "/");
+
+        return logFilePath + logFile;
+    }
+}

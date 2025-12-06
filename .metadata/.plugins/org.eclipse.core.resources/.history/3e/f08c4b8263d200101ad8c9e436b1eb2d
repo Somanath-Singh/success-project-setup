@@ -1,0 +1,144 @@
+package com.aashdit.prod.heads.common.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
+
+import com.aashdit.fms.utils.MetaDataType;
+
+@Entity
+@Table(name = "t_wfm_meta_data", indexes = {@Index(name = "idx_wfm_meta_data", columnList = "meta_data_id")})
+public class MetaData implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "meta_data_id", nullable = false)
+  private Long metaDataId;
+  
+  @Column(name = "meta_data_key", nullable = false)
+  private String metaDataKey;
+  
+  @Enumerated(EnumType.STRING)
+  @Column(name = "meta_data_type", nullable = false)
+  private MetaDataType metaDataType;
+  
+  @Column(name = "meta_data_value", nullable = false, length = 500000)
+  private String metaData;
+  
+  public static MetaDataBuilder builder() {
+    return new MetaDataBuilder();
+  }
+  
+  public static class MetaDataBuilder {
+    private Long metaDataId;
+    
+    private String metaDataKey;
+    
+    private MetaDataType metaDataType;
+    
+    private String metaData;
+    
+    private boolean isActive;
+    
+    public MetaDataBuilder metaDataId(Long metaDataId) {
+      this.metaDataId = metaDataId;
+      return this;
+    }
+    
+    public MetaDataBuilder metaDataKey(String metaDataKey) {
+      this.metaDataKey = metaDataKey;
+      return this;
+    }
+    
+    public MetaDataBuilder metaDataType(MetaDataType metaDataType) {
+      this.metaDataType = metaDataType;
+      return this;
+    }
+    
+    public MetaDataBuilder metaData(String metaData) {
+      this.metaData = metaData;
+      return this;
+    }
+    
+    public MetaDataBuilder isActive(boolean isActive) {
+      this.isActive = isActive;
+      return this;
+    }
+    
+    public MetaData build() {
+      return new MetaData(this.metaDataId, this.metaDataKey, this.metaDataType, this.metaData, this.isActive);
+    }
+    
+    public String toString() {
+      return "MetaData.MetaDataBuilder(metaDataId=" + this.metaDataId + ", metaDataKey=" + this.metaDataKey + ", metaDataType=" + this.metaDataType + ", metaData=" + this.metaData + ", isActive=" + this.isActive + ")";
+    }
+  }
+  
+  public MetaData(Long metaDataId, String metaDataKey, MetaDataType metaDataType, String metaData, boolean isActive) {
+    this.metaDataId = metaDataId;
+    this.metaDataKey = metaDataKey;
+    this.metaDataType = metaDataType;
+    this.metaData = metaData;
+    this.isActive = isActive;
+  }
+  
+  public void setMetaDataId(Long metaDataId) {
+    this.metaDataId = metaDataId;
+  }
+  
+  public void setMetaDataKey(String metaDataKey) {
+    this.metaDataKey = metaDataKey;
+  }
+  
+  public void setMetaDataType(MetaDataType metaDataType) {
+    this.metaDataType = metaDataType;
+  }
+  
+  public void setMetaData(String metaData) {
+    this.metaData = metaData;
+  }
+  
+  public void setActive(boolean isActive) {
+    this.isActive = isActive;
+  }
+  
+  public String toString() {
+    return "MetaData()";
+  }
+  
+  public Long getMetaDataId() {
+    return this.metaDataId;
+  }
+  
+  public String getMetaDataKey() {
+    return this.metaDataKey;
+  }
+  
+  public MetaDataType getMetaDataType() {
+    return this.metaDataType;
+  }
+  
+  public String getMetaData() {
+    return this.metaData;
+  }
+  
+  @Column(name = "is_active", columnDefinition = "boolean default true")
+  private boolean isActive = true;
+  
+  public boolean isActive() {
+    return this.isActive;
+  }
+  
+  public MetaData() {}
+}
+
