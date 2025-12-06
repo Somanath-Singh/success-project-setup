@@ -1,0 +1,152 @@
+package com.aashdit.setup.umt.utils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.springframework.stereotype.Component;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+@Slf4j
+@Component
+public class CommonFn {
+
+	public static HashMap<String, Object> onSuccess(Object data) {
+		HashMap<String, Object> eJsonObject = new HashMap<>();
+		eJsonObject.put("status", "success");
+		eJsonObject.put("data", data);
+		eJsonObject.put("outcome", true);
+		eJsonObject.put("message", "success");
+		return eJsonObject;
+	}
+
+	public static HashMap<String, Object> onError(Exception e) {
+		HashMap<String, Object> eJsonObject = new HashMap<>();
+		eJsonObject.put("status", "error");
+		eJsonObject.put("errorMessage", e.getMessage());
+		eJsonObject.put("outcome", false);
+		log.error("Error: {}", e.getMessage());
+		return eJsonObject;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static JSONObject onGsonArraySuccess(JsonArray data) throws Exception {
+		JSONObject eJsonObject = new JSONObject();
+		// parse data
+		JSONParser parser = new JSONParser();
+		JSONArray parsedData = (JSONArray) parser.parse(data.toString());
+		eJsonObject.put("msg", "success");
+		eJsonObject.put("data", parsedData);
+		eJsonObject.put("outcome", true);
+		return eJsonObject;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static JSONObject onGsonObjectSuccess(JsonObject data) throws Exception {
+		JSONObject eJsonObject = new JSONObject();
+		// parse data
+		JSONParser parser = new JSONParser();
+		JSONObject parsedData = (JSONObject) parser.parse(data.toString());
+		eJsonObject.put("status", "success");
+		eJsonObject.put("data", parsedData);
+		eJsonObject.put("outcome", true);
+		return eJsonObject;
+	}
+
+	// check given string is valid json or not
+	public static boolean isValidJson(String str) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.readTree(str);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public static Long getCurrentMonth() {
+		Calendar cal = Calendar.getInstance();
+		return Long.parseLong((cal.get(Calendar.MONTH) + 1) + "");
+	}
+
+	public static String getCurrentYear() {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.YEAR) + "";
+	}
+
+	public static String getCurrentDate(String format) {
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		return sdf.format(cal.getTime());
+	}
+
+	public static String getCurrentDate() {
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+		return sdf.format(cal.getTime());
+	}
+
+	public static String getCurrentDateWithTime() {
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		return sdf.format(cal.getTime());
+	}
+
+	public static String getCurrentDateWithTime(String format) {
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat(format + " HH:mm:ss");
+		return sdf.format(cal.getTime());
+	}
+
+	public static String EncodeBase64(String string) {
+		String encodedString = "";
+		try {
+			byte[] encodedBytes = Base64.getEncoder().encode(string.getBytes());
+			encodedString = new String(encodedBytes);
+		} catch (Exception e) {
+			log.error("Exception in encodeBase64() : ", e);
+		}
+		return encodedString;
+	}
+
+	public static boolean IsBase4Encoded(String input) {
+		try {
+			byte[] decodedBytes = Base64.getDecoder().decode(input);
+			String reencodedString = Base64.getEncoder().encodeToString(decodedBytes);
+			return input.equals(reencodedString);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public static String DecodeBase64(String string) {
+		String decodedString = "";
+		try {
+			byte[] decodedBytes = Base64.getDecoder().decode(string);
+			decodedString = new String(decodedBytes);
+		} catch (Exception e) {
+			log.error("Exception in decodeBase64() : ", e);
+		}
+		return decodedString;
+	}
+
+	public static Boolean IsValidUUID(UUID mappingUniqueCode) {
+		try {
+			@SuppressWarnings("unused")
+			UUID uuid = UUID.fromString(mappingUniqueCode.toString());
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public static String convertDateToString(Date releaseDate) {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+		return sdf.format(releaseDate);
+	}
+}

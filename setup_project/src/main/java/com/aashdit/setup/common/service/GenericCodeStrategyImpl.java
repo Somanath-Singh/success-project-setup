@@ -1,0 +1,276 @@
+package com.aashdit.setup.common.service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.aashdit.setup.common.model.CodeGenerationConfig;
+import com.aashdit.setup.common.utils.ModuleType;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class GenericCodeStrategyImpl implements GenericCodeStrategy {
+
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@Autowired
+	private CodeGenerationConfigService codeGenerationConfigService;
+	
+	@Override
+	public void validateModuleHierarchy(ModuleType moduleType) {
+	    CodeGenerationConfig cfg = getCodeConfig(moduleType.name());
+	    if (Boolean.TRUE.equals(cfg.getIsParentModule())) {
+	        validateParentModuleType(moduleType);
+	    } else {
+	        validateChildModuleType(moduleType);
+	    }
+	}
+
+	private CodeGenerationConfig getCodeConfig(String moduleName) {
+		try {
+			CodeGenerationConfig codeConfig = codeGenerationConfigService.getActiveConfigByModuleType(moduleName);
+			if (codeConfig == null) {
+				throw new IllegalStateException("No active configuration found for module type: " + moduleName);
+			}
+			return codeConfig;
+		} catch (Exception e) {
+			log.error("Exception occured in getCodeConfig of CodeGenerationConfigServiceImpl :" + e.getMessage());
+			throw new RuntimeException("Failed to fetch code generation config for module: " + moduleName + e.getMessage());
+		}
+	}
+
+	/**
+	 * Validates that the provided module type is a parent module and eligible for top-level code generation.
+	 *
+	 * <p>Process:
+	 * <ol>
+	 *   <li>Fetches the module configuration from the database using {@link #getCodeConfig}.</li>
+	 *   <li>Checks if the module is configured as a parent module (`isParentModule=true`).</li>
+	 *   <li>If the module is not a parent, throws {@link IllegalArgumentException} with a descriptive message,
+	 *       advising to use sub-module code generation instead.</li>
+	 *   <li>If the module is a valid parent, logs a successful validation message.</li>
+	 *   <li>Catches any exceptions during validation and logs the error (currently does not rethrow).</li>
+	 * </ol>
+	 *
+	 * <p>Example:
+	 * <pre>
+	 *   // Validate PROJECT module for top-level generation
+	 *   validateParentModuleType(ModuleType.PROJECT);
+	 * </pre>
+	 *
+	 * @param moduleType The module to validate as a parent
+	 * @throws IllegalArgumentException if the module is not a parent module
+	 */
+	public void validateParentModuleType(ModuleType moduleType) {
+		try {
+			CodeGenerationConfig codeConfig = this.getCodeConfig(moduleType.name());
+
+			// Validate if top-level generation is allowed
+			if (!codeConfig.getIsParentModule()) {
+				log.info("Top-level code generation initiated for parent module: {}" + moduleType);
+				throw new IllegalArgumentException(String.format(
+						"Top-level code generation is only supported for %s module. "
+								+ "Use generateSubModuleCode for dependent modules like ESTIMATION, WORKORDER, etc.",
+						moduleType));
+			}
+			log.info("Top-level code generation validated successfully for parent module: {}" , moduleType);
+		} catch (Exception e) {
+			log.error("Exception occured in validateParentModuleType of CodeGenerationConfigServiceImpl :" + e.getMessage());
+			throw e; // rethrow so calling method can handle
+		}
+	}
+
+	/**
+	 * Validates that a given child module type has a correct parent-child relationship.
+	 *
+	 * <p>Process:
+	 * <ol>
+	 *   <li>Fetches the module's configuration from the database via {@link #getCodeConfig}.</li>
+	 *   <li>If the module is not a parent module (`isParentModule=false`):
+	 *     <ul>
+	 *       <li>Ensures that the expected parent module is defined in the configuration.</li>
+	 *       <li>Compares the provided parent module (from enum) with the expected parent (from DB).</li>
+	 *       <li>If mismatch or missing, throws {@link IllegalArgumentException} with detailed message.</li>
+	 *       <li>If valid, logs a success message indicating the validated parent-child relationship.</li>
+	 *     </ul>
+	 *   </li>
+	 *   <li>If the module is a parent module (`isParentModule=true`), throws an exception
+	 *       because parent modules should not be validated as children.</li>
+	 *   <li>Catches any exceptions and logs them (currently only logs `e.getMessage()`).</li>
+	 * </ol>
+	 *
+	 * <p>Example:
+	 * <pre>
+	 *   // For child module WORKORDER with parent PROJECT
+	 *   validateChildModuleType(ModuleType.WORKORDER);
+	 * </pre>
+	 *
+	 * @param moduleType The module to validate as a child
+	 * @throws IllegalArgumentException if the module hierarchy is invalid or misconfigured
+	 */
+	public void validateChildModuleType(ModuleType moduleType) {
+		try {
+			CodeGenerationConfig codeConfig = this.getCodeConfig(moduleType.name());
+
+			if (!codeConfig.getIsParentModule()) {
+				// Child module – must have a valid parent relationship
+				String parentModule = moduleType.getParentModule();
+				String expectedParent = codeConfig.getParentModuleType();
+				String childModule = codeConfig.getChildModuleType();
+
+				if (expectedParent == null) {
+					throw new IllegalArgumentException(String.format(
+							"Configuration error: Parent module type not defined for child module %s", childModule));
+				}
+
+				if (parentModule == null || !parentModule.equalsIgnoreCase(expectedParent)) {
+
+					throw new IllegalArgumentException(String.format(
+							"Invalid module hierarchy detected:%n" + " - Child Module: %s%n"
+									+ " - Expected Parent (from DB): %s%n" + " - Provided Parent: %s%n"
+									+ "Ensure correct parent is passed while generating code for child modules.",
+							childModule, expectedParent, (parentModule != null ? parentModule : "null")));
+				}
+				log.info(" Parent-child relationship validated successfully → Parent: {}, Child: {}", expectedParent,childModule);
+			} else {
+				// This should not happen — parent modules shouldn't be validated as children
+				throw new IllegalArgumentException(
+						String.format("Module '%s' is configured as a parent module but was validated as a child. "
+								+ "Check your workflow.", moduleType));
+			}
+		} catch (Exception e) {
+			log.error("Exception occured in validateChildModuleType of CodeGenerationConfigServiceImpl :" + e.getMessage());
+		}
+	}
+
+	/**
+	 * Finds the maximum existing code in the database for a given prefix and module type.
+	 *
+	 * <p><b>Purpose:</b><br>
+	 * Used during code generation to determine the last issued code so that the next sequential
+	 * code can be calculated.
+	 *
+	 * <p><b>Process:</b>
+	 * <ol>
+	 *   <li>Validates that the provided prefix is not null or empty.</li>
+	 *   <li>Fetches the active {@link CodeGenerationConfig} for the specified {@link ModuleType}.</li>
+	 *   <li>Executes a dynamic query based on the configuration to find the maximum existing code 
+	 *       that starts with the given prefix.</li>
+	 *   <li>Logs the retrieved max code for debugging and auditing.</li>
+	 * </ol>
+	 *
+	 * <p><b>Example:</b>
+	 * <ul>
+	 *   <li>{@code findMaxCode("EST-RC-SOUTH-", ModuleType.ESTIMATION)} → {@code "EST-RC-SOUTH-0007"}</li>
+	 * </ul>
+	 *
+	 * @param prefix Code prefix to search for (must not be null or empty)
+	 * @param moduleType Module type for which the code is being generated
+	 * @return Maximum existing code with the given prefix, or {@code null} if none exists
+	 * @throws IllegalArgumentException if the prefix is null or empty
+	 */
+	@Override
+	public String findMaxCode(String prefix, ModuleType moduleType) {
+		String maxCode = null;
+		try {
+			if (prefix == null || prefix.trim().isEmpty()) {
+				throw new IllegalArgumentException("Code prefix cannot be null or empty");
+			}
+
+			CodeGenerationConfig codeConfig = this.getCodeConfig(moduleType.name());
+
+			log.info(codeConfig.toString());
+
+			if (codeConfig != null) {
+				maxCode = executeDynamicMaxQuery(codeConfig, prefix);
+				log.debug("Max code found: {} for prefix: {}", maxCode, prefix);
+			}
+		} catch (Exception e) {
+			log.error("Exception occured in getActiveConfigByModuleType of CodeGenerationConfigServiceImpl :" + e.getMessage());
+		}
+		return maxCode;
+	}
+
+	/**
+	 * Executes a dynamic SQL query to find the maximum existing code for a given prefix.
+	 * 
+	 * <p><b>Purpose:</b> This method is used by the code generation service to determine
+	 * the last issued code for a particular module and prefix so the next sequential code can be generated.
+	 *
+	 * <p><b>Process:</b>
+	 * <ol>
+	 *   <li>Validates that the {@link CodeGenerationConfig} has valid table and column names.</li>
+	 *   <li>Determines the schema (defaulting to "public" if not provided).</li>
+	 *   <li>Validates schema, table, and column names to prevent SQL injection.</li>
+	 *   <li>Constructs a dynamic SQL query to get the MAX value of the column where it starts with the prefix.</li>
+	 *   <li>Executes the query using JPA {@link javax.persistence.EntityManager} and returns the result as a string.</li>
+	 *   <li>If no matching row exists, returns {@code null}.</li>
+	 * </ol>
+	 *
+	 * <p><b>Example:</b>
+	 * <pre>
+	 *   CodeGenerationConfig config = ...;
+	 *   String maxCode = executeDynamicMaxQuery(config, "EST-RC-SOUTH-");
+	 *   // maxCode -> "EST-RC-SOUTH-0007" or null if no rows exist
+	 * </pre>
+	 *
+	 * @param config Configuration containing table, column, and optional schema
+	 * @param prefix Code prefix to search for
+	 * @return Maximum existing code matching the prefix, or {@code null} if none found
+	 * @throws IllegalArgumentException if config is invalid or identifiers are unsafe
+	 * @throws RuntimeException if the database query fails
+	 */
+	private String executeDynamicMaxQuery(CodeGenerationConfig config, String prefix) {
+		if (config == null || config.getTableName() == null || config.getColumnName() == null) {
+			throw new IllegalArgumentException("Invalid CodeGenerationConfig: table or column missing");
+		}
+
+		// Safe defaults and validations
+		String schema = (config.getSchemaName() != null && !config.getSchemaName().isBlank())
+				? config.getSchemaName().trim()
+				: "public";
+
+		String table = config.getTableName().trim();
+		String column = config.getColumnName().trim();
+
+		validateIdentifier(schema, "schema");
+		validateIdentifier(table, "table");
+		validateIdentifier(column, "column");
+
+		// Build SQL dynamically
+		StringBuilder sqlBuilder = new StringBuilder();
+		sqlBuilder.append("SELECT COALESCE(MAX(").append(column).append("), NULL) FROM ").append(schema).append(".")
+				.append(table).append(" WHERE ").append(column).append(" LIKE ?1 AND ").append(column)
+				.append(" IS NOT NULL");
+
+		String sql = sqlBuilder.toString();
+
+		log.info("Executing dynamic query: {}", sql);
+
+		try {
+			Query query = entityManager.createNativeQuery(sql);
+			query.setParameter(1, prefix + "%");
+
+			Object result = query.getSingleResult();
+			return result != null ? result.toString() : null;
+
+		} catch (Exception e) {
+			log.error("Dynamic query failed for table: {}.{} -> {}", schema, table, e.getMessage());
+			e.printStackTrace();
+			throw new RuntimeException("Failed executing dynamic query for " + schema + "." + table);
+		}
+	}
+
+	private void validateIdentifier(String name, String type) {
+		if (name == null || !name.matches("[a-zA-Z0-9_]+")) {
+			throw new IllegalArgumentException("Invalid " + type + " name: " + name);
+		}
+	}
+
+}

@@ -1,0 +1,87 @@
+package com.aashdit.setup.common.model;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import com.aashdit.setup.umt.utils.Auditable;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+
+@DynamicInsert
+@DynamicUpdate
+@Entity
+@Table(name = "t_adm_mst_governingbody", schema = "public")
+public class GoverningBody extends Auditable<Long> implements Serializable {/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2024524602027519988L;
+	
+	
+	
+	@Id
+	@Column(name = "governingbody_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long governingBodyId;
+
+	@Column(name = "governingbody_name")
+	private String governingBodyName;
+	
+	@Column(name = "governingbody_code")
+	private String governingBodyCode;
+
+	
+	@Column(name = "is_active")
+	private Boolean isActive;
+
+	@Column(name = "remarks")
+	private String remarks;
+	
+	
+	@Column(name = "email_id")
+	private String emailId;
+	
+	@Column(name = "phone_no")
+	private String phoneNo;
+	
+	@Column(name = "website")
+	private String website;
+	
+	@Column(name = "pincode")
+	private Long pincode;
+	
+	@Column(name = "address_line")
+	private String addressLine;
+	
+	
+	@Transient
+	private List<Long> moduleIds;
+
+	@Transient
+	private String objectType;
+
+	@Column(name = "primary_role_code")
+	private String primaryRoleCode;
+
+	@Column(name = "icon")
+	private String icon;
+
+}

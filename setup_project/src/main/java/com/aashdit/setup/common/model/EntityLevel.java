@@ -1,0 +1,14 @@
+package com.aashdit.setup.common.model;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("ENTITY_LEVEL")
+public class EntityLevel extends LookupValue {
+
+	private static final long serialVersionUID = 1L;
+	
+	public static final String DCODE = "ENTITY_LEVEL";
+
+}

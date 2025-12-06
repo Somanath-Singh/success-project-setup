@@ -1,0 +1,5 @@
+package com.aashdit.setup.common.utils;
+
+public enum MetaDataType {
+  STRING, INTEGER, BOOLEAN, DOUBLE, LONG, FLOAT, SHORT, BYTE, CHAR, DATE, TIME, TIMESTAMP, ARRAY, OBJECT, JSONOBJECT, JSONARRAY, XML, OTHER, STRING_ARRAY;
+}

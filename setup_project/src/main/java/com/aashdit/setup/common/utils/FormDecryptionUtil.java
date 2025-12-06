@@ -1,0 +1,118 @@
+package com.aashdit.setup.common.utils;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class FormDecryptionUtil {
+
+	private static final Logger logger = LoggerFactory.getLogger(FormDecryptionUtil.class);
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+
+	/**
+	 * Decrypts encrypted form data using the CSRF token and deserializes it into the given DTO class.
+	 *
+	 * @param <T>        the type of the DTO
+	 * @param cipherText Base64-encoded encrypted form data (iv::encryptedData::salt)
+	 * @param request    HTTP request containing the CSRF token
+	 * @param dtoClass   target DTO class type
+	 * @return decrypted and deserialized DTO object, or {@code null} if decryption fails
+	 *
+	 * @author Somanath Singh
+	 * @since 12/06/2025
+	 */
+	public static <T> T decryptAndDeserializeForm(String cipherText, HttpServletRequest request, Class<T> dtoClass) {
+		try {
+
+			if (cipherText == null || cipherText.trim().isEmpty()) {
+				throw new Exception("Encrypted form data is empty or null.");
+			}
+
+			String decodedText = new String(Base64.getDecoder().decode(cipherText));
+			String[] parts = decodedText.split("::");
+
+			if (parts.length != 3) {
+				throw new Exception("Invalid encrypted data format.");
+			}
+
+			String iv = parts[0];
+			String encrypted = parts[1];
+			String salt = parts[2];
+
+			String formPsk = request.getParameter("_csrf");
+			if (formPsk == null || formPsk.length() < 16) {
+				throw new Exception("Invalid or missing CSRF token.");
+			}
+
+			formPsk = formPsk.substring(0, 16);
+			AesUtil formAesUtil = new AesUtil(128, 1000);
+			String realFormData = formAesUtil.decrypt(encrypted, iv, formPsk, salt);
+
+			return objectMapper.readValue(realFormData, dtoClass);
+
+		} catch (Exception e) {
+			logger.error("Form decryption failed: {}", e.getMessage(), e);
+			return null;
+		}
+	}
+
+	/**
+	 * Decrypts encrypted form data using the CSRF token and extracts a specific ID field from it.
+	 *
+	 * @param cipherText Base64-encoded encrypted form data (iv::encryptedData::salt)
+	 * @param request    HTTP request containing the CSRF token
+	 * @param idKey      JSON key name of the ID to extract
+	 * @return extracted ID as a {@link Long}, or {@code null} if decryption or extraction fails
+	 *
+	 * @author Somanath Singh
+	 * @since 12/06/2025
+	 */
+	public static Long decryptAndExtractId(String cipherText, HttpServletRequest request, String idKey) {
+		try {
+			if (cipherText == null || cipherText.trim().isEmpty()) {
+				throw new Exception("cipherText is null or empty.");
+			}
+
+			String decoded = new String(Base64.getDecoder().decode(cipherText));
+			String[] parts = decoded.split("::");
+
+			if (parts.length != 3) {
+				throw new Exception("Invalid cipherText format.");
+			}
+
+			String iv = parts[0];
+			String encrypted = parts[1];
+			String salt = parts[2];
+
+			String csrf = request.getParameter("_csrf");
+			if (csrf == null || csrf.length() < 16) {
+				throw new Exception("Invalid CSRF token.");
+			}
+
+			String formPsk = csrf.substring(0, 16);
+			AesUtil aesUtil = new AesUtil(128, 1000);
+			String realFormData = aesUtil.decrypt(encrypted, iv, formPsk, salt);
+
+			String decodedFormData = URLDecoder.decode(realFormData, StandardCharsets.UTF_8.toString());
+			JsonNode jsonNode = objectMapper.readTree(decodedFormData);
+
+			if (jsonNode.has(idKey)) {
+				return jsonNode.get(idKey).asLong();
+			} else {
+				throw new Exception(idKey + " not found in decrypted data.");
+			}
+
+		} catch (Exception e) {
+			logger.error("Failed to decrypt and extract {}: {}", idKey, e.getMessage(), e);
+			return null;
+		}
+	}
+}

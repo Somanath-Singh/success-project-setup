@@ -1,0 +1,51 @@
+package com.aashdit.setup.common.utils;
+
+import lombok.Getter;
+
+/**
+ * Represents the various module types in the system along with metadata for code generation.
+ *
+ * <p>Each module type stores:
+ * <ul>
+ *   <li>{@link #prefix} – short string used as module prefix in codes</li>
+ *   <li>{@link #parentModule} – name of parent module (null if top-level parent)</li>
+ *   <li>{@link #sequenceLength} – length of numeric sequence for code generation</li>
+ *   <li>{@link #isPrefixAllowed} – whether module prefix should be included in code</li>
+ * </ul>
+ *
+ * <p>Examples:
+ * <pre>
+ *   ModuleType.PROJECT.getPrefix()        → "PRO"
+ *   ModuleType.ESTIMATION.getParentModule() → "PROJECT"
+ *   ModuleType.SCHOOL.getIsPrefixAllowed() → true
+ * </pre>
+ */
+@Getter
+public enum ModuleType {
+	
+	SCHOOL("SCH", null, 4, true),
+    PROJECT("PRO", null, 4, false),
+    LEGACY("LEG", null, 4, true),
+    ESTIMATION("EST", "PROJECT", 4, true),
+    WORKORDER("WO", "PROJECT", 4, true),
+    INSPECTION("INS", "WORKORDER", 4, true),
+    AUDIT("AUD", "PROJECT", 4, true),
+    MAINTENANCE("MNTR", "PROJECT", 4, true),
+    SITE_SELECTION("SS", "PROJECT", 4, true),
+    ASSIGN_INSPECTION("ASI", "PROJECT", 4, true),
+    ASSIGN_MAINTENANCE("ASM", "PROJECT", 4, true),
+	BUILDING_PLANNING("BPG", null, 2, false);
+
+    private final String prefix;
+    private final String parentModule;
+    private final Integer sequenceLength;
+    private final Boolean isPrefixAllowed;
+    
+	private ModuleType(String prefix, String parentModule, Integer sequenceLength, Boolean isPrefixAllowed) {
+		this.prefix = prefix;
+		this.parentModule = parentModule;
+		this.sequenceLength = sequenceLength;
+		this.isPrefixAllowed = isPrefixAllowed;
+	}
+    
+}
